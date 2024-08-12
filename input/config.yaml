@@ -1,4 +1,4 @@
-# output_type: landbosse  # What kind of output file should be written. Options are landbosse, sqlite and None
+# output_type: landbosse  # What kind of output file should be written. Options are landbosse, sqlite and None (default)
 output_directory: ./output  # Where should the output files be saved
 model_directory: ./csm/model  # Where are files defining the cost and scaling models saved
 landbosse_template_path: ./input/landbosse_input_template.xlsx
