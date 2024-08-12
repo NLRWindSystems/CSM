@@ -1,0 +1,57 @@
+# output_type: landbosse  # What kind of output file should be written. Options are landbosse, sqlite and None
+output_directory: ./output  # Where should the output files be saved
+model_directory: ./csm/model  # Where are files defining the cost and scaling models saved
+landbosse_template_path: ./input/landbosse_input_template.xlsx
+
+parameters:
+  # Enter parameter values to test
+  # Values can be entered as:
+  # - a single scalar (e.g. 5)
+  # - a list of options (e.g. [5, 6, 7])
+  # - [[start, end], count] - evenly spaced values including the start and end (e.g. [[5, 9], 5] -> [5, 6, 7, 8, 9])
+
+  pc:
+    model: empirical_2024
+    hub_height: 150
+    rotor_efficiency_max: .9
+    turbine_rating_MW: 6.2
+    rotor_diameter: [150, 162, 172]
+    tip_speed_max: [80, 85, 90]
+
+
+  ppinchuck:
+    num_bearings: 2
+    num_blades: 3
+    tip_speed_max: [80, 85, 90]
+    BOS_cost: 0
+
+    onshore:
+      model: [empirical_2020, empirical_2030]
+      rotor_diameter: [[162, 192], 2]
+      rotor_efficiency_max: .9
+      turbine_rating_MW: [6.2, 7.2]
+      hub_height: 150
+
+    offshore:
+      model: [empirical_2020, empirical_2030]
+      rotor_diameter: [[100, 300], 5]
+      rotor_efficiency_max: [.7, .8, .9, 1.0]
+      turbine_rating_MW: [15, 18, 21, 24]
+      small:
+        hub_height: [140, 160, 180, 200, 220, 240]
+      big:
+        hub_height: [300, 350, 400]
+
+
+  "2015":
+    model: [replicate_2015, replicate_2015_excel]
+    num_blades: 3
+    num_bearings: 2
+    onboard_crane_present: [True, False]
+    blade_has_carbon: [True, False]
+    turbine_class: [1, 2, 3]
+    rotor_efficiency_max: 0.95
+    tip_speed_max: 80
+    rotor_diameter: [150, 160, 170, 180, 190, 200]
+    turbine_rating_kW: [5600.0, 6000.0, 6200.0, 6800.0, 7200.0]
+    hub_height: [120, 130, 140, 150, 160, 170, 180, 190, 200]
