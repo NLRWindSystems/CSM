@@ -148,10 +148,13 @@ def nacelle_lift_height(hub_height):
 @util.multi_output
 def tower_section_data(tower_mass, hub_height, num_tower_sections):
 
-    # simplifying assumption - assume top tower section is 1/3 mass of bottom tower section
+    # Assume all tower sections are of equal height
     section_height = hub_height / num_tower_sections
 
+    # Ratio between the diameters of the top and bottom of the tower
     top_bottom_ratio = 0.6
+
+    # Assume the diameter of the tower decreases linearly from the base to the hub and the mass of the sections decrease accordingly
     section_mass_relative = np.linspace(
         start=1.0, stop=top_bottom_ratio, num=num_tower_sections
     )
