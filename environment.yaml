@@ -1,0 +1,13 @@
+name: csm
+
+channels:
+  - conda-forge
+  - defaults
+
+dependencies:
+  - python
+  - openpyxl
+  - pandas
+  - numpy
+  - pyyaml
+  - tqdm
