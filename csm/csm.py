@@ -15,7 +15,7 @@ class CostAndScalingModel:
         self.module = csm_module
 
         # Name of the CSM which corresponds to the name of the .py file containing the model equations
-        self.name = csm_module.__name__
+        self.name = csm_module.__name__.split(".")[-1]
 
         # Some CSM functions return a table with multiple rows for each input row.
         # These need to be returned as separate dataframes and are stored in this dict, keyed by the function name
