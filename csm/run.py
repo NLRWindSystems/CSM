@@ -74,7 +74,7 @@ def create_model_output(
         config["output_directory"] = Path(config.get("output_directory", "./output"))
         
         if output_file_type not in func_create_output_lookup.keys():
-            raise Exception(
+            raise KeyError(
                 f"Invalid output file type: '{output_file_type:s}'. Allowable values are {", ".join(func_create_output_lookup.keys())} or None",
             )
         func_create_output = func_create_output_lookup[output_file_type]

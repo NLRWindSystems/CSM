@@ -24,9 +24,6 @@ class CostAndScalingModel:
         # dict containing the CSM functions
         self.functions = dict(inspect.getmembers(csm_module, inspect.isfunction))
 
-        if len(self.functions) == 0:
-            raise Exception(f"Could not find any functions in the cost and scaling model {self.name:s}. Something went wrong.")
-
         # CSM function arguments
         function_args_unordered = {
             n: set(getattr(f, "_args", inspect.getfullargspec(f).args))
@@ -102,7 +99,7 @@ class CostAndScalingModel:
             
             # If we do a full loop over the remaining unordered functions without any changes being made, it is likely there is a recursive function definition
             if not update_made:
-                raise Exception(f"Check if the any of the following parameters are recursively defined:\n\t{", ".join(function_args_unordered.keys()):s}")
+                raise RecursionError(f"Check if the any of the following parameters are recursively defined:\n\t{", ".join(function_args_unordered.keys()):s}")
         
         return function_args_ordered
 
@@ -124,7 +121,7 @@ class CostAndScalingModel:
         # Check if any of the required inputs are missing
         missing_inputs = self.parameter_inputs.difference(param_data.columns)
         if bool(missing_inputs):
-            raise Exception(
+            raise KeyError(
                 f"{self.name:s}: the following required inputs or functions are missing:\n\t{", ".join(missing_inputs)}"
             )
         
