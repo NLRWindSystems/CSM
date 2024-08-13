@@ -53,10 +53,7 @@ def create_model_output(
 
     Yields:
         Generator[tuple] | Generator[Path]: either the model results returned directly or the paths to the output files
-    """
-
-    # The type of output file to write
-    output_file_type = config.get("output_type", None)
+    """    
 
     # Lookup to get which function should be used to create the output file
     func_create_output_lookup = {
@@ -64,7 +61,7 @@ def create_model_output(
         "sqlite": io.generate_output_sqlite,
     }
 
-    if output_file_type is None:
+    if (output_file_type := config.get("output_type", None)) is None:
         # if there is no output file type, simply return the results from the model(s)
         for r in model_result:
             yield r

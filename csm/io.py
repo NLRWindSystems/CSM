@@ -49,8 +49,7 @@ def read_model_input(
         if model_name is None:
             raise KeyError("All inputs must indicate which model should be used.")
 
-        model_module = config["csm_modules"].get(model_name)
-        if model_module is None:
+        if (model_module := config["csm_modules"].get(model_name)) is None:
             raise KeyError(f"Could not find equation definitions for {model_name:s}")
 
         param_input_model = (
@@ -73,8 +72,7 @@ def read_input_parameters(
         Generator[dict]: generator of invividual scenario parameter kwargs
     """
 
-    parameter_inputs = config.get("parameters")
-    if parameter_inputs is None:
+    if (parameter_inputs := config.get("parameters")) is None:
         raise KeyError("Must specify parameters in the configuration file.")
 
     parameter_inputs = util.expand_dict_of_dicts(parameter_inputs)
@@ -173,8 +171,7 @@ def convert_csm_output_to_landbosse(
 
     o = model_output_single
 
-    ts = model_output_multiple.get("tower_section_data")
-    if ts is None:
+    if (ts := model_output_multiple.get("tower_section_data")) is None:
         raise KeyError(
             f"{model_name:s}: tower_section_data is required to create a LandBOSSE input sheet. You may need to add a function to generate it."
         )
@@ -297,10 +294,6 @@ def read_input_template_landbosse(config: dict) -> dict:
     path_landbosse_template = config.get(
         param_land_landbosse_template, "./input/landbosse_input_template.xlsx"
     )
-    if path_landbosse_template is None:
-        raise OSError(
-            f"In order to produce LandBOSSE output, a template LandBOSSE input file must be specified using {param_land_landbosse_template:s} in the configuration file.",
-        )
     return pd.read_excel(path_landbosse_template, sheet_name=None)
 
 
