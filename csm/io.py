@@ -63,7 +63,7 @@ def read_input_parameters() -> Generator[dict]:
     parameter_inputs = map(util.expand_dict_of_lists, parameter_inputs)
     parameter_inputs = itertools.chain(*parameter_inputs)
 
-    return parameter_inputs
+    yield from parameter_inputs
 
 
 def generate_output_landbosse(
