@@ -24,7 +24,7 @@ def read_model_input(
     config: dict,
 ) -> Generator[tuple]:
     """Read input parameter scenarios from the config file.
-    Parameters defined by a list of options will test all possible combinations of the values
+    Parameters defined by a list of options will test all possible combinations of the list of values
 
     Args:
         config (dict): configuration
