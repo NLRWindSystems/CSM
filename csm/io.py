@@ -9,16 +9,34 @@ import operator
 from collections.abc import Generator
 import sqlite3
 from tqdm import tqdm
+import yaml
 
 
-def read_model_input() -> Generator[tuple]:
-    """Read input parameter scenarios from the config file
+def read_config(
+    path_config: str = "./input/config.yaml",
+) -> dict:
+    with open(path_config, "r") as f:
+        config = yaml.safe_load(f)
+    return config
+
+
+def read_model_input(
+    config: dict,
+) -> Generator[tuple]:
+    """Read input parameter scenarios from the config file.
+    Parameters defined by a list of options will test all possible combinations of the values
+
+    Args:
+        config (dict): configuration
 
     Yields:
         Generator[tuple]: tuple of model name and input parameter dataframe for the model
     """
 
-    param_input = read_input_parameters()
+    param_input = read_input_parameters(config)
+
+    # Import the modules in the csm module location into the config dict
+    config["csm_modules"] = util.get_csm_modules(config)
 
     # The input dicts can theoreticaly appear in any order
     # Using itertools.groupby to organize inputs by model requires them to be sorted before grouping
@@ -31,12 +49,9 @@ def read_model_input() -> Generator[tuple]:
         if model_name is None:
             raise Exception("All inputs must indicate which model should be used.")
 
-        # Handle inputs where model name does not correspond to an existing model definition file
-        if model_name not in csm.csm_models.keys():
-            path_model_file = Path(util.conf["model_directory"]) / (model_name + ".py")
-            raise Exception(
-                f"Model {model_name:s} requires a corresponding file {str(path_model_file):s}"
-            )
+        model_module = config["csm_modules"].get(model_name)
+        if model_module is None:
+            raise Exception(f"Could not find equation definitions for {model_name:s}")
 
         param_input_model = (
             pd.DataFrame(param_input_model)
@@ -44,18 +59,21 @@ def read_model_input() -> Generator[tuple]:
             .rename_axis("scenario_number", axis=0)
             .rename_axis("parameter", axis=1)
         )
-        yield model_name, param_input_model
+        yield model_module, param_input_model
 
 
-def read_input_parameters() -> Generator[dict]:
-    """Read parameters defined in the config file into a generator of dicts containing kwargs to the model(s)
+def read_input_parameters(
+    config: dict,
+) -> Generator[dict]:
+    """Read parameters defined in the config into a generator of dicts containing kwargs to the model(s)
     Different scenarios can be defined as dicts within the input, and all possible combinations of parameter values
     will be run for each scenario. More nested parameter definitions will override less nested ones
 
-    Returns:
+    Yields:
         Generator[dict]: generator of invividual scenario parameter kwargs
     """
-    parameter_inputs = util.conf.get("parameters")
+
+    parameter_inputs = config.get("parameters")
     if parameter_inputs is None:
         raise Exception("Must specify parameters in the configuration file.")
 
@@ -67,9 +85,9 @@ def read_input_parameters() -> Generator[dict]:
 
 
 def generate_output_landbosse(
-    output_directory: Path,
     model_name: str,
     model_output: tuple,
+    config: dict,
 ) -> Generator[Path]:
     """Convert CSM model outputs to LandBOSSE format and save the LandBOSSE excel files
     LandBOSSE requires more inputs than the cost and scaling model generates, so a template containing
@@ -77,9 +95,9 @@ def generate_output_landbosse(
     Files are written sequentially. It is a very ugly and slow process
 
     Args:
-        output_directory (Path): directory to save results
         model_name (str): name of CSM
         model_output (tuple): results from CSM
+        config (dict): config
 
     Yields:
         Generator[Path]: Path of the saved files
@@ -87,7 +105,7 @@ def generate_output_landbosse(
 
     landbosse_input = convert_csm_output_to_landbosse(model_name, model_output)
 
-    lb = read_input_template_landbosse()
+    lb = read_input_template_landbosse(config)
 
     lb_components = lb.pop("components")
 
@@ -98,7 +116,7 @@ def generate_output_landbosse(
         total=lb_scenario_groups.ngroups,
     )
 
-    model_output[0].to_csv(output_directory / f"{model_name:s}_summary.csv")
+    model_output[0].to_csv(config["output_directory"] / f"{model_name:s}_summary.csv")
 
     for scenario_number, lb_grp in lb_scenario_groups:
 
@@ -118,7 +136,9 @@ def generate_output_landbosse(
             ] = lb_components.loc[component_first_row.name, other_columns].values
 
         path_output = (
-            output_directory / "scenario" / f"{model_name:s}_{scenario_number:d}.xlsx"
+            config["output_directory"]
+            / "scenario"
+            / f"{model_name:s}_{scenario_number:d}.xlsx"
         )
 
         lb_grp = lb_grp[lb_components.columns]
@@ -236,23 +256,23 @@ def convert_csm_output_to_landbosse(
 
 
 def generate_output_sqlite(
-    output_directory: Path,
     model_name: str,
     model_output: tuple,
+    config: dict,
 ) -> Generator[Path]:
     """Saves CSM output to sqlite, in case it is needed.
     Yields instead of returns to match the LandBOSSE output function
 
     Args:
-        output_directory (Path): where the file will be saved
         model_name (str): name of model. used for filename
         model_output (tuple): results from model
+        config (dict): configuration settings
 
     Yields:
         Generator[Path]: path to saved sqlite file
     """
 
-    file_path = output_directory / (model_name + ".sqlite")
+    file_path = config["output_directory"] / (model_name + ".sqlite")
 
     model_summary, model_details = model_output
 
@@ -272,9 +292,11 @@ def generate_output_sqlite(
     yield file_path
 
 
-def read_input_template_landbosse() -> dict:
+def read_input_template_landbosse(config: dict) -> dict:
     param_land_landbosse_template = "landbosse_template_path"
-    path_landbosse_template = util.conf.get(param_land_landbosse_template)
+    path_landbosse_template = config.get(
+        param_land_landbosse_template, "./input/landbosse_input_template.xlsx"
+    )
     if path_landbosse_template is None:
         raise Exception(
             f"In order to produce LandBOSSE output, a template LandBOSSE input file must be specified using {param_land_landbosse_template:s} in the configuration file.",

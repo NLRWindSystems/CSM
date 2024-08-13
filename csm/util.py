@@ -3,21 +3,9 @@ import pandas as pd
 import numpy as np
 import functools
 import inspect
-import yaml
 import importlib
 from pathlib import Path
 from collections.abc import Generator
-
-
-def read_config(
-    path_config: str = "./input/config.yaml",
-) -> dict:
-    with open(path_config, "r") as f:
-        config = yaml.safe_load(f)
-    return config
-
-
-conf = read_config()
 
 
 def exclude_output(f):
@@ -49,17 +37,12 @@ def multi_output(f):
     return wrapper
 
 
-def import_csm_models(
-    dir_models: str = conf.get("model_directory", "./csm/model"),
+def get_csm_modules(
+    config: dict,
 ) -> None:
-    """Dynamically import all .py files in the models_directory folder as cost and scaling models
+    """Dynamically import all .py files in the models_directory folder as cost and scaling models"""
 
-    Args:
-        dir_models (str, optional): directory to look for models. Defaults to conf.get("model_directory", "./csm/model").
-
-    """
-
-    dir_models = Path(dir_models)
+    dir_models = Path(config.get("model_directory", "./csm/model"))
 
     csm_modules = dict()
 

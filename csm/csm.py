@@ -1,29 +1,28 @@
-import csm
-
 import inspect
 import itertools
 import numpy as np
 import pandas as pd
 import warnings
 import inspect
+import types
 from collections import OrderedDict
 
 class CostAndScalingModel:
 
-    def __init__(self, name):
+    def __init__(self, csm_module: types.ModuleType):
 
-        if name is None:
-            raise Exception("Must provide a model name")
+        # Module containng cms functions
+        self.module = csm_module
+
+        # Name of the CSM which corresponds to the name of the .py file containing the model equations
+        self.name = csm_module.__name__
 
         # Some CSM functions return a table with multiple rows for each input row.
         # These need to be returned as separate dataframes and are stored in this dict, keyed by the function name
         self.multi_ouputs = dict()
 
-        # Name of the CSM which corresponds to the name of the .py file containing the model equations
-        self.name = name
-
         # dict containing the CSM functions
-        self.functions = dict(inspect.getmembers(csm.csm_models[self.name], inspect.isfunction))
+        self.functions = dict(inspect.getmembers(csm_module, inspect.isfunction))
 
         if len(self.functions) == 0:
             raise Exception(f"Could not find any functions in the cost and scaling model {self.name:s}. Something went wrong.")

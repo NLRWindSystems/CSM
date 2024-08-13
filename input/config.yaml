@@ -1,7 +1,7 @@
-# output_type: landbosse  # What kind of output file should be written. Options are landbosse, sqlite and None (default)
-output_directory: ./output  # Where should the output files be saved
-model_directory: ./csm/model  # Where are files defining the cost and scaling models saved
-landbosse_template_path: ./input/landbosse_input_template.xlsx
+# output_type: sqlite # What kind of output file should be written. Options are landbosse, sqlite and None (default)
+output_directory: ./output # Where should the output files be saved. defaults to ./output
+model_directory: ./csm/model # Where are files defining the cost and scaling models saved. defaults to ./csm/model
+landbosse_template_path: ./input/landbosse_input_template.xlsx # default ./input/landbosse_input_template.xlsx
 
 parameters:
   # Enter parameter values to test
@@ -17,7 +17,6 @@ parameters:
     turbine_rating_MW: 6.2
     rotor_diameter: [150, 162, 172]
     tip_speed_max: [80, 85, 90]
-
 
   ppinchuck:
     num_bearings: 2
@@ -41,7 +40,6 @@ parameters:
         hub_height: [140, 160, 180, 200, 220, 240]
       big:
         hub_height: [300, 350, 400]
-
 
   "2015":
     model: [replicate_2015, replicate_2015_excel]
