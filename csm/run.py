@@ -32,7 +32,7 @@ def run(
 
 
 def generate_model_result(
-    model_input: Generator,
+    model_input: Generator[tuple],
 ) -> Generator[tuple]:
     
     for module, data in model_input:
