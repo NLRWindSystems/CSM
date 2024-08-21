@@ -1,9 +1,7 @@
-from .__core__ import (
+from .replicate_2015 import (
     rotor_angular_velocity_max,
     swept_area,
     rotor_radius,
-)
-from .replicate_2015 import (
     hub_mass,
     pitch_system_mass,
     spinner_mass,
@@ -30,7 +28,7 @@ def blade_mass(rotor_diameter, blade_has_carbon, turbine_class):
         if blade_has_carbon:
             b = 2.47
         else:
-            b = 2.56  # different to code
+            b = 2.56  # different to python version
     else:
         if blade_has_carbon:
             b = 2.44

@@ -1,5 +1,5 @@
 import numpy as np
-from .. import util
+import pandas as pd
 
 from .__core__ import (
     rotor_angular_velocity_max,
@@ -145,8 +145,8 @@ def nacelle_lift_height(hub_height):
     return hub_height + 2.0
 
 
-@util.multi_output
-def tower_section_data(tower_mass, hub_height, num_tower_sections):
+# @util.multi_output
+def multi_tower_section_data(tower_mass, hub_height, num_tower_sections):
 
     # Assume all tower sections are of equal height
     section_height = hub_height / num_tower_sections
@@ -163,14 +163,16 @@ def tower_section_data(tower_mass, hub_height, num_tower_sections):
     section_number = np.arange(num_tower_sections) + 1
     lever_arm_length = (section_number - 0.5) * hub_height / num_tower_sections
 
-    return {
-        "section_number": section_number,
-        "height": section_height,
-        "mass": section_mass_relative * tower_mass,
-        "surface_area": 4.3 * section_height,
-        "lift_height": section_number * section_height,
-        "lever_arm_length": lever_arm_length,
-    }
+    return pd.DataFrame(
+        data={
+            "height": section_height,
+            "mass": section_mass_relative * tower_mass,
+            "surface_area": 4.3 * section_height,
+            "lift_height": section_number * section_height,
+            "lever_arm_length": lever_arm_length,
+        },
+        index=pd.Index(section_number, name="section_number"),
+    )
 
 
 # [ROTOR]

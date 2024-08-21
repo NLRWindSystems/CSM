@@ -4,7 +4,7 @@ from .empirical_2020 import (
     rotor_angular_velocity_max,
     swept_area,
     rotor_radius,
-    tower_section_data,
+    multi_tower_section_data,
     num_tower_sections,
     nacelle_mass,
     rotor_mass,
