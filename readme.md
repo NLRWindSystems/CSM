@@ -56,6 +56,20 @@ def blade_cost(blade_mass_kg):
 
 The model will complain because it isn't smart enough to recognize that `blade_mass` is equivalent to `blade_mass_kg`.
 
+This also means that all the input arguments must be explicity named. For example, a function such as:
+
+```
+def turbine_mass(nacelle_mass, tower_mass, rotor_mass):
+    return nacelle_mass + tower_mass + rotor_mass
+```
+
+Cannot be shortened to
+
+```
+def turbine_mass(*args)
+    return sum(args)
+```
+
 It is important to avoid recursively defined functions, for example:
 
 ```
