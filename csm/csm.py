@@ -155,6 +155,38 @@ class CostAndScalingModel:
 
         return param_data, param_data_multi
 
+        
+
+    def display_categorized_params(self):
+        
+        param_input = self.parameter_inputs
+        param_output = set(self.function_args.keys()).difference(itertools.chain.from_iterable(self.function_args.values()))
+        param_intermediate = self.parameter_outputs.difference(param_input)
+
+        param_input = sorted(param_input)
+        param_intermediate = sorted(param_intermediate)
+        param_output = sorted(param_output)
+
+        params = (param_input, param_intermediate, param_output)
+        column_width = max(map(lambda p: max(map(len, p)), params))
+        params = tuple(map(
+            lambda p: tuple(map(lambda pi: pi.ljust(column_width), p)),
+            params,
+            ))
+
+        csep = "\t"
+        rsep = "\n"
+        header = csep.join(map(lambda s: s.ljust(column_width), ("Input", "Intermediate", "Output")))
+        border = "="*len(header.expandtabs())
+        num_rows = max(map(len, params))
+
+        content = itertools.zip_longest(itertools.repeat(csep, num_rows), *params, fillvalue=" "*column_width)
+        content = tuple(content)
+        content = rsep.join(map(lambda c: "{1:s}{0:s}{2:s}{0:s}{3:s}".format(*c), content))
+        table = rsep.join((header, border, content, border))
+
+        print(table)
+
 
     def get_parameter_calculation_order(self, function_args_unordered: dict) -> OrderedDict:
         """Many of the functions in a cost and scaling model will most likely refer to other functions. For example consider the following equations:
