@@ -1,58 +1,49 @@
 import itertools
-import pandas as pd
 import numpy as np
-import functools
-import inspect
 import importlib
 from pathlib import Path
 from collections.abc import Generator
-
-
-def exclude_output(f):
-    """Wrapper to exclude a particular function from the output results."""
-
-    @functools.wraps(f)
-    def wrapper(*args, **kwargs):
-        return f(*args, **kwargs)
-
-    wrapper._exclude = True
-    return wrapper
-
-
-def multi_output(f):
-    """Decorator to flag a function returns multiple rows of output for each row of input
-    Since the number of rows generated per input row can vary this is not vectorized"""
-
-    @functools.wraps(f)
-    def wrapper(data):
-
-        result = pd.concat(
-            objs=map(lambda r: pd.DataFrame(f(**r)), data.to_dict("records")),
-            keys=data.index,
-        )
-        result.index = result.index.set_names(f"{f.__name__:s}_index", level=-1)
-        return result
-
-    wrapper._args = inspect.getfullargspec(f).args
-    return wrapper
+import os
 
 
 def get_csm_modules(
-    config: dict,
+    dir_models: Path | str | None = None,
+    model_name: list | tuple | str | None = None,
 ) -> None:
     """Dynamically import all .py files in the models_directory folder as cost and scaling models"""
 
-    dir_models = Path(config.get("model_directory", "./csm/model"))
+    DIR_MODELS_DEFAULT = "./csm/model"
 
-    csm_modules = dict()
+    wd = os.getcwd()
 
-    # Load all non-dunder modules in the directory
-    for p in dir_models.glob("[!__]*[!__].py"):
-        model_name = p.stem
-        csm_modules[model_name] = importlib.import_module(
-            name=f".{model_name:s}",
+    if isinstance(dir_models, str):
+        dir_models = Path(dir_models)
+    elif isinstance(dir_models, dict):
+        dir_models = Path(dir_models.get("model_directory", DIR_MODELS_DEFAULT))
+    else:
+        os.chdir(Path(__file__).parent.parent)
+        dir_models = Path(DIR_MODELS_DEFAULT)
+
+    if isinstance(model_name, str):
+        modules_to_import = [model_name]
+    else:
+        modules_to_import = dir_models.glob("[!__]*[!__].py")
+        modules_to_import = (p.stem for p in modules_to_import)
+        if isinstance(model_name, (list, tuple)):
+            modules_to_import = (m for m in modules_to_import if m in model_name)
+
+    csm_modules = {
+        m: importlib.import_module(
+            name=f".{m:s}",
             package=".".join(dir_models.parts),
         )
+        for m in modules_to_import
+    }
+
+    os.chdir(wd)
+
+    if len(csm_modules) == 0:
+        raise ImportError("No CSM modules found.")
 
     return csm_modules
 
