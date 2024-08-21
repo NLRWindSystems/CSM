@@ -1,3 +1,5 @@
+from . import util
+
 import inspect
 import itertools
 import numpy as np
@@ -7,10 +9,22 @@ import inspect
 import types
 from collections import OrderedDict
 import itertools
+from pathlib import Path
 
 class CostAndScalingModel:
 
-    def __init__(self, csm_module: types.ModuleType):
+    def __init__(
+            self,
+            csm_module: types.ModuleType | str,
+            dir_module: Path | str | None = None,
+        ):
+
+        # If the input is a string, assume it is the name of a model
+        if isinstance(csm_module, str):
+            csm_module = util.get_csm_module(
+                csm_module,
+                dir_module,
+                )
 
         # Module containng csm functions
         self.module = csm_module
