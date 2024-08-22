@@ -79,28 +79,23 @@ class CostAndScalingModel:
             return set(self.generate_required_params(param_name))
         
 
-    def calculate_single_param(
-            self,
-            param_to_calculate: str,
-            **known_args,
+    def calculate_parameter(
+        self,
+        param_to_calculate: str,
+        **known_args,
     ):
-        
-        required_args = self.required_inputs_to_calculate(param_to_calculate)
-        missing_args = required_args.difference(known_args.keys())
-        if bool(missing_args):
-            raise KeyError(f"The following parameters are required to calculate {param_to_calculate:s}:\n\t{", ".join(missing_args)}")
 
         if param_to_calculate in known_args.keys():
             return known_args[param_to_calculate]
-        
+
         else:
             return self.functions[param_to_calculate](**{
-                a: self.calculate_single_param(a, **known_args)
+                a: self.calculate_parameter(a, **known_args)
                 for a in self.function_args[param_to_calculate]
             })
 
 
-    def calculate_all_params(self, param_data):
+    def calculate_parameters(self, param_data):
 
         if isinstance(param_data, pd.DataFrame):
             input_param_names = param_data.columns
