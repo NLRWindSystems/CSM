@@ -37,7 +37,7 @@ def generate_model_result(
     
     for module, data in model_input:
         model = CostAndScalingModel(module)
-        result = model.calculate_all_params(data)
+        result = model.calculate_parameters(data)
         yield model.name, result
 
 
