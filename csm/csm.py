@@ -58,6 +58,9 @@ class CostAndScalingModel:
         # Ordered dict containing{function_name: function_arguments} pairs ordered such that each can be calculated from a single loop of the dict
         self.function_args = self.get_parameter_calculation_order(function_args_unordered)
 
+    def __repr__(self):
+        return f"{self.__class__.__name__:s}({self.name:s})"
+
     def get_parameter_inputs(self):
         return self.parameter_inputs
 
