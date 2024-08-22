@@ -4,19 +4,20 @@ import importlib
 from pathlib import Path
 from collections.abc import Generator
 import os
+import types
 
 
 def get_csm_module(
     model_name: list | tuple | str | None = None,
     dir_models: Path | str | None = None,
-):
+) -> types.ModuleType:
     return get_csm_modules(dir_models=dir_models, model_name=model_name)[model_name]
 
 
 def get_csm_modules(
     model_name: list | tuple | str | None = None,
-    dir_models: Path | str | None = None,
-) -> None:
+    dir_models: str | Path | None = None,
+) -> dict:
     """Dynamically import all .py files in the models_directory folder as cost and scaling models"""
 
     DIR_MODELS_DEFAULT = "./csm/model"
