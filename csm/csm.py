@@ -13,6 +13,11 @@ from pathlib import Path
 
 class CostAndScalingModel:
 
+    @classmethod
+    def get_available_models(cls, dir_models: str | Path | None = None) -> dict:
+        model_names = util.get_csm_modules(dir_models=dir_models)
+        return model_names
+
     def __init__(
             self,
             csm_module: types.ModuleType | str,
