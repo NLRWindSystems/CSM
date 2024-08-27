@@ -13,7 +13,16 @@ def get_csm_module(
     model_name: list | tuple | str | None = None,
     dir_models: Path | str | None = None,
 ) -> types.ModuleType:
-    return get_csm_modules(dir_models=dir_models, model_name=model_name)[model_name]
+
+    csm_module = get_csm_modules(
+        dir_models=dir_models,
+        model_name=model_name,
+    ).get(model_name)
+    if csm_module is None:
+        raise ImportError(
+            f"Could not find a cost and scaling model with name {model_name:s}."
+        )
+    return csm_module
 
 
 def get_csm_modules(
@@ -21,8 +30,6 @@ def get_csm_modules(
     dir_models: str | Path | None = None,
 ) -> dict:
     """Dynamically import all .py files in the models_directory folder as cost and scaling models"""
-
-    DIR_MODELS_DEFAULT = "./csm/model"
 
     wd = os.getcwd()
 
@@ -42,20 +49,32 @@ def get_csm_modules(
         if isinstance(model_name, (list, tuple)):
             modules_to_import = (m for m in modules_to_import if m in model_name)
 
-    csm_modules = {
-        m: importlib.import_module(
-            name=f".{m:s}",
-            package=".".join(dir_models.parts),
-        )
-        for m in modules_to_import
-    }
+    csm_modules = {m: import_module(m, dir_models) for m in modules_to_import}
+
+    if len(csm_modules) == 0:
+        raise ImportError(f"No CSM modules found in {str(dir_models):s}")
 
     os.chdir(wd)
 
-    if len(csm_modules) == 0:
-        raise ImportError("No CSM modules found.")
-
     return csm_modules
+
+
+def import_module(
+    name: str,
+    location: Path,  # relative to cwd
+) -> types.ModuleType:
+
+    if len(location.parts) > 0:
+        location_relative = ".".join(location.parts)
+    else:
+        location_relative = str(location)
+
+    try:
+        return importlib.import_module(name=f".{name:s}", package=location_relative)
+    except ModuleNotFoundError:
+        raise Exception(
+            f"Failed to import {name:s}.py from {str(location.resolve()):s}",
+        )
 
 
 def expand_dict_of_dicts(
