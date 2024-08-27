@@ -248,8 +248,12 @@ def controls_cost(turbine_rating_MW):
     return 1092.0 * turbine_rating_MW * 21.15
 
 
-def electrical_connections_cost(turbine_rating_MW):
+def electrical_connection_cost(turbine_rating_MW):
     return 1092.0 * turbine_rating_MW * 41.85
+
+
+# def nacelle_cost(*args):
+#     return sum(args)
 
 
 def nacelle_cost(
@@ -266,7 +270,7 @@ def nacelle_cost(
     hvac_cost,
     nacelle_cover_cost,
     controls_cost,
-    electrical_connections_cost,
+    electrical_connection_cost,
 ):
     return (
         low_speed_shaft_cost
@@ -282,7 +286,7 @@ def nacelle_cost(
         + hvac_cost
         + nacelle_cover_cost
         + controls_cost
-        + electrical_connections_cost
+        + electrical_connection_cost
     )
 
 

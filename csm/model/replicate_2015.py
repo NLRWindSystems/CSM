@@ -5,7 +5,7 @@ from .__core__ import (
 )
 
 from .empirical_2020 import (
-    multi_tower_section_data,
+    tower_section_data,
     num_tower_sections,
     nacelle_lift_height,
     nacelle_surface_area,
