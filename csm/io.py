@@ -222,10 +222,13 @@ def convert_csm_output_to_landbosse(
     )
     component_rows_blade = component_rows_blade.set_axis(columns_landbosse, axis=1)
 
-    ts = ts.reset_index(level=-1).set_index(
-        ts["section_number"].map("Tower section {:d}".format).rename("Component"),
-        append=True,
-    )
+    ts.index = ts.index.set_levels(
+        ts.index.levels[ts.index.names.index("tower_section_id")].map(
+            "Tower section {:d}".format
+        ),
+        level="tower_section_id",
+    ).rename("Component", level="tower_section_id")
+
     component_rows_tower_section = (
         ts["mass"] / 1000.0,
         ts["lift_height"],

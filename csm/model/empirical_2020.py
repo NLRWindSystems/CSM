@@ -145,8 +145,7 @@ def nacelle_lift_height(hub_height):
     return hub_height + 2.0
 
 
-# @util.multi_output
-def multi_tower_section_data(tower_mass, hub_height, num_tower_sections):
+def tower_section_data(tower_mass, hub_height, num_tower_sections) -> pd.DataFrame:
 
     # Assume all tower sections are of equal height
     section_height = hub_height / num_tower_sections
@@ -171,7 +170,7 @@ def multi_tower_section_data(tower_mass, hub_height, num_tower_sections):
             "lift_height": section_number * section_height,
             "lever_arm_length": lever_arm_length,
         },
-        index=pd.Index(section_number, name="section_number"),
+        index=pd.Index(section_number, name="tower_section_id"),
     )
 
 
