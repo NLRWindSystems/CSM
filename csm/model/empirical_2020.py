@@ -146,7 +146,6 @@ def nacelle_lift_height(hub_height):
 
 
 def tower_section_data(tower_mass, hub_height, num_tower_sections) -> pd.DataFrame:
-
     # Assume all tower sections are of equal height
     section_height = hub_height / num_tower_sections
 

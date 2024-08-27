@@ -23,16 +23,15 @@ parameters:
     num_blades: 3
     tip_speed_max: [80, 85, 90]
     BOS_cost: 0
+    model: [empirical_2020, empirical_2030]
 
-    onshore:
-      model: [empirical_2020, empirical_2030]
-      rotor_diameter: [[162, 192], 2]
+    A:
+      rotor_diameter: [[162, 192], 4]
       rotor_efficiency_max: .9
       turbine_rating_MW: [6.2, 7.2]
       hub_height: 150
 
-    offshore:
-      model: [empirical_2020, empirical_2030]
+    B:
       rotor_diameter: [[100, 300], 5]
       rotor_efficiency_max: [.7, .8, .9, 1.0]
       turbine_rating_MW: [15, 18, 21, 24]

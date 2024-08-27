@@ -1,10 +1,11 @@
-import itertools
-import numpy as np
 import importlib
-from pathlib import Path
-from collections.abc import Generator
+import itertools
 import os
 import types
+from collections.abc import Generator
+from pathlib import Path
+
+import numpy as np
 
 DIR_MODELS_DEFAULT = "./csm/model"
 
@@ -13,7 +14,6 @@ def get_csm_module(
     model_name: list | tuple | str | None = None,
     dir_models: Path | str | None = None,
 ) -> types.ModuleType:
-
     csm_module = get_csm_modules(
         dir_models=dir_models,
         model_name=model_name,
@@ -63,7 +63,6 @@ def import_module(
     name: str,
     location: Path,  # relative to cwd
 ) -> types.ModuleType:
-
     if len(location.parts) > 0:
         location_relative = ".".join(location.parts)
     else:
@@ -102,10 +101,8 @@ def expand_dict_of_dicts(
             non_dict_entries[k] = v
 
     if len(dict_entries) > 0:
-
         # For each dict element, recursively expand it's contents, appending the upstream dict keys
         for k, v in dict_entries.items():
-
             k = str(k)  # convert key to string if not already
 
             if upstream_key is None:
@@ -133,7 +130,6 @@ def dict_list_product(**dict_of_lists) -> Generator[dict]:
     for k in dict_of_lists.keys():
         v = dict_of_lists[k]
         if isinstance(v[0], list):
-
             if not (len(v) == 2 and isinstance(v[1], int)):
                 raise Exception(
                     f"{k:s} - the correct input format is [[start, end], count] where count is an integer. Value entered is {str(v):s}.",

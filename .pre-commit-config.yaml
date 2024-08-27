@@ -7,6 +7,7 @@ repos:
         - id: isort
           name: isort
           stages: [commit]
+          exclude: "./csm/model"
 
 - repo: https://github.com/asottile/pyupgrade
   rev: v3.15.2
@@ -45,4 +46,3 @@ repos:
   -   id: mixed-line-ending
   -   id: pretty-format-json
       args: [--autofix]
-

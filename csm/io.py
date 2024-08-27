@@ -1,20 +1,21 @@
-from . import util
-
-import pandas as pd
-import numpy as np
 import itertools
-from pathlib import Path
 import operator
-from collections.abc import Generator
 import sqlite3
-from tqdm import tqdm
+from collections.abc import Generator
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
 import yaml
+from tqdm import tqdm
+
+from . import util
 
 
 def read_config(
     path_config: str = "./input/config.yaml",
 ) -> dict:
-    return yaml.safe_load(open(path_config, "r"))
+    return yaml.safe_load(open(path_config))
 
 
 def read_model_input(
@@ -41,7 +42,6 @@ def read_model_input(
     param_input = itertools.groupby(param_input, key=operator.itemgetter("model"))
 
     for model_name, param_input_model in param_input:
-
         # Handle inputs with no specified model
         if model_name is None:
             raise KeyError("All inputs must indicate which model should be used.")
@@ -114,7 +114,6 @@ def generate_output_landbosse(
     model_output[0].to_csv(config["output_directory"] / f"{model_name:s}_summary.csv")
 
     for scenario_number, lb_grp in lb_scenario_groups:
-
         lb_grp = lb_grp.reset_index(level="Component").reset_index(drop=True)
 
         other_columns = lb_components.columns.difference(lb_grp.columns)

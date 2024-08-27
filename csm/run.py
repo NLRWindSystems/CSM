@@ -1,8 +1,8 @@
+from collections.abc import Generator
+from pathlib import Path
+
 from . import io
 from .csm import CostAndScalingModel
-
-from pathlib import Path
-from collections.abc import Generator
 
 
 def run_parameter_config(
@@ -21,7 +21,7 @@ def run_parameter_config(
 
     if config is None:
         config = io.read_config()
-    
+
     # If the input is provided in the form of a path to a configuration file, read it
     # Otherwise, the config input is assumed to be a dict of config options
     if isinstance(config, str):
@@ -37,7 +37,6 @@ def run_parameter_config(
 def generate_model_result(
     model_input: Generator[tuple],
 ) -> Generator[tuple]:
-    
     for module, data in model_input:
         model = CostAndScalingModel(module)
         result = model.calculate_parameters(data)
@@ -47,7 +46,7 @@ def generate_model_result(
 def create_model_output(
     model_result: Generator[tuple],
     config: dict,
-    ) -> Generator[tuple] | Generator[Path]:
+) -> Generator[tuple] | Generator[Path]:
     """Create the model output in the specified output format, or return the model results directly if not output specified
 
     Args:
@@ -56,7 +55,7 @@ def create_model_output(
 
     Yields:
         Generator[tuple] | Generator[Path]: either the model results returned directly or the paths to the output files
-    """    
+    """
 
     # Lookup to get which function should be used to create the output file
     func_create_output_lookup = {
@@ -70,15 +69,14 @@ def create_model_output(
             yield r
 
     else:
-
         config["output_directory"] = Path(config.get("output_directory", "./output"))
-        
+
         if output_file_type not in func_create_output_lookup.keys():
             raise KeyError(
                 f"Invalid output file type: '{output_file_type:s}'. Allowable values are {", ".join(func_create_output_lookup.keys())} or None",
             )
         func_create_output = func_create_output_lookup[output_file_type]
-        
+
         # Call the appropriate function on the model results
         for r in model_result:
             yield from func_create_output(*r, config)
