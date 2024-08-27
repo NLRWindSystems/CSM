@@ -6,6 +6,8 @@ from collections.abc import Generator
 import os
 import types
 
+DIR_MODELS_DEFAULT = "./csm/model"
+
 
 def get_csm_module(
     model_name: list | tuple | str | None = None,

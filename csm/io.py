@@ -14,9 +14,7 @@ import yaml
 def read_config(
     path_config: str = "./input/config.yaml",
 ) -> dict:
-    with open(path_config, "r") as f:
-        config = yaml.safe_load(f)
-    return config
+    return yaml.safe_load(open(path_config, "r"))
 
 
 def read_model_input(

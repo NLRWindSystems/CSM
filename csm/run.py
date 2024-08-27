@@ -5,8 +5,8 @@ from pathlib import Path
 from collections.abc import Generator
 
 
-def run(
-    config: str | dict = io.read_config(),
+def run_parameter_config(
+    config: str | dict | None = None,
 ) -> Generator[tuple] | Generator[Path]:
     """Run the cost and scaling model(s) for the input configuration
     Configuration can be entered as a string (path to a config file to read) or a dict
@@ -18,6 +18,9 @@ def run(
     Yields:
         Generator[tuple] | Generator[Path]: model results or paths to saved output files
     """
+
+    if config is None:
+        config = io.read_config()
     
     # If the input is provided in the form of a path to a configuration file, read it
     # Otherwise, the config input is assumed to be a dict of config options
