@@ -16,6 +16,7 @@ class CostAndScalingModel:
     @classmethod
     def get_available_models(cls, dir_models: str | Path | None = None) -> dict:
         model_names = util.get_csm_modules(dir_models=dir_models)
+        model_names = sorted(model_names.keys())
         return model_names
 
     def __init__(
@@ -47,7 +48,7 @@ class CostAndScalingModel:
             }
 
         # All the parameters relevant to the model, whether inputs or outputs
-        self.parameters_all = set(itertools.chain(*function_args_unordered.values()))
+        self.parameters_all = set(itertools.chain(*function_args_unordered.values(), function_args_unordered.keys()))
 
         # Any parameters that are not defined by a function must be provided as inputs
         self.parameter_inputs = self.parameters_all.difference(function_args_unordered.keys())
@@ -58,11 +59,18 @@ class CostAndScalingModel:
         # Ordered dict containing{function_name: function_arguments} pairs ordered such that each can be calculated from a single loop of the dict
         self.function_args = self.get_parameter_calculation_order(function_args_unordered)
 
+
     def __repr__(self):
         return f"{self.__class__.__name__:s}({self.name:s})"
 
-    def get_parameter_inputs(self):
+
+    def get_inputs(self):
         return self.parameter_inputs
+    
+
+    def get_outputs(self):
+        return self.parameter_outputs
+
 
     def generate_required_params(self, param_name: str):
 
@@ -90,6 +98,12 @@ class CostAndScalingModel:
 
         if param_to_calculate in known_args.keys():
             return known_args[param_to_calculate]
+        
+        if param_to_calculate not in self.parameters_all:
+            raise KeyError(f"{param_to_calculate:s} is not a parameter in model {self.name:s}")
+        
+        if param_to_calculate in self.parameter_inputs and param_to_calculate not in known_args.keys():
+            raise KeyError(f"{param_to_calculate:s} is a required input for model {self.name:s}")
 
         else:
             return self.functions[param_to_calculate](**{
@@ -99,6 +113,8 @@ class CostAndScalingModel:
 
 
     def calculate_parameters(self, param_data):
+
+        param_data = param_data.copy()
 
         if isinstance(param_data, pd.DataFrame):
             input_param_names = param_data.columns
@@ -127,7 +143,7 @@ class CostAndScalingModel:
             func = self.functions[func_name]
             
             func_args = list(func_args)
-            func_is_multi = func_name.startswith("multi_")
+            func_is_multi = (func.__annotations__.get("return") is pd.DataFrame)
 
             if isinstance(param_data, pd.DataFrame):
                 if func_is_multi:
@@ -173,37 +189,17 @@ class CostAndScalingModel:
         return param_data, param_data_multi
 
         
+    def display_parameter_function(self, param_name:str):
 
-    def display_categorized_params(self):
+        if param_name in self.parameter_inputs:
+            print(f"{param_name:s} is an input to {self.name:s}.")
+
+        param_func = self.functions.get(param_name)
+        if param_func is None:
+            raise KeyError(f"{param_name:s} is not a parameter of {self.name:s}.")
+        else:
+            print(f"{inspect.getsource(param_func):s}")
         
-        param_input = self.parameter_inputs
-        param_output = set(self.function_args.keys()).difference(itertools.chain.from_iterable(self.function_args.values()))
-        param_intermediate = self.parameter_outputs.difference(param_input)
-
-        param_input = sorted(param_input)
-        param_intermediate = sorted(param_intermediate)
-        param_output = sorted(param_output)
-
-        params = (param_input, param_intermediate, param_output)
-        column_width = max(map(lambda p: max(map(len, p)), params))
-        params = tuple(map(
-            lambda p: tuple(map(lambda pi: pi.ljust(column_width), p)),
-            params,
-            ))
-
-        csep = "\t"
-        rsep = "\n"
-        header = csep.join(map(lambda s: s.ljust(column_width), ("Input", "Intermediate", "Output")))
-        border = "="*len(header.expandtabs())
-        num_rows = max(map(len, params))
-
-        content = itertools.zip_longest(itertools.repeat(csep, num_rows), *params, fillvalue=" "*column_width)
-        content = tuple(content)
-        content = rsep.join(map(lambda c: "{1:s}{0:s}{2:s}{0:s}{3:s}".format(*c), content))
-        table = rsep.join((header, border, content, border))
-
-        print(table)
-
 
     def get_parameter_calculation_order(self, function_args_unordered: dict) -> OrderedDict:
         """Many of the functions in a cost and scaling model will most likely refer to other functions. For example consider the following equations:
