@@ -358,7 +358,6 @@ class CSM:
         return param_data, param_data_df
 
 
-@typing.no_type_check
 class CSMBase(CSM):
     """Base CSM class containing functions that will apply to every cost and scaling model"""
 
