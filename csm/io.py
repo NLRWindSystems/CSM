@@ -1,14 +1,16 @@
-import itertools
-import operator
 import typing
-import yaml
-from collections.abc import Generator
+import operator
+import itertools
 from pathlib import Path
+from collections.abc import Generator
+
+import yaml
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
 from csm import util
+
 
 csm_result_type = tuple[pd.DataFrame, dict[str, pd.DataFrame]]
 
@@ -39,7 +41,7 @@ def read_model_input(
         Generator[tuple[str, pd.DataFrame], None, None]: generator of (model_name, input_parameters) model inputs
     """
 
-    param_input = read_input_parameters(config)
+    param_input = create_input_parameter_scenarios(config)
 
     # The input dicts can theoreticaly appear in any order
     # Using itertools.groupby to organize inputs by model requires them to be sorted before grouping
@@ -64,7 +66,7 @@ def read_model_input(
         yield model_name, param_input_model
 
 
-def read_input_parameters(
+def create_input_parameter_scenarios(
     config: dict,
 ) -> Generator[dict[str, typing.Any], None, None]:
     """Read parameters defined in the config into a generator of dicts containing kwargs to the model(s)
@@ -259,7 +261,9 @@ def convert_csm_output_to_landbosse(
 
 
 def read_input_template_landbosse() -> dict:
-    return pd.read_excel(Path(PATH_LANDBOSSE_TEMPLATE), sheet_name=None)
+    path_landbosse_template = Path(PATH_LANDBOSSE_TEMPLATE)
+    util.check_file_exists(path_landbosse_template)
+    return pd.read_excel(path_landbosse_template, sheet_name=None)
 
 
 def write_input_file_landbosse(
