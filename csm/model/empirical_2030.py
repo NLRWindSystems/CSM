@@ -1,6 +1,6 @@
 import numpy as np
 
-from .empirical_2020 import (
+from csm.model.empirical_2020 import (
     rotor_angular_velocity_max,
     swept_area,
     rotor_radius,

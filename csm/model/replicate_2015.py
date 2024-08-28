@@ -1,10 +1,10 @@
-from .__core__ import (
+from csm.model.__core__ import (
     rotor_angular_velocity_max,
     swept_area,
     rotor_radius,
 )
 
-from .empirical_2020 import (
+from csm.model.empirical_2020 import (
     tower_section_data,
     num_tower_sections,
     nacelle_lift_height,

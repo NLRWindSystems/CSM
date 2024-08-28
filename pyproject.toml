@@ -1,0 +1,83 @@
+[project]
+name = "CSM"
+dynamic = ["version"]
+authors = [{name = "Paul Crook", email = "paul.crook@nrel.gov"}]
+readme = {file = "README.md", content-type = "text/markdown"}
+description = "Wind Turbine Cost and Scaling Model Relationships"
+requires-python = ">=3.12"
+license = {file = "LICENSE"}
+dependencies = [
+    "attrs>=23",
+    "numpy>=1.26",
+    "pandas>=2.2",
+    "pyyaml>=6",
+    "tqdm>=4",
+    "openpyxl>=3",
+]
+
+[tool.isort]
+skip = []
+multi_line_output = 3
+sections = [
+  "FUTURE",
+  "STDLIB",
+  "THIRDPARTY",
+  "FIRSTPARTY",
+  "LOCALFOLDER",
+]
+known_third_party = [
+  "attrs",
+  "numpy",
+  "pandas",
+]
+known_first_party = "wombat"
+known_local_folder = "tests"
+combine_as_imports = true
+force_grid_wrap = 0
+include_trailing_comma = true
+use_parentheses = true
+length_sort = true
+lines_after_imports = 2
+line_length = 88
+
+
+[tool.ruff]
+src = ["csm"]
+line-length = 88
+target-version = "py39"
+fix = false
+
+[tool.ruff.lint]
+# See https://github.com/charliermarsh/ruff#supported-rules
+# for rules included and matching to prefix.
+ignore-init-module-imports = true
+
+# Exclude a variety of commonly ignored directories.
+exclude = [
+    ".cache",
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".hg",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "venv",
+]
+
+
+[tool.ruff.lint.per-file-ignores]
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"

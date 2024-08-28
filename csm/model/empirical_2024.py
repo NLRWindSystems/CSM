@@ -1,4 +1,4 @@
-from .__core__ import (
+from csm.model.__core__ import (
     rotor_angular_velocity_max,
     rotor_torque_max,
     rotor_radius,

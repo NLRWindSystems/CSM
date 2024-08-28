@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from .__core__ import (
+from csm.model.__core__ import (
     rotor_angular_velocity_max,
     swept_area,
     rotor_radius,

@@ -1,4 +1,4 @@
-from .replicate_2015 import (
+from csm.model.replicate_2015 import (
     rotor_angular_velocity_max,
     swept_area,
     rotor_radius,

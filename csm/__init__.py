@@ -1,3 +1,7 @@
-from .csm import CostAndScalingModel
+from .csm import CSM
 from .run import run_parameter_config
-from .util import get_csm_modules
+
+__all__ = [
+    "CSM",
+    "run_parameter_config",
+]
