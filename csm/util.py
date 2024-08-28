@@ -1,18 +1,18 @@
-import importlib.util
-import itertools
 import types
 import typing
-from collections.abc import Generator
+import itertools
+import importlib.util
 from pathlib import Path
+from collections.abc import Generator
 
 import numpy as np
 
 
 def import_model(
     model_name: str,
-    dir_model: Path,
-) -> types.ModuleType:
-    """Checks if a CSM model exists before trying to import it
+    dir_model: str | Path,
+) -> typing.Callable:
+    """Checks if a CSM model exists before importing it and creating a new instance
 
     Args:
         model_name (str): name of model (which must correspond to the name of the .py file)
@@ -22,7 +22,7 @@ def import_model(
         FileNotFoundError: if file does not exist
 
     Returns:
-        types.ModuleType: the imported module from the model file
+        typing.Callable: the imported model
     """
 
     dir_model = Path(dir_model)
@@ -34,20 +34,18 @@ def import_model(
             f"Could not find {model_name:s}.py in {str(dir_model):s}."
         )
 
-    return import_module(path_model)
+    module = import_module(path_model)
+
+    model = getattr(module, model_name)
+    if model is None:
+        raise ImportError(f"Could not import {model_name:s} from {path_model:s}")
+
+    return model
 
 
 def import_module(
     path_module: Path,
 ) -> types.ModuleType:
-    """Import module from file
-
-    Args:
-        path_module (Path): path to file
-
-    Returns:
-        types.ModuleType: imported module
-    """
     spec = importlib.util.spec_from_file_location(path_module.stem, path_module)
     module = importlib.util.module_from_spec(spec)  # type: ignore
     spec.loader.exec_module(module)  # type: ignore

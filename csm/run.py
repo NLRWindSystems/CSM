@@ -1,10 +1,11 @@
-from collections.abc import Generator
+import importlib
 from pathlib import Path
+from collections.abc import Generator
 
 import pandas as pd
 
-import csm
 from csm import io
+
 
 # return type of model outputs including the name of the model
 model_result_type = tuple[str, io.csm_result_type]
@@ -70,9 +71,20 @@ def generate_model_result(
         Generator[model_result_type, None, None]: generator of model results
     """
     for model_name, param_df in model_input:
-        model = csm.CSM(name=model_name, dir_model=model_directory)  # type: ignore
+
+        model_import_path = ".".join(
+            model_directory.resolve().relative_to(Path.cwd()).parts
+        )
+        try:
+            module = importlib.import_module(f"{model_import_path:s}.{model_name:s}")
+        except ModuleNotFoundError as e:
+            raise ModuleNotFoundError(
+                f"Failed to import {model_name:s} from {str(model_directory):s}",
+            ) from e
+
+        model = getattr(module, model_name)()
         result = model.calculate_all_parameters(param_df)
-        yield model.name, result
+        yield model._name, result
 
 
 def create_model_output(

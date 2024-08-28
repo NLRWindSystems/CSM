@@ -1,14 +1,16 @@
-import itertools
-import operator
 import typing
-import yaml
-from collections.abc import Generator
+import operator
+import itertools
 from pathlib import Path
+from collections.abc import Generator
+
+import yaml
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
 from csm import util
+
 
 csm_result_type = tuple[pd.DataFrame, dict[str, pd.DataFrame]]
 

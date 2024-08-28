@@ -1,4 +1,3 @@
-import types
 import typing
 import inspect
 import warnings
@@ -15,134 +14,133 @@ import pandas as pd
 from csm import io, util
 
 
-def get_parameter_calculation_order(
-    function_args_unordered: dict[str, list[str]],
-    params_input: set,
-) -> OrderedDict:
-    """Many of the functions in a cost and scaling model will most likely refer to other functions. For example consider the following equations:
-
-        swept_area = pi * rotor_radius**2
-        rotor_radius = rotor_diameter / 2
-
-    In this example, rotor_diameter is the only variable that is not defined by an expression, so it must be an input.
-    Given a rotor_diameter we can calculate the rotor_radius directly, but we cannot calculate swept_area until the rotor_radius has been calculated.
-
-    The functions in a cost and scaling model can be defined in any order, this function will re-order them so they can be calculated in one iteration of a loop.
-
-    In the event that recursive function definitions are found, this should raise an error. For example:
-
-        rotor_radius = rotor_diameter / 2
-        rotor_diameter = rotor_radius * 2
-
-    Each of the above functions depend on the other and so neither can ever be calculated.
-
-    This could be achieved more optimally by using a dependency tree, however this approach is 'good enough'.
-    It could also be achieved with a recursive approach, but that may require safeguards against infinite recursion.
-
-    Args:
-        function_args_unordered (dict[str, list[str]]): dict of function argument names keyed by function names
-        params_input (set): input parameters to the model, which are not defined by a function
-
-    Raises:
-        RecursionError: if recursively defined functions are found
-
-    Returns:
-        OrderedDict: input function args, but ordered by when they should be calculated to reduce repeated calculations
-    """
-
-    # Populate the ordered list of functions and arguments with functions that are calculated only using input parameters (or those which have no parameters)
-    # Simultaneously remove those parameters from the unordered dict
-    function_args_ordered = OrderedDict(
-        {
-            k: function_args_unordered.pop(k)
-            for k in tuple(function_args_unordered.keys())
-            if not bool(set(function_args_unordered[k]).difference(params_input))
-        }
-    )
-
-    # Repeatedly iterate over the unordered functions (while there are still any in the dict) removing them from the dict as we place then in an appropriate order
-    while bool(function_args_unordered):
-        update_made = False  # flag to check if anything changes over an iteration of the dict, to avoid infinitely looping due to recursively defined functions
-
-        # params which we can use as inputs. Any function with all args in this set is calculatable
-        known_params = params_input.union(function_args_ordered.keys())
-
-        # Create a separate tuple from the function dict keys since we are modifying the dict as we loop over it
-        for name in tuple(function_args_unordered.keys()):
-            # Check if all the input kwargs to the function are in the known params
-            if not bool(set(function_args_unordered[name]).difference(known_params)):
-                # Add the unorderd function to the ordered dict and remove it from the unordered dict
-                function_args_ordered[name] = function_args_unordered.pop(name)
-                update_made = True
-
-        # If we do a full loop over the remaining unordered functions without any changes being made, it is likely there is a recursive function definition
-        if not update_made:
-            raise RecursionError(
-                f"Check if the any of the following parameters are recursively defined:\n\t{', '.join(function_args_unordered.keys()):s}"
-            )
-
-    return function_args_ordered
-
-
 @attrs.define
 class CSM:
-    name = attrs.field(type=str)  # name of the model
-    dir_model = attrs.field(
-        default=Path(io.DIR_MODEL_DEFAULT), converter=Path
-    )  # directory where the file containing the model functions is saved
-
-    module = attrs.field(
-        type=types.ModuleType, init=False
-    )  # module object containing model functions
-    functions = attrs.field(
-        type=dict[str, typing.Callable], init=False
-    )  # model function callable objects
-    parameters = attrs.field(
-        type=set[str], init=False
-    )  # all parameters to the model, whether inputs or outputs
-    inputs = attrs.field(type=set[str], init=False)  # input parameters to the model
-    outputs = attrs.field(type=set[str], init=False)  # output parameters to the model
-    function_args = attrs.field(
-        type=dict[str, set], init=False
-    )  # named arguments to each function, keyed by the function name
+    _functions = attrs.field(type=dict[str, typing.Callable], factory=dict)
+    _function_args = attrs.field(type=dict[str, list[str]], factory=OrderedDict)
+    _name = attrs.field(type=str, init=False)
+    _parameters = attrs.field(type=set[str], init=False)
+    _inputs = attrs.field(type=set[str], init=False)
+    _outputs = attrs.field(type=set[str], init=False)
 
     def __attrs_post_init__(self):
-        self.module = util.import_model(self.name, self.dir_model)
-        self.functions = dict(inspect.getmembers(self.module, inspect.isfunction))
+        self._name = self.__class__.__name__
 
-        function_args_unordered = {
-            name: inspect.getfullargspec(func).args
-            for name, func in self.functions.items()
-        }
-        self.parameters = set(
-            itertools.chain(
-                *function_args_unordered.values(), function_args_unordered.keys()
-            )
-        )
-        self.inputs = self.parameters.difference(function_args_unordered.keys())
-        self.outputs = self.parameters.difference(self.inputs)
+        self._functions = self._get_functions()
+        self._populate_function_args(tuple(self._functions.keys()))
 
-        # Ordered dict containing{function_name: function_arguments} pairs ordered such that each can be calculated from a single loop of the dict
-        self.function_args = get_parameter_calculation_order(
-            function_args_unordered=function_args_unordered,
-            params_input=self.inputs,
+        self._parameters = set(
+            itertools.chain(*self._function_args.values(), self._function_args.keys())
         )
+
+        self._inputs = self._parameters.difference(self._function_args.keys())
+        self._outputs = self._parameters.difference(self._inputs)
 
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__:s}({self.name:s})"
+        return f"{__class__.__name__:s}({self.__class__.__name__:s})"  # type: ignore
 
-    def get_inputs(self):
-        return sorted(self.inputs)
+    def _get_functions(self) -> dict[str, typing.Callable]:
+        """Create dict of all functions in the model
 
-    def get_outputs(self):
-        return sorted(self.outputs)
+        Returns:
+            dict[str, typing.Callable]: function objecs keyed by function name
+        """
+        model_functions = dict()
+        # difference between the set of instance attrs and base class attrs should be the model functions
+        for attr_name in set(dir(self)).difference(dir(CSM)):
+            attr_obj = getattr(self.__class__, attr_name)
+            if callable(attr_obj):
+                model_functions[attr_name] = attr_obj
+
+        model_functions = dict(sorted(model_functions.items()))
+        return model_functions
+
+    def _populate_function_args(
+        self,
+        function_names: tuple[str, ...],
+    ) -> None:
+        """Iterate through the functions in the model and place the names of the function args in an ordered dict
+        When non-input arguments that are not themselves defined are identified, these are added to the ordered dict
+        first recursively so that at the end of the process, the function args will be ordered such that a single iteration
+        over the ordered functions will allow all the model output parameters to be calculated without repeating
+        intermediate calculation steps
+
+        Args:
+            function_names (tuple[str, ...] | KeysView): names of functions to get args for
+        """
+        for func_name in function_names:
+            if func_name not in self._function_args.keys():
+                if hasattr(self, func_name):
+                    func_args = inspect.getfullargspec(getattr(self, func_name)).args
+
+                    func_args_requiring_definition = tuple(
+                        a
+                        for a in func_args
+                        # check if function exists for the argument
+                        if a in self._functions.keys()
+                        # check if the argument has already been added to the function args
+                        and a not in self._function_args.keys()
+                    )
+                    if func_args_requiring_definition:
+                        self._populate_function_args(func_args_requiring_definition)
+
+                    self._function_args[func_name] = func_args
+
+    def __new__(cls, *args, **kwargs) -> typing.Self:
+        """Prevent instantiation of the base class"""
+        if type(cls) is CSM:
+            raise TypeError(f"Cannot directly instantiate the {cls.__name__:s} class.")
+        return object.__new__(cls, *args, **kwargs)
 
     @classmethod
     def get_available_models(
         cls,
-        dir_models=Path(io.DIR_MODEL_DEFAULT),
+        dir_models: str | Path = io.DIR_MODEL_DEFAULT,
     ) -> list[str]:
-        return sorted(p.stem for p in dir_models.glob("[!__]*[!__].py"))
+        """Generate a sorted list of available models to use
+
+        Args:
+            dir_models (str | Path, optional): directory to search for models. Defaults to io.DIR_MODEL_DEFAULT.
+
+        Returns:
+            list[str]: sorted list of model names
+        """
+        return sorted(p.stem for p in Path(dir_models).glob("[!__]*[!__].py"))
+
+    @classmethod
+    def from_name(
+        cls,
+        model_name: str,
+        dir_model: str | Path = io.DIR_MODEL_DEFAULT,
+    ) -> typing.Self:
+        """Generate an instance of a CSM subclass by finding and creating it based on the name of the model
+
+        Args:
+            model_name (str): name of CSM model
+            dir_model (str | Path, optional): directory to look for models. Defaults to io.DIR_MODEL_DEFAULT.
+
+        Raises:
+            FileNotFoundError: if model file cannot be found
+
+        Returns:
+            typing.Self: instance of named model
+        """
+        available_models = cls.get_available_models(dir_models=dir_model)
+        if model_name not in available_models:
+            raise FileNotFoundError(
+                f"Cannot find {model_name:s}. Available models are: {', '.join(available_models)}"
+            )
+        model = util.import_model(model_name, dir_model)
+        return model()
+
+    def get_inputs(self) -> list[str]:
+        return sorted(self._inputs)
+
+    def get_outputs(self) -> list[str]:
+        return sorted(self._outputs)
+
+    def get_name(self) -> str:
+        return self._name
 
     def generate_required_inputs_to_calculate(
         self, param_name: str
@@ -156,8 +154,8 @@ class CSM:
         Yields:
             Generator[str, None, None]: names of parameters required to calculate the input param
         """
-        for a in self.function_args[param_name]:
-            if a in self.function_args.keys():
+        for a in self._function_args[param_name]:
+            if a in self._function_args.keys():
                 yield from self.generate_required_inputs_to_calculate(a)
             else:
                 yield a
@@ -174,10 +172,10 @@ class CSM:
         Returns:
             list[str]: ordered list of dependent parameters
         """
-        if param_name in self.inputs:
+        if param_name in self._inputs:
             return [param_name]
-        if param_name not in self.function_args.keys():
-            raise KeyError(f"{param_name:s} is not a parameter of {self.name:s}.")
+        if param_name not in self._function_args.keys():
+            raise KeyError(f"{param_name:s} is not a parameter of {self._name:s}.")
         return sorted(self.generate_required_inputs_to_calculate(param_name))
 
     def display_parameter_function(self, param_name: str) -> None:
@@ -187,14 +185,14 @@ class CSM:
             param_name (str): name of parameter
 
         Raises:
-            KeyError: if no function exists for the parameter
+            KeyError: if no function exists for the parameter name
         """
-        if param_name in self.inputs:
-            print(f"{param_name:s} is an input to {self.name:s}.")
+        if param_name in self._inputs:
+            print(f"{param_name:s} is an input to {self._name:s}.")
 
-        param_func = self.functions.get(param_name)
+        param_func = self._functions.get(param_name)
         if param_func is None:
-            raise KeyError(f"{param_name:s} is not a parameter of {self.name:s}.")
+            raise KeyError(f"{param_name:s} is not a parameter of {self._name:s}.")
         else:
             print(f"{inspect.getsource(param_func):s}")
 
@@ -224,29 +222,29 @@ class CSM:
             return known_kwargs[param_to_calculate]
 
         # Raise exception if requested parameter does not exist
-        if param_to_calculate not in self.parameters:
+        if param_to_calculate not in self._parameters:
             raise KeyError(
-                f"{param_to_calculate:s} is not a parameter in model {self.name:s}"
+                f"{param_to_calculate:s} is not a parameter in model {self._name:s}"
             )
 
         # Raise exception if a required input for the requested parameter does not exist
         if (
-            param_to_calculate in self.inputs
+            param_to_calculate in self._inputs
             and param_to_calculate not in known_kwargs.keys()
         ):
             raise KeyError(
-                f"{param_to_calculate:s} is a required input for model {self.name:s}"
+                f"{param_to_calculate:s} is a required input for model {self._name:s}"
             )
 
         # Get the values of the required inputs to the requested parameter function by recursively
         # calling this function
         required_kwargs = {
             a: self.calculate_parameter(a, **known_kwargs)
-            for a in self.function_args[param_to_calculate]
+            for a in self._function_args[param_to_calculate]
         }
 
         # At this point no more recursion is required and the parameter can be calculated
-        func = self.functions[param_to_calculate]
+        func = self._functions[param_to_calculate]
 
         # Check to see if any of the inputs are numpy arrays, in which case the parameter fuction
         # can be vectorized
@@ -290,19 +288,19 @@ class CSM:
             input_param_names = set(param_data.keys())
 
         # Check if any of the required inputs are missing
-        missing_inputs = self.inputs.difference(input_param_names)
+        missing_inputs = self._inputs.difference(input_param_names)
         if bool(missing_inputs):
             raise KeyError(
-                f"{self.name:s}: the following required inputs or functions are missing:\n\t{', '.join(missing_inputs)}"
+                f"{self._name:s}: the following required inputs or functions are missing:\n\t{', '.join(missing_inputs)}"
             )
 
         # Flag if any unnecessary inputs have been included in the data
         unnecessary_inputs = (
-            set(input_param_names).difference(self.inputs).difference({"scenario"})
+            set(input_param_names).difference(self._inputs).difference({"scenario"})
         )
         if bool(unnecessary_inputs):
             warnings.warn(
-                f"The following inputs have been provided to the {self.name:s} model but are not required:\n\t{', '.join(unnecessary_inputs):s}"
+                f"The following inputs have been provided to the {self._name:s} model but are not required:\n\t{', '.join(unnecessary_inputs):s}"
             )
 
         # Dict to hold the dataframe outputs of the model
@@ -310,9 +308,9 @@ class CSM:
 
         # The model parameters were already pre-ordered when initializing the class instance such that
         # we can calclate each output parmeter by looping through the ordered dict only once
-        for func_name, func_args in self.function_args.items():
+        for func_name, func_args in self._function_args.items():
             # Callable function object for the parameter
-            func = self.functions[func_name]
+            func = self._functions[func_name]
 
             # Check the type annotations from the CSM function to determine if the return type is a dataframe
             # If the function does return a dataframe but does not have this type hint it will generate an error
@@ -358,3 +356,25 @@ class CSM:
             param_data = param_data.sort_index(axis=1)
 
         return param_data, param_data_df
+
+
+@typing.no_type_check
+class CSMBase(CSM):
+    """Base CSM class containing functions that will apply to every cost and scaling model"""
+
+    def rotor_angular_velocity_max(tip_speed_max, rotor_radius):  # type: ignore
+        return tip_speed_max / rotor_radius  # type: ignore
+
+    def rotor_angular_velocity_max_rpm(rotor_angular_velocity_max):  # type: ignore
+        return rotor_angular_velocity_max / (2.0 * np.pi) * 60.0  # type: ignore
+
+    def rotor_torque_max(
+        turbine_rating, rotor_efficiency_max, rotor_angular_velocity_max
+    ):  # type: ignore
+        return (turbine_rating / rotor_efficiency_max) / (rotor_angular_velocity_max)  # type: ignore
+
+    def rotor_radius(rotor_diameter):  # type: ignore
+        return rotor_diameter / 2.0  # type: ignore
+
+    def swept_area(rotor_radius):  # type: ignore
+        return np.pi * rotor_radius**2  # type: ignore
