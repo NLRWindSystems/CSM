@@ -1,10 +1,9 @@
-import importlib
 from pathlib import Path
 from collections.abc import Generator
 
 import pandas as pd
 
-from csm import io, util, CSM
+from csm import CSM, io, util
 
 
 # return type of model outputs including the name of the model
