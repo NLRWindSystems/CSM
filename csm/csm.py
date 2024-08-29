@@ -55,35 +55,6 @@ class CSM:
         model_functions = dict(sorted(model_functions.items()))
         return model_functions
 
-    def compare(self, csm_other: typing.Self) -> None:
-        """Provides a simple comparison between two CSMs
-
-        Args:
-            csm_other (typing.Self): another CSM object to compare with
-        """
-
-        funcs_new = set(csm_other._functions.keys()).difference(self._functions.keys())
-        funcs_missing = set(self._functions.keys()).difference(
-            csm_other._functions.keys()
-        )
-        func_names_shared = set(csm_other._functions).intersection(self._functions)
-        funcs_different = {
-            n
-            for n in func_names_shared
-            if csm_other._functions[n].__code__ != self._functions[n].__code__
-        }
-        funcs_same = func_names_shared.difference(funcs_different)
-
-        print(f"Comparing {csm_other.get_name():s} to {self.get_name():s}:")
-        if funcs_new:
-            print(f"New functions: {', '.join(sorted(funcs_new)):s}")
-        if funcs_missing:
-            print(f"Missing functions: {', '.join(sorted(funcs_missing)):s}")
-        if funcs_different:
-            print(f"Different functions: {', '.join(sorted(funcs_different)):s}")
-        if funcs_same:
-            print(f"{len(funcs_same):d} shared functions.")
-
     def _populate_function_args(
         self,
         function_names: tuple[str, ...],
