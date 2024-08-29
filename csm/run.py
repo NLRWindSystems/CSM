@@ -26,8 +26,8 @@ def get_parameter_config(
     """
     if isinstance(parameter_config, str):
         parameter_config = Path(parameter_config)
-        util.check_file_exists(parameter_config)
     if isinstance(parameter_config, Path):
+        util.check_file_exists(parameter_config)
         parameter_config = io.read_config_file(parameter_config)
     return parameter_config
 
