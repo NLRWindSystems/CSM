@@ -4,7 +4,7 @@ from collections.abc import Generator
 
 import pandas as pd
 
-from csm import io, util
+from csm import io, util, CSM
 
 
 # return type of model outputs including the name of the model
@@ -72,20 +72,9 @@ def generate_model_result(
         Generator[model_result_type, None, None]: generator of model results
     """
     for model_name, param_df in model_input:
-
-        model_import_path = ".".join(
-            model_directory.resolve().relative_to(Path.cwd()).parts
-        )
-        try:
-            module = importlib.import_module(f"{model_import_path:s}.{model_name:s}")
-        except ModuleNotFoundError as e:
-            raise ModuleNotFoundError(
-                f"Failed to import {model_name:s} from {str(model_directory):s}",
-            ) from e
-
-        model = getattr(module, model_name)()
+        model = CSM.from_name(model_name, model_directory)
         result = model.calculate_all_parameters(param_df)
-        yield model._name, result
+        yield model_name, result
 
 
 def create_model_output(
