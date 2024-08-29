@@ -4,6 +4,7 @@ from csm.csm import CSM
 from csm.run import run_parameter_config
 from csm.util import import_model
 
+
 __all__ = ["CSM", "run_parameter_config"]
 
 # dynamically import all models in the "model" directory
