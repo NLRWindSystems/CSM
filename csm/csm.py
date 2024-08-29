@@ -190,11 +190,12 @@ class CSM:
         if param_name in self._inputs:
             print(f"{param_name:s} is an input to {self._name:s}.")
 
-        param_func = self._functions.get(param_name)
-        if param_func is None:
-            raise KeyError(f"{param_name:s} is not a parameter of {self._name:s}.")
         else:
-            print(f"{inspect.getsource(param_func):s}")
+            param_func = self._functions.get(param_name)
+            if param_func is None:
+                raise KeyError(f"{param_name:s} is not a parameter of {self._name:s}.")
+            else:
+                print(f"{inspect.getsource(param_func):s}")
 
     def calculate_parameter(
         self,
