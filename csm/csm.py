@@ -58,6 +58,7 @@ class CSM:
     def _populate_function_args(
         self,
         function_names: tuple[str, ...],
+        funcs_checked: set | None = None,
     ) -> None:
         """Iterate through the functions in the model and place the names of the function args in an ordered dict
         When non-input arguments that are not themselves defined are identified, these are added to the ordered dict
@@ -66,13 +67,35 @@ class CSM:
         intermediate calculation steps
 
         Args:
-            function_names (tuple[str, ...] | KeysView): names of functions to get args for
+            function_names (tuple[str, ...]): names of functions to get args for
+            funcs_checked (set | None, optional): set of functions where definitions have already been attempted. Defaults to None.
+
+        Raises:
+            RecursionError: If attempting to define a parameter more than once, it may be because of a recursive relationship
         """
+
+        # initialize an empty set keeping track of which parameters have already been attempted to get args for
+        if funcs_checked is None:
+            funcs_checked = set()
+
         for func_name in function_names:
+            # Only attempt to get args for functions that do not already have args
             if func_name not in self._function_args.keys():
                 if hasattr(self, func_name):
+                    # If we are attempting to get args for a parameter that we have already attempted to get args for,
+                    # that should occur if there are recursively defined functions
+                    if func_name in funcs_checked:
+                        raise RecursionError(
+                            f"Check if the following parameter is defined recursively: {func_name:s}"
+                        )
+
+                    # If we have not already checked this function name, add it to the list of checked functions
+                    funcs_checked.add(func_name)
+
+                    # Extract the actual arguments themsevles
                     func_args = inspect.getfullargspec(getattr(self, func_name)).args
 
+                    # Get a tuple of which arguments are not already defined and thus require getting their args
                     func_args_requiring_definition = tuple(
                         a
                         for a in func_args
@@ -81,9 +104,16 @@ class CSM:
                         # check if the argument has already been added to the function args
                         and a not in self._function_args.keys()
                     )
-                    if func_args_requiring_definition:
-                        self._populate_function_args(func_args_requiring_definition)
 
+                    # Recursively call this function to define the arguments as required
+                    if func_args_requiring_definition:
+                        self._populate_function_args(
+                            func_args_requiring_definition,
+                            funcs_checked,
+                        )
+
+                    # At this point all the arguments to the function themselves have arguments, so we can add
+                    # the function and it's arguments to the _function_args dict
                     self._function_args[func_name] = func_args
 
     def __new__(cls, *args, **kwargs) -> typing.Self:
