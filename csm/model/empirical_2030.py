@@ -1,9 +1,9 @@
 import numpy as np
 
-from csm.model.empirical_2020 import empirical_2020
+from csm.model.empirical_2020 import Empirical2020
 
 
-class empirical_2030(empirical_2020):
+class Empirical2030(Empirical2020):
 
     def blade_mass(rotor_diameter):
         return 18.45 * (rotor_diameter / 2.0) ** 1.59
@@ -57,7 +57,6 @@ class empirical_2030(empirical_2020):
     def tower_mass(hub_height, swept_area):
         return 0.1 * hub_height * swept_area + 18560.0
 
-    # [ROTOR]
     def blade_cost(blade_mass):
         return 0.85 * 15.9432 * blade_mass
 
@@ -70,7 +69,6 @@ class empirical_2030(empirical_2020):
     def nose_cone_cost(nose_cone_mass):
         return 0.85 * 12.1212 * nose_cone_mass
 
-    # [DRIVETRAIN and NACELLE]
     def low_speed_shaft_cost(low_speed_shaft_mass):
         return 0.85 * 12.9948 * low_speed_shaft_mass
 
@@ -107,11 +105,9 @@ class empirical_2030(empirical_2020):
     def nacelle_cover_cost(nacelle_cover_mass):
         return 0.85 * 6.2244 * nacelle_cover_mass
 
-    # [TOWER]
     def tower_cost(tower_mass):
         return 0.8 * 3.1668 * tower_mass
 
-    # [TRANSPORT]
     def blade_transport_cost(num_blades, rotor_radius):
         return num_blades * np.where(
             rotor_radius < 70.0,

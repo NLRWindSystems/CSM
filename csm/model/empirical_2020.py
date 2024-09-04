@@ -1,10 +1,10 @@
 import numpy as np
 import pandas as pd
 
-from csm.csm import CSMBase
+from csm.model.base import CSMBase
 
 
-class empirical_2020(CSMBase):
+class Empirical2020(CSMBase):
 
     def rotor_torque_max(
         turbine_rating_MW, rotor_efficiency_max, rotor_angular_velocity_max
@@ -144,7 +144,6 @@ class empirical_2020(CSMBase):
             index=pd.Index(section_number, name="tower_section_id"),
         )
 
-    # [ROTOR]
     def blade_cost(blade_mass):
         return 15.9432 * blade_mass
 
@@ -160,7 +159,6 @@ class empirical_2020(CSMBase):
     def rotor_cost(num_blades, blade_cost, hub_cost, pitch_system_cost, nose_cone_cost):
         return num_blades * blade_cost + hub_cost + pitch_system_cost + nose_cone_cost
 
-    # [DRIVETRAIN and NACELLE]
     def low_speed_shaft_cost(low_speed_shaft_mass):
         return 12.9948 * low_speed_shaft_mass
 
@@ -203,9 +201,6 @@ class empirical_2020(CSMBase):
     def electrical_connection_cost(turbine_rating_MW):
         return 1092.0 * turbine_rating_MW * 41.85
 
-    # def nacelle_cost(*args):
-    #     return sum(args)
-
     def nacelle_cost(
         low_speed_shaft_cost,
         main_bearing_cost,
@@ -239,15 +234,12 @@ class empirical_2020(CSMBase):
             + electrical_connection_cost
         )
 
-    # [TOWER]
     def tower_cost(tower_mass):
         return 3.1668 * tower_mass
 
-    # [TURBINE]
     def turbine_cost(rotor_cost, nacelle_cost, tower_cost):
         return rotor_cost + nacelle_cost + tower_cost
 
-    # [TRANSPORT]
     def nacelle_drivetrain_transport_cost(nacelle_mass):
         return np.ceil(nacelle_mass / 90000.0) * 45000.0
 

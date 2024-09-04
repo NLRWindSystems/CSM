@@ -1,7 +1,7 @@
-from csm.csm import CSMBase
+from csm.model.base import CSMBase
 
 
-class replicate_2015(CSMBase):
+class Replicate2015(CSMBase):
 
     def rotor_torque_max(
         turbine_rating_kW, rotor_efficiency_max, rotor_angular_velocity_max

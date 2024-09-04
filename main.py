@@ -1,15 +1,10 @@
 import csm
 
-
 if __name__ == "__main__":
 
     # Create model from name
-    model = csm.CSM.from_name("empirical_2020")
+    model = csm.CSM.from_name("Empirical2020")
     print(model)
-
-    # Directly import model
-    model2 = csm.empirical_2030()
-    print(model2)
 
     # Any values that could be used to calculate a parameter will work
     print(model.calculate_parameter("blade_cost", rotor_diameter=162))
@@ -18,7 +13,6 @@ if __name__ == "__main__":
     # Function relationships only work one way.
     # We can calculate rotor radius in terms of rotor diameter
     # but we cannot do the opposite
-
     # model.calculate_parameter("rotor_diameter", rotor_radius=81)
 
     # Get all the required inputs to calculate every parameter in a model

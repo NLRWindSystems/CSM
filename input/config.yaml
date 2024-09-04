@@ -9,20 +9,13 @@ parameters:
   # - a list of options (e.g. [5, 6, 7])
   # - [[start, end], count] - evenly spaced values including the start and end (e.g. [[5, 9], 5] -> [5, 6, 7, 8, 9])
 
-  pc:
-    model: empirical_2024
-    hub_height: 150
-    rotor_efficiency_max: .9
-    turbine_rating_MW: 6.2
-    rotor_diameter: [150, 162, 172]
-    tip_speed_max: [80, 85, 90]
 
   ppinchuck:
     num_bearings: 2
     num_blades: 3
     tip_speed_max: [80, 85, 90]
     BOS_cost: 0
-    model: [empirical_2020, empirical_2030]
+    model: [Empirical2020, Empirical2030]
 
     A:
       rotor_diameter: [[162, 192], 4]
@@ -40,7 +33,7 @@ parameters:
         hub_height: [300, 350, 400]
 
   "2015":
-    model: [replicate_2015, replicate_2015_excel]
+    model: [Replicate2015, Replicate2015Excel]
     num_blades: 3
     num_bearings: 2
     onboard_crane_present: [True, False]
