@@ -1,0 +1,16 @@
+model_directory: ./test/model
+parameters:
+  model: Basic
+  basic:
+    x:
+      a: 1
+      b: [2, 3]
+
+  dataframe:
+    y:
+      a: [[1, 10], 10]
+      b: [2]
+      model: DataFrame
+  dataframe_noargs:
+    z:
+      model: DataFrameNoArgs

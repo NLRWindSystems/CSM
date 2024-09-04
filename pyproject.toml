@@ -77,3 +77,6 @@ ignore_missing_imports = true
 no_implicit_optional = true
 check_untyped_defs = true
 cache_dir = ".cache/mypy/"
+
+[tool.pytest.ini_options]
+cache_dir = ".cache/pytest"
