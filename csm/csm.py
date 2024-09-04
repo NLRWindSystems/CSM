@@ -1,8 +1,8 @@
 import typing
 import inspect
+import numbers
 import warnings
 import itertools
-from numbers import Number
 from pathlib import Path
 from collections import OrderedDict
 from collections.abc import Generator
@@ -12,6 +12,9 @@ import numpy as np
 import pandas as pd
 
 from csm import io, util
+
+
+TYPE_PARAM = type[numbers.Number | bool | np.ndarray | pd.Series]
 
 
 @attrs.define
@@ -37,11 +40,11 @@ class CSM:
         self._outputs = self._parameters.difference(self._inputs)
 
     def __repr__(self) -> str:
-        return f"{__class__.__name__:s}({self.__class__.__name__:s})"  # type: ignore
+        return f"{__class__.__name__:s}({self._name:s})"  # type: ignore
 
     def __new__(cls, *args, **kwargs) -> typing.Self:
         """Prevent instantiation of the base class"""
-        if type(cls) is CSM:
+        if cls is CSM:
             raise TypeError(f"Cannot directly instantiate the {cls.__name__:s} class.")
         return object.__new__(cls, *args, **kwargs)
 
@@ -49,16 +52,17 @@ class CSM:
     def get_available_models(
         cls,
         dir_models: str | Path = io.DIR_MODEL_DEFAULT,
-    ) -> list[str]:
-        """Generate a sorted list of available models to use
+    ) -> dict[str, type[typing.Self]]:
+        models = {}
+        module_paths = Path(dir_models).glob("[!__]*[!__].py")
+        for p in module_paths:
+            module = util.import_module(p)
+            for name, obj in inspect.getmembers(module):
+                if inspect.isclass(obj) and obj.__module__ == module.__name__:
+                    if issubclass(obj, CSM):
+                        models[name] = obj
 
-        Args:
-            dir_models (str | Path, optional): directory to search for models. Defaults to io.DIR_MODEL_DEFAULT.
-
-        Returns:
-            list[str]: sorted list of model names
-        """
-        return sorted(p.stem for p in Path(dir_models).glob("[!__]*[!__].py"))
+        return models  # type: ignore
 
     @classmethod
     def from_name(
@@ -79,23 +83,43 @@ class CSM:
             typing.Self: instance of named model
         """
         available_models = cls.get_available_models(dir_models=dir_model)
-        if model_name not in available_models:
+        if (model := available_models.get(model_name)) is None:
             raise FileNotFoundError(
-                f"Cannot find {model_name:s}. Available models are: {', '.join(available_models)}"
+                f"Cannot find CSM with name: {model_name:s}. Available models are: {', '.join(available_models)}"
             )
-        model = util.import_model(model_name, dir_model)
         return model()
 
     def get_inputs(self) -> list[str]:
+        """Get all the input parameters for a model, i.e. all the parameters that are needed to calculate every output
+
+        Returns:
+            list[str]: sorted list of input parameter names
+        """
         return sorted(self._inputs)
 
     def get_outputs(self) -> list[str]:
+        """Get all the output parameters from the model. If all the inputs are known, each one of these outputs can be calculated
+
+        Returns:
+            list[str]: sorted list of output parameter names
+        """
         return sorted(self._outputs)
 
     def get_name(self) -> str:
         return self._name
 
-    def generate_required_inputs_to_calculate(
+    def is_calculatable_with_inputs(
+        self,
+        param_to_calculate: str,
+        inputs: set[str] | list[str],
+    ):
+        if param_to_calculate in self._function_args.keys():
+            args = set(self._function_args[param_to_calculate]).difference(inputs)
+            return all(self.is_calculatable_with_inputs(a, inputs=inputs) for a in args)
+        else:
+            return param_to_calculate in inputs
+
+    def _generate_required_inputs_to_calculate(
         self, param_name: str
     ) -> Generator[str, None, None]:
         """For a given parameter, generate all the input paramers that are required to calculate it.
@@ -109,12 +133,12 @@ class CSM:
         """
         for a in self._function_args[param_name]:
             if a in self._function_args.keys():
-                yield from self.generate_required_inputs_to_calculate(a)
+                yield from self._generate_required_inputs_to_calculate(a)
             else:
                 yield a
 
     def required_inputs_to_calculate(self, param_name: str) -> list[str]:
-        """Returns a sorted list from the generator generate_required_inputs_to_calculate
+        """Returns a sorted list from the generator _generate_required_inputs_to_calculate
 
         Args:
             param_name (str): name of parameter to find inputs for
@@ -129,7 +153,7 @@ class CSM:
             return [param_name]
         if param_name not in self._function_args.keys():
             raise KeyError(f"{param_name:s} is not a parameter of {self._name:s}.")
-        return sorted(self.generate_required_inputs_to_calculate(param_name))
+        return sorted(set(self._generate_required_inputs_to_calculate(param_name)))
 
     def display_parameter_function(self, param_name: str) -> None:
         """Display the function that defines a parameter
@@ -171,7 +195,7 @@ class CSM:
         function_names: tuple[str, ...],
         funcs_checked: set | None = None,
     ) -> None:
-        """Iterate through the functions in the model and place the names of the function args in an ordered dict
+        """Iterate through the functions in the model and place the names of the function args in an ordered dict.
         When non-input arguments that are not themselves defined are identified, these are added to the ordered dict
         first recursively so that at the end of the process, the function args will be ordered such that a single iteration
         over the ordered functions will allow all the model output parameters to be calculated without repeating
@@ -191,66 +215,74 @@ class CSM:
 
         for func_name in function_names:
             # Only attempt to get args for functions that do not already have args
-            if func_name not in self._function_args.keys():
-                if hasattr(self, func_name):
-                    # If we are attempting to get args for a parameter that we have already attempted to get args for,
-                    # that should occur if there are recursively defined functions
-                    if func_name in funcs_checked:
-                        raise RecursionError(
-                            f"Check if the following parameter is defined recursively: {func_name:s}"
-                        )
-
-                    # If we have not already checked this function name, add it to the list of checked functions
-                    funcs_checked.add(func_name)
-
-                    # Extract the actual arguments themsevles
-                    func_args = inspect.getfullargspec(getattr(self, func_name)).args
-
-                    # Get a tuple of which arguments are not already defined and thus require getting their args
-                    func_args_requiring_definition = tuple(
-                        a
-                        for a in func_args
-                        # check if function exists for the argument
-                        if a in self._functions.keys()
-                        # check if the argument has already been added to the function args
-                        and a not in self._function_args.keys()
+            # This check must be inside the loop since self._function_args is modified in the loop
+            if func_name not in self._function_args.keys() and hasattr(self, func_name):
+                # If we are attempting to get args for a parameter that we have already attempted to get args for,
+                # that should occur if there are recursively defined functions
+                if func_name in funcs_checked:
+                    raise RecursionError(
+                        f"Check if the following parameter is defined recursively: {func_name:s}"
                     )
 
-                    # Recursively call this function to define the arguments as required
-                    if func_args_requiring_definition:
-                        self._populate_function_args(
-                            func_args_requiring_definition,
-                            funcs_checked,
-                        )
+                # If we have not already checked this function name, add it to the set of checked functions
+                funcs_checked.add(func_name)
 
-                    # At this point all the arguments to the function themselves have arguments, so we can add
-                    # the function and it's arguments to the _function_args dict
-                    self._function_args[func_name] = func_args
+                # Extract the actual arguments themsevles
+                func_args = inspect.getfullargspec(getattr(self, func_name)).args
+
+                # Get a tuple of which arguments are not already defined and thus require definition
+                func_args_requiring_definition = tuple(
+                    a
+                    for a in func_args
+                    # check if the argument is itself defined by a function
+                    if a in self._functions.keys()
+                    # check if the argument has already been added to the function args dict
+                    and a not in self._function_args.keys()
+                )
+
+                # Recursively call this function to define the arguments as required
+                if func_args_requiring_definition:
+                    self._populate_function_args(
+                        func_args_requiring_definition,
+                        funcs_checked,
+                    )
+
+                # At this point all the arguments to the function themselves have defined arguments (or are inputs)
+                # We can add the function and it's arguments to the _function_args ordered dict
+                self._function_args[func_name] = func_args
 
     def calculate_parameter(
         self,
         param_to_calculate: str,
-        **known_kwargs: dict[str, Number | np.ndarray],
-    ) -> Number | np.ndarray | pd.DataFrame:
-        """Calcualte a parameter given certain inputs to the model
+        input_data: dict[str, TYPE_PARAM] | pd.DataFrame | None = None,
+        **input_kwargs: dict[str, TYPE_PARAM],
+    ) -> TYPE_PARAM | pd.DataFrame | tuple[pd.DataFrame]:
+        """Calculate a parameter given certain inputs to the model
         If the function for that parameter depends on intermediate parameter values that are not known,
         the functions for those intermediate parameters are called recursively using their required inputs.
         This function works with both scalar values and numpy arrays. When using numpy arrays, the model
         functions are vectorized before being executed.
-
-        Args:
-            param_to_calculate (str): parameter to be calculated
-
-        Raises:
-            KeyError: if the requested parameter does not exist, or if a required input parameter has not been provided
-
-        Returns:
-            Number | np.ndarray | pd.DataFrame: result returned from the appropriate CSM function
         """
 
-        # If the requested parameter is already provided as an input, simpy return the provided value
-        if param_to_calculate in known_kwargs.keys():
-            return known_kwargs[param_to_calculate]
+        # TODO update docstring. this is the messiest function
+
+        if input_data is None:
+            params_known = input_kwargs
+        else:
+            if bool(input_kwargs):
+                raise ValueError(
+                    "Must provide the known parameters as a dict/dataframe, or using kwargs, but not both."
+                )
+            params_known = input_data  # type: ignore
+
+        is_dataframe_input = isinstance(params_known, pd.DataFrame)
+
+        if is_dataframe_input:
+            params_known = {c: params_known[c].values for c in params_known.columns}  # type: ignore
+
+        # If the requested parameter is already provided as an input, simply return the provided value
+        if param_to_calculate in params_known.keys():
+            return params_known[param_to_calculate]
 
         # Raise exception if requested parameter does not exist
         if param_to_calculate not in self._parameters:
@@ -261,7 +293,7 @@ class CSM:
         # Raise exception if a required input for the requested parameter does not exist
         if (
             param_to_calculate in self._inputs
-            and param_to_calculate not in known_kwargs.keys()
+            and param_to_calculate not in params_known.keys()
         ):
             raise KeyError(
                 f"{param_to_calculate:s} is a required input for model {self._name:s}"
@@ -270,28 +302,77 @@ class CSM:
         # Get the values of the required inputs to the requested parameter function by recursively
         # calling this function
         required_kwargs = {
-            a: self.calculate_parameter(a, **known_kwargs)
+            a: self.calculate_parameter(a, params_known)
             for a in self._function_args[param_to_calculate]
         }
 
         # At this point no more recursion is required and the parameter can be calculated
         func = self._functions[param_to_calculate]
 
-        # Check to see if any of the inputs are numpy arrays, in which case the parameter fuction
-        # can be vectorized
-        is_vectorized = any(isinstance(v, np.ndarray) for v in required_kwargs.values())
-        if is_vectorized:
+        # Check if any of the function inputs are numpy arrays (or pandas series)
+        # If so, the calculation (usually) will be vectorized
+        is_vectorized_input = is_dataframe_input or any(
+            isinstance(v, np.ndarray) for v in required_kwargs.values()
+        )
+
+        # Check if the return type of the function is a dataframe
+        is_dataframe_output = (
+            getattr(func, "__annotations__", {}).get("return") is pd.DataFrame
+        )
+
+        if is_vectorized_input and not is_dataframe_output:
             func = np.vectorize(func)
 
-        # Call the function to calculate the parameter
-        result = func(**required_kwargs)
+        if is_vectorized_input and is_dataframe_output:
+            if bool(required_kwargs):
+                # Handle the scenario where the inputs are vectorized, the output is a dataframe and there is
+                # at least one argument to the function
+                result_generator = (
+                    func(**dict(zip(required_kwargs.keys(), v)))
+                    for v in zip(*required_kwargs.values())
+                )  # type: ignore
+            else:
+                # Handle the scenario where the inputs are vectorized, the output is a dataframe but there
+                # are not any inputs to the function
+
+                # Get the number of outputs to be produced. We cannot rely on the size of the input args
+                # since there aren't any
+                if isinstance(params_known, pd.DataFrame):
+                    # If the input params are a dataframe the number of expected outputs will be the same
+                    # as the number of rows in the input
+                    num_outputs = len(params_known.index)
+                else:
+                    # If the input parameters are a dict of other values (which may or may not be numpy arrays),
+                    # check each element to find the longest one
+                    num_outputs = max(
+                        map(
+                            lambda p: len(p) if hasattr(p, "__len__") else 1,
+                            params_known.values(),
+                        )
+                    )
+                result_generator = itertools.repeat(func(), num_outputs)  # type: ignore
+
+            # Generate the output result where the input is vectorized and the output is a dataframe
+            if is_dataframe_input:
+                # If the inputs are provided as a dataframe, return an output dataframe with a multiindex
+                # to allow joining back to the inputs
+                result = pd.concat(
+                    result_generator,
+                    keys=input_data.index,  # type: ignore
+                )
+            else:
+                # If the input is not a dataframe, we won't be able to join to the input so simply return
+                # a tuple with the appropriate number of output values
+                result = tuple(result_generator)
+        else:
+            result = func(**required_kwargs)
 
         return result
 
     def calculate_all_parameters(
         self,
         param_data: pd.DataFrame | dict,
-    ) -> io.csm_result_type:
+    ) -> io.CSM_RESULT_TYPE:
         """When calculating all the parameters in a model, simply looping over each one and recursively calculating it will
         result in intermediate parameters being calculated multiple times unnecessarily.
         This function will calculate each parameter while retaining those intermediate calculation steps
@@ -314,70 +395,36 @@ class CSM:
 
         # Get the names of the input parameters
         if isinstance(param_data, pd.DataFrame):
-            input_param_names = set(param_data.columns)
-        elif isinstance(param_data, dict):
-            input_param_names = set(param_data.keys())
-
-        # Check if any of the required inputs are missing
-        missing_inputs = self._inputs.difference(input_param_names)
-        if bool(missing_inputs):
-            raise KeyError(
-                f"{self._name:s}: the following required inputs or functions are missing:\n\t{', '.join(missing_inputs)}"
-            )
+            available_inputs = set(param_data.columns)
+        else:
+            available_inputs = set(param_data.keys())
 
         # Flag if any unnecessary inputs have been included in the data
         unnecessary_inputs = (
-            set(input_param_names).difference(self._inputs).difference({"scenario"})
+            set(available_inputs).difference(self._inputs).difference({"scenario"})
         )
         if bool(unnecessary_inputs):
             warnings.warn(
-                f"The following inputs have been provided to the {self._name:s} model but are not required:\n\t{', '.join(unnecessary_inputs):s}"
+                f"The following inputs have been provided to {self._name:s} but are not required:\n\t{', '.join(unnecessary_inputs):s}"
             )
+
+        # Filter the list of parameters that will be calculated to only include those which are calculatable given the inputs
+        funcs_to_calculate = (
+            func_name
+            for func_name in self._function_args.keys()
+            if self.is_calculatable_with_inputs(func_name, available_inputs)
+        )
 
         # Dict to hold the dataframe outputs of the model
         param_data_df = dict()
 
         # The model parameters were already pre-ordered when initializing the class instance such that
         # we can calclate each output parmeter by looping through the ordered dict only once
-        for func_name, func_args in self._function_args.items():
-            # Callable function object for the parameter
-            func = self._functions[func_name]
+        # for func_name, func_args in self._function_args.items():
+        for func_name in funcs_to_calculate:
+            func_result = self.calculate_parameter(func_name, param_data)
 
-            # Check the type annotations from the CSM function to determine if the return type is a dataframe
-            # If the function does return a dataframe but does not have this type hint it will generate an error
-            func_return_dataframe = (
-                getattr(func, "__annotations__", {}).get("return") is pd.DataFrame
-            )
-
-            # Get the kwarg inputs to the function depending on whether the inputs are vectors or scalars
-            if isinstance(param_data, pd.DataFrame):
-                func_kwargs = {p: param_data[p].values for p in func_args}
-            else:
-                func_kwargs = {p: param_data[p] for p in func_args}
-
-            if func_return_dataframe and isinstance(param_data, pd.DataFrame):
-                # Handle the case where the input parameters are vectors and the return type is a dataframe
-                # The outputs will need to be combined into a dataframe that is larger than the input
-                result_multi: map | itertools.repeat
-                if bool(func_args):
-                    result_multi = map(
-                        lambda r: func(**r),
-                        param_data[func_args].to_dict(orient="records"),
-                    )  # relatively slow calculation
-                else:
-                    # Handle special case where the inputs are vectorized but a function returning a dataframe takes no arguments
-                    result_multi = itertools.repeat(func(), len(param_data.index))
-
-                func_result = pd.concat(
-                    result_multi,
-                    keys=param_data.index,
-                )
-            else:
-                # Perform the calculation to get the parameter value
-                func_result = self.calculate_parameter(func_name, **func_kwargs)
-
-            # Append the result to the input dict or dataframe if the output type is not a dataframe, otherwise store it in the dataframe output dict
-            if func_return_dataframe:
+            if isinstance(func_result, (pd.DataFrame, tuple)):
                 param_data_df[func_name] = func_result
             else:
                 param_data[func_name] = func_result
@@ -387,24 +434,3 @@ class CSM:
             param_data = param_data.sort_index(axis=1)
 
         return param_data, param_data_df
-
-
-class CSMBase(CSM):
-    """Base CSM class containing functions that will apply to every cost and scaling model"""
-
-    def rotor_angular_velocity_max(tip_speed_max, rotor_radius):  # type: ignore
-        return tip_speed_max / rotor_radius  # type: ignore
-
-    def rotor_angular_velocity_max_rpm(rotor_angular_velocity_max):  # type: ignore
-        return rotor_angular_velocity_max / (2.0 * np.pi) * 60.0  # type: ignore
-
-    def rotor_torque_max(
-        turbine_rating, rotor_efficiency_max, rotor_angular_velocity_max
-    ):  # type: ignore
-        return (turbine_rating / rotor_efficiency_max) / (rotor_angular_velocity_max)  # type: ignore
-
-    def rotor_radius(rotor_diameter):  # type: ignore
-        return rotor_diameter / 2.0  # type: ignore
-
-    def swept_area(rotor_radius):  # type: ignore
-        return np.pi * rotor_radius**2  # type: ignore

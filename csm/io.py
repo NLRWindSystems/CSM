@@ -12,58 +12,17 @@ from tqdm import tqdm
 from csm import util
 
 
-csm_result_type = tuple[pd.DataFrame, dict[str, pd.DataFrame]]
-
 DIR_MODEL_DEFAULT = "./csm/model"
 DIR_OUTPUT_DEFAULT = "./output"
 PATH_LANDBOSSE_TEMPLATE = "./input/landbosse_input_template.xlsx"
 PATH_CONFIG_DEFAULT = "./input/config.yaml"
+CSM_RESULT_TYPE = tuple[pd.DataFrame, dict[str, pd.DataFrame]]
 
 
 def read_config_file(
     path_config: Path,
 ) -> dict:
     return yaml.safe_load(open(path_config))
-
-
-def read_model_input(
-    config: dict,
-) -> Generator[tuple[str, pd.DataFrame], None, None]:
-    """Read an input config and turn it into a generator of parameter scenario dataframes for each model
-
-    Args:
-        config (dict): dict containing parmeter input values
-
-    Raises:
-        KeyError: flag when a model has not been specified for each input scenario
-
-    Yields:
-        Generator[tuple[str, pd.DataFrame], None, None]: generator of (model_name, input_parameters) model inputs
-    """
-
-    param_input = create_input_parameter_scenarios(config)
-
-    # The input dicts can theoreticaly appear in any order
-    # Using itertools.groupby to organize inputs by model requires them to be sorted before grouping
-    param_groupby = operator.itemgetter("model")
-    param_input_grouped = itertools.groupby(
-        sorted(param_input, key=param_groupby),
-        key=param_groupby,
-    )
-
-    for model_name, param_input_model in param_input_grouped:
-        # Handle inputs with no specified model
-        if model_name is None:
-            raise KeyError("All inputs must indicate which model should be used.")
-
-        # Create dataframe of model input parameters
-        param_input_model = (
-            pd.DataFrame(param_input_model)
-            .drop(columns="model")
-            .rename_axis("scenario_number", axis=0)
-            .rename_axis("parameter", axis=1)
-        )
-        yield model_name, param_input_model
 
 
 def create_input_parameter_scenarios(
@@ -84,12 +43,59 @@ def create_input_parameter_scenarios(
     parameter_inputs = map(util.expand_dict_of_lists, parameter_inputs)
     parameter_inputs = itertools.chain(*parameter_inputs)
 
-    yield from parameter_inputs
+    # Check each set of parameters for to ensure it has a model
+    for pi in parameter_inputs:
+        if pi.get("model") is None:
+            raise KeyError(f"Must specify a model: {str(pi)}")
+        yield pi
+
+
+def read_model_input(
+    config: dict,
+) -> Generator[tuple[str, pd.DataFrame], None, None]:
+    """Read an input config and turn it into a generator of parameter scenario dataframes for each model
+
+    Args:
+        config (dict): dict containing parmeter input values
+
+    Raises:
+        KeyError: flag when a model has not been specified for each input scenario
+
+    Yields:
+        Generator[tuple[str, pd.DataFrame], None, None]: generator of (model_name, input_parameters) model inputs
+    """
+
+    # The input dicts can theoreticaly appear in any order
+    # We need to organise them into groups based on which model they are using, defined by the name of the model
+    # which must appear in the dict
+
+    # In order to use itertools.groupby to organize the dicts into groups, we first must sort them based on the model key
+    model_getter = operator.itemgetter("model")
+    param_input = sorted(
+        create_input_parameter_scenarios(config),
+        key=model_getter,
+    )
+
+    param_input_grouped = itertools.groupby(param_input, key=model_getter)
+
+    for model_name, param_input_model in param_input_grouped:
+        # Handle inputs with no specified model
+        if model_name is None:
+            raise KeyError("All inputs must indicate which model should be used.")
+
+        # Create dataframe of model input parameters
+        param_input_model = (
+            pd.DataFrame(param_input_model)
+            .drop(columns="model")
+            .rename_axis("scenario_number", axis=0)
+            .rename_axis("parameter", axis=1)
+        )
+        yield model_name, param_input_model
 
 
 def generate_output_landbosse(
     model_name: str,
-    model_output: csm_result_type,
+    model_output: CSM_RESULT_TYPE,
     output_dir: Path,
 ) -> Generator[Path, None, None]:
     """Convert CSM model outputs to LandBOSSE format and save the LandBOSSE excel files
@@ -99,7 +105,7 @@ def generate_output_landbosse(
 
     Args:
         model_name (str): name of CSM
-        model_output (csm_result_type): results from CSM
+        model_output (CSM_RESULT_TYPE): results from CSM
         output_dir (Path): directory to save the output files
 
     Yields:
@@ -153,7 +159,7 @@ def generate_output_landbosse(
 
 def convert_csm_output_to_landbosse(
     model_name: str,
-    model_output: csm_result_type,
+    model_output: CSM_RESULT_TYPE,
 ) -> pd.DataFrame:
     """Convert the results of the CSM into a format that LandBOSSE accepts.
     This function only covers certain columns from the 'components' input sheet to LandBOSSE,
@@ -278,7 +284,7 @@ def write_input_file_landbosse(
 
 def generate_output_excel(
     model_name: str,
-    model_output: csm_result_type,
+    model_output: CSM_RESULT_TYPE,
     output_dir: Path,
 ) -> Generator[Path, None, None]:
     """Saves CSM output to excel, in case it is needed.
@@ -286,7 +292,7 @@ def generate_output_excel(
 
     Args:
         model_name (str): name of model. used for filename
-        model_output (csm_result_type): results from model
+        model_output (CSM_RESULT_TYPE): results from model
         output_dir (Path): directory to save the output files
 
     Yields:

@@ -7,7 +7,7 @@ from csm import CSM, io, util
 
 
 # return type of model outputs including the name of the model
-model_result_type = tuple[str, io.csm_result_type]
+model_result_type = tuple[str, io.CSM_RESULT_TYPE]
 
 
 def get_parameter_config(
@@ -47,8 +47,7 @@ def run_parameter_config(
     config_dict = get_parameter_config(config)
 
     model_directory = config_dict.get("model_directory", io.DIR_MODEL_DEFAULT)
-    if model_directory is not None:
-        model_directory = Path(model_directory)
+    model_directory = Path(model_directory)
 
     model_input = io.read_model_input(config_dict)
     model_result = generate_model_result(model_input, model_directory=model_directory)
@@ -59,7 +58,7 @@ def run_parameter_config(
 
 def generate_model_result(
     model_input: Generator[tuple[str, pd.DataFrame], None, None],
-    model_directory: Path,
+    model_directory: Path = Path(io.DIR_MODEL_DEFAULT),
 ) -> Generator[model_result_type, None, None]:
     """Run each model after the parameter inputs have been organized based on model
 
