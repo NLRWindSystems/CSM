@@ -1,9 +1,9 @@
 import numpy as np
 
-from csm.model.base import CSMBase
+from csm.model.base import CSMMixin
 
 
-class Empirical2024Offshore(CSMBase):
+class Empirical2024Offshore(CSMMixin):
 
     def rotor_radius(rotor_diameter):
         return rotor_diameter / 2.0

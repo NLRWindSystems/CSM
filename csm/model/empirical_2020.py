@@ -1,10 +1,10 @@
 import numpy as np
 import pandas as pd
 
-from csm.model.base import CSMBase
+from csm.model.base import CSMMixin
 
 
-class Empirical2020(CSMBase):
+class Empirical2020(CSMMixin):
 
     def rotor_torque_max(
         turbine_rating_MW, rotor_efficiency_max, rotor_angular_velocity_max
