@@ -73,13 +73,17 @@ def generate_model_result(
 
         model = CSM.from_name(model_name, model_directory)
 
-        _, result_iter = zip(*param_df.apply(pd.Series.to_dict, axis=1).items())
-        result_calculate = map(model.calculate_all, result_iter)
+        # Handle the unlikely event that there is a CSM with no inputs
+        model_args = param_df.drop(columns="scenario")
+        if model_args.empty:
+            result_calculate = map(model.calculate_all, [{}] * len(param_df.index))
+        else:
+            _, result_iter = zip(*model_args.apply(pd.Series.to_dict, axis=1).items())
+            result_calculate = map(model.calculate_all, result_iter)
 
-        result_iterate = tqdm(
-            result_calculate, desc=model_name, total=len(param_df.index)
+        result_unprocessed = tuple(
+            tqdm(result_calculate, desc=model_name, total=len(param_df.index))
         )
-        result_unprocessed = tuple(result_iterate)
         keys_dataframe = set(
             k for k, v in result_unprocessed[0].items() if isinstance(v, pd.DataFrame)
         )
