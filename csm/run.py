@@ -1,6 +1,6 @@
 from pathlib import Path
 from collections.abc import Generator
-
+from tqdm import tqdm
 import pandas as pd
 
 from csm import CSM, io, util
@@ -91,7 +91,6 @@ def create_model_output(
 
     # Lookup to get which function should be used to create the output file
     func_create_output_lookup = {
-        "landbosse": io.generate_output_landbosse,
         "excel": io.generate_output_excel,
     }
 
