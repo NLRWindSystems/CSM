@@ -109,8 +109,8 @@ class CSM:
         param_to_calculate: str,
         params_known: typing.Iterable[str],
     ) -> bool:
-        """Determine whether a given parameter is calculatable given a sequence of known parameter names
-        If the parameter is defined by a function, recursively checks if those functions are calculatable
+        """Determine whether a given parameter is calculable given a sequence of known parameter names
+        If the parameter is defined by a function, recursively checks if those functions are calculable
 
         The reason this function cannot simply rely on the required_inputs_to_calculate function is because
         that function returns only the base inputs required to calculate a function, whereas there is no
@@ -121,20 +121,20 @@ class CSM:
             params_known (typing.Sequence[str]): sequence of parameter names which are assumed to be known
 
         Returns:
-            bool: whether or not the parameter is calculatable given the inputs
+            bool: whether or not the parameter is calculable given the inputs
         """
         if param_to_calculate in self._function_args.keys():
             # Get all the arguments that will need to be calculated (that are not already known)
             args = set(self._function_args[param_to_calculate]).difference(params_known)
 
-            # Check the calculatability of all required unknown arguments, if all are calculatable then the
-            # parameter itself is calculatable
+            # Check the calculatability of all required unknown arguments, if all are calculable then the
+            # parameter itself is calculable
             return all(
                 self.is_calculable_with_inputs(a, params_known=params_known)
                 for a in args
             )
         else:
-            # If the parameter is not defined by a function, then it is only 'calculatable' if it is already known
+            # If the parameter is not defined by a function, then it is only 'calculable' if it is already known
             return param_to_calculate in params_known
 
     def _generate_required_inputs_to_calculate(
@@ -182,15 +182,12 @@ class CSM:
         Raises:
             KeyError: if no function exists for the parameter name
         """
-        if param_name in self._inputs:
-            print(f"{param_name:s} is an input to {self._name:s}.")
 
+        param_func = self._functions.get(param_name)
+        if param_func is None:
+            raise KeyError(f"{param_name:s} is not a function in {self._name:s}.")
         else:
-            param_func = self._functions.get(param_name)
-            if param_func is None:
-                raise KeyError(f"{param_name:s} is not a parameter of {self._name:s}.")
-            else:
-                print(f"{inspect.getsource(param_func):s}")
+            print(f"{inspect.getsource(param_func):s}")
 
     def _get_functions(self) -> dict[str, typing.Callable]:
         """Extract all the function objects in the CSM class that are part of the model itself
@@ -354,7 +351,6 @@ class CSM:
 
         # Flag if any unnecessary inputs have been included in the data
         unnecessary_inputs = available_inputs.difference(self._inputs)
-        unnecessary_inputs -= {"scenario"}
 
         if bool(unnecessary_inputs):
             warnings.warn(
