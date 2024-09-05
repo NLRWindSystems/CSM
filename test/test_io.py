@@ -66,3 +66,22 @@ def test_create_input_parameter_scenarios(sample_config):
     actual = io.create_input_parameter_scenarios(sample_config)
     for a, e in zip(actual, expected):
         assert a == e
+
+
+def test_create_input_parameter_scenarios_no_params():
+    with pytest.raises(KeyError):
+        tuple(io.create_input_parameter_scenarios({}))
+
+
+def test_create_input_parameter_scenarios_no_model():
+    with pytest.raises(KeyError):
+        tuple(io.create_input_parameter_scenarios({"a": 1, "b": 2}))
+
+
+def test_create_input_parameter_scenarios_none_model():
+    with pytest.raises(KeyError):
+        tuple(
+            io.create_input_parameter_scenarios(
+                {"parameters": {"a": 1, "b": 2, "model": None}}
+            )
+        )

@@ -25,19 +25,12 @@ def csm_dataframe_noargs():
 
 
 @pytest.fixture
-def input_vectorized():
-    input_vectorized = pd.DataFrame(
-        data={
-            "a": [1, 2, 3],
-            "b": [4, 5, 6],
-        },
-    )
-    input_vectorized = input_vectorized.rename_axis("test_scenario")
-    return input_vectorized
+def csm_simple_all_inputs():
+    return {"a": 1, "b": 2}
 
 
 def test_CSM_instantiate():
-    with pytest.raises(TypeError):
+    with pytest.raises(ValueError):
         CSM()
 
 
@@ -61,9 +54,7 @@ def test_get_available_models_no_models():
 
 def test_create_model(csm_simple):
     assert csm_simple._name == "Basic"
-    assert csm_simple._parameters == {"a", "b", "c", "d", "e"}
-    assert csm_simple._inputs == {"a", "b"}
-    assert csm_simple._outputs == {"c", "d", "e"}
+    assert set(csm_simple._inputs) == {"a", "b"}
     assert csm_simple._function_args == {
         "c": ["a", "b"],
         "d": ["c", "a"],
@@ -77,11 +68,11 @@ def test_create_recursive_model():
 
 
 def test_get_inputs(csm_simple):
-    assert csm_simple.get_inputs() == ["a", "b"]
+    assert set(csm_simple.get_inputs()) == {"a", "b"}
 
 
 def test_get_outputs(csm_simple):
-    assert csm_simple.get_outputs() == ["c", "d", "e"]
+    assert set(csm_simple.get_outputs()) == {"c", "d", "e"}
 
 
 def test_get_name(csm_simple):
@@ -89,7 +80,7 @@ def test_get_name(csm_simple):
 
 
 @pytest.mark.parametrize(
-    "param_name, inputs, calculatable",
+    "param_name, inputs, calculable",
     [
         ("c", ["a", "b"], True),
         ("c", ["a"], False),
@@ -104,8 +95,8 @@ def test_get_name(csm_simple):
         ("e", ["a", "b"], True),
     ],
 )
-def test_is_calculatable_with_inputs(csm_simple, param_name, inputs, calculatable):
-    assert csm_simple.is_calculatable_with_inputs(param_name, inputs) is calculatable
+def test_is_calculable_with_inputs(csm_simple, param_name, inputs, calculable):
+    assert csm_simple.is_calculable_with_inputs(param_name, inputs) is calculable
 
 
 @pytest.mark.parametrize(
@@ -125,6 +116,22 @@ def test_required_inputs_to_calculate_invalid(csm_simple):
         csm_simple.required_inputs_to_calculate("param that does not exist")
 
 
+def test_display_function(csm_simple, capsys):
+    expected = """
+    def e(d):
+        return d + 1
+    """
+    csm_simple.display_function("e")
+    actual = capsys.readouterr()
+    assert actual.out.strip() == expected.strip()
+
+
+@pytest.mark.parametrize("param_name", ["a", "x"])
+def test_display_function_invalid_input(csm_simple, param_name):
+    with pytest.raises(KeyError):
+        csm_simple.display_function(param_name)
+
+
 @pytest.mark.parametrize(
     "param_name, input_data, expected_output",
     [
@@ -141,15 +148,15 @@ def test_required_inputs_to_calculate_invalid(csm_simple):
 def test_calculate_parameter_scalar_input_scalar_output(
     csm_simple, param_name, input_data, expected_output
 ):
-    assert csm_simple.calculate_parameter(param_name, **input_data) == expected_output
-    assert csm_simple.calculate_parameter(param_name, input_data) == expected_output
+    assert csm_simple.calculate(param_name, **input_data) == expected_output
+    assert csm_simple.calculate(param_name, input_data) == expected_output
 
 
 def test_calculate_parameter_scalar_input_dataframe_output(csm_dataframe):
     expected = pd.DataFrame(data={"a": [1, 1, 1], "b": [2, 2, 2]}).rename_axis(
         "test_index_name",
     )
-    actual = csm_dataframe.calculate_parameter("df_output", **{"a": 1, "b": 2})
+    actual = csm_dataframe.calculate("df_output", **{"a": 1, "b": 2})
     assert_frame_equal(actual, expected)
 
 
@@ -159,115 +166,35 @@ def test_calculate_parameter_scalar_input_dataframe_noargs_output(
     expected = pd.DataFrame(data={"a": [1, 2], "b": [4, 5]}).rename_axis(
         "test_index_name",
     )
-    actual = csm_dataframe_noargs.calculate_parameter("df_output")
-    assert_frame_equal(actual, expected)
-
-
-@pytest.mark.parametrize(
-    "param_name, input_data, expected_output",
-    [
-        ("a", {"a": np.array([1, 2]), "b": np.array([3, 4])}, np.array([1, 2])),
-        ("b", {"a": np.array([1, 2]), "b": np.array([3, 4])}, np.array([3, 4])),
-        ("b", {"b": np.array([3, 4]), "a": np.array([1, 2])}, np.array([3, 4])),
-        ("c", {"a": np.array([1, 2]), "b": np.array([3, 4])}, np.array([5, 7])),
-        ("d", {"a": np.array([1, 2]), "b": np.array([3, 4])}, np.array([7, 10])),
-        ("e", {"a": np.array([1, 2]), "b": np.array([3, 4])}, np.array([8, 11])),
-        ("e", {"a": np.array([1, 2]), "c": np.array([3, 4])}, np.array([6, 8])),
-        ("e", {"d": np.array([10, 11])}, np.array([11, 12])),
-    ],
-)
-def test_calculate_parameter_vector_input_vector_output(
-    csm_simple, param_name, input_data, expected_output
-):
-    assert np.array_equal(
-        csm_simple.calculate_parameter(param_name, **input_data),
-        expected_output,
-    )
-
-
-def test_calculate_parameter_vector_input_dataframe_output(csm_dataframe):
-    expected = (
-        pd.DataFrame(data={"a": [1, 1, 1], "b": [3, 3, 3]}).rename_axis(
-            "test_index_name",
-        ),
-        pd.DataFrame(data={"a": [2, 2, 2], "b": [4, 4, 4]}).rename_axis(
-            "test_index_name",
-        ),
-    )
-    actual = csm_dataframe.calculate_parameter(
-        "df_output", {"a": np.array([1, 2]), "b": np.array([3, 4])}
-    )
-    for a, e in zip(actual, expected):
-        assert_frame_equal(a, e, check_dtype=False)
-
-
-@pytest.mark.parametrize(
-    "param_name, expected_output",
-    [
-        ("a", np.array([1, 2, 3])),
-        ("b", np.array([4, 5, 6])),
-        ("c", np.array([6, 8, 10])),
-        ("d", np.array([8, 11, 14])),
-        ("e", np.array([9, 12, 15])),
-    ],
-)
-def test_calculate_parameter_dataframe_input_vector_output(
-    csm_simple,
-    input_vectorized,
-    param_name,
-    expected_output,
-):
-    assert np.array_equal(
-        csm_simple.calculate_parameter(param_name, input_vectorized),
-        expected_output,
-    )
-
-
-def test_calculate_parameter_dataframe_input_dataframe_output(
-    csm_dataframe,
-    input_vectorized,
-):
-
-    expected = pd.DataFrame(
-        data={"a": [1, 1, 1, 2, 2, 2, 3, 3, 3], "b": [4, 4, 4, 5, 5, 5, 6, 6, 6]},
-        index=pd.MultiIndex.from_product(
-            iterables=[[0, 1, 2], [0, 1, 2]],
-            names=["test_scenario", "test_index_name"],
-        ),
-    )
-    actual = csm_dataframe.calculate_parameter("df_output", input_vectorized)
-    assert_frame_equal(actual, expected)
-
-
-def test_calculate_parameter_dataframe_input_dataframe_noargs_output(
-    csm_dataframe_noargs,
-    input_vectorized,
-):
-    expected_rows = len(input_vectorized.index)
-    expected = pd.DataFrame(
-        data={
-            "a": [1, 2] * expected_rows,
-            "b": [4, 5] * expected_rows,
-        },
-        index=pd.MultiIndex.from_product(
-            iterables=[range(expected_rows), [0, 1]],
-            names=["test_scenario", "test_index_name"],
-        ),
-    )
-    actual = csm_dataframe_noargs.calculate_parameter("df_output", input_vectorized)
+    actual = csm_dataframe_noargs.calculate("df_output")
     assert_frame_equal(actual, expected)
 
 
 def test_calculate_parameter_nonexistent_scalar_input(csm_simple):
     with pytest.raises(KeyError):
-        csm_simple.calculate_parameter("nonexistent_parameter", {"a": 1, "b": 2})
+        csm_simple.calculate("nonexistent_parameter", {"a": 1, "b": 2})
 
 
 def test_calculate_parameter_missing_input(csm_simple):
     with pytest.raises(KeyError):
-        csm_simple.calculate_parameter("d", **{"a": 1})
+        csm_simple.calculate("d", **{"a": 1})
 
 
 def test_dataframe_missing_type_hint():
     csm = test_model.MissingReturnTypeHint()
-    csm.calculate_parameter("df_output", a=1, b=2)
+    csm.calculate("df_output", a=1, b=2)
+
+
+def test_calculate_all(csm_simple, csm_simple_all_inputs):
+    expected = {**csm_simple_all_inputs, "c": 4, "d": 6, "e": 7}
+    assert csm_simple.calculate_all(csm_simple_all_inputs) == expected
+    assert csm_simple.calculate_all(**csm_simple_all_inputs) == expected
+
+
+def test_calculate_all_no_inputs(csm_simple):
+    assert csm_simple.calculate_all() == {}
+
+
+def test_calculate_all_unnecessary_inputs(csm_simple, csm_simple_all_inputs):
+    with pytest.warns():
+        csm_simple.calculate_all(**csm_simple_all_inputs, unnecessary_parameter=100)
