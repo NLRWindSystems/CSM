@@ -70,9 +70,33 @@ def generate_model_result(
         Generator[model_result_type, None, None]: generator of model results
     """
     for model_name, param_df in model_input:
+
         model = CSM.from_name(model_name, model_directory)
-        result = model.calculate_all_parameters(param_df)
-        yield model_name, result
+
+        _, result_iter = zip(*param_df.apply(pd.Series.to_dict, axis=1).items())
+        result_calculate = map(model.calculate_all, result_iter)
+
+        result_iterate = tqdm(
+            result_calculate, desc=model_name, total=len(param_df.index)
+        )
+        result_unprocessed = tuple(result_iterate)
+        keys_dataframe = set(
+            k for k, v in result_unprocessed[0].items() if isinstance(v, pd.DataFrame)
+        )
+        result_unprocessed_dataframe = tuple(
+            {k: r.pop(k) for k in keys_dataframe} for r in result_unprocessed
+        )
+        # Assuming all results will have the same keys in the result_df dict
+        result_df = {
+            k: pd.concat(
+                (r[k] for r in result_unprocessed_dataframe), keys=param_df.index
+            )
+            for k in result_unprocessed_dataframe[0].keys()
+        }
+
+        result_scalar = pd.DataFrame(result_unprocessed, index=param_df.index)
+
+        yield model_name, (result_scalar, result_df)
 
 
 def create_model_output(
@@ -110,7 +134,3 @@ def create_model_output(
         # Call the appropriate function on the model results
         for model_name, model_result in model_result:  # type: ignore
             yield from func_create_output(model_name, model_result, output_dir)  # type: ignore
-
-
-if __name__ == "__main__":
-    pass

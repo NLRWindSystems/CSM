@@ -8,41 +8,6 @@ from collections.abc import Generator
 import numpy as np
 
 
-# def import_model(
-#     model_name: str,
-#     dir_model: str | Path,
-# ) -> typing.Callable:
-#     """Checks if a CSM model exists before importing it and creating a new instance
-
-#     Args:
-#         model_name (str): name of model (which must correspond to the name of the .py file)
-#         dir_model (Path): directory where model is saved
-
-#     Raises:
-#         FileNotFoundError: if file does not exist
-
-#     Returns:
-#         typing.Callable: the imported model
-#     """
-
-#     dir_model = Path(dir_model)
-
-#     path_model = dir_model / (model_name + ".py")
-
-#     if not path_model.is_file():
-#         raise FileNotFoundError(
-#             f"Could not find {model_name:s}.py in {str(dir_model):s}."
-#         )
-
-#     module = import_module(path_model)
-
-#     model = getattr(module, model_name)
-#     if model is None:
-#         raise ImportError(f"Could not import {model_name:s} from {path_model:s}")
-
-#     return model
-
-
 def import_module(
     path_module: Path,
 ) -> types.ModuleType:

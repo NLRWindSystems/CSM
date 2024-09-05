@@ -76,9 +76,6 @@ def read_model_input(
     param_input_grouped = itertools.groupby(param_input, key=model_getter)
 
     for model_name, param_input_model in param_input_grouped:
-        # Handle inputs with no specified model
-        if model_name is None:
-            raise KeyError("All inputs must indicate which model should be used.")
 
         # Create dataframe of model input parameters
         param_input_model = (
