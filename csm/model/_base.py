@@ -3,7 +3,7 @@ import numpy as np
 from csm.csm import CSM
 
 
-class CSMBase(CSM):
+class CSMMixin(CSM):
     """Base CSM class containing functions that will apply to every cost and scaling model"""
 
     def rotor_angular_velocity_max(tip_speed_max, rotor_radius):

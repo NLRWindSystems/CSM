@@ -45,3 +45,14 @@ repos:
   -   id: mixed-line-ending
   -   id: pretty-format-json
       args: [--autofix]
+
+# -   repo: local
+#     hooks:
+#     - id: pytest
+#       name: pytest
+#       stages: [commit]
+#       entry: pytest test
+#       language: python
+#       types: [python]
+#       always_run: true
+#       pass_filenames: false
