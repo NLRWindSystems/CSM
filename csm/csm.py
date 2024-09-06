@@ -338,7 +338,7 @@ class CSM:
             **params_input_kwargs: (dict[str, typing.Any]): kwargs form of params_input
 
         Returns:
-            io.CSM_RESULT_TYPE: results from the model, with the scalar results stored in a dict and the dataframe results
+            dict[str, typing.Any]: results from the model, with the scalar results stored in a dict and the dataframe results
             stored in dict, keyed by
         """
 
