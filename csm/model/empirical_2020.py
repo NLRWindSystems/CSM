@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from csm.model.base import CSMMixin
+from csm.model._base import CSMMixin
 
 
 class Empirical2020(CSMMixin):

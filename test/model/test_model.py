@@ -1,4 +1,4 @@
-from csm.model.base import CSM
+from csm.model._base import CSM
 import pandas as pd
 
 

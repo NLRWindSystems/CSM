@@ -1,6 +1,6 @@
 import numpy as np
 
-from csm.model.base import CSMMixin
+from csm.model._base import CSMMixin
 
 
 class Empirical2024Offshore(CSMMixin):

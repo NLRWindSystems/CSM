@@ -1,9 +1,12 @@
-import csm
+from csm import CSM, run_parameter_config
 
 if __name__ == "__main__":
 
+    # Def get list of available CSM models
+    print(CSM.get_available_models())
+
     # Create model from name
-    model = csm.CSM.from_name("Empirical2020")
+    model = CSM.from_name("Empirical2020")
     print(model)
 
     # Any values that could be used to calculate a parameter will work
@@ -56,6 +59,6 @@ if __name__ == "__main__":
     print(model.calculate_all(data))
 
     # Alternatively, we can read a parameter config file and run all possible combinations of parameters
-    result = csm.run_parameter_config()
+    result = run_parameter_config()
     result = tuple(result)
     print(result)

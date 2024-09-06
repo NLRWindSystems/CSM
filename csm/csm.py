@@ -50,7 +50,7 @@ class CSM:
         """
         models = {}
         # Check all non-dunder .py files
-        module_paths = Path(dir_models).glob("[!__]*[!__].py")
+        module_paths = Path(dir_models).glob("[!_]*.py")
         for p in module_paths:
             module = util.import_module(p)
             for name, obj in inspect.getmembers(module):

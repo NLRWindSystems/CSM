@@ -1,4 +1,4 @@
-from csm.model.base import CSMMixin
+from csm.model._base import CSMMixin
 
 
 class Replicate2015(CSMMixin):
