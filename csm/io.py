@@ -5,7 +5,7 @@ import yaml
 import pandas as pd
 
 
-DIR_MODEL_DEFAULT = "./csm/model"
+DIR_MODEL_DEFAULT = Path(__file__).parent / "model"
 DIR_OUTPUT_DEFAULT = "./output"
 PATH_CONFIG_DEFAULT = "./input/config.yaml"
 CSM_RESULT_TYPE = tuple[pd.DataFrame, dict[str, pd.DataFrame]]
