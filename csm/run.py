@@ -141,8 +141,10 @@ def generate_model_results(
 
         model = CSM.from_name(model_name, model_directory)
 
-        # Handle the unlikely event that there is a parameter dataframe no inputs
+        # Remove the scenario column from the module inputs since it is not a parameter in the model
         model_args = param_df.drop(columns="scenario")
+
+        # Handle the unlikely event that there is a parameter dataframe no inputs
         if model_args.empty:
             result_calculate = map(model.calculate_all, [{}] * len(param_df.index))
         else:
@@ -176,6 +178,13 @@ def generate_model_results(
         }
 
         result_scalar = pd.DataFrame(result_unprocessed, index=param_df.index)
+
+        # Add the scenario column that was previously removed back into the results
+        result_scalar.insert(
+            loc=0,
+            column="scenario",
+            value=param_df.loc[result_scalar.index, "scenario"],
+        )
 
         yield model_name, (result_scalar, result_df)
 
