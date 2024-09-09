@@ -20,18 +20,11 @@ class Empirical2024Offshore(CSMMixin):
         return (turbine_rating_MW / rotor_efficiency_max) / (rotor_angular_velocity_max)
 
     ##
-    def gearbox_mass(is_direct_drive, rotor_torque_max_MNm):
-        if is_direct_drive:
-            return 0.0
-        else:
-            return 5149.8 * rotor_torque_max_MNm + 121.58
+    def gearbox_mass(rotor_torque_max_MNm):
+        return 5149.8 * rotor_torque_max_MNm + 121.58
 
     def blade_mass(rotor_diameter):
         return 387.52 * rotor_diameter - 27755.0
 
-    def gearbox_cost(is_direct_drive, gearbox_mass):
-        if is_direct_drive:
-            return 0.0
-        else:
-            # return 1.2902 * gearbox_mass - 42.127
-            return 62.490 * gearbox_mass - 6922742.647
+    def gearbox_cost(gearbox_mass):
+        return 0.0728 * gearbox_mass**1.4364

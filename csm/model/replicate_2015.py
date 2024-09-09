@@ -82,7 +82,7 @@ class Replicate2015(CSMMixin):
         return 0.0001 * rotor_diameter**3.5
 
     def gearbox_mass(rotor_torque_max):
-        return rotor_torque_max * 1.0e3 / 200.0
+        return rotor_torque_max / 200.0
 
     def braking_system_mass(rotor_torque_max):
         return 0.00122 * rotor_torque_max
@@ -117,3 +117,6 @@ class Replicate2015(CSMMixin):
 
     def tower_mass(hub_height):
         return 19.828 * hub_height**2.0282
+
+    def gearbox_cost(gearbox_mass):
+        return gearbox_mass * 12.9
