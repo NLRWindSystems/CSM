@@ -86,3 +86,63 @@
   - `generate_model_result` could be something like `run_models`, though I'm still not sold on the
     usage of `yield`. One consideration would to just concatenate all the resulting data frames
     into a single resulting dataframe.
+
+# Feedback 9/9/2024
+
+## General
+
+- The offshore and onshore models should just be split. I assume the relationships won't ultimately
+  be compatible.
+- `io.py` should be renamed because the Python standard library includes a package called `io`, so
+  importing the CSM version writes over its namespace when imported. I think most of it would fit
+  in `csm/csm.py` just fine as well.
+- Be careful with how long the comments are in some places. Generally aim to be succinct. I'd also
+  avoid breaking up list/dict/etc. comprehensions with comments because it makes the code harder to
+  read. Keep the line lengths consistent with the code line lengths as well, it's much easier to
+  read that way.
+- I'd aim for avoiding abbreviations for things like `param` to keep things explicit.
+- When working with `Path` objects, just be sure to do `Path(<input>).resolve()` when initializing
+- `dict` objects should be initialized with `x = {}`, not `x = dict()`. This comes more of
+  an accepted best practice within Python vs anything substantively wrong. It's just generally best
+  to avoid instantiating a dictionary, or even list, with `dict(<input>)` vs `{"key": "value"}
+  unless it's something like `x = dict(zip(list1, list2))`, which is then the appropriate way.
+- `dict_of_dicts` is more commonly `nested_dict`
+- I'm still curious about the use of yield, is there a reason you're creating the dictionaries
+  from generators? It's just not that common of a use case, so I'm just curious.
+- Is there a reason why only Python 3.12+ is supported? It'd be good to at least include 3.11 as
+  well if it's possible. Relatedly, the ruff target version should reflect the minimum supported
+  version.
+
+## CSM
+
+- I don't think I'm following the self._name logic, what exactly is this doing? Is it pulling the
+  model's name?
+- `CSM.from_name()` seems like it should be the main model creation hook where
+  `model_name` and `model_dir` are the two expected inputs. If using an included model, then
+  `model_dir` could be `None`.
+- `self._function_args.keys()` is used a lot, couldn't `self._functions` be used in its place?
+- `_get_functions` should probably be `_get_model_functions`.
+- In `calculate()`, I might use the arguments `parameter`, `inputs`, and `**kwargs` because they're
+  shorter and a more standard naming convention (at least with `**kwargs`).
+
+## util.py
+
+- `expand_dict_of_dicts`
+  - Will the underscore connection in bringing nested levels up (`upstream_key + "_" + k`) cause
+    issues later if there is an underscore in the parameter name already?
+- The `np.linspace` call could just be `dict_of_lists[k] = np.linspace(*v[0], v[1]), but i might also
+  be being picky about this. You might also need a check that the start and stop are in the correct
+  order.
+- Something that would be helpful when creating the docstrings for these functions is to provide
+  a somewhat basic example to show what the input and output should look like. In general, without 
+  seeing an example these are pretty abstract (totally fine) so they're a bit hard to follow.
+
+## run.py
+
+- `get_parameter_config` should be `read_config` or `load_config` instead of get since this is
+  primarily intended to be a file reading method. This method probably fits nicely in csm.py as well.
+- `run_parameter_config` could also just be `run` and be csm.py as a means to run without using the
+  `CSM` class. This is also seems a bit redundant with `CSM.calculate_all()`.
+- In `create_input_parameter_scenarios`, `pi` threw me off, so I'd either stick with the generic
+  `el` or use something more specific like `parameter` (not `input` since that's an actual method).
+  In the f-string, `f"{str(pi)}"` is redundant and can just be `f"{pi}"`

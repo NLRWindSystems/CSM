@@ -1,3 +1,7 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "CSM"
 dynamic = ["version"]
@@ -14,6 +18,21 @@ dependencies = [
   "tqdm>=4",
   "openpyxl>=3",
 ]
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+include = ["csm"]
+exclude = [
+    "*.test",
+    "*.test.*",
+    "test.*",
+    "test",
+]
+
+[tool.setuptools.dynamic]
+version = {attr = "csm.__version__"}
 
 [tool.isort]
 skip = []
