@@ -29,7 +29,7 @@ def csm_simple_all_inputs():
 
 
 def test_CSM_instantiate():
-    with pytest.raises(ValueError):
+    with pytest.raises(TypeError):
         CSM()
 
 
@@ -182,6 +182,11 @@ def test_calculate_parameter_missing_input(csm_simple):
 def test_dataframe_missing_type_hint():
     csm = test_model.MissingReturnTypeHint()
     csm.calculate("df_output", a=1, b=2)
+
+
+def test_model_no_functions():
+    with pytest.raises(ValueError):
+        test_model.NoFunctions()
 
 
 def test_calculate_all(csm_simple, csm_simple_all_inputs):

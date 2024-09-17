@@ -1,4 +1,4 @@
-from csm import CSM, run_parameter_config
+from csm import CSM, run_config
 
 if __name__ == "__main__":
 
@@ -55,10 +55,12 @@ if __name__ == "__main__":
     for p in model.get_outputs():
         print(f"{p:s} = {model.calculate(p, data)}")
 
-    # Calculate all output parmeters in a more efficient way than looping over them individually
+    # Calculate all output parmeters in a more efficient way than looping over them
+    # individually
     print(model.calculate_all(data))
 
-    # Alternatively, we can read a parameter config file and run all possible combinations of parameters
-    result = run_parameter_config()
+    # Alternatively, we can read a parameter config file and run all possible
+    # combinations of parameters
+    result = run_config()
     result = tuple(result)
     print(result)

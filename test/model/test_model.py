@@ -41,3 +41,7 @@ class MissingReturnTypeHint(CSM):
         num_rows = 3
         result = pd.DataFrame(data={"a": [a] * num_rows, "b": [b] * num_rows})
         return result
+
+
+class NoFunctions(CSM):
+    pass

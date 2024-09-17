@@ -24,15 +24,15 @@ def sample_config():
     }
 
 
-def test_get_parameter_config():
-    assert isinstance(run.get_parameter_config(PATH_CONFIG), dict)
+def test_load_config():
+    assert isinstance(run.load_config(PATH_CONFIG), dict)
 
 
-def test_get_parameter_config_str():
-    assert isinstance(run.get_parameter_config(str(PATH_CONFIG)), dict)
+def test_load_config_str():
+    assert isinstance(run.load_config(str(PATH_CONFIG)), dict)
 
 
-def test_create_input_parameter_scenarios(sample_config):
+def test_generate_input_parameter_scenarios(sample_config):
     expected = (
         {
             "model": "model2",
@@ -62,46 +62,46 @@ def test_create_input_parameter_scenarios(sample_config):
         },
     )
 
-    actual = run.create_input_parameter_scenarios(sample_config)
+    actual = run.generate_input_parameter_scenarios(sample_config)
     for a, e in zip(actual, expected):
         assert a == e
 
 
-def test_create_input_parameter_scenarios_no_params():
+def test_generate_input_parameter_scenarios_no_params():
     with pytest.raises(KeyError):
-        tuple(run.create_input_parameter_scenarios({}))
+        tuple(run.generate_input_parameter_scenarios({}))
 
 
-def test_create_input_parameter_scenarios_no_model():
+def test_generate_input_parameter_scenarios_no_model():
     with pytest.raises(KeyError):
-        tuple(run.create_input_parameter_scenarios({"a": 1, "b": 2}))
+        tuple(run.generate_input_parameter_scenarios({"a": 1, "b": 2}))
 
 
-def test_create_input_parameter_scenarios_none_model():
+def test_generate_input_parameter_scenarios_none_model():
     with pytest.raises(KeyError):
         tuple(
-            run.create_input_parameter_scenarios(
+            run.generate_input_parameter_scenarios(
                 {"parameters": {"a": 1, "b": 2, "model": None}}
             )
         )
 
 
-def test_run_parameter_config():
-    tuple(run.run_parameter_config(config=PATH_CONFIG))
+def test_run_config():
+    tuple(run.run_config(config=PATH_CONFIG))
 
 
-def test_run_parameter_config_excel_output(tmp_path):
-    config = run.get_parameter_config(PATH_CONFIG)
+def test_run_config_excel_output(tmp_path):
+    config = run.load_config(PATH_CONFIG)
     config["output_type"] = "excel"
     config["output_directory"] = tmp_path
 
-    for p in run.run_parameter_config(config):
+    for p in run.run_config(config):
         assert p.is_file()
 
 
-def test_run_parameter_config_invalid_output():
-    config = run.get_parameter_config(PATH_CONFIG)
+def test_run_config_invalid_output():
+    config = run.load_config(PATH_CONFIG)
     config["output_type"] = "invalid_output"
 
     with pytest.raises(KeyError):
-        tuple(run.run_parameter_config(config))
+        tuple(run.run_config(config))

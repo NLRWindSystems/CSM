@@ -24,15 +24,10 @@ include-package-data = true
 
 [tool.setuptools.packages.find]
 include = ["csm"]
-exclude = [
-    "*.test",
-    "*.test.*",
-    "test.*",
-    "test",
-]
+exclude = ["*.test", "*.test.*", "test.*", "test"]
 
 [tool.setuptools.dynamic]
-version = {attr = "csm.__version__"}
+version = { attr = "csm.__version__" }
 
 [tool.isort]
 skip = []
@@ -97,6 +92,7 @@ cache_dir = ".cache/mypy/"
 
 [tool.pytest.ini_options]
 cache_dir = ".cache/pytest"
+addopts = "--cov=csm --cov-report term-missing"
 
 [tool.coverage.run]
 omit = ["./csm/model/*"]

@@ -130,6 +130,9 @@
 - `expand_dict_of_dicts`
   - Will the underscore connection in bringing nested levels up (`upstream_key + "_" + k`) cause
     issues later if there is an underscore in the parameter name already?
+
+  ### you are right in that it won't be possible to reverse-engineer the nested structure from the result, but for this use case it doesn't really bother me. I don't think it will cause problems
+
 - The `np.linspace` call could just be `dict_of_lists[k] = np.linspace(*v[0], v[1]), but i might also
   be being picky about this. You might also need a check that the start and stop are in the correct
   order.
