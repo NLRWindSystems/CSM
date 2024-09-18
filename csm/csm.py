@@ -127,6 +127,15 @@ class CSM:
         """
         return tuple(self._function_args.keys())
 
+    def get_function_args(self) -> dict[str, list[str]]:
+        """Return a dict of the arguments of the model functions keyed by their function
+        name
+
+        Returns:
+            dict[str, list[str]]: model function arguments
+        """
+        return self._function_args
+
     def get_name(self) -> str:
         return self._name
 

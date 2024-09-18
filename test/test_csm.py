@@ -54,7 +54,10 @@ def test_get_available_models_no_models():
 def test_create_model(csm_simple):
     assert csm_simple._name == "Basic"
     assert set(csm_simple._inputs) == {"a", "b"}
-    assert csm_simple._function_args == {
+
+
+def test_get_function_args(csm_simple):
+    assert csm_simple.get_function_args() == {
         "c": ["a", "b"],
         "d": ["c", "a"],
         "e": ["d"],
