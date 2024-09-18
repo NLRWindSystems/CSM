@@ -5,26 +5,37 @@ from csm.model._base import CSMMixin
 
 class Empirical2024Offshore(CSMMixin):
 
-    def rotor_radius(rotor_diameter):
-        return rotor_diameter / 2.0
-
     def rotor_angular_velocity_max(tip_speed_max, rotor_radius):
         return tip_speed_max / rotor_radius
 
-    def rotor_angular_velocity_max_rpm(rotor_angular_velocity_max):
-        return rotor_angular_velocity_max * 180.0 / np.pi
-
-    def rotor_torque_max_MNm(
-        turbine_rating_MW, rotor_efficiency_max, rotor_angular_velocity_max
+    def rotor_torque_max(
+        turbine_rating, rotor_efficiency_max, rotor_angular_velocity_max
     ):
-        return (turbine_rating_MW / rotor_efficiency_max) / (rotor_angular_velocity_max)
+        return (turbine_rating * 1e6 / rotor_efficiency_max) / (
+            rotor_angular_velocity_max
+        )
 
-    ##
-    def gearbox_mass(rotor_torque_max_MNm):
-        return 5149.8 * rotor_torque_max_MNm + 121.58
+    def tower_mass(hub_height, water_depth, rotor_diameter):
+        x = (hub_height + water_depth) * rotor_diameter**2
+        return 0.0841 * x + 383329.0
+
+    def nacelle_mass(tower_mass):
+        return 0.1565 * tower_mass + 437246.0
 
     def blade_mass(rotor_diameter):
-        return 387.52 * rotor_diameter - 27755.0
+        return 177.53 * rotor_diameter**1.0954
 
-    def gearbox_cost(gearbox_mass):
-        return 0.0728 * gearbox_mass**1.4364
+    def monopile_mass(water_depth):
+        return 579824.0 * np.exp(0.0307 * water_depth)
+
+    def gearbox_mass(rotor_torque_max, is_direct_drive):
+        if is_direct_drive:
+            return 0.0
+        else:
+            return 3487.9 * np.exp(0.0184 * rotor_torque_max / 1e6)
+
+    def gearbox_cost(gearbox_mass, is_direct_drive):
+        if is_direct_drive:
+            return 0.0
+        else:
+            return 94.425 * gearbox_mass - 147064.0
