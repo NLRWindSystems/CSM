@@ -367,8 +367,9 @@ class CSM:
         if parameter not in self._function_args.keys():
             raise KeyError(
                 f"{parameter:s}"
-                "is not defined by a function in model "
+                " is not defined by a function in model "
                 f"{self._name:s}"
+                ". It must be provided as an input."
             )
 
         # Get the values of the required inputs to the requested parameter function by
