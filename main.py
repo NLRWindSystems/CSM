@@ -62,5 +62,4 @@ if __name__ == "__main__":
     # Alternatively, we can read a parameter config file and run all possible
     # combinations of parameters
     result = run_config()
-    result = tuple(result)
     print(result)
