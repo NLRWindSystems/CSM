@@ -131,7 +131,6 @@ class Empirical2020(CSMMixin):
         section_mass_relative /= section_mass_relative.sum()
 
         section_number = np.arange(num_tower_sections) + 1
-        lever_arm_length = (section_number - 0.5) * hub_height / num_tower_sections
 
         return pd.DataFrame(
             data={
@@ -139,7 +138,6 @@ class Empirical2020(CSMMixin):
                 "mass": section_mass_relative * tower_mass,
                 "surface_area": 4.3 * section_height,
                 "lift_height": section_number * section_height,
-                "lever_arm_length": lever_arm_length,
             },
             index=pd.Index(section_number, name="tower_section_id"),
         )
