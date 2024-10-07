@@ -137,7 +137,6 @@ class Empirical2020(CSMMixin):
                 "height": section_height,
                 "mass": section_mass_relative * tower_mass,
                 "surface_area": 4.3 * section_height,
-                "lift_height": section_number * section_height,
             },
             index=pd.Index(section_number, name="tower_section_id"),
         )
