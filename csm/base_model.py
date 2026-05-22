@@ -14,12 +14,23 @@ class CSMBase:
     rotor_angular_velocity_max: float = field(default=0.0, validator=validators.instance_of(float), metadata={"units": "unitless", "io": "input"})
     
     # blades
+    blade_has_carbon: bool = field(default=False, validator=validators.instance_of(bool), metadata={"units": "unitless", "io": "input"})
+    blade_mass_coeff: float = field(default=0.0, validator=validators.instance_of(float), metadata={"units": "unitless", "io": "input"})
+    blade_mass_cost_coeff: float = field(default=0.0, validator=validators.instance_of(float), metadata={"units": "USD/kg", "io": "input"})
+    blade_cost_external: float = field(default=0.0, validator=validators.instance_of(float), metadata={"units": "USD", "io": "input"})
+    blade_mass: float = field(default=0.0, validator=validators.instance_of(float), metadata={"units": "kg", "io": "both"})
+    blade_cost: float = field(default=0.0, validator=validators.instance_of(float), metadata={"units": "USD", "io": "both"})
+    
+    # rotor
     rotor_diameter: float = field(default=0.0, validator=validators.instance_of(float), metadata={"units": "m", "io": "input"})
-    rotor_torque: float = field(default=0.0, validator=validators.instance_of(float), metadata={"units": "kN*m", "io": "input"})
     rotor_mass: float = field(default=0.0, validator=validators.instance_of(float), metadata={"units": "m", "io": "output"})
+    rotor_torque: float = field(default=0.0, validator=validators.instance_of(float), metadata={"units": "kN*m", "io": "both"})
 
     # nacelle
-    nacelle_length: float = field(default=0.0, validator=validators.instance_of(float), metadata={"units": "m", "io": "input"})
+    nacelle_length: float = field(default=0.0, validator=validators.instance_of(float), metadata={"units": "m", "io": "both"})
+    
+    # next
+    blade_mass: float = field(default=0.0, validator=validators.instance_of(float), metadata={"units": "kg", "io": "both"})
 
     def _has_values(self, *args) -> Generator[bool, ...]:
         """Checks if the user provided values for a given :py:attr:`arg` (True), or if they are
@@ -50,6 +61,32 @@ class CSMBase:
             missing = [name for exists, name in zip(has_values, parameters) if not exists]
             raise ValueError(f"Inputs for the following variables required: {', '.join(missing)}")
 
+    def calculate_blade_mass(self):
+        if next(self._has_values("blade_mass")):
+            return
+
+        parameters = ("rotor_diameter", "turbine_class", "blade_has_carbon", "blade_mass_coeff")
+        self._validate_inputs(parameters=parameters)
+
+        match self.turbine_class:
+            case 1:
+                _exp = {"carbon": 2.47, "no_carbon": 2.54}
+            case _ if self.turbine_class > 1:
+                _exp = {"carbon": 2.44, "no_carbon": 2.5}
+            case _ :
+                _exp = {"carbon": 2.5, "no_carbon": 2.5}
+        exp = _exp["carbon" if self.blade_has_carbon else "no_carbon"]
+        self.blade_mass = self.blade_mass_coeff * (self.rotor_diameter / 2) ** exp
+
+    def calculate_blade_cost(self):
+        if next(self._has_values("blade_cost")):
+            return
+
+        parameters = ("blade_mass", "blade_mass_cost_coeff")
+        self._validate_inputs(parameters=parameters)
+
+        self.blade_cost = self.blade_mass_cost_coeff * self.blade_mass
+
 
     def calculate_rotor_torque(self):
         if next(self._has_values("rotor_torque")):
@@ -63,10 +100,17 @@ class CSMBase:
             / self.rotor_angular_velocity_max
         )
 
-    def run():
+    def run(self):
+        """Run the mass and cost calculations."""
         self.calculate_rotor_torque()
+        self.calculate_blade_mass()
 
-    def get_results():
+        self.calculate_blade_cost()
+
+    def get_results(self) -> dict[str, float]:
+        """Gathers the core results."""
         results = {
             "rotor_torque": self.rotor_torque,
+            "rotor_mass": self.rotor_mass,
+            "rotor_cost": self.rotor_cost,
         }
