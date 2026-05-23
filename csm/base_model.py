@@ -92,11 +92,11 @@ class CSMBase:
         if next(self._has_values("rotor_torque")):
             return
         
-        parameters = ("turbine_rating", "rotor_efficiency_max", "rotor_angular_velocity_max")
+        parameters = ("rated_power_kw", "rotor_efficiency_max", "rotor_angular_velocity_max")
         self._validate_inputs(parameters=parameters)
         
         self.rotor_torque = (
-            (self.turbine_rating * 1e3 / self.rotor_efficiency_ma)
+            (self.rated_power_kw * 1e3 / self.rotor_efficiency_ma)
             / self.rotor_angular_velocity_max
         )
 
@@ -111,6 +111,7 @@ class CSMBase:
         """Gathers the core results."""
         results = {
             "rotor_torque": self.rotor_torque,
-            "rotor_mass": self.rotor_mass,
-            "rotor_cost": self.rotor_cost,
+            "blade_mass": self.blade_mass,
+            "blade_cost": self.blade_cost,
         }
+        return results
