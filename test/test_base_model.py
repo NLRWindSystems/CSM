@@ -9,24 +9,29 @@ from csm.base_model import CSMBase
 csm_2015_inputs = {
     # defaults
     "turbine_class": 1,
-    "rated_power_kw": None,
     "rotor_efficiency_max": None,
     "blade_has_carbon": False,
-    "blade_mass_coeff": None,
-    "blade_mass_cost_coeff": 0.5,
-    "blade_cost_external": None,
+    "blade_mass_coeff": 0.5,
+    "blade_mass_cost_coeff": 14.6,
+    "hub_mass_coeff": 2.3,
+    "hub_mass_intercept": 1320.0,
+    "hub_mass_cost_coeff": 3.9,
+    "rotor_angular_velocity_max": None,
 
     # example input
+    "rated_power_kw": 3500,
     "rotor_diameter": None,
 }
 
 csm_2015_outputs = {
-        "rotor_angular_velocity_max": None,
-        "blade_mass": None,
-        "blade_cost": None,
-        "rotor_torque": None,
-        "nacelle_length": None,
-    }
+    "rotor_angular_velocity_max": None,
+    "blade_mass": None,
+    "blade_cost": None,
+    "rotor_torque": None,
+    "nacelle_length": None,
+    "hub_mass": None,
+    "hub_cost": None,
+}
 
 
 def test_CSMBase_defaults_only(subtests):
