@@ -25,6 +25,13 @@ class CSMBase:
     rotor_diameter: float = field(default=0.0, validator=validators.instance_of(float), metadata={"units": "m", "io": "input"})
     rotor_mass: float = field(default=0.0, validator=validators.instance_of(float), metadata={"units": "m", "io": "output"})
     rotor_torque: float = field(default=0.0, validator=validators.instance_of(float), metadata={"units": "kN*m", "io": "both"})
+    
+    # hub
+    hub_mass_coeff: float = field(default=0.0, validator=validators.instance_of(float), metadata={"units": "unitless", "io": "input"})
+    hub_mass_intercept: float = field(default=0.0, validator=validators.instance_of(float), metadata={"units": "unitless", "io": "input"})
+    hub_mass_cost_coeff: float = field(default=0.0, validator=validators.instance_of(float), metadata={"units": "USD/kg", "io": "input"})
+    hub_mass: float = field(default=0.0, validator=validators.instance_of(float), metadata={"units": "kg", "io": "both"})
+    hub_cost: float = field(default=0.0, validator=validators.instance_of(float), metadata={"units": "USD", "io": "both"})
 
     # nacelle
     nacelle_length: float = field(default=0.0, validator=validators.instance_of(float), metadata={"units": "m", "io": "both"})
@@ -100,12 +107,32 @@ class CSMBase:
             / self.rotor_angular_velocity_max
         )
 
+    def calculate_hub_mass(self):
+        if next(self._has_values("hub_mass")):
+            return
+
+        parameters = ("blade_mass", "hub_mass_coeff", "hub_mass_intercept")
+        self._validate_inputs(parameters=parameters)
+
+        self.hub_mass = self.hub_mass_coeff * self.blade_mass + self.hub_mass_intercept
+
+    def calculate_hub_cost(self):
+        if next(self._has_values("hub_cost")):
+            return
+
+        parameters = ("hub_mass", "hub_mass_cost_coeff")
+        self._validate_inputs(parameters=parameters)
+
+        self.hub_cost = self.hub_mass_cost_coeff * self.hub_mass
+
     def run(self):
         """Run the mass and cost calculations."""
         self.calculate_rotor_torque()
         self.calculate_blade_mass()
+        self.calculate_hub_mass()
 
         self.calculate_blade_cost()
+        self.calculate_hub_cost()
 
     def get_results(self) -> dict[str, float]:
         """Gathers the core results."""
