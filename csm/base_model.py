@@ -208,17 +208,28 @@ class CSMBase:
         }
         return results
 
-    def irs_mpc_breakdown(self, turbine_production_cost: float, tower_flange_material_cost: float, tower_flange_production_cost: float) -> pd.DataFrame:
+    def irs_mpc_breakdown(
+        self,
+        turbine_production_cost: float,
+        tower_flange_material_cost: float,
+        tower_flange_production_cost: float,
+        *,
+        with_category: bool = False
+    ) -> pd.DataFrame:
         """Calculates the base cost breakdown for the United States IRS manufactured product
         component tables.
 
         Component mapping is as follows:
 
         - Wind turbine
-          - Blades: model-calculated :py:attr:`blade_cost`
-          - Rotor Hub: model-calculated :py:attr:`blade_cost`
-          - Nacelle: model-calculated :py:attr:`nacelle_cost`
-          - Power Converter: model-calculated :py:attr:`power_converter_cost`
+          - Blades: model-calculated :py:attr:`blade_cost`. See :py:meth:`calculate_blade_cost`
+            for complete details.
+          - Rotor Hub: model-calculated :py:attr:`hub_cost`. See :py:meth:`calculate_hub_cost`
+            for complete details.
+          - Nacelle: model-calculated :py:attr:`nacelle_cost`. See :py:meth:`calculate_nacelle_cost`
+            for complete details.
+          - Power Converter: model-calculated :py:attr:`power_converter_cost`. See
+            :py:meth:`calculate_power_converter_cost` for complete details.
           - Production: user-provided :py:attr:`turbine_production_cost`
         - Wind Tower Flanges
           - Material: user-provided :py:attr:`tower_flange_material_cost`
@@ -226,35 +237,46 @@ class CSMBase:
         - Tower: not counted steel or iron product
         - Steel or iron productions in foundation: not counted steel or iron product
 
+        Args:
+            turbine_production_cost (float): Costs associated with production (i.e., not materials)
+                of the wind turbine.
+            tower_flange_material_cost (float): The materials cost for the tower flange.
+            tower_flange_production_cost (float): The production cost for the tower flange.
+            with_category (bool, optional: If True, return the DataFrame with the ``category``
+                column intact, otherwise drop the column to produce an IRS-ready output. Defaults
+                to False.
+
         Returns:
-            pd.DataFrame: M
+            pd.DataFrame: Data Frame with indices for the APCs and MPCs, and columns for the
+                mapping category (if :py:attr:`with_category`), "cost" (total USD), and "Value"
+                (component cost / total cost * 100).
         """
         costs = {
-            "blade_cost": self.blade_cost,
-            "hub_cost": self.hub_cost,
-            "nacelle_cost": self.nacelle_cost,
-            "power_converter_cost": self.power_converter_cost,
-            "turbine_production_cost": turbine_production_cost,
-            "tower_flange_material_cost": tower_flange_material_cost,
-            "tower_flange_production_cost": tower_flange_production_cost,
+            "blade": self.blade_cost,
+            "hub": self.hub_cost,
+            "nacelle": self.nacelle_cost,
+            "power_converter": self.power_converter_cost,
+            "turbine_production": turbine_production_cost,
+            "tower_flange_material": tower_flange_material_cost,
+            "tower_flange_production": tower_flange_production_cost,
         }
         apc_map = {
-            "blade_cost": "Wind Turbine",
-            "hub_cost": "Wind Turbine",
-            "nacelle_cost": "Wind Turbine",
-            "power_converter_cost": "Wind Turbine",
-            "turbine_production_cost": "Wind Turbine",
-            "tower_flange_material_cost": "Wind Tower Flange",
-            "tower_flange_production_cost": "Wind Tower Flange",
+            "blade": "Wind Turbine",
+            "hub": "Wind Turbine",
+            "nacelle": "Wind Turbine",
+            "power_converter": "Wind Turbine",
+            "turbine_production": "Wind Turbine",
+            "tower_flange_material": "Wind Tower Flange",
+            "tower_flange_production": "Wind Tower Flange",
         }
         mpc_map = {
-            "blade_cost": "Blade",
-            "hub_cost": "Hub",
-            "nacelle_cost": "Nacelle",
-            "power_converter_cost": "Power Converter",
-            "turbine_production_cost": "Production",
-            "tower_flange_material_cost": "Material",
-            "tower_flange_production_cost": "Production",
+            "blade": "Blade",
+            "hub": "Hub",
+            "nacelle": "Nacelle",
+            "power_converter": "Power Converter",
+            "turbine_production": "Production",
+            "tower_flange_material": "Material",
+            "tower_flange_production": "Production",
         }
         breakdown = pd.DataFrame.from_dict(costs, orient="index", columns=["cost"])
         breakdown.index.name = "category"
@@ -263,15 +285,75 @@ class CSMBase:
             APC=breakdown.index.str.replace(apc_map),
             MPC=breakdown.index.str.replace(mpc_map)
         )
-        breakdown = breakdown.set_index(["APC", "MPC"])
+        breakdown = breakdown.reset_index(drop=False).set_index(["APC", "MPC"])
 
         total = breakdown.sum().to_frame(name="Total").T.set_index(pd.Index(["-"]), append=True)
         total.index.names = ["APC", "MPC"]
+        total.loc[("Total", "-"), "category"] = "-"
 
+        empty = ["-", 0.0, 0.0]
         steel_ix = pd.MultiIndex.from_arrays(
             [["Tower", "Steel or iron products in foundation"], ["-", "-"]], names=("APC", "MPC")
         )
-        steel = pd.DataFrame([[0.0, 0.0], [0.0, 0.0]], columns=breakdown.columns, index=steel_ix)
+        steel = pd.DataFrame([empty, empty], columns=breakdown.columns, index=steel_ix)
 
-        breakdown = pd.concat((breakdown, steel, total)).replace(0, "-")
-        return breakdown
+        breakdown = pd.concat((breakdown, steel, total))
+        if with_category:
+            return breakdown
+        return breakdown.replace(0, "-").drop(columns=["category"])
+
+    def total_domestic_content(
+        self,
+        turbine_production_cost: float,
+        tower_flange_material_cost: float,
+        tower_flange_production_cost: float,
+        domestic: list[str],
+        *,
+        return_table: bool = False,
+    ) -> float | pd.DataFrame:
+        """Calculates the total, valid domestic content production percentage based on the domestic
+        or allowed-foreign entity produced components provided in :py:attr:`domestic` that align
+        with :py:meth:`irs_mpc_breakdown`.
+
+        Note:
+            MPC domestic content only counts towards the domestic content production percentage if
+            all of the MPCs in an APC have been domestically produced. See IRS notices 2023-38 and
+            2026-15 for complete details prior to calculation of the final proportion.
+
+        Args:
+            turbine_production_cost (float): Costs associated with production (i.e., not materials)
+                of the wind turbine.
+            tower_flange_material_cost (float): The materials cost for the tower flange.
+            tower_flange_production_cost (float): The production cost for the tower flange.
+            domestic (list[str]): List of the components aligning with the ``category`` column
+                of :py:meth:`irs_mpc_breakdown`.
+            return_table (bool, optional): If True, return the DataFrame from
+                :py:meth:`irs_mpc_breakdown` with the additional column ``Domestic`` that shows the
+                total domestic content percentage the counts for the IRS domestic content production
+                calculation. Defaults to False.
+
+        Returns:
+            float | pd.DataFrame: Returns the total valid domestic content as a percent, or the
+                DataFrame breakdown by category.
+        """
+        breakdown = self.irs_mpc_breakdown(
+            turbine_production_cost=turbine_production_cost,
+            tower_flange_material_cost=tower_flange_material_cost,
+            tower_flange_production_cost=tower_flange_production_cost,
+            with_category=True,
+        )
+        domestic_map = {el: 0 for el in breakdown.category}
+        domestic_map |= {el: 1 for el in domestic}
+        breakdown = breakdown.assign(Domestic=breakdown.category.map(domestic_map))
+        
+        for apc in ("Wind Turbine", "Wind Tower Flange"):
+            component = breakdown.loc[apc, "Domestic"]
+            if component.size != component.sum():
+                breakdown.loc[apc, "Domestic"] = 0.0
+
+        breakdown.Domestic = breakdown.Domestic * (breakdown.Value / 100)
+        breakdown.loc["Total", "Domestic"] = breakdown.Domestic.sum()
+        breakdown.Domestic *= 100
+        if return_table:
+            return breakdown
+        return breakdown.loc["Total", "Domestic"].squeeze()
