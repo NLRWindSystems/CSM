@@ -69,6 +69,31 @@ class CSMBase:
             raise ValueError(f"Inputs for the following variables required: {', '.join(missing)}")
 
     def calculate_blade_mass(self):
+        """Calculates and sets :py:attr:`blade_mass` if it was not provided by the user.
+
+        .. math:: k * diameter^b
+
+        where:
+        
+        - :math:`k =` :py:attr:`blade_mass_coeff`
+        - :math:`diameter =` :py:attr:`rotor_diameter` / 2
+        - :math:`b =`
+          - 2.47 if :py:attr:`turbine_class` is 1 and :py:attr:`blade_has_carbon` is True
+          - 2.54 if :py:attr:`turbine_class` is 1 and :py:attr:`blade_has_carbon` is False
+          - 2.44 if :py:attr:`turbine_class` > 1 and :py:attr:`blade_has_carbon` is True
+          - 2.5 if :py:attr:`turbine_class` > 1 and :py:attr:`blade_has_carbon` is False
+          - 2.5 if :py:attr:`turbine_class` < 1
+
+        Args:
+            blade_mass_coeff (float): :math:`k` in the mass equation above.
+            rotor_diameter (float): Diameter of the swept area of the turbine blades.
+            turbine_class (int): Turbine classification; use 1 for IEC Wind-Class I, 2 fo
+                IEC Wind-Class II or III.
+            blade_has_carbon (bool): Use True if the blade has carbon, False if not.
+
+        Raises:
+            ValueError: Raised if the required parameters have not been provided or calculated.
+        """
         if next(self._has_values("blade_mass")):
             return
 
@@ -86,6 +111,22 @@ class CSMBase:
         self.blade_mass = self.blade_mass_coeff * (self.rotor_diameter / 2) ** exp
 
     def calculate_blade_cost(self):
+        """Calculates and sets :py:attr:`blade_cost` if it was not provided by the user.
+
+        .. math:: k * m
+
+        where:
+        
+        - :math:`k =` :py:attr:`blade_mass_cost_coeff` (:math:`USD/kg`)
+        - :math:`m =` :py:attr:`blade_mass`
+
+        Args:
+            blade_mass_cost_coeff (float): Blade cost per kilogram (USD/kg).
+            blade_mass (float): Blade mass (kg).
+
+        Raises:
+            ValueError: Raised if any of the required parameters have not been provided.
+        """
         if next(self._has_values("blade_cost")):
             return
 
