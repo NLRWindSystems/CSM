@@ -1,5 +1,7 @@
 from typing import Generator
+
 import attrs
+import pandas as pd
 from attrs import field, define, validators, fields
 
 
@@ -8,36 +10,42 @@ class CSMBase:
     """Base cost and scaling model that defines universally required inputs and calculations."""
 
     # turbine general
-    turbine_class: int = field(default=0, validator=validators.instance_of(int), metadata={"units": "unitless", "io": "input"})
-    rated_power_kw: int = field(default=0, validator=validators.instance_of(int), metadata={"units": "W", "io": "input"})
-    rotor_efficiency_max: float = field(default=0.0, validator=validators.instance_of(float), metadata={"units": "unitless", "io": "input"})
-    rotor_angular_velocity_max: float = field(default=0.0, validator=validators.instance_of(float), metadata={"units": "unitless", "io": "input"})
+    turbine_class: int = field(default=None, validator=validators.optional(validators.instance_of(int)), metadata={"units": "unitless", "io": "input"})
+    rated_power_kw: int = field(default=None, validator=validators.optional(validators.instance_of(int)), metadata={"units": "W", "io": "input"})
+    rotor_efficiency_max: float = field(default=None, validator=validators.optional(validators.instance_of(float)), metadata={"units": "unitless", "io": "input"})
+    # rotor_angular_velocity_max: float = field(default=None, validator=validators.optional(validators.instance_of(float)), metadata={"units": "unitless", "io": "input"})
     
     # blades
-    blade_has_carbon: bool = field(default=False, validator=validators.instance_of(bool), metadata={"units": "unitless", "io": "input"})
-    blade_mass_coeff: float = field(default=0.0, validator=validators.instance_of(float), metadata={"units": "unitless", "io": "input"})
-    blade_mass_cost_coeff: float = field(default=0.0, validator=validators.instance_of(float), metadata={"units": "USD/kg", "io": "input"})
-    blade_cost_external: float = field(default=0.0, validator=validators.instance_of(float), metadata={"units": "USD", "io": "input"})
-    blade_mass: float = field(default=0.0, validator=validators.instance_of(float), metadata={"units": "kg", "io": "both"})
-    blade_cost: float = field(default=0.0, validator=validators.instance_of(float), metadata={"units": "USD", "io": "both"})
+    blade_has_carbon: bool = field(default=None, validator=validators.optional(validators.instance_of(bool)), metadata={"units": "unitless", "io": "input"})
+    blade_mass_coeff: float = field(default=None, validator=validators.optional(validators.instance_of(float)), metadata={"units": "unitless", "io": "input"})
+    blade_mass_cost_coeff: float = field(default=None, validator=validators.optional(validators.instance_of(float)), metadata={"units": "USD/kg", "io": "input"})
+    blade_mass: float = field(default=None, validator=validators.optional(validators.instance_of(float)), metadata={"units": "kg", "io": "both"})
+    blade_cost: float = field(default=None, validator=validators.optional(validators.instance_of(float)), metadata={"units": "USD", "io": "both"})
     
     # rotor
-    rotor_diameter: float = field(default=0.0, validator=validators.instance_of(float), metadata={"units": "m", "io": "input"})
-    rotor_mass: float = field(default=0.0, validator=validators.instance_of(float), metadata={"units": "m", "io": "output"})
-    rotor_torque: float = field(default=0.0, validator=validators.instance_of(float), metadata={"units": "kN*m", "io": "both"})
+    rotor_diameter: float = field(default=None, validator=validators.optional(validators.instance_of(float)), metadata={"units": "m", "io": "input"})
+    rotor_mass: float = field(default=None, validator=validators.optional(validators.instance_of(float)), metadata={"units": "m", "io": "output"})
+    rotor_torque: float = field(default=None, validator=validators.optional(validators.instance_of(float)), metadata={"units": "kN*m", "io": "both"})
     
     # hub
-    hub_mass_coeff: float = field(default=0.0, validator=validators.instance_of(float), metadata={"units": "unitless", "io": "input"})
-    hub_mass_intercept: float = field(default=0.0, validator=validators.instance_of(float), metadata={"units": "unitless", "io": "input"})
-    hub_mass_cost_coeff: float = field(default=0.0, validator=validators.instance_of(float), metadata={"units": "USD/kg", "io": "input"})
-    hub_mass: float = field(default=0.0, validator=validators.instance_of(float), metadata={"units": "kg", "io": "both"})
-    hub_cost: float = field(default=0.0, validator=validators.instance_of(float), metadata={"units": "USD", "io": "both"})
+    hub_mass_coeff: float = field(default=None, validator=validators.optional(validators.instance_of(float)), metadata={"units": "unitless", "io": "input"})
+    hub_mass_intercept: float = field(default=None, validator=validators.optional(validators.instance_of(float)), metadata={"units": "unitless", "io": "input"})
+    hub_mass_cost_coeff: float = field(default=None, validator=validators.optional(validators.instance_of(float)), metadata={"units": "USD/kg", "io": "input"})
+    hub_mass: float = field(default=None, validator=validators.optional(validators.instance_of(float)), metadata={"units": "kg", "io": "both"})
+    hub_cost: float = field(default=None, validator=validators.optional(validators.instance_of(float)), metadata={"units": "USD", "io": "both"})
 
     # nacelle
-    nacelle_length: float = field(default=0.0, validator=validators.instance_of(float), metadata={"units": "m", "io": "both"})
+    nacelle_length: float = field(default=None, validator=validators.optional(validators.instance_of(float)), metadata={"units": "m", "io": "both"})
     
     # next
-    blade_mass: float = field(default=0.0, validator=validators.instance_of(float), metadata={"units": "kg", "io": "both"})
+    blade_mass: float = field(default=None, validator=validators.optional(validators.instance_of(float)), metadata={"units": "kg", "io": "both"})
+
+    # NOTE: temporary while prototyping
+    power_converter_cost: float = field(default=1000.0)
+    nacelle_cost: float = field(default=1000.0)
+    turbine_production_cost: float = field(default=1000.0)
+    tower_flange_material_cost: float = field(default=1000.0)
+    tower_flange_production_cost: float = field(default=1000.0)
 
     def _has_values(self, *args) -> Generator[bool, ...]:
         """Checks if the user provided values for a given :py:attr:`arg` (True), or if they are
@@ -168,7 +176,7 @@ class CSMBase:
 
     def run(self):
         """Run the mass and cost calculations."""
-        self.calculate_rotor_torque()
+        # self.calculate_rotor_torque()
         self.calculate_blade_mass()
         self.calculate_hub_mass()
 
@@ -181,5 +189,89 @@ class CSMBase:
             "rotor_torque": self.rotor_torque,
             "blade_mass": self.blade_mass,
             "blade_cost": self.blade_cost,
+            "hub_mass": self.hub_mass,
+            "hub_cost": self.hub_cost,
         }
         return results
+
+    def get_mass_results(self) -> dict[str, float]:
+        results = {
+            "blade_mass": self.blade_mass,
+            "hub_mass": self.hub_mass,
+        }
+        return results
+
+    def get_cost_results(self) -> dict[str, float]:
+        results = {
+            "blade_cost": self.blade_cost,
+            "hub_cost": self.hub_cost,
+        }
+        return results
+
+    def irs_mpc_breakdown(self, turbine_production_cost: float, tower_flange_material_cost: float, tower_flange_production_cost: float) -> pd.DataFrame:
+        """Calculates the base cost breakdown for the United States IRS manufactured product
+        component tables.
+
+        Component mapping is as follows:
+
+        - Wind turbine
+          - Blades: model-calculated :py:attr:`blade_cost`
+          - Rotor Hub: model-calculated :py:attr:`blade_cost`
+          - Nacelle: model-calculated :py:attr:`nacelle_cost`
+          - Power Converter: model-calculated :py:attr:`power_converter_cost`
+          - Production: user-provided :py:attr:`turbine_production_cost`
+        - Wind Tower Flanges
+          - Material: user-provided :py:attr:`tower_flange_material_cost`
+          - Production: user-provided :py:attr:`tower_flange_production_cost`
+        - Tower: not counted steel or iron product
+        - Steel or iron productions in foundation: not counted steel or iron product
+
+        Returns:
+            pd.DataFrame: M
+        """
+        costs = {
+            "blade_cost": self.blade_cost,
+            "hub_cost": self.hub_cost,
+            "nacelle_cost": self.nacelle_cost,
+            "power_converter_cost": self.power_converter_cost,
+            "turbine_production_cost": turbine_production_cost,
+            "tower_flange_material_cost": tower_flange_material_cost,
+            "tower_flange_production_cost": tower_flange_production_cost,
+        }
+        apc_map = {
+            "blade_cost": "Wind Turbine",
+            "hub_cost": "Wind Turbine",
+            "nacelle_cost": "Wind Turbine",
+            "power_converter_cost": "Wind Turbine",
+            "turbine_production_cost": "Wind Turbine",
+            "tower_flange_material_cost": "Wind Tower Flange",
+            "tower_flange_production_cost": "Wind Tower Flange",
+        }
+        mpc_map = {
+            "blade_cost": "Blade",
+            "hub_cost": "Hub",
+            "nacelle_cost": "Nacelle",
+            "power_converter_cost": "Power Converter",
+            "turbine_production_cost": "Production",
+            "tower_flange_material_cost": "Material",
+            "tower_flange_production_cost": "Production",
+        }
+        breakdown = pd.DataFrame.from_dict(costs, orient="index", columns=["cost"])
+        breakdown.index.name = "category"
+        breakdown = breakdown.assign(
+            Value=breakdown.cost / breakdown.cost.sum() * 100,
+            APC=breakdown.index.str.replace(apc_map),
+            MPC=breakdown.index.str.replace(mpc_map)
+        )
+        breakdown = breakdown.set_index(["APC", "MPC"])
+
+        total = breakdown.sum().to_frame(name="Total").T.set_index(pd.Index(["-"]), append=True)
+        total.index.names = ["APC", "MPC"]
+
+        steel_ix = pd.MultiIndex.from_arrays(
+            [["Tower", "Steel or iron products in foundation"], ["-", "-"]], names=("APC", "MPC")
+        )
+        steel = pd.DataFrame([[0.0, 0.0], [0.0, 0.0]], columns=breakdown.columns, index=steel_ix)
+
+        breakdown = pd.concat((breakdown, steel, total)).replace(0, "-")
+        return breakdown
