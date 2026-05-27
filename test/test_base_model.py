@@ -8,9 +8,7 @@ from csm.base_model import CSMBase
 
 csm_2015_inputs = {
     # defaults
-    "turbine_class": 1,
-    "rotor_efficiency_max": None,
-    "blade_has_carbon": False,
+    "rotor_efficiency_max": 1.0,
     "blade_mass_coeff": 0.5,
     "blade_mass_cost_coeff": 14.6,
     "hub_mass_coeff": 2.3,
@@ -19,8 +17,10 @@ csm_2015_inputs = {
     "rotor_angular_velocity_max": None,
 
     # example input
+    "turbine_class": 1,
+    "blade_has_carbon": False,
     "rated_power_kw": 3500,
-    "rotor_diameter": None,
+    "rotor_diameter": 136.7,
 }
 
 csm_2015_outputs = {
