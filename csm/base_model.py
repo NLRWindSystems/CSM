@@ -57,105 +57,105 @@ class CSMBase:
     """
 
     # turbine general
-    turbine_class: int = field(
+    turbine_class: int = field(  # type: ignore
         default=None,
         validator=validators.optional(validators.instance_of(int)),
         metadata={"units": "unitless", "io": "input"},
     )
-    rated_power_kw: int = field(
+    rated_power_kw: int = field(  # type: ignore
         default=None,
         validator=validators.optional(validators.instance_of(int)),
         metadata={"units": "W", "io": "input"},
     )
 
     # blades
-    blade_has_carbon: bool = field(
+    blade_has_carbon: bool = field(  # type: ignore
         default=None,
         validator=validators.optional(validators.instance_of(bool)),
         metadata={"units": "unitless", "io": "input"},
     )
-    blade_mass_coeff: float = field(
+    blade_mass_coeff: float = field(  # type: ignore
         default=None,
         validator=validators.optional(validators.instance_of(float)),
         metadata={"units": "unitless", "io": "input"},
     )
-    blade_mass_cost_coeff: float = field(
+    blade_mass_cost_coeff: float = field(  # type: ignore
         default=None,
         validator=validators.optional(validators.instance_of(float)),
         metadata={"units": "USD/kg", "io": "input"},
     )
-    blade_mass: float = field(
+    blade_mass: float = field(  # type: ignore
         default=None,
         validator=validators.optional(validators.instance_of(float)),
         metadata={"units": "kg", "io": "both"},
     )
-    blade_cost: float = field(
+    blade_cost: float = field(  # type: ignore
         default=None,
         validator=validators.optional(validators.instance_of(float)),
         metadata={"units": "USD", "io": "both"},
     )
 
     # hub
-    hub_mass_coeff: float = field(
+    hub_mass_coeff: float = field(  # type: ignore
         default=None,
         validator=validators.optional(validators.instance_of(float)),
         metadata={"units": "unitless", "io": "input"},
     )
-    hub_mass_intercept: float = field(
+    hub_mass_intercept: float = field(  # type: ignore
         default=None,
         validator=validators.optional(validators.instance_of(float)),
         metadata={"units": "unitless", "io": "input"},
     )
-    hub_mass_cost_coeff: float = field(
+    hub_mass_cost_coeff: float = field(  # type: ignore
         default=None,
         validator=validators.optional(validators.instance_of(float)),
         metadata={"units": "USD/kg", "io": "input"},
     )
-    hub_mass: float = field(
+    hub_mass: float = field(  # type: ignore
         default=None,
         validator=validators.optional(validators.instance_of(float)),
         metadata={"units": "kg", "io": "both"},
     )
-    hub_cost: float = field(
+    hub_cost: float = field(  # type: ignore
         default=None,
         validator=validators.optional(validators.instance_of(float)),
         metadata={"units": "USD", "io": "both"},
     )
 
     # rotor
-    rotor_diameter: float = field(
+    rotor_diameter: float = field(  # type: ignore
         default=None,
         validator=validators.optional(validators.instance_of(float)),
         metadata={"units": "m", "io": "input"},
     )
-    efficiency_max: float = field(
+    efficiency_max: float = field(  # type: ignore
         default=None,
         validator=validators.optional(validators.instance_of(float)),
         metadata={"units": "unitless", "io": "input"},
     )
-    max_tip_speed: float = field(
+    max_tip_speed: float = field(  # type: ignore
         default=None,
         validator=validators.optional(validators.instance_of(float)),
         metadata={"units": "m/s", "io": "input"},
     )
-    rated_rpm: float = field(
+    rated_rpm: float = field(  # type: ignore
         default=None,
         validator=validators.optional(validators.instance_of(float)),
         metadata={"units": "rpm", "io": "both"},
     )
-    rotor_torque: float = field(
+    rotor_torque: float = field(  # type: ignore
         default=None,
         validator=validators.optional(validators.instance_of(float)),
         metadata={"units": "MN*m", "io": "both"},
     )
-    rotor_mass: float = field(
+    rotor_mass: float = field(  # type: ignore
         default=None,
         validator=validators.optional(validators.instance_of(float)),
         metadata={"units": "m", "io": "output"},
     )
 
     # nacelle
-    nacelle_length: float = field(
+    nacelle_length: float = field(  # type: ignore
         default=None,
         validator=validators.optional(validators.instance_of(float)),
         metadata={"units": "m", "io": "both"},
@@ -175,13 +175,13 @@ class CSMBase:
     tower_flange_material_cost: float = field(default=1000.0)
     tower_flange_production_cost: float = field(default=1000.0)
 
-    def _has_values(self, *args) -> Generator[bool, ...]:
+    def _has_values(self, *args) -> Generator[bool]:
         """Checks if the user provided values for a given :py:attr:`arg` (True), or if they are
         model defaults (False).
 
         Yields
         ------
-            Generator[bool, ...]: Booleans indicating valid values have been implemented or provided
+            Generator[bool]: Booleans indicating valid values have been implemented or provided
                 by the user (True) or if the base class defaults are present (False).
         """
         for arg in args:
@@ -189,7 +189,7 @@ class CSMBase:
             value = getattr(self, arg)
             yield value != default
 
-    def _validate_inputs(self, parameters: tuple[str]) -> None:
+    def _validate_inputs(self, parameters: tuple[str, ...]) -> None:
         """Validates if the required parameters to calculate an attribute's value have been
         populated by a subclass or provided by the user.
 

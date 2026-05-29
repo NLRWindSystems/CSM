@@ -19,6 +19,17 @@ dependencies = [
   "openpyxl>=3",
 ]
 
+[project.optional-dependencies]
+develop = [
+    "pre-commit>=2.20",
+    "isort>=5.10",
+    "pytest>=7",
+    "pytest-cov>=4",
+    "pytest-check",
+    "ruff>=0.2",
+    "ty",
+]
+
 [tool.setuptools]
 include-package-data = true
 
@@ -97,12 +108,14 @@ dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 [tool.ruff.lint.pydocstyle]
 convention = "numpy"
 
-[tool.mypy]
-exclude = ["csm/model"]
-ignore_missing_imports = true
-no_implicit_optional = true
-check_untyped_defs = true
-cache_dir = ".cache/mypy/"
+[tool.ty.src]
+include = [
+    "csm/",
+    "tests",
+]
+exclude = [
+  "pyproject.toml"
+]
 
 # [tool.pytest.ini_options]
 # cache_dir = ".cache/pytest"
