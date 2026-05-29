@@ -3,7 +3,7 @@ requires = ["setuptools", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "CSM"
+name = "csm"
 dynamic = ["version"]
 authors = [{ name = "Paul Crook", email = "paul.crook@nrel.gov" }]
 readme = { file = "README.md", content-type = "text/markdown" }
@@ -34,7 +34,7 @@ skip = []
 multi_line_output = 3
 sections = ["FUTURE", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
 known_third_party = ["attrs", "numpy", "pandas"]
-# known_first_party = "wombat"
+known_first_party = "csm"
 known_local_folder = "test"
 combine_as_imports = true
 force_grid_wrap = 0
@@ -46,38 +46,52 @@ line_length = 88
 
 
 [tool.ruff]
-src = ["csm"]
-cache-dir = "./.cache/ruff"
-line-length = 88
-target-version = "py39"
-fix = false
+src = ["csm", "tests"]
+line-length = 100
+target-version = "py311"
+fix = true
 
 [tool.ruff.lint]
 # See https://github.com/charliermarsh/ruff#supported-rules
 # for rules included and matching to prefix.
-ignore-init-module-imports = true
+select = ["F", "E", "W", "C4", "D", "UP", "NPY", "PTH", "RUF", "FBT", "B", "PIE", "T20", "SIM", ]
+
+# D205: not using summary lines and descriptions, just descriptions
+# D401: don't believe enough in imperative mode to make all the changes currently
+ignore = ["D205", "D401"]
+
+# Allow autofix for all enabled rules (when `--fix`) is provided.
+fixable = ["F", "E", "W", "C4", "D", "UP", "NPY", "PTH", "RUF", "FBT", "B", "PIE", "T20", "SIM", ]
+unfixable = []
 
 # Exclude a variety of commonly ignored directories.
 exclude = [
-  ".cache",
-  ".bzr",
-  ".direnv",
-  ".eggs",
-  ".git",
-  ".hg",
-  ".nox",
-  ".pants.d",
-  ".svn",
-  ".tox",
-  ".venv",
-  "__pypackages__",
-  "_build",
-  "buck-out",
-  "build",
-  "dist",
-  "node_modules",
-  "venv",
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".hg",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "venv",
+    "examples/archival/*",
+    "examples/*.ipynb"
 ]
+
+# Allow unused variables when underscore-prefixed.
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
 
 
 [tool.ruff.lint.pydocstyle]
@@ -90,10 +104,10 @@ no_implicit_optional = true
 check_untyped_defs = true
 cache_dir = ".cache/mypy/"
 
-[tool.pytest.ini_options]
-cache_dir = ".cache/pytest"
-addopts = "--cov=csm --cov-report term-missing"
+# [tool.pytest.ini_options]
+# cache_dir = ".cache/pytest"
+# addopts = "--cov=csm --cov-report term-missing"
 
-[tool.coverage.run]
-omit = ["./csm/model/*"]
-data_file = "./.cache/coverage.sqlite"
+# [tool.coverage.run]
+# omit = ["./csm/model/*"]
+# data_file = "./.cache/coverage.sqlite"
