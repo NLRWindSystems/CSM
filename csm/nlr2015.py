@@ -17,6 +17,7 @@ class Land2015NLR(CSMBase):
 
 # TODO: Determine if there is a way to use evolve and make_class together with a workaround
 # NOTE: The below does not function while evolve and make_class remain incompatible
+# TODO: check this workaround: https://github.com/python-attrs/attrs/issues/637#issuecomment-1019330330
 
 def generate_new_model(name: str, default_map: dict[str, Any]):
     field_map = {el: f for el in default_map if (f := getattr(base, el)) is not None}

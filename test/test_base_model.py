@@ -51,6 +51,15 @@ def test_CSMBase_defaults_only(subtests):
         
     with pytest.raises(ValueError, match=undefined_params_msg):
         model.calculate_blade_cost()
+        
+    with pytest.raises(ValueError, match=undefined_params_msg):
+        model.calculate_hub_mass()
+        
+    with pytest.raises(ValueError, match=undefined_params_msg):
+        model.calculate_hub_cost()
+        
+    with pytest.raises(ValueError, match=undefined_params_msg):
+        model.calculate_rotor_torque()
     
     with pytest.raises(ValueError, match=undefined_params_msg):
         model.run()

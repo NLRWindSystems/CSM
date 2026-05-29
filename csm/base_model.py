@@ -1,3 +1,4 @@
+import math
 from typing import Generator
 
 import attrs
@@ -12,8 +13,6 @@ class CSMBase:
     # turbine general
     turbine_class: int = field(default=None, validator=validators.optional(validators.instance_of(int)), metadata={"units": "unitless", "io": "input"})
     rated_power_kw: int = field(default=None, validator=validators.optional(validators.instance_of(int)), metadata={"units": "W", "io": "input"})
-    rotor_efficiency_max: float = field(default=None, validator=validators.optional(validators.instance_of(float)), metadata={"units": "unitless", "io": "input"})
-    # rotor_angular_velocity_max: float = field(default=None, validator=validators.optional(validators.instance_of(float)), metadata={"units": "unitless", "io": "input"})
     
     # blades
     blade_has_carbon: bool = field(default=None, validator=validators.optional(validators.instance_of(bool)), metadata={"units": "unitless", "io": "input"})
@@ -22,10 +21,6 @@ class CSMBase:
     blade_mass: float = field(default=None, validator=validators.optional(validators.instance_of(float)), metadata={"units": "kg", "io": "both"})
     blade_cost: float = field(default=None, validator=validators.optional(validators.instance_of(float)), metadata={"units": "USD", "io": "both"})
     
-    # rotor
-    rotor_diameter: float = field(default=None, validator=validators.optional(validators.instance_of(float)), metadata={"units": "m", "io": "input"})
-    rotor_mass: float = field(default=None, validator=validators.optional(validators.instance_of(float)), metadata={"units": "m", "io": "output"})
-    rotor_torque: float = field(default=None, validator=validators.optional(validators.instance_of(float)), metadata={"units": "kN*m", "io": "both"})
     
     # hub
     hub_mass_coeff: float = field(default=None, validator=validators.optional(validators.instance_of(float)), metadata={"units": "unitless", "io": "input"})
@@ -33,6 +28,14 @@ class CSMBase:
     hub_mass_cost_coeff: float = field(default=None, validator=validators.optional(validators.instance_of(float)), metadata={"units": "USD/kg", "io": "input"})
     hub_mass: float = field(default=None, validator=validators.optional(validators.instance_of(float)), metadata={"units": "kg", "io": "both"})
     hub_cost: float = field(default=None, validator=validators.optional(validators.instance_of(float)), metadata={"units": "USD", "io": "both"})
+    
+    # rotor
+    rotor_diameter: float = field(default=None, validator=validators.optional(validators.instance_of(float)), metadata={"units": "m", "io": "input"})
+    efficiency_max: float = field(default=None, validator=validators.optional(validators.instance_of(float)), metadata={"units": "unitless", "io": "input"})
+    max_tip_speed: float = field(default=None, validator=validators.optional(validators.instance_of(float)), metadata={"units": "m/s", "io": "input"})
+    rated_rpm: float = field(default=None, validator=validators.optional(validators.instance_of(float)), metadata={"units": "rpm", "io": "both"})
+    rotor_torque: float = field(default=None, validator=validators.optional(validators.instance_of(float)), metadata={"units": "MN*m", "io": "both"})
+    rotor_mass: float = field(default=None, validator=validators.optional(validators.instance_of(float)), metadata={"units": "m", "io": "output"})
 
     # nacelle
     nacelle_length: float = field(default=None, validator=validators.optional(validators.instance_of(float)), metadata={"units": "m", "io": "both"})
@@ -145,16 +148,16 @@ class CSMBase:
 
 
     def calculate_rotor_torque(self):
-        if next(self._has_values("rotor_torque")):
+        if all(self._has_values("rated_rpm", "rotor_torque")):
             return
         
-        parameters = ("rated_power_kw", "rotor_efficiency_max", "rotor_angular_velocity_max")
+        parameters = ("rotor_diameter", "rated_power_kw", "efficiency_max", "max_tip_speed")
         self._validate_inputs(parameters=parameters)
-        
-        self.rotor_torque = (
-            (self.rated_power_kw * 1e3 / self.rotor_efficiency_ma)
-            / self.rotor_angular_velocity_max
-        )
+
+        rated_hub_power = self.rated_power_kw / self.efficiency_max
+        rotor_speed = self.max_tip_speed / (0.5 / self.rotor_diameter)
+        self.rated_rpm = rotor_speed / (2.0 * math.pi) * 60.0
+        self.rotor_torque = rated_hub_power / rotor_speed
 
     def calculate_hub_mass(self):
         if next(self._has_values("hub_mass")):
@@ -182,6 +185,8 @@ class CSMBase:
 
         self.calculate_blade_cost()
         self.calculate_hub_cost()
+
+        self.calculate_rotor_torque()
 
     def get_results(self) -> dict[str, float]:
         """Gathers the core results."""
