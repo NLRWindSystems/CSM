@@ -19,6 +19,7 @@ class CustomModel(CSMBase):
 """
 
 import math
+from typing import Any
 from collections.abc import Generator
 
 import pandas as pd
@@ -174,6 +175,39 @@ class CSMBase:
     turbine_production_cost: float = field(default=1000.0)
     tower_flange_material_cost: float = field(default=1000.0)
     tower_flange_production_cost: float = field(default=1000.0)
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]):
+        """Creates a new instance from a dictionary with simplified and intuitive error messages
+        for extraneous and missing attributes.
+
+        Args:
+            data (dict): The data dictionary to be mapped.
+
+        Returns
+        -------
+            cls: An instance of :py:class:`CSMBase` or one of its subclasses.
+        """
+        inputs = set(data)
+        attributes = {el.name for el in cls.__attrs_attrs__ if el.init}
+        required = {el.name for el in cls.__attrs_attrs__ if el.init and el.default is None}
+
+        extra = inputs.difference(attributes)
+        if len(extra):
+            msg = (
+                f"The initialization for {cls.__name__} was given extraneous "
+                f"inputs: {', '.join(extra)}"
+            )
+            raise AttributeError(msg)
+
+        missing = inputs.difference(required)
+        if missing:
+            msg = (
+                f"The class definition for {cls.__name__} is missing the following inputs: "
+                f"{missing}"
+            )
+            raise AttributeError(msg)
+        return cls(**data)
 
     def _has_values(self, *args) -> Generator[bool]:
         """Checks if the user provided values for a given :py:attr:`arg` (True), or if they are
