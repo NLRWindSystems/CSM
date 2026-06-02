@@ -48,6 +48,15 @@ class CSMBase:
         rated_power_kw (float): Turbine rated power (:math:`kW`).
         efficiency_max (float): Maximum possible drivetrain efficiency.
         max_tip_speed (float): Maximum allowable blade tip speed (:math:`m/s`).
+        num_blades (int, optional): Number of turbine blades. Defaults to 3.
+        pitch_bearing_mass_coeff (float): :math:`k` in the pitch bearing mass equation.
+        blade_mass (float): Blade mass (:math:`kg`). See :py:method:`calculate_blade_mass`
+            for details.
+        pitch_bearing_mass_intercept (float): :math:`b1` in the pitch bearing mass equation.
+        bearing_housing_fraction (float): Mass of the housing for the bearing as a fraction of
+            the bearing mass. :math:`h` in the pitch system mass equation.
+        mass_sys_offset (float): :math:`b2` in the pitch system mass equation.
+        pitch_system_mass_cost_coeff (float): Pitch system cost per kilogram (USD/kg).
 
     Attributes
     ----------
@@ -70,6 +79,11 @@ class CSMBase:
     )
 
     # blades
+    num_blades: int = field(  # type: ignore
+        default=3,
+        validator=validators.instance_of(int),
+        metadata={"units": "unitless", "io": "input"},
+    )
     blade_has_carbon: bool = field(  # type: ignore
         default=None,
         validator=validators.optional(validators.instance_of(bool)),
@@ -152,7 +166,7 @@ class CSMBase:
     rotor_mass: float = field(  # type: ignore
         default=None,
         validator=validators.optional(validators.instance_of(float)),
-        metadata={"units": "m", "io": "output"},
+        metadata={"units": "m", "io": "both"},
     )
 
     # nacelle
@@ -162,12 +176,42 @@ class CSMBase:
         metadata={"units": "m", "io": "both"},
     )
 
-    # next
-    # blade_mass: float = field(
-    #     default=None,
-    #     validator=validators.optional(validators.instance_of(float)),
-    #     metadata={"units": "kg", "io": "both"},
-    # )
+    # pitch system
+    pitch_bearing_mass_coeff: float = field(
+        default=None,
+        validator=validators.optional(validators.instance_of(float)),
+        metadata={"units": "unitless", "io": "input"},
+    )
+    pitch_bearing_mass_intercept: float = field(
+        default=None,
+        validator=validators.optional(validators.instance_of(float)),
+        metadata={"units": "unitless", "io": "input"},
+    )
+    bearing_housing_fraction: float = field(
+        default=None,
+        validator=validators.optional(validators.instance_of(float)),
+        metadata={"units": "unitless", "io": "input"},
+    )
+    mass_sys_offset: float = field(
+        default=None,
+        validator=validators.optional(validators.instance_of(float)),
+        metadata={"units": "unitless", "io": "input"},
+    )
+    pitch_system_mass_cost_coeff: float = field(
+        default=None,
+        validator=validators.optional(validators.instance_of(float)),
+        metadata={"units": "unitless", "io": "input"},
+    )
+    pitch_system_mass: float = field(
+        default=None,
+        validator=validators.optional(validators.instance_of(float)),
+        metadata={"units": "unitless", "io": "both"},
+    )
+    pitch_system_cost: float = field(
+        default=None,
+        validator=validators.optional(validators.instance_of(float)),
+        metadata={"units": "unitless", "io": "both"},
+    )
 
     # NOTE: temporary while prototyping
     power_converter_cost: float = field(default=1000.0)
@@ -354,6 +398,84 @@ class CSMBase:
             hub_mass_cost_coeff (float): Hub cost per kilogram (USD/kg).
             hub_mass (float): Hub mass (kg). See :py:method:`calculate_hub_mass`
                 for more details.
+
+        Raises
+        ------
+            ValueError: Raised if any of the required parameters have not been provided.
+        """
+        if next(self._has_values("hub_cost")):
+            return
+
+        parameters = ("hub_mass", "hub_mass_cost_coeff")
+        self._validate_inputs(parameters=parameters)
+
+        self.hub_cost = self.hub_mass_cost_coeff * self.hub_mass
+
+    def calculate_pitch_system_mass(self):
+        """Calculates and sets :py:attr:`pitch_system_mass` if it was not provided by the user.
+
+        First, the pitch bearing mass is calculated as
+        :math:`m_{bearing} = k*m_{blade}*{num_blades} + b1`. Then the total pitch system mass,
+        including with bearing housing is calculated as :math:`mass = (1+h)*m_{bearing} + b2`.
+        The values of the constants were NOT updated in 2015 and are the same as the original CSM.
+
+        where:
+
+        - :math:`k =` :py:attr:`pitch_bearing_mass_coeff`
+        - :math:`m_{blade} =` :py:attr:`blade_mass`
+        - :math:`b1 =` :py:attr:`pitch_bearing_mass_intercept`
+        - :math:`h =` :py:attr:`bearing_housing_fraction`
+        - :math:`b2 =` :py:attr:`mass_sys_offset`
+
+        Args:
+            num_blades (int, optional): Number of turbine blades. Defaults to 3.
+            pitch_bearing_mass_coeff (float): :math:`k` in the pitch bearing mass equation.
+            blade_mass (float): Blade mass (:math:`kg`). See :py:method:`calculate_blade_mass`
+                for details.
+            pitch_bearing_mass_intercept (float): :math:`b1` in the pitch bearing mass equation.
+            bearing_housing_fraction (float): Mass of the housing for the bearing as a fraction of
+                the bearing mass. :math:`h` in the pitch system mass equation.
+            mass_sys_offset (float): :math:`b2` in the pitch system mass equation.
+
+        Raises
+        ------
+            ValueError: Raised if the required parameters have not been provided or calculated.
+        """
+        if next(self._has_values("pitch_system_mass")):
+            return
+
+        parameters = (
+            "num_blades",
+            "pitch_bearing_mass_coeff",
+            "blade_mass",
+            "pitch_bearing_mass_intercept",
+            "bearing_housing_fraction",
+            "mass_sys_offset",
+        )
+        self._validate_inputs(parameters=parameters)
+
+        bearing_mass = (
+            self.pitch_bearing_mass_coeff * self.blade_mass * self.num_blades
+            + self.pitch_bearing_mass_intercept
+        )
+        self.pitch_system_mass = (
+            bearing_mass * (1 + self.bearing_housing_fraction) + self.mass_sys_offset
+        )
+
+    def calculate_pitch_system_cost(self):
+        """Calculates and sets :py:attr:`pitch_system_cost` if it was not provided by the user.
+
+        .. math:: k * m
+
+        where:
+
+        - :math:`k =` :py:attr:`pitch_system_mass_cost_coeff` (:math:`USD/kg`)
+        - :math:`m =` :py:attr:`pitch_system_mass` (:math:`kg`).
+
+        Args:
+            pitch_system_mass_cost_coeff (float): Pitch system cost per kilogram (USD/kg).
+            pitch_system_mass (float): Pitch system mass (kg). See
+                :py:method:`calculate_pitch_system_mass` for more details.
 
         Raises
         ------
