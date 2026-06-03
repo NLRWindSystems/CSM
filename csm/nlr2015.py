@@ -36,6 +36,10 @@ class Land2015NLR(CSMBase):
     spinner_mass_coeff: float = base.spinner_mass_coeff.evolve(default=15.5, init=False)
     spinner_mass_intercept: float = base.spinner_mass_intercept.evolve(default=-980.0, init=False)
     spinner_mass_cost_coeff: float = base.spinner_mass_cost_coeff.evolve(default=11.1, init=False)
+    lss_mass_coeff: float = base.lss_mass_coeff.evolve(default=13.0, init=False)
+    lss_mass_exp: float = base.lss_mass_exp.evolve(default=0.65, init=False)
+    lss_mass_intercept: float = base.lss_mass_intercept.evolve(default=775.0, init=False)
+    lss_mass_cost_coeff: float = base.lss_mass_cost_coeff.evolve(default=11.9, init=False)
 
 
 # TODO: Determine if there is a way to use evolve and make_class together with a workaround

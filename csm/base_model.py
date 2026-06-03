@@ -32,6 +32,7 @@ class CSMBase:
 
     Args:
         num_blades (int, optional): Number of turbine blades. Defaults to 3.
+        rated_power_kw (float): Turbine rated power (:math:`kW`).
         rotor_diameter (float): Diameter of the swept area of the turbine blades (:math:`m`).
         turbine_class (int): Turbine classification; use 1 for IEC Wind-Class I, 2 fo
             IEC Wind-Class II or III.
@@ -44,18 +45,34 @@ class CSMBase:
             :py:method:`calculate_hub_mass`.
         hub_mass_intercept (bool): :math:`b` in the hub mass equation from
             :py:method:`calculate_hub_mass`.
-        hub_mass_cost_coeff (float): Hub cost per kilogram (USD/kg).
-        pitch_bearing_mass_coeff (float): :math:`k` in the pitch bearing mass equation.
-        pitch_bearing_mass_intercept (float): :math:`b1` in the pitch bearing mass equation.
+        hub_mass_cost_coeff (float): Hub cost per kilogram (USD/kg) from
+            :py:method:`calculate_hub_cost`.
+        pitch_bearing_mass_coeff (float): :math:`k` in the pitch bearing mass equation from
+            :py:method:`calculate_pitch_system_mass`.
+        pitch_bearing_mass_intercept (float): :math:`b1` in the pitch bearing mass equation from
+            :py:method:`calculate_pitch_system_mass`.
         bearing_housing_fraction (float): Mass of the housing for the bearing as a fraction of
-            the bearing mass. :math:`h` in the pitch system mass equation.
-        mass_sys_offset (float): :math:`b2` in the pitch system mass equation.
-        pitch_system_mass_cost_coeff (float): Pitch system cost per kilogram (USD/kg).
-        spinner_mass_coeff (float): :math:`k` in the mass equation above.
-        rotor_diameter (float): Turbine rotor diameter (:math:`m`).
-        spinner_mass_intercept (bool): :math:`b` in the mass equation above.
-        spinner_mass_cost_coeff (float): Spinner cost per kilogram (USD/kg).
-        rated_power_kw (float): Turbine rated power (:math:`kW`).
+            the bearing mass. :math:`h` in the pitch system mass equation from
+            :py:method:`calculate_pitch_system_mass`.
+        mass_sys_offset (float): :math:`b2` in the pitch system mass equation from
+            :py:method:`calculate_pitch_system_mass`.
+        pitch_system_mass_cost_coeff (float): Pitch system cost per kilogram (USD/kg) from
+            :py:method:`calculate_pitch_system_cost`.
+        spinner_mass_coeff (float): :math:`k` in the mass equation above from
+            :py:method:`calculate_spinner_mass`.
+        spinner_mass_intercept (bool): :math:`b` in the mass equation above from
+            :py:method:`calculate_spinner_mass`.
+        spinner_mass_cost_coeff (float): Spinner cost per kilogram (USD/kg) from
+            :py:method:`calculate_spinner_cost`.
+        lss_mass_coeff (float): :math:`k` in the low speed shaft mass equation from
+            :py:method:`calculate_low_speed_shaft_mass`.
+        lss_mass_exp (float): :math:`b1` in the low speed shaft mass equation from
+            :py:method:`calculate_low_speed_shaft_mass`.
+        lss_mass_intercept (float): :math:`b2` in the low speed shaft mass equation from
+            :py:method:`calculate_low_speed_shaft_mass`.
+        lss_mass_cost_coeff (float): Low speed shaft cost per kilogram (USD/kg).
+
+
         efficiency_max (float): Maximum possible drivetrain efficiency.
         max_tip_speed (float): Maximum allowable blade tip speed (:math:`m/s`).
 
@@ -77,6 +94,10 @@ class CSMBase:
             for more details.
         spinner_cost (float): Spinner cost (USD). See :py:method:`calculate_spinner_cost`
             for more details.
+        low_speed_shaft_mass (float): Low speed shaft mass (kg). See
+            :py:method:`calculate_low_speed_shaft_mass` for more details.
+        low_speed_shaft_cost (float): Low speed shaft cost (USD). See
+            :py:method:`calculate_low_speed_shaft_cost` for more details.
     """
 
     # turbine general
@@ -494,13 +515,13 @@ class CSMBase:
         ------
             ValueError: Raised if any of the required parameters have not been provided.
         """
-        if next(self._has_values("hub_cost")):
+        if next(self._has_values("pitch_system_cost")):
             return
 
-        parameters = ("hub_mass", "hub_mass_cost_coeff")
+        parameters = ("pitch_system_mass", "pitch_system_mass_cost_coeff")
         self._validate_inputs(parameters=parameters)
 
-        self.hub_cost = self.hub_mass_cost_coeff * self.hub_mass
+        self.pitch_system_cost = self.pitch_system_mass_cost_coeff * self.pitch_system_mass
 
     def calculate_spinner_mass(self):
         """Calculates and sets :py:attr:`spinner_mass` (nose cone mass) if it was not provided by
@@ -558,6 +579,77 @@ class CSMBase:
         self._validate_inputs(parameters=parameters)
 
         self.spinner_cost = self.spinner_mass_cost_coeff * self.spinner_mass
+
+    def calculate_low_speed_shaft_mass(self):
+        """Calculates and sets :py:attr:`low_speed_shaft_mass` if it was not provided by the user.
+
+        :math:`m_{lss} = k*(m_{blade}*power)^b1 + b2`.
+
+        where:
+
+        - :math:`k =` :py:attr:`lss_mass_coeff`
+        - :math:`m_{blade} =` :py:attr:`blade_mass`
+        - :math:`b1 =` :py:attr:`lss_mass_exp`
+        - :math:`b2 =` :py:attr:`lss_mass_intercept`
+
+        Args:
+            rated_power_kw (int, optional): Turbine nameplate capacity, (:math:`kW`).
+            blade_mass (float): Blade mass (:math:`kg`). See :py:method:`calculate_blade_mass`
+                for details.
+            lss_mass_coeff (float): :math:`k` in the low speed shaft mass equation.
+            lss_mass_exp (float): :math:`b1` in the low speed shaft mass equation.
+            lss_mass_intercept (float): :math:`b2` in the low speed shaft mass equation.
+
+        Raises
+        ------
+            ValueError: Raised if the required parameters have not been provided or calculated.
+        """
+        if next(self._has_values("low_speed_shaft_mass")):
+            return
+
+        parameters = (
+            "rated_power_kw",
+            "blade_mass",
+            "lss_mass_coeff",
+            "lss_mass_exp",
+            "lss_mass_intercept",
+        )
+        self._validate_inputs(parameters=parameters)
+
+        bearing_mass = (
+            self.pitch_bearing_mass_coeff * self.blade_mass * self.num_blades
+            + self.pitch_bearing_mass_intercept
+        )
+        self.low_speed_shaft_mass = (
+            bearing_mass * (1 + self.bearing_housing_fraction) + self.mass_sys_offset
+        )
+
+    def calculate_low_speed_shaft_cost(self):
+        """Calculates and sets :py:attr:`low_speed_shaft_cost` if it was not provided by the user.
+
+        .. math:: k * m
+
+        where:
+
+        - :math:`k =` :py:attr:`lss_mass_cost_coeff` (:math:`USD/kg`)
+        - :math:`m =` :py:attr:`low_speed_shaft_mass` (:math:`kg`).
+
+        Args:
+            lss_mass_cost_coeff (float): Low speed shaft cost per kilogram (USD/kg).
+            low_speed_shaft_mass (float): Low speed shaft mass (kg). See
+                :py:method:`calculate_low_speed_shaft_mass` for more details.
+
+        Raises
+        ------
+            ValueError: Raised if any of the required parameters have not been provided.
+        """
+        if next(self._has_values("low_speed_shaft_cost")):
+            return
+
+        parameters = ("low_speed_shaft_mass", "lss_mass_cost_coeff")
+        self._validate_inputs(parameters=parameters)
+
+        self.low_speed_shaft_cost = self.low_speed_shaft_mass_cost_coeff * self.low_speed_shaft_mass
 
     def calculate_rotor_torque(self):
         """Calculates and sets :py:attr:`rated_rpm` and :py:attr:`rotor_torque` if they were not
