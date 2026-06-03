@@ -31,11 +31,12 @@ class CSMBase:
     """Base cost and scaling model that defines universally required inputs and calculations.
 
     Args:
-        blade_mass_coeff (float): :math:`k` in the blade mass equation from
-            :py:method:`calculate_blade_mass`.
-        rotor_diameter (float): Diameter of the swept area of the turbine blades.
+        num_blades (int, optional): Number of turbine blades. Defaults to 3.
+        rotor_diameter (float): Diameter of the swept area of the turbine blades (:math:`m`).
         turbine_class (int): Turbine classification; use 1 for IEC Wind-Class I, 2 fo
             IEC Wind-Class II or III.
+        blade_mass_coeff (float): :math:`k` in the blade mass equation from
+            :py:method:`calculate_blade_mass`.
         blade_has_carbon (bool): Use True if the blade has carbon, False if not.
         blade_mass_cost_coeff (float): Blade cost per kilogram (USD/kg).
         blade_mass (float): Blade mass (kg).
@@ -44,26 +45,38 @@ class CSMBase:
         hub_mass_intercept (bool): :math:`b` in the hub mass equation from
             :py:method:`calculate_hub_mass`.
         hub_mass_cost_coeff (float): Hub cost per kilogram (USD/kg).
-        rotor_diameter (float): Turbine rotor diameter (:math:`m`).
-        rated_power_kw (float): Turbine rated power (:math:`kW`).
-        efficiency_max (float): Maximum possible drivetrain efficiency.
-        max_tip_speed (float): Maximum allowable blade tip speed (:math:`m/s`).
-        num_blades (int, optional): Number of turbine blades. Defaults to 3.
         pitch_bearing_mass_coeff (float): :math:`k` in the pitch bearing mass equation.
-        blade_mass (float): Blade mass (:math:`kg`). See :py:method:`calculate_blade_mass`
-            for details.
         pitch_bearing_mass_intercept (float): :math:`b1` in the pitch bearing mass equation.
         bearing_housing_fraction (float): Mass of the housing for the bearing as a fraction of
             the bearing mass. :math:`h` in the pitch system mass equation.
         mass_sys_offset (float): :math:`b2` in the pitch system mass equation.
         pitch_system_mass_cost_coeff (float): Pitch system cost per kilogram (USD/kg).
+        spinner_mass_coeff (float): :math:`k` in the mass equation above.
+        rotor_diameter (float): Turbine rotor diameter (:math:`m`).
+        spinner_mass_intercept (bool): :math:`b` in the mass equation above.
+        spinner_mass_cost_coeff (float): Spinner cost per kilogram (USD/kg).
+        rated_power_kw (float): Turbine rated power (:math:`kW`).
+        efficiency_max (float): Maximum possible drivetrain efficiency.
+        max_tip_speed (float): Maximum allowable blade tip speed (:math:`m/s`).
 
     Attributes
     ----------
         blade_mass (float): Blade mass (:math:`kg`). See :py:method:`calculate_blade_mass`
             for details.
+        blade_cost (float): Blade cost (USD). See :py:method:`calculate_blade_cost`
+            for details.
         hub_mass (float): Hub mass (kg). See :py:method:`calculate_hub_mass`
-                for more details.
+            for more details.
+        hub_cost (float): Hub cost (USD). See :py:method:`calculate_hub_cost`
+            for more details.
+        pitch_system_mass (float): Pitch system mass (kg). See
+            :py:method:`calculate_pitch_system_mass` for more details.
+        pitch_system_cost (float): Pitch system cost (USD). See
+            :py:method:`calculate_pitch_system_cost for more details.
+        spinner_mass (float): Spinner mass (kg). See :py:method:`calculate_spinner_mass`
+            for more details.
+        spinner_cost (float): Spinner cost (USD). See :py:method:`calculate_spinner_cost`
+            for more details.
     """
 
     # turbine general
@@ -489,6 +502,63 @@ class CSMBase:
 
         self.hub_cost = self.hub_mass_cost_coeff * self.hub_mass
 
+    def calculate_spinner_mass(self):
+        """Calculates and sets :py:attr:`spinner_mass` (nose cone mass) if it was not provided by
+        the user.
+
+        .. math:: k * rotor_diameter + b
+
+        where:
+
+        - :math:`k =` :py:attr:`spinner_mass_coeff`
+        - :math:`rotor_diameter =` :py:attr:`rotor_diameter`
+        - :math:`b =` :py:attr:`spinner_mass_intercept`
+
+        Args:
+            spinner_mass_coeff (float): :math:`k` in the mass equation above.
+            rotor_diameter (float): Turbine rotor diameter (:math:`m`).
+            spinner_mass_intercept (bool): :math:`b` in the mass equation above.
+
+        Raises
+        ------
+            ValueError: Raised if the required parameters have not been provided or calculated.
+        """
+        if next(self._has_values("spinner_mass")):
+            return
+
+        parameters = ("spinner_mass_coeff", "rotor_diameter", "spinner_mass_intercept")
+        self._validate_inputs(parameters=parameters)
+
+        self.spinner_mass = self.spinner_mass_coeff * self.blade_mass + self.spinner_mass_intercept
+
+    def calculate_spinner_cost(self):
+        """Calculates and sets :py:attr:`spinner_cost` (nose cone cost) if it was not provided by
+        the user.
+
+        .. math:: k * m
+
+        where:
+
+        - :math:`k =` :py:attr:`spinner_mass_cost_coeff` (:math:`USD/kg`)
+        - :math:`m =` :py:attr:`spinner_mass` (:math:`kg`).
+
+        Args:
+            spinner_mass_cost_coeff (float): Spinner cost per kilogram (USD/kg).
+            spinner_mass (float): Spinner mass (kg). See :py:method:`calculate_spinner_mass`
+                for more details.
+
+        Raises
+        ------
+            ValueError: Raised if any of the required parameters have not been provided.
+        """
+        if next(self._has_values("spinner_cost")):
+            return
+
+        parameters = ("spinner_mass", "spinner_mass_cost_coeff")
+        self._validate_inputs(parameters=parameters)
+
+        self.spinner_cost = self.spinner_mass_cost_coeff * self.spinner_mass
+
     def calculate_rotor_torque(self):
         """Calculates and sets :py:attr:`rated_rpm` and :py:attr:`rotor_torque` if they were not
         provided by the user.
@@ -519,9 +589,11 @@ class CSMBase:
         # self.calculate_rotor_torque()
         self.calculate_blade_mass()
         self.calculate_hub_mass()
+        self.calculate_spinner_mass()
 
         self.calculate_blade_cost()
         self.calculate_hub_cost()
+        self.calculate_spinner_cost()
 
         self.calculate_rotor_torque()
 
