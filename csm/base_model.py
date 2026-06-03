@@ -244,7 +244,7 @@ class CSMBase:
         default=None,
         converter=converters.optional(float),
         validator=validators.optional(validators.instance_of(float)),
-        metadata={"units": "unitless", "io": "input"},
+        metadata={"units": "kg", "io": "input"},
     )
     bearing_housing_fraction: float = field(
         default=None,
@@ -256,25 +256,127 @@ class CSMBase:
         default=None,
         converter=converters.optional(float),
         validator=validators.optional(validators.instance_of(float)),
-        metadata={"units": "unitless", "io": "input"},
+        metadata={"units": "kg", "io": "input"},
     )
     pitch_system_mass_cost_coeff: float = field(
         default=None,
         converter=converters.optional(float),
         validator=validators.optional(validators.instance_of(float)),
-        metadata={"units": "unitless", "io": "input"},
+        metadata={"units": "USD/kg", "io": "input"},
     )
     pitch_system_mass: float = field(
         default=None,
         converter=converters.optional(float),
         validator=validators.optional(validators.instance_of(float)),
-        metadata={"units": "unitless", "io": "both"},
+        metadata={"units": "kg", "io": "both"},
     )
     pitch_system_cost: float = field(
         default=None,
         converter=converters.optional(float),
         validator=validators.optional(validators.instance_of(float)),
-        metadata={"units": "unitless", "io": "both"},
+        metadata={"units": "USD", "io": "both"},
+    )
+
+    # spinner (nose cone)
+    spinner_mass_coeff: float = field(
+        default=None,
+        converter=converters.optional(float),
+        validator=validators.optional(validators.instance_of(float)),
+        metadata={"units": "unitless", "io": "input"},
+    )
+    spinner_mass_intercept: float = field(
+        default=None,
+        converter=converters.optional(float),
+        validator=validators.optional(validators.instance_of(float)),
+        metadata={"units": "kg", "io": "input"},
+    )
+    spinner_mass_cost_coeff: float = field(
+        default=None,
+        converter=converters.optional(float),
+        validator=validators.optional(validators.instance_of(float)),
+        metadata={"units": "USD/kg", "io": "input"},
+    )
+    spinner_mass: float = field(
+        default=None,
+        converter=converters.optional(float),
+        validator=validators.optional(validators.instance_of(float)),
+        metadata={"units": "kg", "io": "both"},
+    )
+    spinner_cost: float = field(
+        default=None,
+        converter=converters.optional(float),
+        validator=validators.optional(validators.instance_of(float)),
+        metadata={"units": "USD", "io": "both"},
+    )
+
+    # low speed shaft
+    lss_mass_coeff: float = field(
+        default=None,
+        converter=converters.optional(float),
+        validator=validators.optional(validators.instance_of(float)),
+        metadata={"units": "unitless", "io": "input"},
+    )
+    lss_mass_intercept: float = field(
+        default=None,
+        converter=converters.optional(float),
+        validator=validators.optional(validators.instance_of(float)),
+        metadata={"units": "kg", "io": "input"},
+    )
+    lss_mass_exp: float = field(
+        default=None,
+        converter=converters.optional(float),
+        validator=validators.optional(validators.instance_of(float)),
+        metadata={"units": "unitless", "io": "input"},
+    )
+    lss_mass_cost_coeff: float = field(
+        default=None,
+        converter=converters.optional(float),
+        validator=validators.optional(validators.instance_of(float)),
+        metadata={"units": "USD/kg", "io": "input"},
+    )
+    low_speed_shaft_mass: float = field(
+        default=None,
+        converter=converters.optional(float),
+        validator=validators.optional(validators.instance_of(float)),
+        metadata={"units": "kg", "io": "both"},
+    )
+    low_speed_shaft_cost: float = field(
+        default=None,
+        converter=converters.optional(float),
+        validator=validators.optional(validators.instance_of(float)),
+        metadata={"units": "USD", "io": "both"},
+    )
+
+    # main bearing
+    bearing_mass_coeff: float = field(
+        default=None,
+        converter=converters.optional(float),
+        validator=validators.optional(validators.instance_of(float)),
+        metadata={"units": "unitless", "io": "input"},
+    )
+    bearing_mass_exp: float = field(
+        default=None,
+        converter=converters.optional(float),
+        validator=validators.optional(validators.instance_of(float)),
+        metadata={"units": "kg", "io": "input"},
+    )
+    bearing_mass_cost_coeff: float = field(
+        default=None,
+        converter=converters.optional(float),
+        validator=validators.optional(validators.instance_of(float)),
+        metadata={"units": "USD/kg", "io": "input"},
+    )
+    bearing_mass: float = field(
+        default=None,
+        converter=converters.optional(float),
+        validator=validators.optional(validators.instance_of(float)),
+        metadata={"units": "kg", "io": "both"},
+    )
+    bearing_cost: float = field(
+        default=None,
+        converter=converters.optional(float),
+        validator=validators.optional(validators.instance_of(float)),
+        metadata={"units": "USD", "io": "both"},
     )
 
     # NOTE: temporary while prototyping
