@@ -1,21 +1,28 @@
 from copy import deepcopy
 
-from attrs import fields
 import pytest
+from attrs import fields
 
 from csm.base_model import CSMBase
 
 
 csm_2015_inputs = {
     # defaults
-    "rotor_efficiency_max": 1.0,
+    "efficiency_max": 1.0,
     "blade_mass_coeff": 0.5,
     "blade_mass_cost_coeff": 14.6,
     "hub_mass_coeff": 2.3,
     "hub_mass_intercept": 1320.0,
     "hub_mass_cost_coeff": 3.9,
     "rotor_angular_velocity_max": None,
-
+    "num_blades": 3,
+    "pitch_bearing_mass_coeff": 0.1295,
+    "pitch_bearing_mass_intercept": 491.31,
+    "bearing_housing_fraction": 0.3280,
+    "spinner_mass_coeff": 15.5,
+    "spinner_mass_intercept": -980.0,
+    "spinner_mass_cost_coeff": 11.1,
+    "mass_sys_offset": 555.0,
     # example input
     "turbine_class": 1,
     "blade_has_carbon": False,
@@ -31,6 +38,11 @@ csm_2015_outputs = {
     "nacelle_length": None,
     "hub_mass": None,
     "hub_cost": None,
+    "spinner_mass": None,
+    "spinner_cost": None,
+    # "max_tip_speed": None,
+    # "max_tip_speed": None,
+    # "max_tip_speed": None,
 }
 
 
@@ -42,28 +54,34 @@ def test_CSMBase_defaults_only(subtests):
     """
     model = CSMBase()
     undefined_params_msg = "Inputs for the following variables required"
-    
+
     with pytest.raises(ValueError, match=undefined_params_msg):
         model.calculate_blade_mass()
 
     with pytest.raises(ValueError, match=undefined_params_msg):
         model.calculate_rotor_torque()
-        
+
     with pytest.raises(ValueError, match=undefined_params_msg):
         model.calculate_blade_cost()
-        
+
     with pytest.raises(ValueError, match=undefined_params_msg):
         model.calculate_hub_mass()
-        
+
+    with pytest.raises(ValueError, match=undefined_params_msg):
+        model.calculate_pitch_system_cost()
+
+    with pytest.raises(ValueError, match=undefined_params_msg):
+        model.calculate_pitch_system_mass()
+
     with pytest.raises(ValueError, match=undefined_params_msg):
         model.calculate_hub_cost()
-        
+
     with pytest.raises(ValueError, match=undefined_params_msg):
         model.calculate_rotor_torque()
-    
+
     with pytest.raises(ValueError, match=undefined_params_msg):
         model.run()
-    
+
     results = model.get_results()
     _fields = fields(CSMBase)
     for name, val in results.items():
@@ -73,17 +91,16 @@ def test_CSMBase_defaults_only(subtests):
 
 def test_CSMBase_with_inputs(subtests):
     """Tests the model functionality works as expected when all inputs are defined."""
+    blade_variant1 = deepcopy(csm_2015_inputs)
+    blade_variant1["blade_has_carbon"] = True
 
-    blade_variant1 =  deepcopy(csm_2015_inputs)
-    blade_variant1["blade_has_carbon"] = True
-    
-    blade_variant2 =  deepcopy(csm_2015_inputs)
+    blade_variant2 = deepcopy(csm_2015_inputs)
     blade_variant2["turbine_class"] = 2
-    
-    blade_variant3 =  deepcopy(blade_variant1)
+
+    blade_variant3 = deepcopy(blade_variant1)
     blade_variant1["blade_has_carbon"] = True
     blade_variant2["turbine_class"] = 2
-    
+
     csm1 = CSMBase(**blade_variant1)
     csm2 = CSMBase(**blade_variant2)
     csm3 = CSMBase(**blade_variant3)
@@ -96,6 +113,7 @@ def test_CSMBase_with_inputs(subtests):
     # TODO: check actual values
     # TODO: check the outputs
 
+
 def test_CSMBase_with_outputs_as_inputs(subtests):
-    
+
     assert True

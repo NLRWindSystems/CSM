@@ -17,17 +17,29 @@ class Land2015NLR(CSMBase):
     Excel and WISDEM CSM implementation.
     """
 
-    rotor_efficiency_max: float = base.rotor_efficiency_max.evolve(default=1.0)
-    blade_mass_coeff: float = base.blade_mass_coeff.evolve(default=0.5)
-    blade_mass_cost_coeff: float = base.blade_mass_cost_coeff.evolve(default=14.6)
-    hub_mass_coeff: float = base.hub_mass_coeff.evolve(default=2.3)
-    hub_mass_intercept: float = base.hub_mass_intercept.evolve(default=1320.0)
-    hub_mass_cost_coeff: float = base.hub_mass_cost_coeff.evolve(default=3.9)
+    efficiency_max: float = base.efficiency_max.evolve(default=1.0, init=False)
+    blade_mass_coeff: float = base.blade_mass_coeff.evolve(default=0.5, init=False)
+    blade_mass_cost_coeff: float = base.blade_mass_cost_coeff.evolve(default=14.6, init=False)
+    hub_mass_coeff: float = base.hub_mass_coeff.evolve(default=2.3, init=False)
+    hub_mass_intercept: float = base.hub_mass_intercept.evolve(default=1320.0, init=False)
+    hub_mass_cost_coeff: float = base.hub_mass_cost_coeff.evolve(default=3.9, init=False)
+    pitch_bearing_mass_coeff: float = base.pitch_bearing_mass_coeff.evolve(
+        default=0.1295, init=False
+    )
+    pitch_bearing_mass_intercept: float = base.pitch_bearing_mass_intercept.evolve(
+        default=491.31, init=False
+    )
+    bearing_housing_fraction: float = base.bearing_housing_fraction.evolve(
+        default=0.3280, init=False
+    )
+    mass_sys_offset: float = base.mass_sys_offset.evolve(default=555.0, init=False)
+    spinner_mass_coeff: float = base.spinner_mass_coeff.evolve(default=15.5, init=False)
+    spinner_mass_intercept: float = base.spinner_mass_intercept.evolve(default=-980.0, init=False)
+    spinner_mass_cost_coeff: float = base.spinner_mass_cost_coeff.evolve(default=11.1, init=False)
 
 
 # TODO: Determine if there is a way to use evolve and make_class together with a workaround
 # NOTE: The below does not function while evolve and make_class remain incompatible
-# TODO: check this workaround: https://github.com/python-attrs/attrs/issues/637#issuecomment-1019330330
 
 
 def generate_new_model(name: str, default_map: dict[str, Any]):
@@ -62,3 +74,20 @@ def generate_new_model(name: str, default_map: dict[str, Any]):
         name, {k: field_map[k].evolve(default=val) for k, val in default_map.items()}
     )
     return cls
+
+
+# TODO: check this workaround: https://github.com/python-attrs/attrs/issues/637#issuecomment-1019330330  # noqa: E501
+# NOTE: Same issue with _CountingAttr _default vs default, so likely not worth continuing down this path  # noqa: E501
+def generate_model(name: str, default_map: dict[str, Any]):  # noqa: D103
+    def gen_fields(base_fields):
+        for field in base_fields:
+            name = field.name
+            if (default := default_map.get(name)) is None:  # noqa: F841
+                yield name, field
+                continue
+            yield name, field.evolve(default=default_map, init=False)
+
+    def reset_defaults(base_fields: tuple[attrs.Attribute]):
+        return dict(gen_fields(base_fields))
+
+    return attrs.make_class(name, reset_defaults(base), bases=(CSMBase,))
