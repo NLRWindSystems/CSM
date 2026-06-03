@@ -67,22 +67,37 @@ def test_CSMBase_defaults_only(subtests):
         model.calculate_blade_mass()
 
     with pytest.raises(ValueError, match=undefined_params_msg):
-        model.calculate_rotor_torque()
-
-    with pytest.raises(ValueError, match=undefined_params_msg):
         model.calculate_blade_cost()
 
     with pytest.raises(ValueError, match=undefined_params_msg):
         model.calculate_hub_mass()
 
     with pytest.raises(ValueError, match=undefined_params_msg):
-        model.calculate_pitch_system_cost()
+        model.calculate_hub_cost()
 
     with pytest.raises(ValueError, match=undefined_params_msg):
         model.calculate_pitch_system_mass()
 
     with pytest.raises(ValueError, match=undefined_params_msg):
-        model.calculate_hub_cost()
+        model.calculate_pitch_system_cost()
+
+    with pytest.raises(ValueError, match=undefined_params_msg):
+        model.calculate_spinner_mass()
+
+    with pytest.raises(ValueError, match=undefined_params_msg):
+        model.calculate_spinner_cost()
+
+    with pytest.raises(ValueError, match=undefined_params_msg):
+        model.calculate_low_speed_shaft_mass()
+
+    with pytest.raises(ValueError, match=undefined_params_msg):
+        model.calculate_low_speed_shaft_cost()
+
+    with pytest.raises(ValueError, match=undefined_params_msg):
+        model.calculate_bearing_mass()
+
+    with pytest.raises(ValueError, match=undefined_params_msg):
+        model.calculate_bearing_cost()
 
     with pytest.raises(ValueError, match=undefined_params_msg):
         model.calculate_rotor_torque()
