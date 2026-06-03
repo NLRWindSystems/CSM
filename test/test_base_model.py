@@ -19,15 +19,23 @@ csm_2015_inputs = {
     "pitch_bearing_mass_coeff": 0.1295,
     "pitch_bearing_mass_intercept": 491.31,
     "bearing_housing_fraction": 0.3280,
+    "mass_sys_offset": 555.0,
     "spinner_mass_coeff": 15.5,
     "spinner_mass_intercept": -980.0,
     "spinner_mass_cost_coeff": 11.1,
-    "mass_sys_offset": 555.0,
+    "lss_mass_coeff": 13.0,
+    "lss_mass_exp": 0.65,
+    "lss_mass_intercept": 775.0,
+    "lss_mass_cost_coeff": 11.9,
+    "bearing_mass_coeff": 0.0001,
+    "bearing_mass_exp": 3.5,
+    "bearing_mass_cost_coeff": 4.5,
     # example input
     "turbine_class": 1,
     "blade_has_carbon": False,
     "rated_power_kw": 3500,
     "rotor_diameter": 136.7,
+    "max_tip_speed": 71.53,
 }
 
 csm_2015_outputs = {

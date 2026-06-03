@@ -23,7 +23,7 @@ from typing import Any
 from collections.abc import Generator
 
 import pandas as pd
-from attrs import field, define, fields, validators
+from attrs import field, define, fields, converters, validators
 
 
 @define
@@ -71,7 +71,11 @@ class CSMBase:
         lss_mass_intercept (float): :math:`b2` in the low speed shaft mass equation from
             :py:method:`calculate_low_speed_shaft_mass`.
         lss_mass_cost_coeff (float): Low speed shaft cost per kilogram (USD/kg).
-
+        bearing_mass_coeff (float): :math:`k` in the bearing mass equation from
+            :py:method:`calculate_bearing_mass`.
+        bearing_mass_exp (bool): :math:`b` in the bearing mass equation from
+            :py:method:`calculate_bearing_mass`.
+        bearing_mass_cost_coeff (float): Main bearing cost per kilogram (USD/kg).
 
         efficiency_max (float): Maximum possible drivetrain efficiency.
         max_tip_speed (float): Maximum allowable blade tip speed (:math:`m/s`).
@@ -98,6 +102,10 @@ class CSMBase:
             :py:method:`calculate_low_speed_shaft_mass` for more details.
         low_speed_shaft_cost (float): Low speed shaft cost (USD). See
             :py:method:`calculate_low_speed_shaft_cost` for more details.
+        bearing_mass (float): Main bearing mass (kg). See :py:method:`calculate_bearing_mass`
+            for more details.
+        bearing_cost (float): Main bearing cost (USD). See :py:method:`calculate_bearing_cost`
+            for more details.
     """
 
     # turbine general
@@ -125,21 +133,25 @@ class CSMBase:
     )
     blade_mass_coeff: float = field(  # type: ignore
         default=None,
+        converter=converters.optional(float),
         validator=validators.optional(validators.instance_of(float)),
         metadata={"units": "unitless", "io": "input"},
     )
     blade_mass_cost_coeff: float = field(  # type: ignore
         default=None,
+        converter=converters.optional(float),
         validator=validators.optional(validators.instance_of(float)),
         metadata={"units": "USD/kg", "io": "input"},
     )
     blade_mass: float = field(  # type: ignore
         default=None,
+        converter=converters.optional(float),
         validator=validators.optional(validators.instance_of(float)),
         metadata={"units": "kg", "io": "both"},
     )
     blade_cost: float = field(  # type: ignore
         default=None,
+        converter=converters.optional(float),
         validator=validators.optional(validators.instance_of(float)),
         metadata={"units": "USD", "io": "both"},
     )
@@ -147,11 +159,13 @@ class CSMBase:
     # hub
     hub_mass_coeff: float = field(  # type: ignore
         default=None,
+        converter=converters.optional(float),
         validator=validators.optional(validators.instance_of(float)),
         metadata={"units": "unitless", "io": "input"},
     )
     hub_mass_intercept: float = field(  # type: ignore
         default=None,
+        converter=converters.optional(float),
         validator=validators.optional(validators.instance_of(float)),
         metadata={"units": "unitless", "io": "input"},
     )
@@ -162,11 +176,13 @@ class CSMBase:
     )
     hub_mass: float = field(  # type: ignore
         default=None,
+        converter=converters.optional(float),
         validator=validators.optional(validators.instance_of(float)),
         metadata={"units": "kg", "io": "both"},
     )
     hub_cost: float = field(  # type: ignore
         default=None,
+        converter=converters.optional(float),
         validator=validators.optional(validators.instance_of(float)),
         metadata={"units": "USD", "io": "both"},
     )
@@ -174,31 +190,37 @@ class CSMBase:
     # rotor
     rotor_diameter: float = field(  # type: ignore
         default=None,
+        converter=converters.optional(float),
         validator=validators.optional(validators.instance_of(float)),
         metadata={"units": "m", "io": "input"},
     )
     efficiency_max: float = field(  # type: ignore
         default=None,
+        converter=converters.optional(float),
         validator=validators.optional(validators.instance_of(float)),
         metadata={"units": "unitless", "io": "input"},
     )
     max_tip_speed: float = field(  # type: ignore
         default=None,
+        converter=converters.optional(float),
         validator=validators.optional(validators.instance_of(float)),
         metadata={"units": "m/s", "io": "input"},
     )
     rated_rpm: float = field(  # type: ignore
         default=None,
+        converter=converters.optional(float),
         validator=validators.optional(validators.instance_of(float)),
         metadata={"units": "rpm", "io": "both"},
     )
     rotor_torque: float = field(  # type: ignore
         default=None,
+        converter=converters.optional(float),
         validator=validators.optional(validators.instance_of(float)),
         metadata={"units": "MN*m", "io": "both"},
     )
     rotor_mass: float = field(  # type: ignore
         default=None,
+        converter=converters.optional(float),
         validator=validators.optional(validators.instance_of(float)),
         metadata={"units": "m", "io": "both"},
     )
@@ -206,6 +228,7 @@ class CSMBase:
     # nacelle
     nacelle_length: float = field(  # type: ignore
         default=None,
+        converter=converters.optional(float),
         validator=validators.optional(validators.instance_of(float)),
         metadata={"units": "m", "io": "both"},
     )
@@ -213,36 +236,43 @@ class CSMBase:
     # pitch system
     pitch_bearing_mass_coeff: float = field(
         default=None,
+        converter=converters.optional(float),
         validator=validators.optional(validators.instance_of(float)),
         metadata={"units": "unitless", "io": "input"},
     )
     pitch_bearing_mass_intercept: float = field(
         default=None,
+        converter=converters.optional(float),
         validator=validators.optional(validators.instance_of(float)),
         metadata={"units": "unitless", "io": "input"},
     )
     bearing_housing_fraction: float = field(
         default=None,
+        converter=converters.optional(float),
         validator=validators.optional(validators.instance_of(float)),
         metadata={"units": "unitless", "io": "input"},
     )
     mass_sys_offset: float = field(
         default=None,
+        converter=converters.optional(float),
         validator=validators.optional(validators.instance_of(float)),
         metadata={"units": "unitless", "io": "input"},
     )
     pitch_system_mass_cost_coeff: float = field(
         default=None,
+        converter=converters.optional(float),
         validator=validators.optional(validators.instance_of(float)),
         metadata={"units": "unitless", "io": "input"},
     )
     pitch_system_mass: float = field(
         default=None,
+        converter=converters.optional(float),
         validator=validators.optional(validators.instance_of(float)),
         metadata={"units": "unitless", "io": "both"},
     )
     pitch_system_cost: float = field(
         default=None,
+        converter=converters.optional(float),
         validator=validators.optional(validators.instance_of(float)),
         metadata={"units": "unitless", "io": "both"},
     )
@@ -651,6 +681,63 @@ class CSMBase:
 
         self.low_speed_shaft_cost = self.low_speed_shaft_mass_cost_coeff * self.low_speed_shaft_mass
 
+    def calculate_bearing_mass(self):
+        """Calculates and sets :py:attr:`bearing_mass` for the main bearing if it was not provided
+        by the user.
+
+        .. math:: k*rotor_diameter^b
+
+        where:
+
+        - :math:`k =` :py:attr:`bearing_mass_coeff`
+        - :math:`rotor_diameter =` :py:attr:`rotor_diameter`
+        - :math:`b =` :py:attr:`bearing_mass_exp`
+
+        Args:
+            rotor_diameter (float): Turbine rotor diameter (:math:`m`).
+            bearing_mass_coeff (float): :math:`k` in the mass equation above.
+            bearing_mass_exp (bool): :math:`b` in the mass equation above.
+
+        Raises
+        ------
+            ValueError: Raised if the required parameters have not been provided or calculated.
+        """
+        if next(self._has_values("bearing_mass")):
+            return
+
+        parameters = ("bearing_mass_coeff", "rotor_diameter", "bearing_mass_exp")
+        self._validate_inputs(parameters=parameters)
+
+        self.bearing_mass = self.bearing_mass_coeff * self.blade_mass**self.bearing_mass_exp
+
+    def calculate_bearing_cost(self):
+        """Calculates and sets :py:attr:`bearing_cost` (nose cone cost) if it was not provided by
+        the user.
+
+        .. math:: k * m
+
+        where:
+
+        - :math:`k =` :py:attr:`bearing_mass_cost_coeff` (:math:`USD/kg`)
+        - :math:`m =` :py:attr:`bearing_mass` (:math:`kg`).
+
+        Args:
+            bearing_mass_cost_coeff (float): Main bearing cost per kilogram (USD/kg).
+            bearing_mass (float): Main bearing mass (kg). See :py:method:`calculate_bearing_mass`
+                for more details.
+
+        Raises
+        ------
+            ValueError: Raised if any of the required parameters have not been provided.
+        """
+        if next(self._has_values("bearing_cost")):
+            return
+
+        parameters = ("bearing_mass", "bearing_mass_cost_coeff")
+        self._validate_inputs(parameters=parameters)
+
+        self.bearing_cost = self.bearing_mass_cost_coeff * self.bearing_mass
+
     def calculate_rotor_torque(self):
         """Calculates and sets :py:attr:`rated_rpm` and :py:attr:`rotor_torque` if they were not
         provided by the user.
@@ -681,13 +768,18 @@ class CSMBase:
         # self.calculate_rotor_torque()
         self.calculate_blade_mass()
         self.calculate_hub_mass()
+        self.calculate_pitch_system_mass()
         self.calculate_spinner_mass()
+        self.calculate_low_speed_shaft_mass()
+        self.calculate_bearing_mass()
+        self.calculate_rotor_torque()
 
         self.calculate_blade_cost()
         self.calculate_hub_cost()
+        self.calculate_pitch_system_cost()
         self.calculate_spinner_cost()
-
-        self.calculate_rotor_torque()
+        self.calculate_low_speed_shaft_cost()
+        self.calculate_bearing_cost()
 
     def get_results(self) -> dict[str, float]:
         """Gathers the core results."""
@@ -697,6 +789,14 @@ class CSMBase:
             "blade_cost": self.blade_cost,
             "hub_mass": self.hub_mass,
             "hub_cost": self.hub_cost,
+            "pitch_system_mass": self.pitch_system_mass,
+            "pitch_system_cost": self.pitch_system_cost,
+            "spinner_mass": self.spinner_mass,
+            "spinner_cost": self.spinner_cost,
+            "low_speed_shaft_mass": self.low_speed_shaft_mass,
+            "low_speed_shaft_cost": self.low_speed_shaft_cost,
+            "bearing_mass": self.bearing_mass,
+            "bearing_cost": self.bearing_cost,
         }
         return results
 
@@ -705,6 +805,10 @@ class CSMBase:
         results = {
             "blade_mass": self.blade_mass,
             "hub_mass": self.hub_mass,
+            "pitch_system_mass": self.pitch_system_mass,
+            "spinner_mass": self.spinner_mass,
+            "low_speed_shaft_mass": self.low_speed_shaft_mass,
+            "bearing_mass": self.bearing_mass,
         }
         return results
 
@@ -713,6 +817,10 @@ class CSMBase:
         results = {
             "blade_cost": self.blade_cost,
             "hub_cost": self.hub_cost,
+            "pitch_system_cost": self.pitch_system_cost,
+            "spinner_cost": self.spinner_cost,
+            "low_speed_shaft_cost": self.low_speed_shaft_cost,
+            "bearing_cost": self.bearing_cost,
         }
         return results
 

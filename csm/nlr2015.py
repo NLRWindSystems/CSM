@@ -40,6 +40,9 @@ class Land2015NLR(CSMBase):
     lss_mass_exp: float = base.lss_mass_exp.evolve(default=0.65, init=False)
     lss_mass_intercept: float = base.lss_mass_intercept.evolve(default=775.0, init=False)
     lss_mass_cost_coeff: float = base.lss_mass_cost_coeff.evolve(default=11.9, init=False)
+    bearing_mass_coeff: float = base.bearing_mass_coeff.evolve(default=0.0001, init=False)
+    bearing_mass_exp: float = base.bearing_mass_exp.evolve(default=3.5, init=False)
+    bearing_mass_cost_coeff: float = base.bearing_mass_cost_coeff.evolve(default=4.5, init=False)
 
 
 # TODO: Determine if there is a way to use evolve and make_class together with a workaround
