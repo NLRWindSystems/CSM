@@ -90,9 +90,13 @@ class CSMBase:
         hss_mass_coeff (float): Mass scaling coefficient, :math:`k` in the mass equation.
         hss_mass_cost_coeff (float): High speed shaft cost, per kilogram of mass, :math:`k` in the
             equation above (:math:`USD/kg`).
+        generator_mass_coeff (float): :math:`k` in the generator mass equation above (:math:`kg/kW`)
+            from :py:method:`calculate_generator_mass`.
+        generator_mass_intercept (bool): :math:`b` in the generator mass equation above (:math:`kg`)
+            from :py:method:`calculate_generator_mass`.
+        generator_mass_cost_coeff (float): generator cost per kilogram (USD/kg).
 
     Attributes:
-    ----------
         blade_mass (float): Blade mass (:math:`kg`). See :py:method:`calculate_blade_mass`
             for details.
         blade_cost (float): Blade cost (USD). See :py:method:`calculate_blade_cost`
@@ -127,6 +131,10 @@ class CSMBase:
             See :py:method:`high_speed_shaft_mass` for more details.
         high_speed_shaft_cost (float): High speed shaft cost (USD).
             See :py:method:`high_speed_shaft_cost` for more details.
+        generator_mass (float): Generator mass (kg). See :py:method:`calculate_generator_mass`
+            for more details.
+        generator_cost (float): Generator cost (USD). See :py:method:`calculate_generator_cost`
+            for more details.
     """
 
     # turbine general
@@ -472,6 +480,37 @@ class CSMBase:
         metadata={"units": "kg", "io": "both"},
     )
     high_speed_shaft_cost: float = field(
+        default=None,
+        converter=converters.optional(float),
+        validator=validators.optional(validators.instance_of(float)),
+        metadata={"units": "USD", "io": "both"},
+    )
+
+    # generator
+    generator_mass_coeff: float = field(  # type: ignore
+        default=None,
+        converter=converters.optional(float),
+        validator=validators.optional(validators.instance_of(float)),
+        metadata={"units": "kg/kW", "io": "input"},
+    )
+    generator_mass_intercept: float = field(  # type: ignore
+        default=None,
+        converter=converters.optional(float),
+        validator=validators.optional(validators.instance_of(float)),
+        metadata={"units": "kg", "io": "input"},
+    )
+    generator_mass_cost_coeff: float = field(  # type: ignore
+        default=None,
+        validator=validators.optional(validators.instance_of(float)),
+        metadata={"units": "USD/kg", "io": "input"},
+    )
+    generator_mass: float = field(  # type: ignore
+        default=None,
+        converter=converters.optional(float),
+        validator=validators.optional(validators.instance_of(float)),
+        metadata={"units": "kg", "io": "both"},
+    )
+    generator_cost: float = field(  # type: ignore
         default=None,
         converter=converters.optional(float),
         validator=validators.optional(validators.instance_of(float)),
@@ -1103,10 +1142,65 @@ class CSMBase:
         if next(self._has_values("high_speed_shaft_cost")):
             return
 
-        parameters = ("high_speed_shaft_mass", "high_speed_shaft_mass_cost_coeff")
+        parameters = ("high_speed_shaft_mass", "hss_mass_cost_coeff")
         self._validate_inputs(parameters=parameters)
 
-        self.gearbox_cost = self.high_speed_shaft_mass * self.high_speed_shaft_mass_cost_coeff
+        self.gearbox_cost = self.high_speed_shaft_mass * self.hss_mass_cost_coeff
+
+    def calculate_generator_mass(self):
+        """Calculates and sets :py:attr:`generator_mass` if it was not provided by the user.
+
+        .. math:: k * power + b
+
+        where:
+
+        - :math:`k =` :py:attr:`generator_mass_coeff`
+        - :math:`power =` :py:attr:`rated_power_kw`
+        - :math:`b =` :py:attr:`generator_mass_intercept`
+
+        Args:
+            generator_mass_coeff (float): :math:`k` in the mass equation above (:math:`kg/kW`).
+            rated_power_kw (float): Turbine nameplate capacity (rated power) (:math:`kW`).
+            generator_mass_intercept (bool): :math:`b` in the mass equation above (:math:`kg`).
+
+        Raises:
+            ValueError: Raised if the required parameters have not been provided or calculated.
+        """
+        if next(self._has_values("generator_mass")):
+            return
+
+        parameters = ("rated_power_kw", "generator_mass_coeff", "generator_mass_intercept")
+        self._validate_inputs(parameters=parameters)
+
+        self.generator_mass = (
+            self.generator_mass_coeff * self.rated_power_kw + self.generator_mass_intercept
+        )
+
+    def calculate_generator_cost(self):
+        """Calculates and sets :py:attr:`generator_cost` if it was not provided by the user.
+
+        .. math:: k * m
+
+        where:
+
+        - :math:`k =` :py:attr:`generator_mass_cost_coeff` (:math:`USD/kg`)
+        - :math:`m =` :py:attr:`generator_mass` (:math:`kg`).
+
+        Args:
+            generator_mass_cost_coeff (float): generator cost per kilogram (USD/kg).
+            generator_mass (float): generator mass (kg). See :py:method:`calculate_generator_mass`
+                for more details.
+
+        Raises:
+            ValueError: Raised if any of the required parameters have not been provided.
+        """
+        if next(self._has_values("generator_cost")):
+            return
+
+        parameters = ("generator_mass", "generator_mass_cost_coeff")
+        self._validate_inputs(parameters=parameters)
+
+        self.generator_cost = self.generator_mass_cost_coeff * self.generator_mass
 
     def run(self):
         """Run the mass and cost calculations."""
@@ -1199,6 +1293,8 @@ class CSMBase:
             "brake_cost": self.brake_cost,
             "high_speed_shaft_mass": self.high_speed_shaft_mass,
             "high_speed_shaft_cost": self.high_speed_shaft_cost,
+            "generator_mass": self.generator_mass,
+            "generator_cost": self.generator_cost,
         }
         return results
 
@@ -1214,6 +1310,7 @@ class CSMBase:
             "gearbox_mass": self.gearbox_mass,
             "brake_mass": self.brake_mass,
             "high_speed_shaft_mass": self.high_speed_shaft_mass,
+            "generator_mass": self.generator_mass,
         }
         return results
 
@@ -1229,6 +1326,7 @@ class CSMBase:
             "gearbox_cost": self.gearbox_cost,
             "brake_cost": self.brake_cost,
             "high_speed_shaft_cost": self.high_speed_shaft_cost,
+            "generator_cost": self.generator_cost,
         }
         return results
 

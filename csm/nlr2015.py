@@ -63,6 +63,11 @@ class Land2015NLR(CSMBase):
     brake_mass_coeff: float = base.gearbox_torque_cost.evolve(default=0.00122, init=False)
     hss_mass_coeff: float = base.hss_mass_coeff.evolve(default=0.19894, init=False)
     hss_mass_cost_coeff: float = base.hss_mass_cost_coeff.evolve(default=6.8, init=False)
+    generator_mass_coeff: float = base.generator_mass_coeff.evolve(default=2.3, init=False)
+    generator_mass_intercept: float = base.generator_mass_intercept.evolve(default=3400, init=False)
+    generator_mass_cost_coeff: float = base.generator_mass_cost_coeff.evolve(
+        default=12.4, init=False
+    )
 
 
 # TODO: Determine if there is a way to use evolve and make_class together with a workaround

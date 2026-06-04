@@ -36,6 +36,9 @@ csm_2015_inputs = {
     "brake_mass_cost_coeff": 3.6254,
     "hss_mass_coeff": 0.19894,
     "hss_mass_cost_coeff": 6.8,
+    "generator_mass_coeff": 2.3,
+    "generator_mass_intercept": 3400,
+    "generator_mass_cost_coeff": 12.4,
     # example input
     "turbine_class": 1,
     "blade_has_carbon": False,
@@ -112,10 +115,22 @@ def test_CSMBase_defaults_only(subtests):
         model.calculate_gearbox_cost()
 
     with pytest.raises(ValueError, match=undefined_params_msg):
-        model.self.calculate_brake_mass()()
+        model.calculate_brake_mass()
 
     with pytest.raises(ValueError, match=undefined_params_msg):
         model.calculate_brake_cost()
+
+    with pytest.raises(ValueError, match=undefined_params_msg):
+        model.calculate_high_speed_shaft_mass()
+
+    with pytest.raises(ValueError, match=undefined_params_msg):
+        model.calculate_high_speed_shaft_cost()
+
+    with pytest.raises(ValueError, match=undefined_params_msg):
+        model.calculate_generator_mass()
+
+    with pytest.raises(ValueError, match=undefined_params_msg):
+        model.calculate_generator_cost()
 
     with pytest.raises(ValueError, match=undefined_params_msg):
         model.run()
