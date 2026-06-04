@@ -32,6 +32,8 @@ csm_2015_inputs = {
     "bearing_mass_cost_coeff": 4.5,
     "gearbox_torque_density": 200,
     "gearbox_torque_cost": 50,
+    "brake_mass_coeff": 0.00122,
+    "brake_mass_cost_coeff": 3.6254,
     # example input
     "turbine_class": 1,
     "blade_has_carbon": False,
@@ -109,6 +111,12 @@ def test_CSMBase_defaults_only(subtests):
 
     with pytest.raises(ValueError, match=undefined_params_msg):
         model.calculate_gearbox_cost()
+
+    with pytest.raises(ValueError, match=undefined_params_msg):
+        model.self.calculate_brake_mass()()
+
+    with pytest.raises(ValueError, match=undefined_params_msg):
+        model.calculate_brake_cost()
 
     with pytest.raises(ValueError, match=undefined_params_msg):
         model.run()

@@ -83,6 +83,9 @@ class CSMBase:
             (:math:`N*m/kg`).
         gearbox_torque_cost (float): Gearbox cost per unit of torque (:math:`USD/kN/m`) from
             :py:method:`calculate_gearbox_cost`.
+        brake_mass_coeff (bool): :math:`k` in the brake mass equation from
+            :py:method:`calculate_brake_mass`.
+        brake_mass_cost_coeff (float): Brake cost per kilogram (USD/kg).
 
     Attributes
     ----------
@@ -110,10 +113,12 @@ class CSMBase:
             for more details.
         bearing_cost (float): Main bearing cost (USD). See :py:method:`calculate_bearing_cost`
             for more details.
-        gearbox_mass (float): Main bearing mass (kg). See :py:method:`calculate_gearbox_mass`
+        gearbox_mass (float): Gearbox mass (kg). See :py:method:`calculate_gearbox_mass`
             for more details.
         gearbox_cost (float): Gearbox cost (USD). See :py:method:`calculate_gearbox_cost`
             for more details.
+        brake_mass (float): Brake mass (kg). See :py:method:`brake_mass` for more details.
+        brake_cost (float): Brake cost (USD). See :py:method:`brake_cost` for more details.
     """
 
     # turbine general
@@ -366,7 +371,7 @@ class CSMBase:
         default=None,
         converter=converters.optional(float),
         validator=validators.optional(validators.instance_of(float)),
-        metadata={"units": "kg", "io": "input"},
+        metadata={"units": "units", "io": "input"},
     )
     bearing_mass_cost_coeff: float = field(
         default=None,
@@ -407,6 +412,32 @@ class CSMBase:
         metadata={"units": "kg", "io": "both"},
     )
     gearbox_cost: float = field(
+        default=None,
+        converter=converters.optional(float),
+        validator=validators.optional(validators.instance_of(float)),
+        metadata={"units": "USD", "io": "both"},
+    )
+
+    # brakes
+    brake_mass_coeff: float = field(
+        default=None,
+        converter=converters.optional(float),
+        validator=validators.optional(validators.instance_of(float)),
+        metadata={"units": "unitless", "io": "input"},
+    )
+    brake_mass_cost_coeff: float = field(
+        default=None,
+        converter=converters.optional(float),
+        validator=validators.optional(validators.instance_of(float)),
+        metadata={"units": "USD/kg", "io": "input"},
+    )
+    brake_mass: float = field(
+        default=None,
+        converter=converters.optional(float),
+        validator=validators.optional(validators.instance_of(float)),
+        metadata={"units": "kg", "io": "both"},
+    )
+    brake_cost: float = field(
         default=None,
         converter=converters.optional(float),
         validator=validators.optional(validators.instance_of(float)),
@@ -956,6 +987,60 @@ class CSMBase:
             self.gearbox_mass * self.gearbox_torque_density * self.gearbox_torque_cost * 1e-3
         )
 
+    def calculate_brake_mass(self):
+        """Calculates and sets :py:attr:`brake_mass` for if it was not provided by the user.
+
+        .. math:: k * torque
+
+        where:
+
+        - :math:`torque =` :py:attr:`rotor_torque`
+        - :math:`k =` :py:attr:`brake_mass_coeff`
+
+        Args:
+            rotor_torque (float): Turbine rotor torque at rated power (:math:`kNm`).
+            brake_mass_coeff (float): Mass scaling coefficient, :math:`k` in the mass equation.
+
+        Raises
+        ------
+            ValueError: Raised if the required parameters have not been provided or calculated.
+        """
+        if next(self._has_values("brake_mass")):
+            return
+
+        parameters = ("rotor_torque", "brake_mass_coeff")
+        self._validate_inputs(parameters=parameters)
+
+        self.brake_mass = self.rotor_torque * self.brake_mass_coeff
+
+    def calculate_brake_cost(self):
+        """Calculates and sets :py:attr:`brake_cost` if it was not provided by the user.
+
+        .. math:: k * m_{brake}
+
+        where:
+
+        - :math:`k =` :py:attr:`brake_mass_cost_coeff` (:math:`USD/kg`)
+        - :math:`m =` :py:attr:`brake_mass` (:math:`kg`).
+
+        Args:
+            brake_mass (float): Main bearing mass (kg). See :py:method:`calculate_brake_mass`
+                for more details.
+            brake_mass_cost_coeff (float): Brake cost, per kilogram of mass, :math:`k` in the
+                equation above (:math:`USD/kg`).
+
+        Raises
+        ------
+            ValueError: Raised if any of the required parameters have not been provided.
+        """
+        if next(self._has_values("brake_cost")):
+            return
+
+        parameters = ("brake_mass", "brake_mass_cost_coeff")
+        self._validate_inputs(parameters=parameters)
+
+        self.gearbox_cost = self.brake_mass * self.brake_mass_cost_coeff
+
     def run(self):
         """Run the mass and cost calculations."""
         # self.calculate_rotor_torque()
@@ -967,6 +1052,7 @@ class CSMBase:
         self.calculate_bearing_mass()
         self.calculate_rotor_torque()
         self.calculate_gearbox_mass()
+        self.calculate_brake_mass()
 
         self.calculate_blade_cost()
         self.calculate_hub_cost()
@@ -974,7 +1060,7 @@ class CSMBase:
         self.calculate_spinner_cost()
         self.calculate_low_speed_shaft_cost()
         self.calculate_bearing_cost()
-        self.calculate_cost_mass()
+        self.calculate_brake_cost()
 
     def get_results(self) -> dict[str, float]:
         """Gathers the core results."""
@@ -994,6 +1080,8 @@ class CSMBase:
             "bearing_cost": self.bearing_cost,
             "gearbox_mass": self.gearbox_mass,
             "gearbox_cost": self.gearbox_cost,
+            "brake_mass": self.brake_mass,
+            "brake_cost": self.brake_cost,
         }
         return results
 

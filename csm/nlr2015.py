@@ -14,7 +14,15 @@ base = fields(CSMBase)
 @define
 class Land2015NLR(CSMBase):
     """Replication of the original CSM model for land-based turbines in 2015. Replicates both the
-    Excel and WISDEM CSM implementation.
+    Excel and WISDEM CSM implementation. For complete details on all arguments, attributes, and
+    methods. please see the :py:class:`csm.base_model.CSMBase` documentation. All listed attributes
+    below describe the models defaults and any relevant contextual information.
+
+    Attributes
+    ----------
+        sample (float): description. Set to 1.0.
+        gearbox_torque_density (float): In 2024, modern 5-7MW gearboxes are able to reach 200 Nm/kg.
+        gearbox_torque_density (float): In 2020, updated to 3.6254 USD/kg.
     """
 
     efficiency_max: float = base.efficiency_max.evolve(default=1.0, init=False)
@@ -45,6 +53,8 @@ class Land2015NLR(CSMBase):
     bearing_mass_cost_coeff: float = base.bearing_mass_cost_coeff.evolve(default=4.5, init=False)
     gearbox_torque_density: float = base.gearbox_torque_density.evolve(default=200, init=False)
     gearbox_torque_cost: float = base.gearbox_torque_cost.evolve(default=50, init=False)
+    # Regression based sizing derived by J.Keller under FOA 1981 support project
+    brake_mass_coeff: float = base.gearbox_torque_cost.evolve(default=0.00122, init=False)
 
 
 # TODO: Determine if there is a way to use evolve and make_class together with a workaround
