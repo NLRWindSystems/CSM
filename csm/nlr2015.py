@@ -43,6 +43,8 @@ class Land2015NLR(CSMBase):
     bearing_mass_coeff: float = base.bearing_mass_coeff.evolve(default=0.0001, init=False)
     bearing_mass_exp: float = base.bearing_mass_exp.evolve(default=3.5, init=False)
     bearing_mass_cost_coeff: float = base.bearing_mass_cost_coeff.evolve(default=4.5, init=False)
+    gearbox_torque_density: float = base.gearbox_torque_density.evolve(default=200, init=False)
+    gearbox_torque_cost: float = base.gearbox_torque_cost.evolve(default=50, init=False)
 
 
 # TODO: Determine if there is a way to use evolve and make_class together with a workaround

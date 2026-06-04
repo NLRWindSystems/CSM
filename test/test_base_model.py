@@ -25,11 +25,13 @@ csm_2015_inputs = {
     "spinner_mass_cost_coeff": 11.1,
     "lss_mass_coeff": 13.0,
     "lss_mass_exp": 0.65,
-    "lss_mass_intercept": 775.0,
+    "lss_mass_intercept": 775,
     "lss_mass_cost_coeff": 11.9,
     "bearing_mass_coeff": 0.0001,
     "bearing_mass_exp": 3.5,
     "bearing_mass_cost_coeff": 4.5,
+    "gearbox_torque_density": 200,
+    "gearbox_torque_cost": 50,
     # example input
     "turbine_class": 1,
     "blade_has_carbon": False,
@@ -103,13 +105,28 @@ def test_CSMBase_defaults_only(subtests):
         model.calculate_rotor_torque()
 
     with pytest.raises(ValueError, match=undefined_params_msg):
+        model.calculate_gearbox_mass()
+
+    with pytest.raises(ValueError, match=undefined_params_msg):
+        model.calculate_gearbox_cost()
+
+    with pytest.raises(ValueError, match=undefined_params_msg):
         model.run()
 
     results = model.get_results()
-    _fields = fields(CSMBase)
-    for name, val in results.items():
-        default = getattr(_fields, name).default
-        assert default == val, f"{name} does not match the default value when no input was provided"
+    mass_results = model.get_mass_results()
+    cost_results = model.get_cost_results()
+    with subtests.test("Ensure mass and cost results add to the joint results"):
+        assert len(mass_results) + len(cost_results) == len(results)
+        assert not set(mass_results).intersection(cost_results)
+
+    with subtests.test("Check default attribute values for results"):
+        _fields = fields(CSMBase)
+        for name, val in results.items():
+            default = getattr(_fields, name).default
+            assert default == val, (
+                f"{name} does not match the default value when no input was provided"
+            )
 
 
 def test_CSMBase_with_inputs(subtests):

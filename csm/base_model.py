@@ -14,7 +14,7 @@ base = fields(CSMBase)
 
 @define
 class CustomModel(CSMBase):
-    rotor_efficiency_max: float = base.rotor_efficiency_max.evolve(default=1.0)
+    rotor_efficiency_max: float = base.rotor_efficiency_max.evolve(default=1.0, init=False)
 ```
 """
 
@@ -76,9 +76,13 @@ class CSMBase:
         bearing_mass_exp (bool): :math:`b` in the bearing mass equation from
             :py:method:`calculate_bearing_mass`.
         bearing_mass_cost_coeff (float): Main bearing cost per kilogram (USD/kg).
-
         efficiency_max (float): Maximum possible drivetrain efficiency.
         max_tip_speed (float): Maximum allowable blade tip speed (:math:`m/s`).
+        gearbox_torque_density (float): Gearbox torque per kilogram of mass from
+            :py:method:`calculate_gearbox_mass` and :py:method:`calculate_gearbox_cost`
+            (:math:`N*m/kg`).
+        gearbox_torque_cost (float): Gearbox cost per unit of torque (:math:`USD/kN/m`) from
+            :py:method:`calculate_gearbox_cost`.
 
     Attributes
     ----------
@@ -105,6 +109,10 @@ class CSMBase:
         bearing_mass (float): Main bearing mass (kg). See :py:method:`calculate_bearing_mass`
             for more details.
         bearing_cost (float): Main bearing cost (USD). See :py:method:`calculate_bearing_cost`
+            for more details.
+        gearbox_mass (float): Main bearing mass (kg). See :py:method:`calculate_gearbox_mass`
+            for more details.
+        gearbox_cost (float): Gearbox cost (USD). See :py:method:`calculate_gearbox_cost`
             for more details.
     """
 
@@ -373,6 +381,32 @@ class CSMBase:
         metadata={"units": "kg", "io": "both"},
     )
     bearing_cost: float = field(
+        default=None,
+        converter=converters.optional(float),
+        validator=validators.optional(validators.instance_of(float)),
+        metadata={"units": "USD", "io": "both"},
+    )
+
+    # gearbox
+    gearbox_torque_density: float = field(
+        default=None,
+        converter=converters.optional(float),
+        validator=validators.optional(validators.instance_of(float)),
+        metadata={"units": "N*m/kg", "io": "input"},
+    )
+    gearbox_torque_cost: float = field(
+        default=None,
+        converter=converters.optional(float),
+        validator=validators.optional(validators.instance_of(float)),
+        metadata={"units": "USD/kN/m", "io": "input"},
+    )
+    gearbox_mass: float = field(
+        default=None,
+        converter=converters.optional(float),
+        validator=validators.optional(validators.instance_of(float)),
+        metadata={"units": "kg", "io": "both"},
+    )
+    gearbox_cost: float = field(
         default=None,
         converter=converters.optional(float),
         validator=validators.optional(validators.instance_of(float)),
@@ -865,6 +899,63 @@ class CSMBase:
         self.rated_rpm = rotor_speed / (2.0 * math.pi) * 60.0
         self.rotor_torque = rated_hub_power / rotor_speed
 
+    def calculate_gearbox_mass(self):
+        """Calculates and sets :py:attr:`gearbox_mass` for the gearbox if it was not provided
+        by the user.
+
+        .. math:: torque * 1000 / b
+
+        where:
+
+        - :math:`torque =` :py:attr:`rotor_torque`
+        - :math:`b =` :py:attr:`gearbox_torque_density`
+
+        Args:
+            rotor_torque (float): Turbine rotor torque at rated power (:math:`kNm`).
+            gearbox_torque_density (float): :math:`k` in the mass equation above (:math:`N*m/kg`).
+
+        Raises
+        ------
+            ValueError: Raised if the required parameters have not been provided or calculated.
+        """
+        if next(self._has_values("gearbox_mass")):
+            return
+
+        parameters = ("rotor_torque", "gearbox_torque_density")
+        self._validate_inputs(parameters=parameters)
+
+        self.gearbox_mass = self.rotor_torque * 1e3 / self.gearbox_torque_density
+
+    def calculate_gearbox_cost(self):
+        """Calculates and sets :py:attr:`gearbox_cost` if it was not provided by the user.
+
+        .. math:: k * m_{gearbox} * {gearbox_torque_cost} / 1000
+
+        where:
+
+        - :math:`k =` :py:attr:`gearbox_mass_cost_coeff` (:math:`USD/kg`)
+        - :math:`m =` :py:attr:`gearbox_mass` (:math:`kg`).
+
+        Args:
+            gearbox_mass (float): Main bearing mass (kg). See :py:method:`calculate_gearbox_mass`
+                for more details.
+            gearbox_torque_density (float): :math:`k` in the mass equation above (:math:`N*m/kg`).
+            gearbox_torque_cost (float): Gearbox cost per :math:`N*m` (:math:`USD/kN/m`).
+
+        Raises
+        ------
+            ValueError: Raised if any of the required parameters have not been provided.
+        """
+        if next(self._has_values("gearbox_cost")):
+            return
+
+        parameters = ("gearbox_mass", "gearbox_torque_density", "gearbox_torque_cost")
+        self._validate_inputs(parameters=parameters)
+
+        self.gearbox_cost = (
+            self.gearbox_mass * self.gearbox_torque_density * self.gearbox_torque_cost * 1e-3
+        )
+
     def run(self):
         """Run the mass and cost calculations."""
         # self.calculate_rotor_torque()
@@ -875,6 +966,7 @@ class CSMBase:
         self.calculate_low_speed_shaft_mass()
         self.calculate_bearing_mass()
         self.calculate_rotor_torque()
+        self.calculate_gearbox_mass()
 
         self.calculate_blade_cost()
         self.calculate_hub_cost()
@@ -882,11 +974,12 @@ class CSMBase:
         self.calculate_spinner_cost()
         self.calculate_low_speed_shaft_cost()
         self.calculate_bearing_cost()
+        self.calculate_cost_mass()
 
     def get_results(self) -> dict[str, float]:
         """Gathers the core results."""
         results = {
-            "rotor_torque": self.rotor_torque,
+            # "rotor_torque": self.rotor_torque,
             "blade_mass": self.blade_mass,
             "blade_cost": self.blade_cost,
             "hub_mass": self.hub_mass,
@@ -899,6 +992,8 @@ class CSMBase:
             "low_speed_shaft_cost": self.low_speed_shaft_cost,
             "bearing_mass": self.bearing_mass,
             "bearing_cost": self.bearing_cost,
+            "gearbox_mass": self.gearbox_mass,
+            "gearbox_cost": self.gearbox_cost,
         }
         return results
 
@@ -911,6 +1006,7 @@ class CSMBase:
             "spinner_mass": self.spinner_mass,
             "low_speed_shaft_mass": self.low_speed_shaft_mass,
             "bearing_mass": self.bearing_mass,
+            "gearbox_mass": self.gearbox_mass,
         }
         return results
 
@@ -923,6 +1019,7 @@ class CSMBase:
             "spinner_cost": self.spinner_cost,
             "low_speed_shaft_cost": self.low_speed_shaft_cost,
             "bearing_cost": self.bearing_cost,
+            "gearbox_cost": self.gearbox_cost,
         }
         return results
 
