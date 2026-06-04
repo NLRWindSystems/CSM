@@ -91,7 +91,7 @@ class CSMBase:
         hss_mass_cost_coeff (float): High speed shaft cost, per kilogram of mass, :math:`k` in the
             equation above (:math:`USD/kg`).
 
-    Attributes
+    Attributes:
     ----------
         blade_mass (float): Blade mass (:math:`kg`). See :py:method:`calculate_blade_mass`
             for details.
@@ -493,8 +493,7 @@ class CSMBase:
         Args:
             data (dict): The data dictionary to be mapped.
 
-        Returns
-        -------
+        Returns:-
             cls: An instance of :py:class:`CSMBase` or one of its subclasses.
         """
         inputs = set(data)
@@ -522,8 +521,7 @@ class CSMBase:
         """Checks if the user provided values for a given :py:attr:`arg` (True), or if they are
         model defaults (False).
 
-        Yields
-        ------
+        Yields:
             Generator[bool]: Booleans indicating valid values have been implemented or provided
                 by the user (True) or if the base class defaults are present (False).
         """
@@ -539,8 +537,7 @@ class CSMBase:
         Args:
             parameters (list[str]): List of class attributes to check for valid inputs.
 
-        Raises
-        ------
+        Raises:
             ValueError: Raised if any of the required :py:attr:`parameters` have not been
             provided by the user or a subclass.
         """
@@ -574,8 +571,7 @@ class CSMBase:
                 IEC Wind-Class II or III.
             blade_has_carbon (bool): Use True if the blade has carbon, False if not.
 
-        Raises
-        ------
+        Raises:
             ValueError: Raised if the required parameters have not been provided or calculated.
         """
         if next(self._has_values("blade_mass")):
@@ -608,8 +604,7 @@ class CSMBase:
             blade_mass_cost_coeff (float): Blade cost per kilogram (USD/kg).
             blade_mass (float): Blade mass (kg).
 
-        Raises
-        ------
+        Raises:
             ValueError: Raised if any of the required parameters have not been provided.
         """
         if next(self._has_values("blade_cost")):
@@ -637,8 +632,7 @@ class CSMBase:
                 for details.
             hub_mass_intercept (bool): :math:`b` in the mass equation above.
 
-        Raises
-        ------
+        Raises:
             ValueError: Raised if the required parameters have not been provided or calculated.
         """
         if next(self._has_values("hub_mass")):
@@ -664,8 +658,7 @@ class CSMBase:
             hub_mass (float): Hub mass (kg). See :py:method:`calculate_hub_mass`
                 for more details.
 
-        Raises
-        ------
+        Raises:
             ValueError: Raised if any of the required parameters have not been provided.
         """
         if next(self._has_values("hub_cost")):
@@ -702,8 +695,7 @@ class CSMBase:
                 the bearing mass. :math:`h` in the pitch system mass equation.
             mass_sys_offset (float): :math:`b2` in the pitch system mass equation.
 
-        Raises
-        ------
+        Raises:
             ValueError: Raised if the required parameters have not been provided or calculated.
         """
         if next(self._has_values("pitch_system_mass")):
@@ -742,8 +734,7 @@ class CSMBase:
             pitch_system_mass (float): Pitch system mass (kg). See
                 :py:method:`calculate_pitch_system_mass` for more details.
 
-        Raises
-        ------
+        Raises:
             ValueError: Raised if any of the required parameters have not been provided.
         """
         if next(self._has_values("pitch_system_cost")):
@@ -771,8 +762,7 @@ class CSMBase:
             rotor_diameter (float): Turbine rotor diameter (:math:`m`).
             spinner_mass_intercept (bool): :math:`b` in the mass equation above.
 
-        Raises
-        ------
+        Raises:
             ValueError: Raised if the required parameters have not been provided or calculated.
         """
         if next(self._has_values("spinner_mass")):
@@ -799,8 +789,7 @@ class CSMBase:
             spinner_mass (float): Spinner mass (kg). See :py:method:`calculate_spinner_mass`
                 for more details.
 
-        Raises
-        ------
+        Raises:
             ValueError: Raised if any of the required parameters have not been provided.
         """
         if next(self._has_values("spinner_cost")):
@@ -831,8 +820,7 @@ class CSMBase:
             lss_mass_exp (float): :math:`b1` in the low speed shaft mass equation.
             lss_mass_intercept (float): :math:`b2` in the low speed shaft mass equation.
 
-        Raises
-        ------
+        Raises:
             ValueError: Raised if the required parameters have not been provided or calculated.
         """
         if next(self._has_values("low_speed_shaft_mass")):
@@ -870,8 +858,7 @@ class CSMBase:
             low_speed_shaft_mass (float): Low speed shaft mass (kg). See
                 :py:method:`calculate_low_speed_shaft_mass` for more details.
 
-        Raises
-        ------
+        Raises:
             ValueError: Raised if any of the required parameters have not been provided.
         """
         if next(self._has_values("low_speed_shaft_cost")):
@@ -899,8 +886,7 @@ class CSMBase:
             bearing_mass_coeff (float): :math:`k` in the mass equation above.
             bearing_mass_exp (bool): :math:`b` in the mass equation above.
 
-        Raises
-        ------
+        Raises:
             ValueError: Raised if the required parameters have not been provided or calculated.
         """
         if next(self._has_values("bearing_mass")):
@@ -927,8 +913,7 @@ class CSMBase:
             bearing_mass (float): Main bearing mass (kg). See :py:method:`calculate_bearing_mass`
                 for more details.
 
-        Raises
-        ------
+        Raises:
             ValueError: Raised if any of the required parameters have not been provided.
         """
         if next(self._has_values("bearing_cost")):
@@ -949,8 +934,7 @@ class CSMBase:
             efficiency_max (float): Maximum possible drivetrain efficiency.
             max_tip_speed (float): Maximum allowable blade tip speed (:math:`m/s`).
 
-        Raises
-        ------
+        Raises:
             ValueError: Raised if any of the required parameters have not been provided.
         """
         if all(self._has_values("rated_rpm", "rotor_torque")):
@@ -979,8 +963,7 @@ class CSMBase:
             rotor_torque (float): Turbine rotor torque at rated power (:math:`kNm`).
             gearbox_torque_density (float): :math:`k` in the mass equation above (:math:`N*m/kg`).
 
-        Raises
-        ------
+        Raises:
             ValueError: Raised if the required parameters have not been provided or calculated.
         """
         if next(self._has_values("gearbox_mass")):
@@ -1007,8 +990,7 @@ class CSMBase:
             gearbox_torque_density (float): :math:`k` in the mass equation above (:math:`N*m/kg`).
             gearbox_torque_cost (float): Gearbox cost per :math:`N*m` (:math:`USD/kN/m`).
 
-        Raises
-        ------
+        Raises:
             ValueError: Raised if any of the required parameters have not been provided.
         """
         if next(self._has_values("gearbox_cost")):
@@ -1035,8 +1017,7 @@ class CSMBase:
             rotor_torque (float): Turbine rotor torque at rated power (:math:`kNm`).
             brake_mass_coeff (float): Mass scaling coefficient, :math:`k` in the mass equation.
 
-        Raises
-        ------
+        Raises:
             ValueError: Raised if the required parameters have not been provided or calculated.
         """
         if next(self._has_values("brake_mass")):
@@ -1058,13 +1039,12 @@ class CSMBase:
         - :math:`m =` :py:attr:`brake_mass` (:math:`kg`).
 
         Args:
-            brake_mass (float): Main bearing mass (kg). See :py:method:`calculate_brake_mass`
+            brake_mass (float): Brake mass (kg). See :py:method:`calculate_brake_mass`
                 for more details.
             brake_mass_cost_coeff (float): Brake cost, per kilogram of mass, :math:`k` in the
                 equation above (:math:`USD/kg`).
 
-        Raises
-        ------
+        Raises:
             ValueError: Raised if any of the required parameters have not been provided.
         """
         if next(self._has_values("brake_cost")):
@@ -1090,8 +1070,7 @@ class CSMBase:
             rated_power_kw (float): Turbine nameplate capacity (rated power) (:math:`kW`).
             hss_mass_coeff (float): Mass scaling coefficient, :math:`k` in the mass equation.
 
-        Raises
-        ------
+        Raises:
             ValueError: Raised if the required parameters have not been provided or calculated.
         """
         if next(self._has_values("high_speed_shaft_mass")):
@@ -1118,8 +1097,7 @@ class CSMBase:
             hss_mass_cost_coeff (float): High speed shaft cost, per kilogram of mass, :math:`k` in
                 the equation above (:math:`USD/kg`).
 
-        Raises
-        ------
+        Raises:
             ValueError: Raised if any of the required parameters have not been provided.
         """
         if next(self._has_values("high_speed_shaft_cost")):
@@ -1153,7 +1131,7 @@ class CSMBase:
         self.calculate_brake_cost()
         self.calculate_high_speed_shaft_cost()
 
-    @staticmethod
+    @classmethod
     def _get_attr_map(
         cls, *, both_as_separate: bool = False, include_units: bool = False
     ) -> dict[str, Any]:
@@ -1170,8 +1148,7 @@ class CSMBase:
             include_units (bool, optional): Include the attribute's units in the attribute's values
                 or just the default value (False). Defaults to False.
 
-        Returns
-        -------
+        Returns:-
             dict[str, Any]: Dictionary of "inputs", "outputs", and optionally "both (when
                 :py:attr:`both_as_separate` is True). Each of the corresponding dictionaries will
                 have keys of model attribute name and values of either the default value or a
@@ -1255,7 +1232,7 @@ class CSMBase:
         }
         return results
 
-    def irs_mpc_breakdown(
+    def irs_mpc_breakdown(  # noqa: D417
         self,
         turbine_production_cost: float,
         tower_flange_material_cost: float,
@@ -1293,8 +1270,7 @@ class CSMBase:
                 column intact, otherwise drop the column to produce an IRS-ready output. Defaults
                 to False.
 
-        Returns
-        -------
+        Returns:-
             pd.DataFrame: Data Frame with indices for the APCs and MPCs, and columns for the
                 mapping category (if :py:attr:`with_category`), "cost" (total USD), and "Value"
                 (component cost / total cost * 100).
@@ -1380,8 +1356,7 @@ class CSMBase:
                 the total domestic content percentage the counts for the IRS domestic content
                 production calculation. Defaults to False.
 
-        Returns
-        -------
+        Returns:-
             float | pd.DataFrame: Returns the total valid domestic content as a percent, or the
                 DataFrame breakdown by category.
         """

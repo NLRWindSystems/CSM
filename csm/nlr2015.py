@@ -18,7 +18,7 @@ class Land2015NLR(CSMBase):
     methods. please see the :py:class:`csm.base_model.CSMBase` documentation. All listed attributes
     below describe the models defaults and any relevant contextual information.
 
-    Attributes
+    Attributes:
     ----------
         sample (float): description. Set to 1.0.
         pitch_system_mass_cost_coeff (float): Not updated in 2015, so is the original $22.1 USD/kg.
@@ -85,11 +85,11 @@ def generate_new_model(name: str, default_map: dict[str, Any]):
         name (str): Name to assign the new class.
         default_map (dict[str, Any]): Dictionary of model attributes and their new default values.
 
-    Raises
+    Raises:
     ------
         ValueError: Raised when incompatible model attributes are passed.
 
-    Returns
+    Returns:
     -------
         Subclass of ``CSMBase``.
     """
