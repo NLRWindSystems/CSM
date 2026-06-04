@@ -21,8 +21,15 @@ class Land2015NLR(CSMBase):
     Attributes
     ----------
         sample (float): description. Set to 1.0.
+        pitch_system_mass_cost_coeff (float): Not updated in 2015, so is the original $22.1 USD/kg.
         gearbox_torque_density (float): In 2024, modern 5-7MW gearboxes are able to reach 200 Nm/kg.
-        gearbox_torque_density (float): In 2020, updated to 3.6254 USD/kg.
+        gearbox_torque_cost (float): In 2024, modern 5-7MW gearboxes cost approximately $50/kNm.
+        pitch_bearing_mass_coeff (float): Not updated in 2015, so is the original 0.1295.
+        pitch_bearing_mass_intercept (float): Not updated in 2015, so is the original 491.31 kg.
+        bearing_housing_fraction (float): Not updated in 2015, so is the original 0.3280.
+        mass_sys_offset (float): Not updated in 2015, so is the original 555.0 kg.
+        brake_mass_cost_coeff (float): In 2020, updated to $3.6254 USD/kg. Regression based sizing
+            derived by J.Keller under FOA 1981 support project.
     """
 
     efficiency_max: float = base.efficiency_max.evolve(default=1.0, init=False)
@@ -53,8 +60,9 @@ class Land2015NLR(CSMBase):
     bearing_mass_cost_coeff: float = base.bearing_mass_cost_coeff.evolve(default=4.5, init=False)
     gearbox_torque_density: float = base.gearbox_torque_density.evolve(default=200, init=False)
     gearbox_torque_cost: float = base.gearbox_torque_cost.evolve(default=50, init=False)
-    # Regression based sizing derived by J.Keller under FOA 1981 support project
     brake_mass_coeff: float = base.gearbox_torque_cost.evolve(default=0.00122, init=False)
+    hss_mass_coeff: float = base.hss_mass_coeff.evolve(default=0.19894, init=False)
+    hss_mass_cost_coeff: float = base.hss_mass_cost_coeff.evolve(default=6.8, init=False)
 
 
 # TODO: Determine if there is a way to use evolve and make_class together with a workaround

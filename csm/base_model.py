@@ -86,6 +86,10 @@ class CSMBase:
         brake_mass_coeff (bool): :math:`k` in the brake mass equation from
             :py:method:`calculate_brake_mass`.
         brake_mass_cost_coeff (float): Brake cost per kilogram (USD/kg).
+        rated_power_kw (float): Turbine nameplate capacity (rated power) (:math:`kW`).
+        hss_mass_coeff (float): Mass scaling coefficient, :math:`k` in the mass equation.
+        hss_mass_cost_coeff (float): High speed shaft cost, per kilogram of mass, :math:`k` in the
+            equation above (:math:`USD/kg`).
 
     Attributes
     ----------
@@ -119,6 +123,10 @@ class CSMBase:
             for more details.
         brake_mass (float): Brake mass (kg). See :py:method:`brake_mass` for more details.
         brake_cost (float): Brake cost (USD). See :py:method:`brake_cost` for more details.
+        high_speed_shaft_mass (float): High speed shaft mass (kg).
+            See :py:method:`high_speed_shaft_mass` for more details.
+        high_speed_shaft_cost (float): High speed shaft cost (USD).
+            See :py:method:`high_speed_shaft_cost` for more details.
     """
 
     # turbine general
@@ -438,6 +446,32 @@ class CSMBase:
         metadata={"units": "kg", "io": "both"},
     )
     brake_cost: float = field(
+        default=None,
+        converter=converters.optional(float),
+        validator=validators.optional(validators.instance_of(float)),
+        metadata={"units": "USD", "io": "both"},
+    )
+
+    # high speed shaft
+    hss_mass_coeff: float = field(
+        default=None,
+        converter=converters.optional(float),
+        validator=validators.optional(validators.instance_of(float)),
+        metadata={"units": "unitless", "io": "input"},
+    )
+    hss_mass_cost_coeff: float = field(
+        default=None,
+        converter=converters.optional(float),
+        validator=validators.optional(validators.instance_of(float)),
+        metadata={"units": "USD/kg", "io": "input"},
+    )
+    high_speed_shaft_mass: float = field(
+        default=None,
+        converter=converters.optional(float),
+        validator=validators.optional(validators.instance_of(float)),
+        metadata={"units": "kg", "io": "both"},
+    )
+    high_speed_shaft_cost: float = field(
         default=None,
         converter=converters.optional(float),
         validator=validators.optional(validators.instance_of(float)),
@@ -1039,7 +1073,62 @@ class CSMBase:
         parameters = ("brake_mass", "brake_mass_cost_coeff")
         self._validate_inputs(parameters=parameters)
 
-        self.gearbox_cost = self.brake_mass * self.brake_mass_cost_coeff
+        self.brake_cost = self.brake_mass * self.brake_mass_cost_coeff
+
+    def calculate_high_speed_shaft_mass(self):
+        """Calculates and sets :py:attr:`high_speed_shaft_mass` for if it was not provided by the
+        user.
+
+        .. math:: k * power
+
+        where:
+
+        - :math:`power =` :py:attr:`rated_power_kw`
+        - :math:`k =` :py:attr:`hss_mass_coeff`
+
+        Args:
+            rated_power_kw (float): Turbine nameplate capacity (rated power) (:math:`kW`).
+            hss_mass_coeff (float): Mass scaling coefficient, :math:`k` in the mass equation.
+
+        Raises
+        ------
+            ValueError: Raised if the required parameters have not been provided or calculated.
+        """
+        if next(self._has_values("high_speed_shaft_mass")):
+            return
+
+        parameters = ("rated_power_kw", "hss_mass_coeff")
+        self._validate_inputs(parameters=parameters)
+
+        self.high_speed_shaft_mass = self.hss_mass_coeff * self.rated_power_kw
+
+    def calculate_high_speed_shaft_cost(self):
+        """Calculates and sets :py:attr:`high_speed_shaft_cost` if it was not provided by the user.
+
+        .. math:: k * m_{high_speed_shaft}
+
+        where:
+
+        - :math:`k =` :py:attr:`hss_mass_cost_coeff` (:math:`USD/kg`)
+        - :math:`m =` :py:attr:`high_speed_shaft_mass` (:math:`kg`).
+
+        Args:
+            high_speed_shaft_mass (float): High speed shaft mass (kg). See
+                :py:method:`calculate_high_speed_shaft_mass` for more details.
+            hss_mass_cost_coeff (float): High speed shaft cost, per kilogram of mass, :math:`k` in
+                the equation above (:math:`USD/kg`).
+
+        Raises
+        ------
+            ValueError: Raised if any of the required parameters have not been provided.
+        """
+        if next(self._has_values("high_speed_shaft_cost")):
+            return
+
+        parameters = ("high_speed_shaft_mass", "high_speed_shaft_mass_cost_coeff")
+        self._validate_inputs(parameters=parameters)
+
+        self.gearbox_cost = self.high_speed_shaft_mass * self.high_speed_shaft_mass_cost_coeff
 
     def run(self):
         """Run the mass and cost calculations."""
@@ -1053,6 +1142,7 @@ class CSMBase:
         self.calculate_rotor_torque()
         self.calculate_gearbox_mass()
         self.calculate_brake_mass()
+        self.calculate_high_speed_shaft_mass()
 
         self.calculate_blade_cost()
         self.calculate_hub_cost()
@@ -1061,6 +1151,54 @@ class CSMBase:
         self.calculate_low_speed_shaft_cost()
         self.calculate_bearing_cost()
         self.calculate_brake_cost()
+        self.calculate_high_speed_shaft_cost()
+
+    @staticmethod
+    def _get_attr_map(
+        cls, *, both_as_separate: bool = False, include_units: bool = False
+    ) -> dict[str, Any]:
+        """Creates an dictionary attribute mapping of model attribute name to either default value
+        or a dictionary of default value and units (when :py:attr:`include_units` is True). Use of
+        False for :py:attr:`both_as_separate` and True for :py:attr:`include_units` are geared
+        towards WISDEM use cases.
+
+        Args:
+            both_as_separate (bool, optional): Model attributes marked as "both" in their attribute
+                metadata `io` field will be included in the "both" key. If False, the attribute and
+                its value(s) will be include in both the "inputs" and "outputs" values. Defaults to
+                False.
+            include_units (bool, optional): Include the attribute's units in the attribute's values
+                or just the default value (False). Defaults to False.
+
+        Returns
+        -------
+            dict[str, Any]: Dictionary of "inputs", "outputs", and optionally "both (when
+                :py:attr:`both_as_separate` is True). Each of the corresponding dictionaries will
+                have keys of model attribute name and values of either the default value or a
+                dictionary of "default" and "units" with their respective values.
+        """
+        attr_map = {"inputs": {}, "outputs": {}}
+        if both_as_separate:
+            attr_map["both"] = {}
+        for f in fields(cls):
+            meta = f.metadata
+            if (_io := meta.get("io")) is None:
+                continue
+            name = f.name
+            default = f.default
+            val = {"default": default, "units": meta["units"]} if include_units else default
+            match _io:
+                case "input":
+                    attr_map["inputs"][name] = val
+                case "output":
+                    attr_map["outputs"][name] = val
+                case "both":
+                    if both_as_separate:
+                        attr_map["both"][name] = val
+                    else:
+                        attr_map["inputs"][name] = val
+                        attr_map["outputs"][name] = val
+        return attr_map
 
     def get_results(self) -> dict[str, float]:
         """Gathers the core results."""
@@ -1082,6 +1220,8 @@ class CSMBase:
             "gearbox_cost": self.gearbox_cost,
             "brake_mass": self.brake_mass,
             "brake_cost": self.brake_cost,
+            "high_speed_shaft_mass": self.high_speed_shaft_mass,
+            "high_speed_shaft_cost": self.high_speed_shaft_cost,
         }
         return results
 
@@ -1095,6 +1235,8 @@ class CSMBase:
             "low_speed_shaft_mass": self.low_speed_shaft_mass,
             "bearing_mass": self.bearing_mass,
             "gearbox_mass": self.gearbox_mass,
+            "brake_mass": self.brake_mass,
+            "high_speed_shaft_mass": self.high_speed_shaft_mass,
         }
         return results
 
@@ -1108,6 +1250,8 @@ class CSMBase:
             "low_speed_shaft_cost": self.low_speed_shaft_cost,
             "bearing_cost": self.bearing_cost,
             "gearbox_cost": self.gearbox_cost,
+            "brake_cost": self.brake_cost,
+            "high_speed_shaft_cost": self.high_speed_shaft_cost,
         }
         return results
 

@@ -34,6 +34,8 @@ csm_2015_inputs = {
     "gearbox_torque_cost": 50,
     "brake_mass_coeff": 0.00122,
     "brake_mass_cost_coeff": 3.6254,
+    "hss_mass_coeff": 0.19894,
+    "hss_mass_cost_coeff": 6.8,
     # example input
     "turbine_class": 1,
     "blade_has_carbon": False,
@@ -52,9 +54,6 @@ csm_2015_outputs = {
     "hub_cost": None,
     "spinner_mass": None,
     "spinner_cost": None,
-    # "max_tip_speed": None,
-    # "max_tip_speed": None,
-    # "max_tip_speed": None,
 }
 
 

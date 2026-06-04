@@ -1,7 +1,6 @@
 """Automatically Generated WISDEM interface for the user-defined CSM implementation."""
 
 import openmdao.api as om
-from attrs import fields
 
 from csm.base_model import CSMBase
 
@@ -33,19 +32,12 @@ class WisdemCSMBase(om.ExplicitComponent):
         self.options.declare("model", default="CSMBase")
         self.csm_model = model_map[self.options["model"]]
 
-        for f in fields(self.csm_model):
-            meta = f.metadata
-            if (_io := meta.get("io")) is not None:
-                name = f.name
-                default = f.default
-                match _io:
-                    case "input":
-                        self.add_input(name, default, units=meta["units"])
-                    case "output":
-                        self.add_output(name, default, units=meta["units"])
-                    case "both":
-                        self.add_input(name, default, units=meta["units"])
-                        self.add_output(name, default, units=meta["units"])
+        # TODO: check for discrete inputs when complete
+        attr_map = self.csm_model._get_attr_map(both_as_separate=False, include_units=True)
+        for name, vals in attr_map["inputs"].items():
+            self.add_input(name, vals["default"], units=vals["units"])
+        for name, vals in attr_map["outputs"].items():
+            self.add_output(name, vals["default"], units=vals["units"])
 
     def compute(self, inputs, outputs, discrete_inputs=None, discrete_outputs=None):
         """Runs the ``ExplicitComponent.compute()`` method after custom setup."""
