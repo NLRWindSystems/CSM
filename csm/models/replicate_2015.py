@@ -2,13 +2,8 @@ from csm.model._base import CSMMixin
 
 
 class Replicate2015(CSMMixin):
-
-    def rotor_torque_max(
-        turbine_rating_kW, rotor_efficiency_max, rotor_angular_velocity_max
-    ):
-        return (turbine_rating_kW * 1000.0 / rotor_efficiency_max) / (
-            rotor_angular_velocity_max
-        )
+    def rotor_torque_max(turbine_rating_kW, rotor_efficiency_max, rotor_angular_velocity_max):
+        return (turbine_rating_kW * 1000.0 / rotor_efficiency_max) / (rotor_angular_velocity_max)
 
     def nacelle_length():
         return 15.0

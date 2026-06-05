@@ -2,7 +2,6 @@ from csm.model.replicate_2015 import Replicate2015
 
 
 class Replicate2015Excel(Replicate2015):
-
     def blade_mass(rotor_diameter, blade_has_carbon, turbine_class):
         if turbine_class == 1:
             if blade_has_carbon:

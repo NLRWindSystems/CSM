@@ -5,7 +5,7 @@ from typing import Any
 import attrs
 from attrs import define, fields
 
-from csm.base_model import CSMBase
+from csm.models.base_model import CSMBase
 
 
 base = fields(CSMBase)
@@ -15,8 +15,8 @@ base = fields(CSMBase)
 class Land2015NLR(CSMBase):
     """Replication of the original CSM model for land-based turbines in 2015. Replicates both the
     Excel and WISDEM CSM implementation. For complete details on all arguments, attributes, and
-    methods. please see the :py:class:`csm.base_model.CSMBase` documentation. All listed attributes
-    below describe the models defaults and any relevant contextual information.
+    methods. please see the :py:class:`csm.models.base_model.CSMBase` documentation. All listed
+    attributes below describe the models defaults and any relevant contextual information.
 
     Attributes:
     ----------
@@ -32,42 +32,35 @@ class Land2015NLR(CSMBase):
             derived by J.Keller under FOA 1981 support project.
     """
 
-    efficiency_max: float = base.efficiency_max.evolve(default=1.0, init=False)
-    blade_mass_coeff: float = base.blade_mass_coeff.evolve(default=0.5, init=False)
-    blade_mass_cost_coeff: float = base.blade_mass_cost_coeff.evolve(default=14.6, init=False)
-    hub_mass_coeff: float = base.hub_mass_coeff.evolve(default=2.3, init=False)
-    hub_mass_intercept: float = base.hub_mass_intercept.evolve(default=1320.0, init=False)
-    hub_mass_cost_coeff: float = base.hub_mass_cost_coeff.evolve(default=3.9, init=False)
-    pitch_bearing_mass_coeff: float = base.pitch_bearing_mass_coeff.evolve(
-        default=0.1295, init=False
-    )
-    pitch_bearing_mass_intercept: float = base.pitch_bearing_mass_intercept.evolve(
-        default=491.31, init=False
-    )
-    bearing_housing_fraction: float = base.bearing_housing_fraction.evolve(
-        default=0.3280, init=False
-    )
-    mass_sys_offset: float = base.mass_sys_offset.evolve(default=555.0, init=False)
-    spinner_mass_coeff: float = base.spinner_mass_coeff.evolve(default=15.5, init=False)
-    spinner_mass_intercept: float = base.spinner_mass_intercept.evolve(default=-980.0, init=False)
-    spinner_mass_cost_coeff: float = base.spinner_mass_cost_coeff.evolve(default=11.1, init=False)
-    lss_mass_coeff: float = base.lss_mass_coeff.evolve(default=13.0, init=False)
-    lss_mass_exp: float = base.lss_mass_exp.evolve(default=0.65, init=False)
-    lss_mass_intercept: float = base.lss_mass_intercept.evolve(default=775.0, init=False)
-    lss_mass_cost_coeff: float = base.lss_mass_cost_coeff.evolve(default=11.9, init=False)
-    bearing_mass_coeff: float = base.bearing_mass_coeff.evolve(default=0.0001, init=False)
-    bearing_mass_exp: float = base.bearing_mass_exp.evolve(default=3.5, init=False)
-    bearing_mass_cost_coeff: float = base.bearing_mass_cost_coeff.evolve(default=4.5, init=False)
-    gearbox_torque_density: float = base.gearbox_torque_density.evolve(default=200, init=False)
-    gearbox_torque_cost: float = base.gearbox_torque_cost.evolve(default=50, init=False)
-    brake_mass_coeff: float = base.gearbox_torque_cost.evolve(default=0.00122, init=False)
-    hss_mass_coeff: float = base.hss_mass_coeff.evolve(default=0.19894, init=False)
-    hss_mass_cost_coeff: float = base.hss_mass_cost_coeff.evolve(default=6.8, init=False)
-    generator_mass_coeff: float = base.generator_mass_coeff.evolve(default=2.3, init=False)
-    generator_mass_intercept: float = base.generator_mass_intercept.evolve(default=3400, init=False)
-    generator_mass_cost_coeff: float = base.generator_mass_cost_coeff.evolve(
-        default=12.4, init=False
-    )
+    efficiency_max: float = base.efficiency_max.evolve(default=1.0)
+    blade_mass_coeff: float = base.blade_mass_coeff.evolve(default=0.5)
+    blade_mass_cost_coeff: float = base.blade_mass_cost_coeff.evolve(default=14.6)
+    hub_mass_coeff: float = base.hub_mass_coeff.evolve(default=2.3)
+    hub_mass_intercept: float = base.hub_mass_intercept.evolve(default=1320.0)
+    hub_mass_cost_coeff: float = base.hub_mass_cost_coeff.evolve(default=3.9)
+    pitch_bearing_mass_coeff: float = base.pitch_bearing_mass_coeff.evolve(default=0.1295)
+    pitch_bearing_mass_intercept: float = base.pitch_bearing_mass_intercept.evolve(default=491.31)
+    bearing_housing_fraction: float = base.bearing_housing_fraction.evolve(default=0.3280)
+    mass_sys_offset: float = base.mass_sys_offset.evolve(default=555.0)
+    pitch_system_mass_cost_coeff: float = base.pitch_system_mass_cost_coeff.evolve(default=22.1)
+    spinner_mass_coeff: float = base.spinner_mass_coeff.evolve(default=15.5)
+    spinner_mass_intercept: float = base.spinner_mass_intercept.evolve(default=-980.0)
+    spinner_mass_cost_coeff: float = base.spinner_mass_cost_coeff.evolve(default=11.1)
+    lss_mass_coeff: float = base.lss_mass_coeff.evolve(default=13.0)
+    lss_mass_exp: float = base.lss_mass_exp.evolve(default=0.65)
+    lss_mass_intercept: float = base.lss_mass_intercept.evolve(default=775.0)
+    lss_mass_cost_coeff: float = base.lss_mass_cost_coeff.evolve(default=11.9)
+    bearing_mass_coeff: float = base.bearing_mass_coeff.evolve(default=0.0001)
+    bearing_mass_exp: float = base.bearing_mass_exp.evolve(default=3.5)
+    bearing_mass_cost_coeff: float = base.bearing_mass_cost_coeff.evolve(default=4.5)
+    gearbox_torque_density: float = base.gearbox_torque_density.evolve(default=200)
+    gearbox_torque_cost: float = base.gearbox_torque_cost.evolve(default=50)
+    brake_mass_coeff: float = base.gearbox_torque_cost.evolve(default=0.00122)
+    hss_mass_coeff: float = base.hss_mass_coeff.evolve(default=0.19894)
+    hss_mass_cost_coeff: float = base.hss_mass_cost_coeff.evolve(default=6.8)
+    generator_mass_coeff: float = base.generator_mass_coeff.evolve(default=2.3)
+    generator_mass_intercept: float = base.generator_mass_intercept.evolve(default=3400)
+    generator_mass_cost_coeff: float = base.generator_mass_cost_coeff.evolve(default=12.4)
 
 
 # TODO: Determine if there is a way to use evolve and make_class together with a workaround
@@ -117,7 +110,7 @@ def generate_model(name: str, default_map: dict[str, Any]):  # noqa: D103
             if (default := default_map.get(name)) is None:  # noqa: F841
                 yield name, field
                 continue
-            yield name, field.evolve(default=default_map, init=False)
+            yield name, field.evolve(default=default_map)
 
     def reset_defaults(base_fields: tuple[attrs.Attribute]):
         return dict(gen_fields(base_fields))

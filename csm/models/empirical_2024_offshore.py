@@ -4,7 +4,6 @@ from csm.model.empirical_2020 import Empirical2020
 
 
 class Empirical2024Offshore(Empirical2020):
-
     def tower_mass(hub_height, water_depth, rotor_diameter):
         x = (hub_height + water_depth) * rotor_diameter**2
         return 0.0841 * x + 383329.0

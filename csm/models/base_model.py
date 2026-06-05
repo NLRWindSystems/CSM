@@ -8,7 +8,7 @@ the base model.
 ```python
 from attrs import define, fields
 
-from csm.base_model import CSMBase
+from csm.models.base_model import CSMBase
 
 base = fields(CSMBase)
 
@@ -537,7 +537,11 @@ class CSMBase:
         """
         inputs = set(data)
         attributes = {el.name for el in cls.__attrs_attrs__ if el.init}
-        required = {el.name for el in cls.__attrs_attrs__ if el.init and el.default is None}
+        required = {
+            el.name
+            for el in cls.__attrs_attrs__
+            if el.init and el.default is None and el.metadata["io"] == "input"
+        }
 
         extra = inputs.difference(attributes)
         if len(extra):
@@ -547,7 +551,7 @@ class CSMBase:
             )
             raise AttributeError(msg)
 
-        missing = inputs.difference(required)
+        missing = required.difference(inputs)
         if missing:
             msg = (
                 f"The class definition for {cls.__name__} is missing the following inputs: "
@@ -567,7 +571,7 @@ class CSMBase:
         for arg in args:
             default = getattr(fields(CSMBase), arg).default
             value = getattr(self, arg)
-            yield value != default
+            yield value != default and default is not None
 
     def _validate_inputs(self, parameters: tuple[str, ...]) -> None:
         """Validates if the required parameters to calculate an attribute's value have been
@@ -1215,6 +1219,7 @@ class CSMBase:
         self.calculate_gearbox_mass()
         self.calculate_brake_mass()
         self.calculate_high_speed_shaft_mass()
+        self.calculate_generator_mass()
 
         self.calculate_blade_cost()
         self.calculate_hub_cost()
@@ -1224,6 +1229,7 @@ class CSMBase:
         self.calculate_bearing_cost()
         self.calculate_brake_cost()
         self.calculate_high_speed_shaft_cost()
+        self.calculate_generator_cost()
 
     @classmethod
     def _get_attr_map(

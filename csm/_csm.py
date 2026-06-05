@@ -37,7 +37,7 @@ class CSM:
         )
 
     def __repr__(self) -> str:
-        return f"{str(__class__.__name__):s}({self._name:s})"  # type: ignore
+        return f"{__class__.__name__!s:s}({self._name:s})"  # type: ignore
 
     def __new__(cls, *args, **kwargs) -> typing.Self:
         """If creating a new instance of the CSM class directly, use the from_name
@@ -164,15 +164,12 @@ class CSM:
         if parameter_to_calculate in self._function_args.keys():
             # Get all the arguments that will need to be calculated (that are not
             # already known)
-            args = set(self._function_args[parameter_to_calculate]).difference(
-                parameters_known
-            )
+            args = set(self._function_args[parameter_to_calculate]).difference(parameters_known)
 
             # Check the calculatability of all required unknown arguments, if all are
             # calculable then the parameter itself is calculable
             return all(
-                self.is_calculable_with_inputs(a, parameters_known=parameters_known)
-                for a in args
+                self.is_calculable_with_inputs(a, parameters_known=parameters_known) for a in args
             )
         else:
             # If the parameter is not defined by a function, then it is only
@@ -226,7 +223,6 @@ class CSM:
         Raises:
             KeyError: if no function exists for the parameter name
         """
-
         parameter_function = self._functions.get(parameter_name)
         if parameter_function is None:
             raise KeyError(f"{parameter_name:s} is not a function in {self._name:s}.")
@@ -243,7 +239,6 @@ class CSM:
         Returns:
             dict[str, typing.Callable]: dict of function object keyed by function name
         """
-
         model_functions = {}
         # difference between the set of instance attrs and base class attrs should be
         # the model functions
@@ -282,7 +277,6 @@ class CSM:
             RecursionError: If attempting to define a parameter more than once, it may
                 be because of a recursive relationship
         """
-
         # initialize an empty set keeping track of which parameters have already been
         # attempted to get args for
         if functions_checked is None:
@@ -298,8 +292,7 @@ class CSM:
                 # defined functions
                 if func_name in functions_checked:
                     raise RecursionError(
-                        "Check if the following parameter is defined recursively: "
-                        f"{func_name:s}"
+                        f"Check if the following parameter is defined recursively: {func_name:s}"
                     )
 
                 # If we have not already checked this function name, add it to the set
@@ -354,7 +347,6 @@ class CSM:
         Returns:
             typing.Any: the output parameter value
         """
-
         if inputs is None:
             inputs = kwargs
 
@@ -374,9 +366,7 @@ class CSM:
 
         # Get the values of the required inputs to the requested parameter function by
         # recursively calling this function
-        required_kwargs = {
-            a: self.calculate(a, inputs) for a in self._function_args[parameter]
-        }
+        required_kwargs = {a: self.calculate(a, inputs) for a in self._function_args[parameter]}
 
         # At this point no more recursion is required and the parameter can be
         # calculated
@@ -408,7 +398,6 @@ class CSM:
                 stored in a dict and the dataframe results stored in dict, keyed by the
                 parameter name
         """
-
         if inputs is None:
             inputs = kwargs
 

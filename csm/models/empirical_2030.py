@@ -4,7 +4,6 @@ from csm.model.empirical_2020 import Empirical2020
 
 
 class Empirical2030(Empirical2020):
-
     def blade_mass(rotor_diameter):
         return 18.45 * (rotor_diameter / 2.0) ** 1.59
 
@@ -111,16 +110,6 @@ class Empirical2030(Empirical2020):
     def blade_transport_cost(num_blades, rotor_radius):
         return num_blades * np.where(
             rotor_radius < 70.0,
-            (
-                0.543 * rotor_radius**3
-                - 7.4093 * rotor_radius**2
-                - 2847.5 * rotor_radius
-                + 103627
-            ),
-            (
-                -0.0269 * rotor_radius**3
-                + 39.953 * rotor_radius**2
-                - 2947.9 * rotor_radius
-                + 69268
-            ),
+            (0.543 * rotor_radius**3 - 7.4093 * rotor_radius**2 - 2847.5 * rotor_radius + 103627),
+            (-0.0269 * rotor_radius**3 + 39.953 * rotor_radius**2 - 2947.9 * rotor_radius + 69268),
         )

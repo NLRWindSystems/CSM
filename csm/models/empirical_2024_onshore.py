@@ -4,7 +4,6 @@ from csm.model.empirical_2024_offshore import Empirical2024Offshore
 
 
 class Empirical2024Onshore(Empirical2024Offshore):
-
     def blade_mass(rotor_diameter):
         return 373.51 * rotor_diameter - 33_858.0
 

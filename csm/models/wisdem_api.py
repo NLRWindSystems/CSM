@@ -2,7 +2,7 @@
 
 import openmdao.api as om
 
-from csm.base_model import CSMBase
+from csm.models.base_model import CSMBase
 
 
 model_map = {

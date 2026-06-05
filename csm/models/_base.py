@@ -12,9 +12,7 @@ class CSMMixin(CSM):
     def rotor_angular_velocity_max_rpm(rotor_angular_velocity_max):
         return rotor_angular_velocity_max / (2.0 * np.pi) * 60.0
 
-    def rotor_torque_max(
-        turbine_rating, rotor_efficiency_max, rotor_angular_velocity_max
-    ):
+    def rotor_torque_max(turbine_rating, rotor_efficiency_max, rotor_angular_velocity_max):
         return (turbine_rating / rotor_efficiency_max) / (rotor_angular_velocity_max)
 
     def rotor_radius(rotor_diameter):

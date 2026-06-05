@@ -5,13 +5,8 @@ from csm.model._base import CSMMixin
 
 
 class Empirical2020(CSMMixin):
-
-    def rotor_torque_max(
-        turbine_rating_MW, rotor_efficiency_max, rotor_angular_velocity_max
-    ):
-        return (turbine_rating_MW * 1e6 / rotor_efficiency_max) / (
-            rotor_angular_velocity_max
-        )
+    def rotor_torque_max(turbine_rating_MW, rotor_efficiency_max, rotor_angular_velocity_max):
+        return (turbine_rating_MW * 1e6 / rotor_efficiency_max) / (rotor_angular_velocity_max)
 
     def blade_mass(rotor_radius):
         return 9.2157 * rotor_radius**1.7679
@@ -244,12 +239,7 @@ class Empirical2020(CSMMixin):
         return np.maximum(turbine_rating_MW - 3.0, 0.0) * 9000.0
 
     def blade_transport_cost(rotor_radius):
-        return (
-            0.543 * rotor_radius**3
-            - 7.4093 * rotor_radius**2
-            - 2847.5 * rotor_radius
-            + 103627.0
-        )
+        return 0.543 * rotor_radius**3 - 7.4093 * rotor_radius**2 - 2847.5 * rotor_radius + 103627.0
 
     def num_tower_sections(tower_mass):
         return int(np.ceil(tower_mass / 80000.0))

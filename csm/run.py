@@ -1,12 +1,15 @@
-from pathlib import Path
-from collections.abc import Generator
-from tqdm import tqdm
-import pandas as pd
+import typing
 import operator
 import itertools
-import typing
+from pathlib import Path
+from collections.abc import Generator
 
-from csm import csm, util
+import pandas as pd
+from tqdm import tqdm
+
+from csm import util
+from csm._csm import CSM, DIR_MODEL_DEFAULT, DIR_OUTPUT_DEFAULT
+
 
 # default location to look for configuration file
 PATH_CONFIG_DEFAULT = "./input/config.yaml"
@@ -54,10 +57,9 @@ def run_config(
             specified, return the model results themselves. Otherwise return the paths
             to the output files
     """
-
     config_dict = load_config(config)
 
-    model_directory = config_dict.get("model_directory", csm.DIR_MODEL_DEFAULT)
+    model_directory = config_dict.get("model_directory", DIR_MODEL_DEFAULT)
     model_directory = Path(model_directory).resolve()
 
     model_input = tuple(generate_model_parameter_inputs(config_dict))
@@ -79,7 +81,6 @@ def generate_input_parameter_scenarios(
         Generator[dict[str, typing.Any], None, None]: generator of invividual scenario
             parameter values
     """
-
     if (parameter_inputs := config.get("parameters")) is None:
         raise KeyError("Must specify parameters in the configuration file.")
 
@@ -90,7 +91,7 @@ def generate_input_parameter_scenarios(
     # Check each set of parameters for to ensure it has a model
     for parameter_input in parameter_inputs:
         if parameter_input.get("model") is None:
-            raise KeyError(f"Must specify a model: {str(parameter_input):s}")
+            raise KeyError(f"Must specify a model: {parameter_input!s:s}")
         yield parameter_input
 
 
@@ -110,7 +111,6 @@ def generate_model_parameter_inputs(
         Generator[tuple[str, pd.DataFrame], None, None]: generator of (model_name,
         input_parameters) model inputs
     """
-
     # The input dicts can theoreticaly appear in any order We need to organise them into
     # groups based on which model they are using, defined by the name of the model which
     # must appear in the dict
@@ -126,7 +126,6 @@ def generate_model_parameter_inputs(
     param_input_grouped = itertools.groupby(param_input, key=model_getter)
 
     for model_name, param_input_model in param_input_grouped:
-
         # Create dataframe of model input parameters
         param_input_model = (
             pd.DataFrame(param_input_model)
@@ -153,8 +152,7 @@ def calculate_model_result(
     Returns:
         MODEL_RESULT_TYPE: calculated model results
     """
-
-    model = csm.CSM.from_name(model_name, model_directory)
+    model = CSM.from_name(model_name, model_directory)
 
     # Remove the scenario column from the module inputs since it is not a parameter in
     # the model
@@ -179,18 +177,14 @@ def calculate_model_result(
     # all models should return the number and types of output so it is sufficient to
     # check only the first
     keys_dataframe = set(
-        k
-        for k, v in result_unprocessed[0].items()
-        if isinstance(v, (pd.DataFrame, pd.Series))
+        k for k, v in result_unprocessed[0].items() if isinstance(v, (pd.DataFrame, pd.Series))
     )
     result_unprocessed_dataframe = tuple(
         {k: r.pop(k) for k in keys_dataframe} for r in result_unprocessed
     )
     # Assuming all results will have the same keys in the result_df dict
     result_df = {
-        k: pd.concat(
-            (r[k] for r in result_unprocessed_dataframe), keys=parameter_input.index
-        )
+        k: pd.concat((r[k] for r in result_unprocessed_dataframe), keys=parameter_input.index)
         for k in result_unprocessed_dataframe[0].keys()
     }
 
@@ -208,7 +202,7 @@ def calculate_model_result(
 
 def calculate_model_results(
     model_inputs: tuple[tuple[str, pd.DataFrame], ...],
-    model_directory: Path = Path(csm.DIR_MODEL_DEFAULT),
+    model_directory: Path = Path(DIR_MODEL_DEFAULT),
 ) -> tuple[MODEL_RESULT_TYPE, ...]:
     """Run each model after the parameter inputs have been organized based on model
 
@@ -242,22 +236,19 @@ def create_model_output(
         tuple[MODEL_RESULT_TYPE, ...] | tuple[Path, ...]: either the model results
         returned directly or the paths to the output files
     """
-
     # Lookup to get which function should be used to create the output file
     func_create_output_lookup = {
         "excel": util.generate_output_excel,
     }
 
-    if (output_file_type := config.get("output_type", None)) is None:
+    if (output_file_type := config.get("output_type")) is None:
         # if there is no output file type, simply return the results from the model(s)
         return model_result
 
     else:
-        output_dir = Path(
-            config.get("output_directory", csm.DIR_OUTPUT_DEFAULT)
-        ).resolve()
+        output_dir = Path(config.get("output_directory", DIR_OUTPUT_DEFAULT)).resolve()
 
-        if output_file_type not in func_create_output_lookup.keys():
+        if output_file_type not in func_create_output_lookup:
             raise KeyError(
                 (
                     "Invalid output file type: '"
