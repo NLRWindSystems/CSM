@@ -26,6 +26,48 @@ import pandas as pd
 from attrs import field, define, fields, converters, validators
 
 
+def create_field(obj: type, units: str, io_type: str, *, default: int | None = None) -> field:
+    """Creates an :py:obj:`int`-based field with pre-loaded defaults, conversions, validations,
+    and metadata.
+
+    Args:
+        obj (type): A type. Currently only accepts ``int``, ``float``, or ``bool``.
+        units (str): OpenMDAO-compatible units. See
+            <https://openmdao.org/newdocs/versions/latest/features/units.html> for more details.
+        io_type (str): One of "input", "output", or "both" for how the attribute should be
+            initialized within a WISDEM model. Typically ``xx_mass` and ``xx_cost`` attributes
+            are both inputs and outputs.
+        default (int, optional):  Value of the default, if not None. Should be used sparingly.
+
+    Returns:
+        attrs.field:
+            Creates an :py:attr:`attrs.field` object for the attribute.
+    """
+    if obj is int:
+        _field = field(
+            default=None,
+            validator=validators.optional(validators.instance_of(int)),
+            metadata={"units": units, "io": io_type},
+        )
+        return _field
+    if obj is float:
+        _field = field(
+            default=None,
+            converter=converters.optional(float),
+            validator=validators.optional(validators.instance_of(float)),
+            metadata={"units": units, "io": io_type},
+        )
+        return _field
+    if obj is bool:
+        _field = field(
+            default=None,
+            validator=validators.optional(validators.instance_of(bool)),
+            metadata={"units": units, "io": io_type},
+        )
+        return _field
+    raise NotImplementedError(f"No setup created for type: {obj}")
+
+
 @define
 class CSMBase:
     """Base cost and scaling model that defines universally required inputs and calculations.
@@ -138,384 +180,90 @@ class CSMBase:
     """
 
     # turbine general
-    turbine_class: int = field(  # type: ignore
-        default=None,
-        validator=validators.optional(validators.instance_of(int)),
-        metadata={"units": "unitless", "io": "input"},
-    )
-    rated_power_kw: int = field(  # type: ignore
-        default=None,
-        validator=validators.optional(validators.instance_of(int)),
-        metadata={"units": "W", "io": "input"},
-    )
+    turbine_class: int = create_field(int, "unitless", "input")
+    rated_power_kw: int = create_field(int, "kW", "input")
 
     # blades
-    num_blades: int = field(  # type: ignore
-        default=3,
-        validator=validators.instance_of(int),
-        metadata={"units": "unitless", "io": "input"},
-    )
-    blade_has_carbon: bool = field(  # type: ignore
-        default=None,
-        validator=validators.optional(validators.instance_of(bool)),
-        metadata={"units": "unitless", "io": "input"},
-    )
-    blade_mass_coeff: float = field(  # type: ignore
-        default=None,
-        converter=converters.optional(float),
-        validator=validators.optional(validators.instance_of(float)),
-        metadata={"units": "unitless", "io": "input"},
-    )
-    blade_mass_cost_coeff: float = field(  # type: ignore
-        default=None,
-        converter=converters.optional(float),
-        validator=validators.optional(validators.instance_of(float)),
-        metadata={"units": "USD/kg", "io": "input"},
-    )
-    blade_mass: float = field(  # type: ignore
-        default=None,
-        converter=converters.optional(float),
-        validator=validators.optional(validators.instance_of(float)),
-        metadata={"units": "kg", "io": "both"},
-    )
-    blade_cost: float = field(  # type: ignore
-        default=None,
-        converter=converters.optional(float),
-        validator=validators.optional(validators.instance_of(float)),
-        metadata={"units": "USD", "io": "both"},
-    )
+    num_blades: int = create_field(int, "unitless", "input", default=3)
+    blade_has_carbon: bool = create_field(bool, "unitless", "input")
+    blade_mass_coeff: float = create_field(float, "unitless", "input")
+    blade_mass_cost_coeff: float = create_field(float, "USD/kg", "input")
+    blade_mass: float = create_field(float, "kg", "both")
+    blade_cost: float = create_field(float, "USD", "both")
 
     # hub
-    hub_mass_coeff: float = field(  # type: ignore
-        default=None,
-        converter=converters.optional(float),
-        validator=validators.optional(validators.instance_of(float)),
-        metadata={"units": "unitless", "io": "input"},
-    )
-    hub_mass_intercept: float = field(  # type: ignore
-        default=None,
-        converter=converters.optional(float),
-        validator=validators.optional(validators.instance_of(float)),
-        metadata={"units": "unitless", "io": "input"},
-    )
-    hub_mass_cost_coeff: float = field(  # type: ignore
-        default=None,
-        validator=validators.optional(validators.instance_of(float)),
-        metadata={"units": "USD/kg", "io": "input"},
-    )
-    hub_mass: float = field(  # type: ignore
-        default=None,
-        converter=converters.optional(float),
-        validator=validators.optional(validators.instance_of(float)),
-        metadata={"units": "kg", "io": "both"},
-    )
-    hub_cost: float = field(  # type: ignore
-        default=None,
-        converter=converters.optional(float),
-        validator=validators.optional(validators.instance_of(float)),
-        metadata={"units": "USD", "io": "both"},
-    )
+    hub_mass_coeff: float = create_field(float, "unitless", "input")
+    hub_mass_intercept: float = create_field(float, "unitless", "input")
+    hub_mass_cost_coeff: float = create_field(float, "USD/kg", "input")
+    hub_mass: float = create_field(float, "kg", "both")
+    hub_cost: float = create_field(float, "USD", "both")
 
     # rotor
-    rotor_diameter: float = field(  # type: ignore
-        default=None,
-        converter=converters.optional(float),
-        validator=validators.optional(validators.instance_of(float)),
-        metadata={"units": "m", "io": "input"},
-    )
-    efficiency_max: float = field(  # type: ignore
-        default=None,
-        converter=converters.optional(float),
-        validator=validators.optional(validators.instance_of(float)),
-        metadata={"units": "unitless", "io": "input"},
-    )
-    max_tip_speed: float = field(  # type: ignore
-        default=None,
-        converter=converters.optional(float),
-        validator=validators.optional(validators.instance_of(float)),
-        metadata={"units": "m/s", "io": "input"},
-    )
-    rated_rpm: float = field(  # type: ignore
-        default=None,
-        converter=converters.optional(float),
-        validator=validators.optional(validators.instance_of(float)),
-        metadata={"units": "rpm", "io": "both"},
-    )
-    rotor_torque: float = field(  # type: ignore
-        default=None,
-        converter=converters.optional(float),
-        validator=validators.optional(validators.instance_of(float)),
-        metadata={"units": "MN*m", "io": "both"},
-    )
-    rotor_mass: float = field(  # type: ignore
-        default=None,
-        converter=converters.optional(float),
-        validator=validators.optional(validators.instance_of(float)),
-        metadata={"units": "m", "io": "both"},
-    )
+    rotor_diameter: float = create_field(float, "m", "input")
+    efficiency_max: float = create_field(float, "unitless", "input")
+    max_tip_speed: float = create_field(float, "m/s", "input")
+    rated_rpm: float = create_field(float, "rpm", "both")
+    rotor_torque: float = create_field(float, "MN*m", "both")
+    rotor_mass: float = create_field(float, "m", "both")
 
     # nacelle
-    nacelle_length: float = field(  # type: ignore
-        default=None,
-        converter=converters.optional(float),
-        validator=validators.optional(validators.instance_of(float)),
-        metadata={"units": "m", "io": "both"},
-    )
+    nacelle_length: float = create_field(float, "m", "both")
 
     # pitch system
-    pitch_bearing_mass_coeff: float = field(
-        default=None,
-        converter=converters.optional(float),
-        validator=validators.optional(validators.instance_of(float)),
-        metadata={"units": "unitless", "io": "input"},
-    )
-    pitch_bearing_mass_intercept: float = field(
-        default=None,
-        converter=converters.optional(float),
-        validator=validators.optional(validators.instance_of(float)),
-        metadata={"units": "kg", "io": "input"},
-    )
-    bearing_housing_fraction: float = field(
-        default=None,
-        converter=converters.optional(float),
-        validator=validators.optional(validators.instance_of(float)),
-        metadata={"units": "unitless", "io": "input"},
-    )
-    mass_sys_offset: float = field(
-        default=None,
-        converter=converters.optional(float),
-        validator=validators.optional(validators.instance_of(float)),
-        metadata={"units": "kg", "io": "input"},
-    )
-    pitch_system_mass_cost_coeff: float = field(
-        default=None,
-        converter=converters.optional(float),
-        validator=validators.optional(validators.instance_of(float)),
-        metadata={"units": "USD/kg", "io": "input"},
-    )
-    pitch_system_mass: float = field(
-        default=None,
-        converter=converters.optional(float),
-        validator=validators.optional(validators.instance_of(float)),
-        metadata={"units": "kg", "io": "both"},
-    )
-    pitch_system_cost: float = field(
-        default=None,
-        converter=converters.optional(float),
-        validator=validators.optional(validators.instance_of(float)),
-        metadata={"units": "USD", "io": "both"},
-    )
+    pitch_bearing_mass_coeff: float = create_field(float, "unitless", "input")
+    pitch_bearing_mass_intercept: float = create_field(float, "kg", "input")
+    bearing_housing_fraction: float = create_field(float, "unitless", "input")
+    mass_sys_offset: float = create_field(float, "kg", "input")
+    pitch_system_mass_cost_coeff: float = create_field(float, "USD/kg", "input")
+    pitch_system_mass: float = create_field(float, "kg", "both")
+    pitch_system_cost: float = create_field(float, "USD", "both")
 
     # spinner (nose cone)
-    spinner_mass_coeff: float = field(
-        default=None,
-        converter=converters.optional(float),
-        validator=validators.optional(validators.instance_of(float)),
-        metadata={"units": "unitless", "io": "input"},
-    )
-    spinner_mass_intercept: float = field(
-        default=None,
-        converter=converters.optional(float),
-        validator=validators.optional(validators.instance_of(float)),
-        metadata={"units": "kg", "io": "input"},
-    )
-    spinner_mass_cost_coeff: float = field(
-        default=None,
-        converter=converters.optional(float),
-        validator=validators.optional(validators.instance_of(float)),
-        metadata={"units": "USD/kg", "io": "input"},
-    )
-    spinner_mass: float = field(
-        default=None,
-        converter=converters.optional(float),
-        validator=validators.optional(validators.instance_of(float)),
-        metadata={"units": "kg", "io": "both"},
-    )
-    spinner_cost: float = field(
-        default=None,
-        converter=converters.optional(float),
-        validator=validators.optional(validators.instance_of(float)),
-        metadata={"units": "USD", "io": "both"},
-    )
+    spinner_mass_coeff: float = create_field(float, "unitless", "input")
+    spinner_mass_intercept: float = create_field(float, "kg", "input")
+    spinner_mass_cost_coeff: float = create_field(float, "USD/kg", "input")
+    spinner_mass: float = create_field(float, "kg", "both")
+    spinner_cost: float = create_field(float, "USD", "both")
 
     # low speed shaft
-    lss_mass_coeff: float = field(
-        default=None,
-        converter=converters.optional(float),
-        validator=validators.optional(validators.instance_of(float)),
-        metadata={"units": "unitless", "io": "input"},
-    )
-    lss_mass_intercept: float = field(
-        default=None,
-        converter=converters.optional(float),
-        validator=validators.optional(validators.instance_of(float)),
-        metadata={"units": "kg", "io": "input"},
-    )
-    lss_mass_exp: float = field(
-        default=None,
-        converter=converters.optional(float),
-        validator=validators.optional(validators.instance_of(float)),
-        metadata={"units": "unitless", "io": "input"},
-    )
-    lss_mass_cost_coeff: float = field(
-        default=None,
-        converter=converters.optional(float),
-        validator=validators.optional(validators.instance_of(float)),
-        metadata={"units": "USD/kg", "io": "input"},
-    )
-    low_speed_shaft_mass: float = field(
-        default=None,
-        converter=converters.optional(float),
-        validator=validators.optional(validators.instance_of(float)),
-        metadata={"units": "kg", "io": "both"},
-    )
-    low_speed_shaft_cost: float = field(
-        default=None,
-        converter=converters.optional(float),
-        validator=validators.optional(validators.instance_of(float)),
-        metadata={"units": "USD", "io": "both"},
-    )
+    lss_mass_coeff: float = create_field(float, "unitless", "input")
+    lss_mass_intercept: float = create_field(float, "kg", "input")
+    lss_mass_exp: float = create_field(float, "unitless", "input")
+    lss_mass_cost_coeff: float = create_field(float, "USD/kg", "input")
+    low_speed_shaft_mass: float = create_field(float, "kg", "both")
+    low_speed_shaft_cost: float = create_field(float, "USD", "both")
 
     # main bearing
-    bearing_mass_coeff: float = field(
-        default=None,
-        converter=converters.optional(float),
-        validator=validators.optional(validators.instance_of(float)),
-        metadata={"units": "unitless", "io": "input"},
-    )
-    bearing_mass_exp: float = field(
-        default=None,
-        converter=converters.optional(float),
-        validator=validators.optional(validators.instance_of(float)),
-        metadata={"units": "units", "io": "input"},
-    )
-    bearing_mass_cost_coeff: float = field(
-        default=None,
-        converter=converters.optional(float),
-        validator=validators.optional(validators.instance_of(float)),
-        metadata={"units": "USD/kg", "io": "input"},
-    )
-    bearing_mass: float = field(
-        default=None,
-        converter=converters.optional(float),
-        validator=validators.optional(validators.instance_of(float)),
-        metadata={"units": "kg", "io": "both"},
-    )
-    bearing_cost: float = field(
-        default=None,
-        converter=converters.optional(float),
-        validator=validators.optional(validators.instance_of(float)),
-        metadata={"units": "USD", "io": "both"},
-    )
+    bearing_mass_coeff: float = create_field(float, "unitless", "input")
+    bearing_mass_exp: float = create_field(float, "units", "input")
+    bearing_mass_cost_coeff: float = create_field(float, "USD/kg", "input")
+    bearing_mass: float = create_field(float, "kg", "both")
+    bearing_cost: float = create_field(float, "USD", "both")
 
     # gearbox
-    gearbox_torque_density: float = field(
-        default=None,
-        converter=converters.optional(float),
-        validator=validators.optional(validators.instance_of(float)),
-        metadata={"units": "N*m/kg", "io": "input"},
-    )
-    gearbox_torque_cost: float = field(
-        default=None,
-        converter=converters.optional(float),
-        validator=validators.optional(validators.instance_of(float)),
-        metadata={"units": "USD/kN/m", "io": "input"},
-    )
-    gearbox_mass: float = field(
-        default=None,
-        converter=converters.optional(float),
-        validator=validators.optional(validators.instance_of(float)),
-        metadata={"units": "kg", "io": "both"},
-    )
-    gearbox_cost: float = field(
-        default=None,
-        converter=converters.optional(float),
-        validator=validators.optional(validators.instance_of(float)),
-        metadata={"units": "USD", "io": "both"},
-    )
+    gearbox_torque_density: float = create_field(float, "N*m/kg", "input")
+    gearbox_torque_cost: float = create_field(float, "USD/kN/m", "input")
+    gearbox_mass: float = create_field(float, "kg", "both")
+    gearbox_cost: float = create_field(float, "USD", "both")
 
     # brakes
-    brake_mass_coeff: float = field(
-        default=None,
-        converter=converters.optional(float),
-        validator=validators.optional(validators.instance_of(float)),
-        metadata={"units": "unitless", "io": "input"},
-    )
-    brake_mass_cost_coeff: float = field(
-        default=None,
-        converter=converters.optional(float),
-        validator=validators.optional(validators.instance_of(float)),
-        metadata={"units": "USD/kg", "io": "input"},
-    )
-    brake_mass: float = field(
-        default=None,
-        converter=converters.optional(float),
-        validator=validators.optional(validators.instance_of(float)),
-        metadata={"units": "kg", "io": "both"},
-    )
-    brake_cost: float = field(
-        default=None,
-        converter=converters.optional(float),
-        validator=validators.optional(validators.instance_of(float)),
-        metadata={"units": "USD", "io": "both"},
-    )
+    brake_mass_coeff: float = create_field(float, "unitless", "input")
+    brake_mass_cost_coeff: float = create_field(float, "USD/kg", "input")
+    brake_mass: float = create_field(float, "kg", "both")
+    brake_cost: float = create_field(float, "USD", "both")
 
     # high speed shaft
-    hss_mass_coeff: float = field(
-        default=None,
-        converter=converters.optional(float),
-        validator=validators.optional(validators.instance_of(float)),
-        metadata={"units": "unitless", "io": "input"},
-    )
-    hss_mass_cost_coeff: float = field(
-        default=None,
-        converter=converters.optional(float),
-        validator=validators.optional(validators.instance_of(float)),
-        metadata={"units": "USD/kg", "io": "input"},
-    )
-    high_speed_shaft_mass: float = field(
-        default=None,
-        converter=converters.optional(float),
-        validator=validators.optional(validators.instance_of(float)),
-        metadata={"units": "kg", "io": "both"},
-    )
-    high_speed_shaft_cost: float = field(
-        default=None,
-        converter=converters.optional(float),
-        validator=validators.optional(validators.instance_of(float)),
-        metadata={"units": "USD", "io": "both"},
-    )
+    hss_mass_coeff: float = create_field(float, "unitless", "input")
+    hss_mass_cost_coeff: float = create_field(float, "USD/kg", "input")
+    high_speed_shaft_mass: float = create_field(float, "kg", "both")
+    high_speed_shaft_cost: float = create_field(float, "USD", "both")
 
     # generator
-    generator_mass_coeff: float = field(  # type: ignore
-        default=None,
-        converter=converters.optional(float),
-        validator=validators.optional(validators.instance_of(float)),
-        metadata={"units": "kg/kW", "io": "input"},
-    )
-    generator_mass_intercept: float = field(  # type: ignore
-        default=None,
-        converter=converters.optional(float),
-        validator=validators.optional(validators.instance_of(float)),
-        metadata={"units": "kg", "io": "input"},
-    )
-    generator_mass_cost_coeff: float = field(  # type: ignore
-        default=None,
-        validator=validators.optional(validators.instance_of(float)),
-        metadata={"units": "USD/kg", "io": "input"},
-    )
-    generator_mass: float = field(  # type: ignore
-        default=None,
-        converter=converters.optional(float),
-        validator=validators.optional(validators.instance_of(float)),
-        metadata={"units": "kg", "io": "both"},
-    )
-    generator_cost: float = field(  # type: ignore
-        default=None,
-        converter=converters.optional(float),
-        validator=validators.optional(validators.instance_of(float)),
-        metadata={"units": "USD", "io": "both"},
-    )
+    generator_mass_coeff: float = create_field(float, "kg/kW", "input")
+    generator_mass_intercept: float = create_field(float, "kg", "input")
+    generator_mass_cost_coeff: float = create_field(float, "USD/kg", "input")
+    generator_mass: float = create_field(float, "kg", "both")
+    generator_cost: float = create_field(float, "USD", "both")
 
     # NOTE: temporary while prototyping
     power_converter_cost: float = field(default=1000.0)
