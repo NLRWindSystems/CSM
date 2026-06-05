@@ -3,7 +3,7 @@ from copy import deepcopy
 import pytest
 from attrs import fields
 
-from csm.base_model import CSMBase
+from csm.models.base_model import CSMBase
 
 
 csm_2015_inputs = {
@@ -20,6 +20,7 @@ csm_2015_inputs = {
     "pitch_bearing_mass_intercept": 491.31,
     "bearing_housing_fraction": 0.3280,
     "mass_sys_offset": 555.0,
+    "pitch_system_mass_cost_coeff": 22.1,
     "spinner_mass_coeff": 15.5,
     "spinner_mass_intercept": -980.0,
     "spinner_mass_cost_coeff": 11.1,

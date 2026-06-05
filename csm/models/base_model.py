@@ -571,7 +571,7 @@ class CSMBase:
         for arg in args:
             default = getattr(fields(CSMBase), arg).default
             value = getattr(self, arg)
-            yield value != default and default is not None
+            yield value != default or default is not None
 
     def _validate_inputs(self, parameters: tuple[str, ...]) -> None:
         """Validates if the required parameters to calculate an attribute's value have been
@@ -910,7 +910,7 @@ class CSMBase:
         parameters = ("low_speed_shaft_mass", "lss_mass_cost_coeff")
         self._validate_inputs(parameters=parameters)
 
-        self.low_speed_shaft_cost = self.low_speed_shaft_mass_cost_coeff * self.low_speed_shaft_mass
+        self.low_speed_shaft_cost = self.lss_mass_cost_coeff * self.low_speed_shaft_mass
 
     def calculate_bearing_mass(self):
         """Calculates and sets :py:attr:`bearing_mass` for the main bearing if it was not provided
