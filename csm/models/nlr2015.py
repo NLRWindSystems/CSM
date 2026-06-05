@@ -61,6 +61,8 @@ class Land2015NLR(CSMBase):
     generator_mass_coeff: float = base.generator_mass_coeff.evolve(default=2.3)
     generator_mass_intercept: float = base.generator_mass_intercept.evolve(default=3400)
     generator_mass_cost_coeff: float = base.generator_mass_cost_coeff.evolve(default=12.4)
+    bedplate_mass_exp: float = base.bedplate_mass_exp.evolve(default=2.2)
+    bedplate_mass_cost_coeff: float = base.bedplate_mass_cost_coeff.evolve(default=2.9)
 
 
 # TODO: Determine if there is a way to use evolve and make_class together with a workaround

@@ -40,6 +40,8 @@ csm_2015_inputs = {
     "generator_mass_coeff": 2.3,
     "generator_mass_intercept": 3400,
     "generator_mass_cost_coeff": 12.4,
+    "bedplate_mass_exp": 2.2,
+    "bedplate_mass_cost_coeff": 2.9,
     # example input
     "turbine_class": 1,
     "blade_has_carbon": False,
@@ -132,6 +134,12 @@ def test_CSMBase_defaults_only(subtests):
 
     with pytest.raises(ValueError, match=undefined_params_msg):
         model.calculate_generator_cost()
+
+    with pytest.raises(ValueError, match=undefined_params_msg):
+        model.calculate_bedplate_mass()
+
+    with pytest.raises(ValueError, match=undefined_params_msg):
+        model.calculate_bedplate_cost()
 
     with pytest.raises(ValueError, match=undefined_params_msg):
         model.run()
