@@ -145,6 +145,11 @@ class CSMBase:
         bedplate_mass_exp (bool): :math:`b` in the mass equation from
             :py:method:`calculate_bedplate_mass`.
         bedplate_mass_cost_coeff (float): bedplate cost per kilogram (USD/kg).
+        yaw_system_mass_coeff (float): :math:`k` in the mass equation from
+            :py:method:`calculate_yaw_system_mass`.
+        yaw_system_mass_exp (bool): :math:`b` in the mass equation from
+            :py:method:`calculate_yaw_system_mass`..
+        yaw_system_mass_cost_coeff (float): Yaw system cost per kilogram (USD/kg).
 
     Attributes:
         blade_mass (float): Blade mass (:math:`kg`). See :py:method:`calculate_blade_mass`
@@ -188,6 +193,10 @@ class CSMBase:
         bedplate_mass (float): Bedplate mass (kg). See :py:method:`calculate_bedplate_mass`
             for more details.
         bedplate_cost (float): Bedplate cost (USD). See :py:method:`calculate_bedplate_cost`
+            for more details.
+        yaw_system_mass (float): Yaw system mass (kg). See :py:method:`calculate_yaw_system_mass`
+            for more details.
+        yaw_system_cost (float): Yaw system cost (USD). See :py:method:`calculate_yaw_system_cost`
             for more details.
     """
 
@@ -278,10 +287,17 @@ class CSMBase:
     generator_cost: float = create_field(float, "USD", "both")
 
     # bedplate
-    bedplate_mass_coeff: float = create_field(float, "unitless", "input")
+    bedplate_mass_exp: float = create_field(float, "unitless", "input")
     bedplate_mass_cost_coeff: float = create_field(float, "USD/kg", "input")
     bedplate_mass: float = create_field(float, "kg", "both")
     bedplate_cost: float = create_field(float, "USD", "both")
+
+    # yaw system
+    yaw_system_mass_coeff: float = create_field(float, "unitless", "input")
+    yaw_system_mass_exp: float = create_field(float, "unitless", "input")
+    yaw_system_mass_cost_coeff: float = create_field(float, "USD/kg", "input")
+    yaw_system_mass: float = create_field(float, "kg", "both")
+    yaw_system_cost: float = create_field(float, "USD", "both")
 
     # NOTE: temporary while prototyping
     power_converter_cost: float = field(default=1000.0)
@@ -979,7 +995,7 @@ class CSMBase:
 
         where:
 
-         - :math:`rotor_diameter =` :py:attr:`rotor_diameter`
+        - :math:`rotor_diameter =` :py:attr:`rotor_diameter`
         - :math:`b =` :py:attr:`bedplate_mass_exp`
 
         Args:
@@ -1023,6 +1039,61 @@ class CSMBase:
 
         self.bedplate_cost = self.bedplate_mass_cost_coeff * self.bedplate_mass
 
+    def calculate_yaw_system_mass(self):
+        """Calculates and sets :py:attr:`yaw_system_mass` if it was not provided by the user.
+
+        .. math:: k * {rotor_diameter} ^ b
+
+        where:
+
+        - :math:`k =` :py:attr:`yaw_system_mass_coeff`
+        - :math:`rotor_diameter =` :py:attr:`rotor_diameter`
+        - :math:`b =` :py:attr:`yaw_system_mass_exp`
+
+        Args:
+            yaw_system_mass_coeff (float): :math:`k` in the mass equation above (:math:`kg/kW`).
+            rotor_diameter (float): Turbine rotor diameter (:math:`m`).
+            yaw_system_mass_exp (bool): :math:`b` in the mass equation above (:math:`kg`).
+
+        Raises:
+            ValueError: Raised if the required parameters have not been provided or calculated.
+        """
+        if next(self._has_values("yaw_system_mass")):
+            return
+
+        parameters = ("rotor_diameter", "yaw_system_mass_coeff", "yaw_system_mass_exp")
+        self._validate_inputs(parameters=parameters)
+
+        self.yaw_system_mass = (
+            self.yaw_system_mass_coeff * self.rotor_diameter**self.yaw_system_mass_exp
+        )
+
+    def calculate_yaw_system_cost(self):
+        """Calculates and sets :py:attr:`yaw_system_cost` if it was not provided by the user.
+
+        .. math:: k * m
+
+        where:
+
+        - :math:`k =` :py:attr:`yaw_system_mass_cost_coeff` (:math:`USD/kg`)
+        - :math:`m =` :py:attr:`yaw_system_mass` (:math:`kg`).
+
+        Args:
+            yaw_system_mass_cost_coeff (float): Yaw system cost per kilogram (USD/kg).
+            yaw_system_mass (float): Yaw system mass (kg).
+                See :py:method:`calculate_yaw_system_mass` for more details.
+
+        Raises:
+            ValueError: Raised if any of the required parameters have not been provided.
+        """
+        if next(self._has_values("yaw_system_cost")):
+            return
+
+        parameters = ("yaw_system_mass", "yaw_system_mass_cost_coeff")
+        self._validate_inputs(parameters=parameters)
+
+        self.yaw_system_cost = self.yaw_system_mass_cost_coeff * self.yaw_system_mass
+
     def run(self):
         """Run the mass and cost calculations."""
         # self.calculate_rotor_torque()
@@ -1038,6 +1109,7 @@ class CSMBase:
         self.calculate_high_speed_shaft_mass()
         self.calculate_generator_mass()
         self.calculate_bedplate_mass()
+        self.calculate_yaw_system_mass()
 
         self.calculate_blade_cost()
         self.calculate_hub_cost()
@@ -1049,6 +1121,7 @@ class CSMBase:
         self.calculate_high_speed_shaft_cost()
         self.calculate_generator_cost()
         self.calculate_bedplate_cost()
+        self.calculate_yaw_system_cost()
 
     @classmethod
     def _get_attr_map(
@@ -1122,6 +1195,8 @@ class CSMBase:
             "generator_cost": self.generator_cost,
             "bedplate_mass": self.bedplate_mass,
             "bedplate_cost": self.bedplate_cost,
+            "yaw_system_mass": self.yaw_system_mass,
+            "yaw_system_cost": self.yaw_system_cost,
         }
         return results
 
@@ -1139,6 +1214,7 @@ class CSMBase:
             "high_speed_shaft_mass": self.high_speed_shaft_mass,
             "generator_mass": self.generator_mass,
             "bedplate_mass": self.bedplate_mass,
+            "yaw_system_mass": self.yaw_system_mass,
         }
         return results
 
@@ -1156,6 +1232,7 @@ class CSMBase:
             "high_speed_shaft_cost": self.high_speed_shaft_cost,
             "generator_cost": self.generator_cost,
             "bedplate_cost": self.bedplate_cost,
+            "yaw_system_cost": self.yaw_system_cost,
         }
         return results
 
