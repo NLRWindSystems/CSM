@@ -158,6 +158,17 @@ class CSMBase:
         nacelle_cover_mass_intercept (bool): :math:`b` in the mass equation from
             :py:method:`calculate_nacelle_cover_mass`.
         nacelle_cover_mass_cost_coeff (float): Nacelle cover cost per kilogram (USD/kg).
+        platform_mainframe_mass_coeff (float): :math:`k` from
+            :py:method:`calculate_platform_mainframe_mass`.
+        has_crane (bool): If True, apply :py:attr:`crane_mass` to
+            :py:method:`calculate_platform_mainframe_mass` and :py:attr:`crane_cost` to
+            :py:method:`calculate_platform_mainframe_cost`, otherwise ignore.
+        crane_mass (bool): Mass of onboard crane, if :py:attr:`has_crane`, :math:`m_{crane}` from
+            :py:method:`calculate_platform_mainframe_mass`.
+        crane_cost (bool): Cost of onboard crane, if :py:attr:`has_crane`, :math:`b` in the
+            mass equation above.
+        platform_mainframe_mass_cost_coeff (float): Platform mainframe cost per kilogram
+            (USD/kg).
 
     Attributes:
         blade_mass (float): Blade mass (:math:`kg`). See :py:method:`calculate_blade_mass`
@@ -214,6 +225,10 @@ class CSMBase:
             :py:method:`calculate_nacelle_cover_mass` for more details.
         nacelle_cover_cost (float): nacelle_cover mass (USD). See
             :py:method:`calculate_nacelle_cover_cost` for more details.
+        platform_mainframe_mass (float): Platform mainframe mass (kg).
+            See :py:method:`calculate_platform_mainframe_mass` for more details.
+        platform_mainframe_cost (float): Platform mainframe cost (USD).
+            See :py:method:`calculate_platform_mainframe_cost` for more details.
     """
 
     # turbine general
@@ -327,6 +342,15 @@ class CSMBase:
     nacelle_cover_mass_cost_coeff: float = create_field(float, "USD/kg", "input")
     nacelle_cover_mass: float = create_field(float, "kg", "both")
     nacelle_cover_cost: float = create_field(float, "USD", "both")
+
+    # platform mainframe
+    has_crane: bool = create_field(bool, "unitless", "input")
+    crane_mass: float = create_field(float, "kg", "both")
+    crane_cost: float = create_field(float, "USD", "both")
+    platform_mainframe_mass_coeff: float = create_field(float, "unitless", "input")
+    platform_mainframe_mass_cost_coeff: float = create_field(float, "USD/kg", "input")
+    platform_mainframe_mass: float = create_field(float, "kg", "both")
+    platform_mainframe_cost: float = create_field(float, "USD", "both")
 
     # NOTE: temporary while prototyping
     power_converter_cost: float = field(default=1000.0)
@@ -1231,6 +1255,102 @@ class CSMBase:
 
         self.nacelle_cover_cost = self.nacelle_cover_mass_cost_coeff * self.nacelle_cover_mass
 
+    def calculate_platform_mainframe_mass(self):
+        r"""Calculates and sets :py:attr:`platform_mainframe_mass` if it was not provided by the
+        user.
+
+        .. math::
+            k * m_{bedplate} + \\left\\{
+                \begin{array}{ll}
+                m_{crane} & has\\_crane \\
+                0 & otherwise \\
+            \\end{array}
+            \right.
+
+        where:
+
+        - :math:`k =` :py:attr:`platform_mainframe_mass_coeff`
+        - :math:`m_{bedplate} =` :py:attr:`bedplate_mass`
+        - :math:`m_{crane} =` :py:attr:`crane_mass`
+        - :math:`has\\_crane =` :py:attr:`has_crane`
+
+        Args:
+            has_crane (bool): If True, apply :py:attr:`crane_mass`, otherwise ignore.
+            platform_mainframe_mass_coeff (float): :math:`k` in the mass equation above.
+            bedplate_mass (float): Bedplate mass (:math:`kg`). See
+                :py:method:`calculate_bedplate_mass` for details.
+            crane_mass (bool): Mass of onboard crane, if :py:attr:`has_crane`, :math:`b` in the
+                mass equation above.
+
+        Raises:
+            ValueError: Raised if the required parameters have not been provided or calculated.
+        """
+        if next(self._has_values("platform_mainframe_mass")):
+            return
+
+        parameters = ("bedplate_mass", "platform_mainframe_mass_coeff", "has_crane", "crane_mass")
+        self._validate_inputs(parameters=parameters)
+
+        self.platform_mainframe_mass = (
+            self.platform_mainframe_mass_coeff * self.bedplate_mass
+            + int(self.has_crane) * self.crane_mass
+        )
+
+    def calculate_platform_mainframe_cost(self):
+        r"""Calculates and sets :py:attr:`platform_mainframe_cost` if it was not provided by the
+        user.
+
+        .. math::
+            k * (m_{platform\\_mainframe}
+            - \\left\\{
+                \begin{array}{ll}
+                m_{crane} & has\\_crane \\
+                0 & otherwise \\
+            \\end{array}
+            )
+            + \\left\\{
+                \begin{array}{ll}
+                m_{crane} & has\\_crane \\
+                0 & otherwise \\
+            \\end{array}
+            \right.
+
+        where:
+
+        - :math:`k =` :py:attr:`platform_mainframe_mass_cost_coeff` (:math:`USD/kg`)
+        - :math:`m =` :py:attr:`platform_mainframe_mass` (:math:`kg`).
+
+        Args:
+            has_crane (bool): If True, apply :py:attr:`crane_cost`, otherwise ignore.
+            crane_cost (bool): Cost of onboard crane, if :py:attr:`has_crane`, :math:`b` in the
+                mass equation above.
+            platform_mainframe_mass_cost_coeff (float): Platform mainframe cost per kilogram
+                (USD/kg).
+            platform_mainframe_mass (float): Platform mainframe mass (kg).
+                See :py:method:`calculate_platform_mainframe_mass` for more details.
+
+        Raises:
+            ValueError: Raised if any of the required parameters have not been provided.
+        """
+        if next(self._has_values("platform_mainframe_cost")):
+            return
+
+        parameters = (
+            "platform_mainframe_mass",
+            "platform_mainframe_mass_cost_coeff",
+            "has_crane",
+            "crane_mass",
+            "crane_cost",
+        )
+        self._validate_inputs(parameters=parameters)
+
+        has_crane = int(self.has_crane)
+        self.platform_mainframe_cost = (
+            self.platform_mainframe_mass_cost_coeff
+            * (self.platform_mainframe_mas - has_crane * self.crane_mass)
+            + has_crane * self.crane_cost
+        )
+
     def run(self):
         """Run the mass and cost calculations."""
         # self.calculate_rotor_torque()
@@ -1249,6 +1369,7 @@ class CSMBase:
         self.calculate_yaw_system_mass()
         self.calculate_hydraulic_cooling_mass()
         self.calculate_nacelle_cover_mass()
+        self.calculate_platform_mainframe_mass()
 
         self.calculate_blade_cost()
         self.calculate_hub_cost()
@@ -1263,6 +1384,7 @@ class CSMBase:
         self.calculate_yaw_system_cost()
         self.calculate_hydraulic_cooling_cost()
         self.calculate_nacelle_cover_cost()
+        self.calculate_platform_mainframe_cost()
 
     @classmethod
     def _get_attr_map(
@@ -1342,6 +1464,8 @@ class CSMBase:
             "hydraulic_cooling_cost": self.hydraulic_cooling_cost,
             "nacelle_cover_mass": self.nacelle_cover_mass,
             "nacelle_cover_cost": self.nacelle_cover_cost,
+            "platform_mainframe_mass": self.platform_mainframe_mass,
+            "platform_mainframe_cost": self.platform_mainframe_cost,
         }
         return results
 
@@ -1362,6 +1486,7 @@ class CSMBase:
             "yaw_system_mass": self.yaw_system_mass,
             "hydraulic_cooling_mass": self.hydraulic_cooling_mass,
             "nacelle_cover_mass": self.nacelle_cover_mass,
+            "platform_mainframe_mass": self.platform_mainframe_mass,
         }
         return results
 
@@ -1382,6 +1507,7 @@ class CSMBase:
             "yaw_system_cost": self.yaw_system_cost,
             "hydraulic_cooling_cost": self.hydraulic_cooling_cost,
             "nacelle_cover_cost": self.nacelle_cover_cost,
+            "platform_mainframe_cost": self.platform_mainframe_cost,
         }
         return results
 

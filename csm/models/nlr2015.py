@@ -32,6 +32,10 @@ class Land2015NLR(CSMBase):
             derived by J.Keller under FOA 1981 support project.
         hvac_mass_coeff (float): Not updated in 2015, so is the original 0.08.
         hvac_mass_cost_coeff (float): Not updated in 2015, so is the original 124 USD/kg.
+        platforms_mass_coeff (float): Not updated in 2015, so the original 0.125.
+        crane_mass (float): Not updated in 2015, so the original 3000.
+        platforms_mass_cost_coeff (float): Not updated in 2015, so the original 17.1.
+        crane_cost (float): Not updated in 2015, so the original 12000.
     """
 
     efficiency_max: float = base.efficiency_max.evolve(default=1.0)
@@ -70,8 +74,13 @@ class Land2015NLR(CSMBase):
     yaw_mass_cost_coeff: float = base.yaw_mass_cost_coeff.evolve(default=8.3)
     hvac_mass_coeff: float = base.hvac_mass_coeff.evolve(default=0.08)
     hvac_mass_cost_coeff: float = base.hvac_mass_cost_coeff.evolve(default=124)
-    cover_mass_coeff: float = base.cover_mass_coeff.evolve(default=1.2817)
-    cover_mass_intercept: float = base.cover_mass_intercept.evolve(default=428.19)
+    nacelle_cover_mass_coeff: float = base.nacelle_cover_mass_coeff.evolve(default=1.2817)
+    nacelle_cover_mass_intercept: float = base.nacelle_cover_mass_intercept.evolve(default=428.19)
+    platforms_mass_coeff: float = base.platforms_mass_coeff.evolve(default=0.125)
+    has_crane: bool = base.has_crane.evolve(default=False)
+    crane_mass: float = base.crane_mass.evolve(default=3000)
+    platforms_mass_cost_coeff: float = base.platforms_mass_cost_coeff.evolve(default=17.1)
+    crane_cost: float = base.crane_cost.evolve(default=12000.0)
 
 
 # TODO: Determine if there is a way to use evolve and make_class together with a workaround
