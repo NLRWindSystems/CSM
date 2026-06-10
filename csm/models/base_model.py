@@ -169,6 +169,11 @@ class CSMBase:
             mass equation above.
         platform_mainframe_mass_cost_coeff (float): Platform mainframe cost per kilogram
             (USD/kg).
+        transformer_mass_coeff (float): :math:`k` in the mass equation from
+            :py:method:`calculate_transformer_mass`.
+        transformer_mass_intercept (bool): :math:`b` in the mass equation from
+            :py:method:`calculate_transformer_mass`.
+        transformer_mass_cost_coeff (float): Nacelle cover cost per kilogram (USD/kg).
 
     Attributes:
         blade_mass (float): Blade mass (:math:`kg`). See :py:method:`calculate_blade_mass`
@@ -229,6 +234,10 @@ class CSMBase:
             See :py:method:`calculate_platform_mainframe_mass` for more details.
         platform_mainframe_cost (float): Platform mainframe cost (USD).
             See :py:method:`calculate_platform_mainframe_cost` for more details.
+        transformer_mass (float): Transformer cover mass (kg). See
+            :py:method:`calculate_transformer_mass` for more details.
+        transformer_cost (float): Transformer cover cost (USD). See
+            :py:method:`calculate_transformer_mass` for more details.
     """
 
     # turbine general
@@ -351,6 +360,13 @@ class CSMBase:
     platform_mainframe_mass_cost_coeff: float = create_field(float, "USD/kg", "input")
     platform_mainframe_mass: float = create_field(float, "kg", "both")
     platform_mainframe_cost: float = create_field(float, "USD", "both")
+
+    # transformer
+    transformer_mass_coeff: float = create_field(float, "kg/kW", "input")
+    transformer_mass_intercept: float = create_field(float, "kg", "input")
+    transformer_mass_cost_coeff: float = create_field(float, "USD/kg", "input")
+    transformer_mass: float = create_field(float, "kg", "both")
+    transformer_cost: float = create_field(float, "USD", "both")
 
     # NOTE: temporary while prototyping
     power_converter_cost: float = field(default=1000.0)
@@ -1351,6 +1367,61 @@ class CSMBase:
             + has_crane * self.crane_cost
         )
 
+    def calculate_transformer_mass(self):
+        """Calculates and sets :py:attr:`transformer_mass` if it was not provided by the user.
+
+        .. math:: k * power + b
+
+        where:
+
+        - :math:`k =` :py:attr:`transformer_mass_coeff`
+        - :math:`power =` :py:attr:`rated_power_kw`
+        - :math:`b =` :py:attr:`transformer_mass_intercept`
+
+        Args:
+            transformer_mass_coeff (float): :math:`k` in the mass equation above (:math:`kg/kW`).
+            rated_power_kw (float): Turbine nameplate capacity (rated power) (:math:`kW`).
+            transformer_mass_intercept (bool): :math:`b` in the mass equation above (:math:`kg`).
+
+        Raises:
+            ValueError: Raised if the required parameters have not been provided or calculated.
+        """
+        if next(self._has_values("transformer_mass")):
+            return
+
+        parameters = ("rated_power_kw", "transformer_mass_coeff", "transformer_mass_intercept")
+        self._validate_inputs(parameters=parameters)
+
+        self.transformer_mass = (
+            self.transformer_mass_coeff * self.rated_power_kw + self.transformer_mass_intercept
+        )
+
+    def calculate_transformer_cost(self):
+        """Calculates and sets :py:attr:`transformer_cost` if it was not provided by the user.
+
+        .. math:: k * m
+
+        where:
+
+        - :math:`k =` :py:attr:`transformer_mass_cost_coeff` (:math:`USD/kg`)
+        - :math:`m =` :py:attr:`transformer_mass` (:math:`kg`).
+
+        Args:
+            transformer_mass_cost_coeff (float): Transformer cover cost per kilogram (USD/kg).
+            transformer_mass (float): Transformer cover mass (kg). See
+                :py:method:`calculate_transformer_mass` for more details.
+
+        Raises:
+            ValueError: Raised if any of the required parameters have not been provided.
+        """
+        if next(self._has_values("transformer_cost")):
+            return
+
+        parameters = ("transformer_mass", "transformer_mass_cost_coeff")
+        self._validate_inputs(parameters=parameters)
+
+        self.transformer_cost = self.transformer_mass_cost_coeff * self.transformer_mass
+
     def run(self):
         """Run the mass and cost calculations."""
         # self.calculate_rotor_torque()
@@ -1370,6 +1441,7 @@ class CSMBase:
         self.calculate_hydraulic_cooling_mass()
         self.calculate_nacelle_cover_mass()
         self.calculate_platform_mainframe_mass()
+        self.calculate_transformer_mass()
 
         self.calculate_blade_cost()
         self.calculate_hub_cost()
@@ -1385,6 +1457,7 @@ class CSMBase:
         self.calculate_hydraulic_cooling_cost()
         self.calculate_nacelle_cover_cost()
         self.calculate_platform_mainframe_cost()
+        self.calculate_transformer_cost()
 
     @classmethod
     def _get_attr_map(
@@ -1466,6 +1539,8 @@ class CSMBase:
             "nacelle_cover_cost": self.nacelle_cover_cost,
             "platform_mainframe_mass": self.platform_mainframe_mass,
             "platform_mainframe_cost": self.platform_mainframe_cost,
+            "transformer_mass": self.transformer_mass,
+            "transformer_cost": self.transformer_cost,
         }
         return results
 
@@ -1487,6 +1562,7 @@ class CSMBase:
             "hydraulic_cooling_mass": self.hydraulic_cooling_mass,
             "nacelle_cover_mass": self.nacelle_cover_mass,
             "platform_mainframe_mass": self.platform_mainframe_mass,
+            "transformer_mass": self.transformer_mass,
         }
         return results
 
@@ -1508,6 +1584,7 @@ class CSMBase:
             "hydraulic_cooling_cost": self.hydraulic_cooling_cost,
             "nacelle_cover_cost": self.nacelle_cover_cost,
             "platform_mainframe_cost": self.platform_mainframe_cost,
+            "transformer_cost": self.transformer_cost,
         }
         return results
 

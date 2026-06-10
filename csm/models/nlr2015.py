@@ -81,6 +81,9 @@ class Land2015NLR(CSMBase):
     crane_mass: float = base.crane_mass.evolve(default=3000)
     platforms_mass_cost_coeff: float = base.platforms_mass_cost_coeff.evolve(default=17.1)
     crane_cost: float = base.crane_cost.evolve(default=12000.0)
+    transformer_mass_coeff: float = base.transformer_mass_coeff.evolve(default=1.9150)
+    transformer_mass_intercept: float = base.transformer_mass_intercept.evolve(default=1910.0)
+    transformer_mass_cost_coeff: float = base.transformer_mass_cost_coeff.evolve(default=18.8)
 
 
 # TODO: Determine if there is a way to use evolve and make_class together with a workaround

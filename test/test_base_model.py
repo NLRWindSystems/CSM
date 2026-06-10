@@ -49,11 +49,14 @@ csm_2015_inputs = {
     "hvac_mass_cost_coeff": 124,
     "nacelle_cover_mass_coeff": 1.2817,
     "nacelle_cover_mass_intercept": 428.19,
-    "platform_mainframe_mass_coeff": 0.125,
     "has_crane": False,
     "crane_mass": 3000,
-    "platform_mainframe_mass_cost_coeff": 17.1,
     "crane_cost": 12000.0,
+    "platform_mainframe_mass_coeff": 0.125,
+    "platform_mainframe_mass_cost_coeff": 17.1,
+    "transformer_mass_coeff": 1.9150,
+    "transformer_mass_intercept": 1910.0,
+    "transformer_mass_cost_coeff": 18.8,
     # example input
     "turbine_class": 1,
     "blade_has_carbon": False,
@@ -170,11 +173,18 @@ def test_CSMBase_defaults_only(subtests):
 
     with pytest.raises(ValueError, match=undefined_params_msg):
         model.calculate_nacelle_cover_cost()
+
     with pytest.raises(ValueError, match=undefined_params_msg):
         model.calculate_platform_mainframe_mass()
 
     with pytest.raises(ValueError, match=undefined_params_msg):
         model.calculate_platform_mainframe_cost()
+
+    with pytest.raises(ValueError, match=undefined_params_msg):
+        model.calculate_transformer_mass()
+
+    with pytest.raises(ValueError, match=undefined_params_msg):
+        model.calculate_transformer_cost()
 
     with pytest.raises(ValueError, match=undefined_params_msg):
         model.run()
