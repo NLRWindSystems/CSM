@@ -49,10 +49,10 @@ csm_2015_inputs = {
     "hvac_mass_cost_coeff": 124,
     "nacelle_cover_mass_coeff": 1.2817,
     "nacelle_cover_mass_intercept": 428.19,
-    "platforms_mass_coeff": 0.125,
+    "platform_mainframe_mass_coeff": 0.125,
     "has_crane": False,
     "crane_mass": 3000,
-    "platforms_mass_cost_coeff": 17.1,
+    "platform_mainframe_mass_cost_coeff": 17.1,
     "crane_cost": 12000.0,
     # example input
     "turbine_class": 1,
