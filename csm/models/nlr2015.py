@@ -84,6 +84,9 @@ class Land2015NLR(CSMBase):
     transformer_mass_coeff: float = base.transformer_mass_coeff.evolve(default=1.9150)
     transformer_mass_intercept: float = base.transformer_mass_intercept.evolve(default=1910.0)
     transformer_mass_cost_coeff: float = base.transformer_mass_cost_coeff.evolve(default=18.8)
+    tower_mass_coeff: float = base.tower_mass_coeff.evolve(default=19.828)
+    tower_mass_exp: float = base.tower_mass_exp.evolve(default=2.0282)
+    tower_mass_cost_coeff: float = base.tower_mass_cost_coeff.evolve(default=2.9)
 
 
 # TODO: Determine if there is a way to use evolve and make_class together with a workaround

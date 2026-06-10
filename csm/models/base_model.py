@@ -174,6 +174,14 @@ class CSMBase:
         transformer_mass_intercept (bool): :math:`b` in the mass equation from
             :py:method:`calculate_transformer_mass`.
         transformer_mass_cost_coeff (float): Nacelle cover cost per kilogram (USD/kg).
+        tower_mass_coeff (float): :math:`k` in the mass from :py:method:`calculate_tower_mass`
+            (:math:`kg/m`).
+        tower_length (float): For onshore turbines, this is the hub height (total length above
+            ground). For offshore turbines, this is length from transition piece to hub height
+            (:math:`m`).
+        tower_mass_exp (bool): :math:`b` in the mass equation from
+            :py:method:`calculate_tower_mass`.
+        tower_mass_cost_coeff (float): Tower cover cost per kilogram (USD/kg).
 
     Attributes:
         blade_mass (float): Blade mass (:math:`kg`). See :py:method:`calculate_blade_mass`
@@ -237,7 +245,11 @@ class CSMBase:
         transformer_mass (float): Transformer cover mass (kg). See
             :py:method:`calculate_transformer_mass` for more details.
         transformer_cost (float): Transformer cover cost (USD). See
-            :py:method:`calculate_transformer_mass` for more details.
+            :py:method:`calculate_transformer_cost` for more details.
+        tower_mass (float): Tower mass (kg). See
+            :py:method:`calculate_tower_mass` for more details.
+        tower_cost (float): Tower mass (USD1). See
+            :py:method:`calculate_tower_cost` for more details.
     """
 
     # turbine general
@@ -365,6 +377,13 @@ class CSMBase:
     transformer_mass_cost_coeff: float = create_field(float, "USD/kg", "input")
     transformer_mass: float = create_field(float, "kg", "both")
     transformer_cost: float = create_field(float, "USD", "both")
+
+    # tower
+    tower_mass_coeff: float = create_field(float, "unitless", "input")
+    tower_mass_exp: float = create_field(float, "unitless", "input")
+    tower_mass_cost_coeff: float = create_field(float, "USD/kg", "input")
+    tower_mass: float = create_field(float, "kg", "both")
+    tower_cost: float = create_field(float, "USD", "both")
 
     # totals
     nacelle_mass: float = create_field(float, "kg", "both")
@@ -1614,6 +1633,61 @@ class CSMBase:
             )
         )
 
+    def calculate_tower_mass(self):
+        """Calculates and sets :py:attr:`tower_mass` if it was not provided by the user.
+
+        .. math:: k * H_{hub}^b
+
+        where:
+
+        - :math:`k =` :py:attr:`tower_mass_coeff`
+        - :math:`H_{hub} =` :py:attr:`hub_height`
+        - :math:`b =` :py:attr:`tower_mass_exp`
+
+        Args:
+            tower_mass_coeff (float): :math:`k` in the mass equation above (:math:`kg/m`).
+            tower_length (float): For onshore turbines, this is the hub height (total length above
+                ground). For offshore turbines, this is length from transition piece to hub height
+                (:math:`m`).
+            tower_mass_exp (bool): :math:`b` in the mass equation above (:math:`kg`).
+
+        Raises:
+            ValueError: Raised if the required parameters have not been provided or calculated.
+        """
+        if next(self._has_values("tower_mass")):
+            return
+
+        parameters = ("tower_length", "tower_mass_coeff", "tower_mass_exp")
+        self._validate_inputs(parameters=parameters)
+
+        self.tower_mass = self.tower_mass_coeff * self.tower_length**self.tower_mass_exp
+
+    def calculate_tower_cost(self):
+        """Calculates and sets :py:attr:`tower_cost` if it was not provided by the user.
+
+        .. math:: k * m
+
+        where:
+
+        - :math:`k =` :py:attr:`tower_mass_cost_coeff` (:math:`USD/kg`)
+        - :math:`m =` :py:attr:`tower_mass` (:math:`kg`).
+
+        Args:
+            tower_mass_cost_coeff (float): Tower cost per kilogram (USD/kg).
+            tower_mass (float): Tower mass (kg). See
+                :py:method:`calculate_tower_mass` for more details.
+
+        Raises:
+            ValueError: Raised if any of the required parameters have not been provided.
+        """
+        if next(self._has_values("tower_cost")):
+            return
+
+        parameters = ("tower_mass", "tower_mass_cost_coeff")
+        self._validate_inputs(parameters=parameters)
+
+        self.tower_cost = self.tower_mass_cost_coeff * self.tower_mass
+
     def run(self):
         """Run the mass and cost calculations."""
         # self.calculate_rotor_torque()
@@ -1635,6 +1709,7 @@ class CSMBase:
         self.calculate_platform_mainframe_mass()
         self.calculate_transformer_mass()
         self.calculate_nacelle_mass()
+        self.calculate_tower_mass()
 
         self.calculate_blade_cost()
         self.calculate_hub_cost()
@@ -1652,6 +1727,7 @@ class CSMBase:
         self.calculate_platform_mainframe_cost()
         self.calculate_transformer_cost()
         self.calculate_nacelle_cost()
+        self.calculate_tower_cost()
 
     @classmethod
     def _get_attr_map(
@@ -1737,6 +1813,8 @@ class CSMBase:
             "transformer_cost": self.transformer_cost,
             "nacelle_mass": self.nacelle_mass,
             "nacelle_cost": self.nacelle_cost,
+            "tower_mass": self.tower_mass,
+            "tower_cost": self.tower_cost,
         }
         return results
 
@@ -1760,6 +1838,7 @@ class CSMBase:
             "platform_mainframe_mass": self.platform_mainframe_mass,
             "transformer_mass": self.transformer_mass,
             "nacelle_mass": self.nacelle_mass,
+            "tower_mass": self.tower_mass,
         }
         return results
 
@@ -1783,6 +1862,7 @@ class CSMBase:
             "platform_mainframe_cost": self.platform_mainframe_cost,
             "transformer_cost": self.transformer_cost,
             "nacelle_cost": self.nacelle_cost,
+            "tower_cost": self.tower_cost,
         }
         return results
 
