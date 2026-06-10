@@ -70,6 +70,8 @@ class Land2015NLR(CSMBase):
     yaw_mass_cost_coeff: float = base.yaw_mass_cost_coeff.evolve(default=8.3)
     hvac_mass_coeff: float = base.hvac_mass_coeff.evolve(default=0.08)
     hvac_mass_cost_coeff: float = base.hvac_mass_cost_coeff.evolve(default=124)
+    cover_mass_coeff: float = base.cover_mass_coeff.evolve(default=1.2817)
+    cover_mass_intercept: float = base.cover_mass_intercept.evolve(default=428.19)
 
 
 # TODO: Determine if there is a way to use evolve and make_class together with a workaround

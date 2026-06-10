@@ -153,6 +153,11 @@ class CSMBase:
         hvac_mass_coeff (float): Mass scaling coefficient. See
             :py:method:`calculate_hydraulic_cooling_mass` for more details.
         hvac_mass_cost_coeff (float): Hydraulic cooling cost, per kilogram of mass.
+        nacelle_cover_mass_coeff (float): :math:`k` in the mass equation from
+            :py:method:`calculate_nacelle_cover_mass`.
+        nacelle_cover_mass_intercept (bool): :math:`b` in the mass equation from
+            :py:method:`calculate_nacelle_cover_mass`.
+        nacelle_cover_mass_cost_coeff (float): Nacelle cover cost per kilogram (USD/kg).
 
     Attributes:
         blade_mass (float): Blade mass (:math:`kg`). See :py:method:`calculate_blade_mass`
@@ -205,6 +210,10 @@ class CSMBase:
             :py:method:`calculate_hydraulic_cooling_mass` for more details.
         hydraulic_cooling_cost (float): Hydraulic cooling cost (USD). See
             :py:method:`calculate_hydraulic_cooling_cost` for more details.
+        nacelle_cover_mass (float): nacelle_cover mass (kg). See
+            :py:method:`calculate_nacelle_cover_mass` for more details.
+        nacelle_cover_cost (float): nacelle_cover mass (USD). See
+            :py:method:`calculate_nacelle_cover_cost` for more details.
     """
 
     # turbine general
@@ -311,6 +320,13 @@ class CSMBase:
     hvac_mass_cost_coeff: float = create_field(float, "USD/kg", "input")
     hydraulic_cooling_mass: float = create_field(float, "kg", "both")
     hydraulic_cooling_cost: float = create_field(float, "USD", "both")
+
+    # nacelle cover
+    nacelle_cover_mass_coeff: float = create_field(float, "kg/kW", "input")
+    nacelle_cover_mass_intercept: float = create_field(float, "kg", "input")
+    nacelle_cover_mass_cost_coeff: float = create_field(float, "USD/kg", "input")
+    nacelle_cover_mass: float = create_field(float, "kg", "both")
+    nacelle_cover_cost: float = create_field(float, "USD", "both")
 
     # NOTE: temporary while prototyping
     power_converter_cost: float = field(default=1000.0)
@@ -1160,6 +1176,61 @@ class CSMBase:
 
         self.gearbox_cost = self.hydraulic_cooling_mass * self.hvac_mass_cost_coeff
 
+    def calculate_nacelle_cover_mass(self):
+        """Calculates and sets :py:attr:`nacelle_cover_mass` if it was not provided by the user.
+
+        .. math:: k * power + b
+
+        where:
+
+        - :math:`k =` :py:attr:`nacelle_cover_mass_coeff`
+        - :math:`power =` :py:attr:`rated_power_kw`
+        - :math:`b =` :py:attr:`nacelle_cover_mass_intercept`
+
+        Args:
+            nacelle_cover_mass_coeff (float): :math:`k` in the mass equation above (:math:`kg/kW`).
+            rated_power_kw (float): Turbine nameplate capacity (rated power) (:math:`kW`).
+            nacelle_cover_mass_intercept (bool): :math:`b` in the mass equation above (:math:`kg`).
+
+        Raises:
+            ValueError: Raised if the required parameters have not been provided or calculated.
+        """
+        if next(self._has_values("nacelle_cover_mass")):
+            return
+
+        parameters = ("rated_power_kw", "nacelle_cover_mass_coeff", "nacelle_cover_mass_intercept")
+        self._validate_inputs(parameters=parameters)
+
+        self.nacelle_cover_mass = (
+            self.nacelle_cover_mass_coeff * self.rated_power_kw + self.nacelle_cover_mass_intercept
+        )
+
+    def calculate_nacelle_cover_cost(self):
+        """Calculates and sets :py:attr:`nacelle_cover_cost` if it was not provided by the user.
+
+        .. math:: k * m
+
+        where:
+
+        - :math:`k =` :py:attr:`nacelle_cover_mass_cost_coeff` (:math:`USD/kg`)
+        - :math:`m =` :py:attr:`nacelle_cover_mass` (:math:`kg`).
+
+        Args:
+            nacelle_cover_mass_cost_coeff (float): Nacelle cover cost per kilogram (USD/kg).
+            nacelle_cover_mass (float): Nacelle cover mass (kg). See
+                :py:method:`calculate_nacelle_cover_mass` for more details.
+
+        Raises:
+            ValueError: Raised if any of the required parameters have not been provided.
+        """
+        if next(self._has_values("nacelle_cover_cost")):
+            return
+
+        parameters = ("nacelle_cover_mass", "nacelle_cover_mass_cost_coeff")
+        self._validate_inputs(parameters=parameters)
+
+        self.nacelle_cover_cost = self.nacelle_cover_mass_cost_coeff * self.nacelle_cover_mass
+
     def run(self):
         """Run the mass and cost calculations."""
         # self.calculate_rotor_torque()
@@ -1177,6 +1248,7 @@ class CSMBase:
         self.calculate_bedplate_mass()
         self.calculate_yaw_system_mass()
         self.calculate_hydraulic_cooling_mass()
+        self.calculate_nacelle_cover_mass()
 
         self.calculate_blade_cost()
         self.calculate_hub_cost()
@@ -1190,6 +1262,7 @@ class CSMBase:
         self.calculate_bedplate_cost()
         self.calculate_yaw_system_cost()
         self.calculate_hydraulic_cooling_cost()
+        self.calculate_nacelle_cover_cost()
 
     @classmethod
     def _get_attr_map(
@@ -1267,6 +1340,8 @@ class CSMBase:
             "yaw_system_cost": self.yaw_system_cost,
             "hydraulic_cooling_mass": self.hydraulic_cooling_mass,
             "hydraulic_cooling_cost": self.hydraulic_cooling_cost,
+            "nacelle_cover_mass": self.nacelle_cover_mass,
+            "nacelle_cover_cost": self.nacelle_cover_cost,
         }
         return results
 
@@ -1286,6 +1361,7 @@ class CSMBase:
             "bedplate_mass": self.bedplate_mass,
             "yaw_system_mass": self.yaw_system_mass,
             "hydraulic_cooling_mass": self.hydraulic_cooling_mass,
+            "nacelle_cover_mass": self.nacelle_cover_mass,
         }
         return results
 
@@ -1305,6 +1381,7 @@ class CSMBase:
             "bedplate_cost": self.bedplate_cost,
             "yaw_system_cost": self.yaw_system_cost,
             "hydraulic_cooling_cost": self.hydraulic_cooling_cost,
+            "nacelle_cover_cost": self.nacelle_cover_cost,
         }
         return results
 
