@@ -47,6 +47,8 @@ csm_2015_inputs = {
     "yaw_system_mass_cost_coeff": 8.3,
     "hvac_mass_coeff": 0.08,
     "hvac_mass_cost_coeff": 124,
+    "cover_mass_coeff": 1.2817,
+    "cover_mass_intercept": 428.19,
     # example input
     "turbine_class": 1,
     "blade_has_carbon": False,
@@ -157,6 +159,12 @@ def test_CSMBase_defaults_only(subtests):
 
     with pytest.raises(ValueError, match=undefined_params_msg):
         model.calculate_hydraulic_cooling_cost()
+
+    with pytest.raises(ValueError, match=undefined_params_msg):
+        model.calculate_nacelle_cover_mass()
+
+    with pytest.raises(ValueError, match=undefined_params_msg):
+        model.calculate_nacelle_cover_cost()
 
     with pytest.raises(ValueError, match=undefined_params_msg):
         model.run()
