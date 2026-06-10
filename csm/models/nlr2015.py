@@ -30,6 +30,8 @@ class Land2015NLR(CSMBase):
         mass_sys_offset (float): Not updated in 2015, so is the original 555.0 kg.
         brake_mass_cost_coeff (float): In 2020, updated to $3.6254 USD/kg. Regression based sizing
             derived by J.Keller under FOA 1981 support project.
+        hvac_mass_coeff (float): Not updated in 2015, so is the original 0.08.
+        hvac_mass_cost_coeff (float): Not updated in 2015, so is the original 124 USD/kg.
     """
 
     efficiency_max: float = base.efficiency_max.evolve(default=1.0)
@@ -66,6 +68,8 @@ class Land2015NLR(CSMBase):
     yaw_mass_coeff: float = base.yaw_mass_coeff.evolve(default=0.0009)
     yaw_mass_exp: float = base.yaw_mass_exp.evolve(default=3.314)
     yaw_mass_cost_coeff: float = base.yaw_mass_cost_coeff.evolve(default=8.3)
+    hvac_mass_coeff: float = base.hvac_mass_coeff.evolve(default=0.08)
+    hvac_mass_cost_coeff: float = base.hvac_mass_cost_coeff.evolve(default=124)
 
 
 # TODO: Determine if there is a way to use evolve and make_class together with a workaround

@@ -150,6 +150,9 @@ class CSMBase:
         yaw_system_mass_exp (bool): :math:`b` in the mass equation from
             :py:method:`calculate_yaw_system_mass`..
         yaw_system_mass_cost_coeff (float): Yaw system cost per kilogram (USD/kg).
+        hvac_mass_coeff (float): Mass scaling coefficient. See
+            :py:method:`calculate_hydraulic_cooling_mass` for more details.
+        hvac_mass_cost_coeff (float): Hydraulic cooling cost, per kilogram of mass.
 
     Attributes:
         blade_mass (float): Blade mass (:math:`kg`). See :py:method:`calculate_blade_mass`
@@ -198,6 +201,10 @@ class CSMBase:
             for more details.
         yaw_system_cost (float): Yaw system cost (USD). See :py:method:`calculate_yaw_system_cost`
             for more details.
+        hydraulic_cooling_mass (float): Hydraulic cooling mass (kg). See
+            :py:method:`calculate_hydraulic_cooling_mass` for more details.
+        hydraulic_cooling_cost (float): Hydraulic cooling cost (USD). See
+            :py:method:`calculate_hydraulic_cooling_cost` for more details.
     """
 
     # turbine general
@@ -298,6 +305,12 @@ class CSMBase:
     yaw_system_mass_cost_coeff: float = create_field(float, "USD/kg", "input")
     yaw_system_mass: float = create_field(float, "kg", "both")
     yaw_system_cost: float = create_field(float, "USD", "both")
+
+    # high speed shaft
+    hvac_mass_coeff: float = create_field(float, "unitless", "input")
+    hvac_mass_cost_coeff: float = create_field(float, "USD/kg", "input")
+    hydraulic_cooling_mass: float = create_field(float, "kg", "both")
+    hydraulic_cooling_cost: float = create_field(float, "USD", "both")
 
     # NOTE: temporary while prototyping
     power_converter_cost: float = field(default=1000.0)
@@ -1094,6 +1107,59 @@ class CSMBase:
 
         self.yaw_system_cost = self.yaw_system_mass_cost_coeff * self.yaw_system_mass
 
+    def calculate_hydraulic_cooling_mass(self):
+        """Calculates and sets :py:attr:`hydraulic_cooling_mass` for if it was not provided by the
+        user.
+
+        .. math:: k * power
+
+        where:
+
+        - :math:`power =` :py:attr:`rated_power_kw`
+        - :math:`k =` :py:attr:`hvac_mass_coeff`
+
+        Args:
+            rated_power_kw (float): Turbine nameplate capacity (rated power) (:math:`kW`).
+            hvac_mass_coeff (float): Mass scaling coefficient, :math:`k` in the mass equation.
+
+        Raises:
+            ValueError: Raised if the required parameters have not been provided or calculated.
+        """
+        if next(self._has_values("hydraulic_cooling_mass")):
+            return
+
+        parameters = ("rated_power_kw", "hvac_mass_coeff")
+        self._validate_inputs(parameters=parameters)
+
+        self.hydraulic_cooling_mass = self.hvac_mass_coeff * self.rated_power_kw
+
+    def calculate_hydraulic_cooling_cost(self):
+        """Calculates and sets :py:attr:`hydraulic_cooling_cost` if it was not provided by the user.
+
+        .. math:: k * m_{hydraulic_cooling}
+
+        where:
+
+        - :math:`k =` :py:attr:`hvac_mass_cost_coeff` (:math:`USD/kg`)
+        - :math:`m =` :py:attr:`hydraulic_cooling_mass` (:math:`kg`).
+
+        Args:
+            hydraulic_cooling_mass (float): Hydraulic cooling mass (kg). See
+                :py:method:`calculate_hydraulic_cooling_mass` for more details.
+            hvac_mass_cost_coeff (float): Hydraulic cooling cost, per kilogram of mass, :math:`k` in
+                the equation above (:math:`USD/kg`).
+
+        Raises:
+            ValueError: Raised if any of the required parameters have not been provided.
+        """
+        if next(self._has_values("hydraulic_cooling_cost")):
+            return
+
+        parameters = ("hydraulic_cooling_mass", "hvac_mass_cost_coeff")
+        self._validate_inputs(parameters=parameters)
+
+        self.gearbox_cost = self.hydraulic_cooling_mass * self.hvac_mass_cost_coeff
+
     def run(self):
         """Run the mass and cost calculations."""
         # self.calculate_rotor_torque()
@@ -1110,6 +1176,7 @@ class CSMBase:
         self.calculate_generator_mass()
         self.calculate_bedplate_mass()
         self.calculate_yaw_system_mass()
+        self.calculate_hydraulic_cooling_mass()
 
         self.calculate_blade_cost()
         self.calculate_hub_cost()
@@ -1122,6 +1189,7 @@ class CSMBase:
         self.calculate_generator_cost()
         self.calculate_bedplate_cost()
         self.calculate_yaw_system_cost()
+        self.calculate_hydraulic_cooling_cost()
 
     @classmethod
     def _get_attr_map(
@@ -1197,6 +1265,8 @@ class CSMBase:
             "bedplate_cost": self.bedplate_cost,
             "yaw_system_mass": self.yaw_system_mass,
             "yaw_system_cost": self.yaw_system_cost,
+            "hydraulic_cooling_mass": self.hydraulic_cooling_mass,
+            "hydraulic_cooling_cost": self.hydraulic_cooling_cost,
         }
         return results
 
@@ -1215,6 +1285,7 @@ class CSMBase:
             "generator_mass": self.generator_mass,
             "bedplate_mass": self.bedplate_mass,
             "yaw_system_mass": self.yaw_system_mass,
+            "hydraulic_cooling_mass": self.hydraulic_cooling_mass,
         }
         return results
 
@@ -1233,6 +1304,7 @@ class CSMBase:
             "generator_cost": self.generator_cost,
             "bedplate_cost": self.bedplate_cost,
             "yaw_system_cost": self.yaw_system_cost,
+            "hydraulic_cooling_cost": self.hydraulic_cooling_cost,
         }
         return results
 
