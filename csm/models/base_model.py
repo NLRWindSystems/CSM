@@ -267,9 +267,6 @@ class CSMBase:
     rotor_torque: float = create_field(float, "MN*m", "both")
     rotor_mass: float = create_field(float, "m", "both")
 
-    # nacelle
-    nacelle_length: float = create_field(float, "m", "both")
-
     # pitch system
     pitch_bearing_mass_coeff: float = create_field(float, "unitless", "input")
     pitch_bearing_mass_intercept: float = create_field(float, "kg", "input")
@@ -295,6 +292,7 @@ class CSMBase:
     low_speed_shaft_cost: float = create_field(float, "USD", "both")
 
     # main bearing
+    num_bearings: int = create_field(int, "unitless", "input")
     bearing_mass_coeff: float = create_field(float, "unitless", "input")
     bearing_mass_exp: float = create_field(float, "units", "input")
     bearing_mass_cost_coeff: float = create_field(float, "USD/kg", "input")
@@ -368,9 +366,12 @@ class CSMBase:
     transformer_mass: float = create_field(float, "kg", "both")
     transformer_cost: float = create_field(float, "USD", "both")
 
+    # totals
+    nacelle_mass: float = create_field(float, "kg", "both")
+    nacelle_cost: float = create_field(float, "USD", "both")
+
     # NOTE: temporary while prototyping
     power_converter_cost: float = field(default=1000.0)
-    nacelle_cost: float = field(default=1000.0)
     turbine_production_cost: float = field(default=1000.0)
     tower_flange_material_cost: float = field(default=1000.0)
     tower_flange_production_cost: float = field(default=1000.0)
@@ -1422,6 +1423,197 @@ class CSMBase:
 
         self.transformer_cost = self.transformer_mass_cost_coeff * self.transformer_mass
 
+    def calculate_nacelle_mass(self):
+        """Calculates and sets :py:attr:`nacelle_mass` (:math:`kg`) if it was not provided by the
+        user.
+
+        Sum of all above-tower components:
+
+        - :py:attr:`blade_mass`
+        - :py:attr:`hub_mass`
+        - :py:attr:`pitch_system_mass`
+        - :py:attr:`spinner_mass`
+        - :py:attr:`low_speed_shaft_mass`
+        - :py:attr:`bearing_mass` * :py:attr:`num_bearings`
+        - :py:attr:`gearbox_mass`
+        - :py:attr:`brake_mass`
+        - :py:attr:`high_speed_shaft_mass`
+        - :py:attr:`generator_mass`
+        - :py:attr:`bedplate_mass`
+        - :py:attr:`yaw_system_mass`
+        - :py:attr:`hydraulic_cooling_mass`
+        - :py:attr:`nacelle_cover_mass`
+        - :py:attr:`platform_mainframe_mass`
+        - :py:attr:`transformer_mass`
+
+        Args:
+            blade_mass (float): See :py:method:`calculate_blade_mass` for more details.
+            hub_mass (float): See :py:method:`calculate_hub_mass` for more details.
+            pitch_system_mass (float): See :py:method:`calculate_pitch_system_mass` for more
+                details.
+            spinner_mass (float): See :py:method:`calculate_spinner_mass` for more details.
+            low_speed_shaft_mass (float): See :py:method:`calculate_low_speed_shaft_mass` for more
+                details.
+            num_bearings (float): Number of main bearings (:py:attr:`num_bearings`).
+            bearing_mass (float): See :py:method:`calculate_bearing_mass` for more details.
+            gearbox_mass (float): See :py:method:`calculate_gearbox_mass` for more details.
+            brake_mass (float): See :py:method:`calculate_brake_mass` for more details.
+            high_speed_shaft_mass (float): See :py:method:`calculate_high_speed_shaft_mass` for
+                more details.
+            generator_mass (float): See :py:method:`calculate_generator_mass` for more details.
+            bedplate_mass (float): See :py:method:`calculate_bedplate_mass` for more details.
+            yaw_system_mass (float): See :py:method:`calculate_yaw_system_mass` for more details.
+            hydraulic_cooling_mass (float): See :py:method:`calculate_hydraulic_cooling_mass` for
+                more details.
+            nacelle_cover_mass (float): See :py:method:`calculate_nacelle_cover_mass` for more
+                details.
+            platform_mainframe_mass (float): See :py:method:`calculate_platform_mainframe_mass` for
+                more details.
+            transformer_mass (float): See :py:method:`calculate_transformer_mass` for more details.
+
+        Raises:
+            ValueError: Raised if the required parameters have not been provided or calculated.
+        """
+        if next(self._has_values("nacelle_mass")):
+            return
+
+        parameters = (
+            "blade_mass",
+            "hub_mass",
+            "pitch_system_mass",
+            "spinner_mass",
+            "low_speed_shaft_mass",
+            "num_bearings",
+            "bearing_mass",
+            "gearbox_mass",
+            "brake_mass",
+            "high_speed_shaft_mass",
+            "generator_mass",
+            "bedplate_mass",
+            "yaw_system_mass",
+            "hydraulic_cooling_mass",
+            "nacelle_cover_mass",
+            "platform_mainframe_mass",
+            "transformer_mass",
+        )
+        self._validate_inputs(parameters=parameters)
+
+        self.nacelle_mass = sum(
+            (
+                self.blade_mass,
+                self.hub_mass,
+                self.pitch_system_mass,
+                self.spinner_mass,
+                self.low_speed_shaft_mass,
+                self.num_bearings * self.bearing_mass,
+                self.gearbox_mass,
+                self.brake_mass,
+                self.high_speed_shaft_mass,
+                self.generator_mass,
+                self.bedplate_mass,
+                self.yaw_system_mass,
+                self.hydraulic_cooling_mass,
+                self.nacelle_cover_mass,
+                self.platform_mainframe_mass,
+                self.transformer_mass,
+            )
+        )
+
+    def calculate_nacelle_cost(self):
+        """Calculates and sets :py:attr:`nacelle_cost`  (USD) if it was not provided by the user.
+
+        Sum of all above-tower components:
+
+        - :py:attr:`blade_cost`
+        - :py:attr:`hub_cost`
+        - :py:attr:`pitch_system_cost`
+        - :py:attr:`spinner_cost`
+        - :py:attr:`low_speed_shaft_cost`
+        - :py:attr:`bearing_cost` * :py:attr:`num_bearings`
+        - :py:attr:`gearbox_cost`
+        - :py:attr:`brake_cost`
+        - :py:attr:`high_speed_shaft_cost`
+        - :py:attr:`generator_cost`
+        - :py:attr:`bedplate_cost`
+        - :py:attr:`yaw_system_cost`
+        - :py:attr:`hydraulic_cooling_cost`
+        - :py:attr:`nacelle_cover_cost`
+        - :py:attr:`platform_mainframe_cost`
+        - :py:attr:`transformer_cost`
+
+        Args:
+            blade_cost (float): See :py:method:`calculate_blade_cost` for more details.
+            hub_cost (float): See :py:method:`calculate_hub_cost` for more details.
+            pitch_system_cost (float): See :py:method:`calculate_pitch_system_cost` for more
+                details.
+            spinner_cost (float): See :py:method:`calculate_spinner_cost` for more details.
+            low_speed_shaft_cost (float): See :py:method:`calculate_low_speed_shaft_cost` for more
+                details.
+            num_bearings (float): Number of main bearings (:py:attr:`num_bearings`).
+            bearing_cost (float): See :py:method:`calculate_bearing_cost` for more details.
+            gearbox_cost (float): See :py:method:`calculate_gearbox_cost` for more details.
+            brake_cost (float): See :py:method:`calculate_brake_cost` for more details.
+            high_speed_shaft_cost (float): See :py:method:`calculate_high_speed_shaft_cost` for
+                more details.
+            generator_cost (float): See :py:method:`calculate_generator_cost` for more details.
+            bedplate_cost (float): See :py:method:`calculate_bedplate_cost` for more details.
+            yaw_system_cost (float): See :py:method:`calculate_yaw_system_cost` for more details.
+            hydraulic_cooling_cost (float): See :py:method:`calculate_hydraulic_cooling_cost` for
+                more details.
+            nacelle_cover_cost (float): See :py:method:`calculate_nacelle_cover_cost` for more
+                details.
+            platform_mainframe_cost (float): See :py:method:`calculate_platform_mainframe_cost` for
+                more details.
+            transformer_cost (float): See :py:method:`calculate_transformer_cost` for more details.
+
+        Raises:
+            ValueError: Raised if the required parameters have not been provided or calculated.
+        """
+        if next(self._has_values("nacelle_cost")):
+            return
+
+        parameters = (
+            "blade_cost",
+            "hub_cost",
+            "pitch_system_cost",
+            "spinner_cost",
+            "low_speed_shaft_cost",
+            "num_bearings",
+            "bearing_cost",
+            "gearbox_cost",
+            "brake_cost",
+            "high_speed_shaft_cost",
+            "generator_cost",
+            "bedplate_cost",
+            "yaw_system_cost",
+            "hydraulic_cooling_cost",
+            "nacelle_cover_cost",
+            "platform_mainframe_cost",
+            "transformer_cost",
+        )
+        self._validate_inputs(parameters=parameters)
+
+        self.nacelle_cost = sum(
+            (
+                self.blade_cost,
+                self.hub_cost,
+                self.pitch_system_cost,
+                self.spinner_cost,
+                self.low_speed_shaft_cost,
+                self.num_bearings * self.bearing_cost,
+                self.gearbox_cost,
+                self.brake_cost,
+                self.high_speed_shaft_cost,
+                self.generator_cost,
+                self.bedplate_cost,
+                self.yaw_system_cost,
+                self.hydraulic_cooling_cost,
+                self.nacelle_cover_cost,
+                self.platform_mainframe_cost,
+                self.transformer_cost,
+            )
+        )
+
     def run(self):
         """Run the mass and cost calculations."""
         # self.calculate_rotor_torque()
@@ -1442,6 +1634,7 @@ class CSMBase:
         self.calculate_nacelle_cover_mass()
         self.calculate_platform_mainframe_mass()
         self.calculate_transformer_mass()
+        self.calculate_nacelle_mass()
 
         self.calculate_blade_cost()
         self.calculate_hub_cost()
@@ -1458,6 +1651,7 @@ class CSMBase:
         self.calculate_nacelle_cover_cost()
         self.calculate_platform_mainframe_cost()
         self.calculate_transformer_cost()
+        self.calculate_nacelle_cost()
 
     @classmethod
     def _get_attr_map(
@@ -1541,6 +1735,8 @@ class CSMBase:
             "platform_mainframe_cost": self.platform_mainframe_cost,
             "transformer_mass": self.transformer_mass,
             "transformer_cost": self.transformer_cost,
+            "nacelle_mass": self.nacelle_mass,
+            "nacelle_cost": self.nacelle_cost,
         }
         return results
 
@@ -1563,6 +1759,7 @@ class CSMBase:
             "nacelle_cover_mass": self.nacelle_cover_mass,
             "platform_mainframe_mass": self.platform_mainframe_mass,
             "transformer_mass": self.transformer_mass,
+            "nacelle_mass": self.nacelle_mass,
         }
         return results
 
@@ -1585,6 +1782,7 @@ class CSMBase:
             "nacelle_cover_cost": self.nacelle_cover_cost,
             "platform_mainframe_cost": self.platform_mainframe_cost,
             "transformer_cost": self.transformer_cost,
+            "nacelle_cost": self.nacelle_cost,
         }
         return results
 

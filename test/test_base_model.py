@@ -70,7 +70,6 @@ csm_2015_outputs = {
     "blade_mass": None,
     "blade_cost": None,
     "rotor_torque": None,
-    "nacelle_length": None,
     "hub_mass": None,
     "hub_cost": None,
     "spinner_mass": None,
@@ -185,6 +184,12 @@ def test_CSMBase_defaults_only(subtests):
 
     with pytest.raises(ValueError, match=undefined_params_msg):
         model.calculate_transformer_cost()
+
+    with pytest.raises(ValueError, match=undefined_params_msg):
+        model.calculate_nacelle_mass()
+
+    with pytest.raises(ValueError, match=undefined_params_msg):
+        model.calculate_nacelle_cost()
 
     with pytest.raises(ValueError, match=undefined_params_msg):
         model.run()
