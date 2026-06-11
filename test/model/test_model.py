@@ -1,5 +1,6 @@
-from csm.model._base import CSM
 import pandas as pd
+
+from csm.models._base import CSM
 
 
 class Basic(CSM):
@@ -14,7 +15,6 @@ class Basic(CSM):
 
 
 class DataFrame(CSM):
-
     def df_output(a, b) -> pd.DataFrame:
         num_rows = 3
         result = pd.DataFrame(data={"a": [a] * num_rows, "b": [b] * num_rows})
@@ -36,7 +36,6 @@ class Recursive(CSM):
 
 
 class MissingReturnTypeHint(CSM):
-
     def df_output(a, b):
         num_rows = 3
         result = pd.DataFrame(data={"a": [a] * num_rows, "b": [b] * num_rows})

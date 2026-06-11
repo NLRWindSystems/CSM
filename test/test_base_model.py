@@ -49,7 +49,7 @@ csm_2015_inputs = {
     "hvac_mass_cost_coeff": 124,
     "nacelle_cover_mass_coeff": 1.2817,
     "nacelle_cover_mass_intercept": 428.19,
-    "has_crane": False,
+    "nacelle_cover_mass_cost_coeff": 5.7,
     "crane_mass": 3000,
     "crane_cost": 12000.0,
     "platform_mainframe_mass_coeff": 0.125,
@@ -66,6 +66,9 @@ csm_2015_inputs = {
     "rated_power_kw": 3500,
     "rotor_diameter": 136.7,
     "max_tip_speed": 71.53,
+    "tower_length": 80,
+    "has_crane": False,
+    "num_bearings": 2,
 }
 
 csm_2015_outputs = {

@@ -1,6 +1,6 @@
 import numpy as np
 
-from csm.csm import CSM
+from csm._csm import CSM
 
 
 class CSMMixin(CSM):

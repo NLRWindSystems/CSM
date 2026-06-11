@@ -11,7 +11,7 @@ import attrs
 from csm import util
 
 
-DIR_MODEL_DEFAULT = Path(__file__).parent / "model"
+DIR_MODEL_DEFAULT = Path(__file__).parent / "models"
 DIR_OUTPUT_DEFAULT = "./output"
 
 

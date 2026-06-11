@@ -1,6 +1,6 @@
 import numpy as np
 
-from csm.model.empirical_2020 import Empirical2020
+from csm.models.empirical_2020 import Empirical2020
 
 
 class Empirical2024Offshore(Empirical2020):

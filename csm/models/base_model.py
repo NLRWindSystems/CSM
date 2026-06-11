@@ -831,7 +831,7 @@ class CSMBase:
         parameters = ("bearing_mass_coeff", "rotor_diameter", "bearing_mass_exp")
         self._validate_inputs(parameters=parameters)
 
-        self.bearing_mass = self.bearing_mass_coeff * self.blade_mass**self.bearing_mass_exp
+        self.bearing_mass = self.bearing_mass_coeff * self.rotor_diameter**self.bearing_mass_exp
 
     def calculate_bearing_cost(self):
         """Calculates and sets :py:attr:`bearing_cost` (nose cone cost) if it was not provided by
@@ -880,7 +880,7 @@ class CSMBase:
         self._validate_inputs(parameters=parameters)
 
         rated_hub_power = self.rated_power_kw / self.efficiency_max
-        rotor_speed = self.max_tip_speed / (0.5 / self.rotor_diameter)
+        rotor_speed = self.max_tip_speed / (0.5 * self.rotor_diameter)
         self.rated_rpm = rotor_speed / (2.0 * math.pi) * 60.0
         self.rotor_torque = rated_hub_power / rotor_speed
 
@@ -962,7 +962,7 @@ class CSMBase:
         parameters = ("rotor_torque", "brake_mass_coeff")
         self._validate_inputs(parameters=parameters)
 
-        self.brake_mass = self.rotor_torque * self.brake_mass_coeff
+        self.brake_mass = self.rotor_torque * 1000.0 * self.brake_mass_coeff
 
     def calculate_brake_cost(self):
         """Calculates and sets :py:attr:`brake_cost` if it was not provided by the user.
@@ -1042,7 +1042,7 @@ class CSMBase:
         parameters = ("high_speed_shaft_mass", "hss_mass_cost_coeff")
         self._validate_inputs(parameters=parameters)
 
-        self.gearbox_cost = self.high_speed_shaft_mass * self.hss_mass_cost_coeff
+        self.high_speed_shaft_cost = self.high_speed_shaft_mass * self.hss_mass_cost_coeff
 
     def calculate_generator_mass(self):
         """Calculates and sets :py:attr:`generator_mass` if it was not provided by the user.
@@ -1256,7 +1256,7 @@ class CSMBase:
         parameters = ("hydraulic_cooling_mass", "hvac_mass_cost_coeff")
         self._validate_inputs(parameters=parameters)
 
-        self.gearbox_cost = self.hydraulic_cooling_mass * self.hvac_mass_cost_coeff
+        self.hydraulic_cooling_cost = self.hydraulic_cooling_mass * self.hvac_mass_cost_coeff
 
     def calculate_nacelle_cover_mass(self):
         """Calculates and sets :py:attr:`nacelle_cover_mass` if it was not provided by the user.
@@ -1405,7 +1405,7 @@ class CSMBase:
         has_crane = int(self.has_crane)
         self.platform_mainframe_cost = (
             self.platform_mainframe_mass_cost_coeff
-            * (self.platform_mainframe_mas - has_crane * self.crane_mass)
+            * (self.platform_mainframe_mass - has_crane * self.crane_mass)
             + has_crane * self.crane_cost
         )
 
@@ -1784,10 +1784,7 @@ class CSMBase:
         if next(self._has_values("rotor_cost")):
             return
 
-        parameters = (
-            "num_bladesblade_cost",
-            "hub_system_cost",
-        )
+        parameters = ("num_blades", "blade_cost", "hub_system_cost")
         self._validate_inputs(parameters=parameters)
 
         self.rotor_cost = self.num_blades * self.blade_cost + self.hub_system_cost
@@ -1878,10 +1875,10 @@ class CSMBase:
         self.calculate_nacelle_cover_mass()
         self.calculate_platform_mainframe_mass()
         self.calculate_transformer_mass()
-        self.calculate_nacelle_mass()
         self.calculate_tower_mass()
-        self.calculate_rotor_mass()
+        self.calculate_nacelle_mass()
         self.calculate_hub_system_mass()
+        self.calculate_rotor_mass()
         self.calculate_turbine_mass()
 
         self.calculate_blade_cost()
@@ -1890,6 +1887,7 @@ class CSMBase:
         self.calculate_spinner_cost()
         self.calculate_low_speed_shaft_cost()
         self.calculate_bearing_cost()
+        self.calculate_gearbox_cost()
         self.calculate_brake_cost()
         self.calculate_high_speed_shaft_cost()
         self.calculate_generator_cost()
@@ -1899,10 +1897,10 @@ class CSMBase:
         self.calculate_nacelle_cover_cost()
         self.calculate_platform_mainframe_cost()
         self.calculate_transformer_cost()
-        self.calculate_nacelle_cost()
         self.calculate_tower_cost()
-        self.calculate_rotor_cost()
+        self.calculate_nacelle_cost()
         self.calculate_hub_system_cost()
+        self.calculate_rotor_cost()
         self.calculate_turbine_cost()
 
     @classmethod

@@ -1,4 +1,4 @@
-from csm.model.replicate_2015 import Replicate2015
+from csm.models.replicate_2015 import Replicate2015
 
 
 class Replicate2015Excel(Replicate2015):
