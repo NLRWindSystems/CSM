@@ -57,6 +57,9 @@ csm_2015_inputs = {
     "transformer_mass_coeff": 1.9150,
     "transformer_mass_intercept": 1910.0,
     "transformer_mass_cost_coeff": 18.8,
+    "tower_mass_coeff": 19.828,
+    "tower_mass_exp": 2.0282,
+    "tower_mass_cost_coeff": 2.9,
     # example input
     "turbine_class": 1,
     "blade_has_carbon": False,
@@ -190,6 +193,12 @@ def test_CSMBase_defaults_only(subtests):
 
     with pytest.raises(ValueError, match=undefined_params_msg):
         model.calculate_nacelle_cost()
+
+    with pytest.raises(ValueError, match=undefined_params_msg):
+        model.calculate_tower_mass()
+
+    with pytest.raises(ValueError, match=undefined_params_msg):
+        model.calculate_tower_cost()
 
     with pytest.raises(ValueError, match=undefined_params_msg):
         model.run()
