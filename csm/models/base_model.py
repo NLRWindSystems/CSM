@@ -145,7 +145,9 @@ class CSMBase:
         bedplate_mass_exp (bool): :math:`b` in the mass equation from
             :py:method:`calculate_bedplate_mass`.
         bedplate_mass_cost_coeff (float): bedplate cost per kilogram (USD/kg).
-        yaw_system_mass_coeff (float): :math:`k` in the mass equation from
+        yaw_system_non_bearing_mass_coeff (float): :math:`k1` in the mass equation from
+            :py:method:`calculate_yaw_system_mass` to account for non-bearing mass.
+        yaw_system_mass_coeff (float): :math:`k2` in the mass equation from
             :py:method:`calculate_yaw_system_mass`.
         yaw_system_mass_exp (bool): :math:`b` in the mass equation from
             :py:method:`calculate_yaw_system_mass`..
@@ -358,6 +360,7 @@ class CSMBase:
     bedplate_cost: float = create_field(float, "USD", "both")
 
     # yaw system
+    yaw_system_non_bearing_mass_coeff: float = create_field(float, "unitless", "input")
     yaw_system_mass_coeff: float = create_field(float, "unitless", "input")
     yaw_system_mass_exp: float = create_field(float, "unitless", "input")
     yaw_system_mass_cost_coeff: float = create_field(float, "USD/kg", "input")
@@ -707,7 +710,9 @@ class CSMBase:
         parameters = ("spinner_mass_coeff", "rotor_diameter", "spinner_mass_intercept")
         self._validate_inputs(parameters=parameters)
 
-        self.spinner_mass = self.spinner_mass_coeff * self.blade_mass + self.spinner_mass_intercept
+        self.spinner_mass = (
+            self.spinner_mass_coeff * self.rotor_diameter + self.spinner_mass_intercept
+        )
 
     def calculate_spinner_cost(self):
         """Calculates and sets :py:attr:`spinner_cost` (nose cone cost) if it was not provided by
@@ -744,6 +749,7 @@ class CSMBase:
         where:
 
         - :math:`k =` :py:attr:`lss_mass_coeff`
+        - :math:`power =` :py:attr:`rated_power_kw` / 1000
         - :math:`m_{blade} =` :py:attr:`blade_mass`
         - :math:`b1 =` :py:attr:`lss_mass_exp`
         - :math:`b2 =` :py:attr:`lss_mass_intercept`
@@ -771,12 +777,10 @@ class CSMBase:
         )
         self._validate_inputs(parameters=parameters)
 
-        bearing_mass = (
-            self.pitch_bearing_mass_coeff * self.blade_mass * self.num_blades
-            + self.pitch_bearing_mass_intercept
-        )
         self.low_speed_shaft_mass = (
-            bearing_mass * (1 + self.bearing_housing_fraction) + self.mass_sys_offset
+            self.lss_mass_coeff
+            * (self.blade_mass * self.rated_power_kw * 1e-3) ** self.lss_mass_exp
+            + self.lss_mass_intercept
         )
 
     def calculate_low_speed_shaft_cost(self):
@@ -1151,18 +1155,21 @@ class CSMBase:
         self.bedplate_cost = self.bedplate_mass_cost_coeff * self.bedplate_mass
 
     def calculate_yaw_system_mass(self):
-        """Calculates and sets :py:attr:`yaw_system_mass` if it was not provided by the user.
+        r"""Calculates and sets :py:attr:`yaw_system_mass` if it was not provided by the user.
 
-        .. math:: k * {rotor_diameter} ^ b
+        .. math:: k1 * (k2 * rotor\_diameter ^ b)
 
         where:
 
-        - :math:`k =` :py:attr:`yaw_system_mass_coeff`
-        - :math:`rotor_diameter =` :py:attr:`rotor_diameter`
+        - :math:`k1 =` :py:attr:`yaw_system_non_bearing_mass_coeff`
+        - :math:`k2 =` :py:attr:`yaw_system_mass_coeff`
+        - :math:`rotor\_diameter =` :py:attr:`rotor_diameter`
         - :math:`b =` :py:attr:`yaw_system_mass_exp`
 
         Args:
-            yaw_system_mass_coeff (float): :math:`k` in the mass equation above (:math:`kg/kW`).
+            yaw_system_non_bearing_mass_coeff (float): :math:`k1` in the mass equation above to
+                account for non-bearing mass.
+            yaw_system_mass_coeff (float): :math:`k2` in the mass equation above (:math:`kg/kW`).
             rotor_diameter (float): Turbine rotor diameter (:math:`m`).
             yaw_system_mass_exp (bool): :math:`b` in the mass equation above (:math:`kg`).
 
@@ -1172,10 +1179,15 @@ class CSMBase:
         if next(self._has_values("yaw_system_mass")):
             return
 
-        parameters = ("rotor_diameter", "yaw_system_mass_coeff", "yaw_system_mass_exp")
+        parameters = (
+            "rotor_diameter",
+            "yaw_system_non_bearing_mass_coeff",
+            "yaw_system_mass_coeff",
+            "yaw_system_mass_exp",
+        )
         self._validate_inputs(parameters=parameters)
 
-        self.yaw_system_mass = (
+        self.yaw_system_mass = self.yaw_system_non_bearing_mass_coeff * (
             self.yaw_system_mass_coeff * self.rotor_diameter**self.yaw_system_mass_exp
         )
 
