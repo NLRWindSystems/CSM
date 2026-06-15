@@ -14,7 +14,7 @@ base = fields(CSMBase)
 
 @define
 class CustomModel(CSMBase):
-    rotor_efficiency_max: float = base.rotor_efficiency_max.evolve(default=1.0, init=False)
+    rotor_efficiency_max: float = base.rotor_efficiency_max.evolve(default=1.0)
 ```
 """
 
@@ -23,54 +23,9 @@ from typing import Any
 from collections.abc import Generator
 
 import pandas as pd
-from attrs import field, define, fields, converters, validators
+from attrs import field, define, fields
 
-
-def create_field(obj: type, units: str, io_type: str, *, default: int | None = None) -> field:
-    """Creates an :py:obj:`int`-based field with pre-loaded defaults, conversions, validations,
-    and metadata.
-
-    Args:
-        obj (type): A type. Currently only accepts ``int``, ``float``, or ``bool``.
-        units (str): OpenMDAO-compatible units. See
-            <https://openmdao.org/newdocs/versions/latest/features/units.html> for more details.
-        io_type (str): One of "input", "output", or "both" for how the attribute should be
-            initialized within a WISDEM model. Typically ``xx_mass` and ``xx_cost`` attributes
-            are both inputs and outputs.
-        default (int, optional):  Value of the default, if not None. Should be used sparingly.
-
-    Returns:
-        attrs.field:
-            Creates an :py:attr:`attrs.field` object for the attribute.
-
-    Raises:
-        NotImplementedError:
-            Raised if an unsupported type object is passed. Only ``int``, ``float``, and ``bool``
-            are accepted at this time.
-    """
-    if obj is int:
-        _field = field(
-            default=None,
-            validator=validators.optional(validators.instance_of(int)),
-            metadata={"units": units, "io": io_type},
-        )
-        return _field
-    if obj is float:
-        _field = field(
-            default=None,
-            converter=converters.optional(float),
-            validator=validators.optional(validators.instance_of(float)),
-            metadata={"units": units, "io": io_type},
-        )
-        return _field
-    if obj is bool:
-        _field = field(
-            default=None,
-            validator=validators.optional(validators.instance_of(bool)),
-            metadata={"units": units, "io": io_type},
-        )
-        return _field
-    raise NotImplementedError(f"No setup created for type: {obj}")
+from csm.models.utils import create_field
 
 
 @define
