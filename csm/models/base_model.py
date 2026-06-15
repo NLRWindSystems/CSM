@@ -205,24 +205,26 @@ class CSMBase:
             :py:method:`calculate_transformer_cost` for more details.
         tower_mass (float): Tower mass (kg). See
             :py:method:`calculate_tower_mass` for more details.
-        tower_cost (float): Tower mass (USD1). See
+        tower_cost (float): Tower cost (USD). See
             :py:method:`calculate_tower_cost` for more details.
-        nacelle_mass (float): Tower mass (kg). See
+        nacelle_mass (float): Total nacelle mass (kg). See
             :py:method:`calculate_nacelle_mass` for more details.
-        nacelle_cost (float): Tower mass (USD1). See
+        nacelle_cost (float): Total nacelle cost (US). See
             :py:method:`calculate_nacelle_cost` for more details.
-        hub_system_mass (float): Tower mass (kg). See
+        hub_system_mass (float): Total hub system mass (kg). See
             :py:method:`calculate_hub_system_mass` for more details.
-        hub_system_cost (float): Tower mass (USD1). See
+        hub_system_cost (float): Total hub system cost (USD). See
             :py:method:`calculate_hub_system_cost` for more details.
-        rotor_mass (float): Tower mass (kg). See
+        rotor_mass (float): Total rotor mass (kg). See
             :py:method:`calculate_rotor_mass` for more details.
-        rotor_cost (float): Tower mass (USD1). See
+        rotor_cost (float): Total rotor cost (USD). See
             :py:method:`calculate_rotor_cost` for more details.
-        turbine_mass (float): Tower mass (kg). See
+        turbine_mass (float): Total turbine mass (kg). See
             :py:method:`calculate_turbine_mass` for more details.
-        turbine_cost (float): Tower mass (USD1). See
+        turbine_cost (float): Total turbine cost (USD). See
             :py:method:`calculate_turbine_cost` for more details.
+        turbine_cost (float): Total turbine cost, normalized by
+            :py:attr:`rated_power_kw` (USD/kW).
     """
 
     # turbine general
@@ -367,7 +369,8 @@ class CSMBase:
     rotor_mass: float = create_field(float, "kg", "both")
     rotor_cost: float = create_field(float, "USD", "both")
     turbine_mass: float = create_field(float, "kg", "both")
-    turbine_cost: float = create_field(float, "USD", "both")
+    turbine_cost: float = create_field(float, "USD", "output")
+    turbine_cost_kw: float = create_field(float, "USD/kW", "output")
 
     # NOTE: temporary while prototyping
     power_converter_cost: float = field(default=1000.0)
@@ -1779,15 +1782,12 @@ class CSMBase:
 
         parameters = (
             "nacelle_mass",
-            "hub_system_mass",
             "rotor_mass",
             "tower_mass",
         )
         self._validate_inputs(parameters=parameters)
 
-        self.turbine_mass = sum(
-            (self.nacelle_mass, self.hub_system_mass, self.rotor_mass, self.tower_mass)
-        )
+        self.turbine_mass = self.nacelle_mass + self.rotor_mass + self.tower_mass
 
     def calculate_turbine_cost(self):
         """Calculates and sets :py:attr:`turbine_cost` (:math:`kg`) if it was not provided by the
@@ -1812,15 +1812,13 @@ class CSMBase:
 
         parameters = (
             "nacelle_cost",
-            "hub_system_cost",
             "rotor_cost",
             "tower_cost",
         )
         self._validate_inputs(parameters=parameters)
 
-        self.turbine_cost = sum(
-            (self.nacelle_cost, self.hub_system_cost, self.rotor_cost, self.tower_cost)
-        )
+        self.turbine_cost = self.nacelle_cost + self.rotor_cost + self.tower_cost
+        self.turbine_cost_kw = self.turbine_cost / self.rated_power_kw
 
     def run(self):
         """Run the mass and cost calculations."""

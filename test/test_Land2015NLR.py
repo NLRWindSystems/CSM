@@ -1,35 +1,13 @@
+import pytest
 from attrs import fields
 from pytest import approx
 
 from csm.models.nlr2015 import Land2015NLR
 
-
-csm_2015_inputs = {
-    # WISDEM test input
-    "turbine_class": 1,
-    "efficiency_max": 0.9,
-    "num_blades": 3,
-    "num_bearings": 2,
-    "rated_power_kw": 5000,
-    "blade_has_carbon": False,
-    "rotor_diameter": 126,
-    "max_tip_speed": 80,
-    "tower_length": 90,
-    "has_crane": True,
-}
-
-csm_2015_outputs = {
-    "rotor_angular_velocity_max": None,
-    "blade_mass": None,
-    "blade_cost": None,
-    "rotor_torque": None,
-    "hub_mass": None,
-    "hub_cost": None,
-    "spinner_mass": None,
-    "spinner_cost": None,
-}
+from test.conftest import csm_2015_test_inputs
 
 
+@pytest.mark.unit
 def test_CSMBase_defaults_only(subtests):
     """Tests that all the individual model calculations fail individually and when run as a group.
     Ensures that all results (output) values are still their defaults. The combination of these
@@ -106,9 +84,10 @@ def test_CSMBase_defaults_only(subtests):
             )
 
 
+@pytest.mark.regression
 def test_Land2015NLR_with_2015_inputs(subtests):
     """Tests against the WISDEM CSM test restults for the 2015 model."""
-    csm = Land2015NLR.from_dict(csm_2015_inputs)
+    csm = Land2015NLR.from_dict(csm_2015_test_inputs)
     csm.run()
 
     with subtests.test("Blade mass"):
@@ -129,6 +108,8 @@ def test_Land2015NLR_with_2015_inputs(subtests):
         assert csm.rotor_torque == approx(4375.0)
     with subtests.test("Gearbox mass"):
         assert csm.gearbox_mass == approx(21875.0)
+    with subtests.test("Brake mass"):
+        assert csm.brake_mass == approx(5337.5)
     with subtests.test("High speed shaft mass"):
         assert csm.high_speed_shaft_mass == approx(994.7)
     with subtests.test("Generator mass"):
@@ -206,11 +187,11 @@ def test_Land2015NLR_with_2015_inputs(subtests):
         # assert csm.hub_system_mass_tcc == approx(55850.44282136)
         assert csm.hub_system_cost == approx(421362.41522849)
     with subtests.test("Rotor cost"):
-        assert csm.rotor_cost == approx(1)  # TODO
+        assert csm.rotor_cost == approx(1235633.68267274)
     with subtests.test("Turbine cost"):
         # assert csm.turbine_mass_tcc == approx(445414.81133358914)
         assert csm.turbine_cost == approx(3430022.404353479)
-        assert csm.turbine_cost_kW == approx(686.0044808706958)  # TODO
+        assert csm.turbine_cost_kW == approx(686.0044808706958)
 
     # TODO: check actual values
     # TODO: check the outputs

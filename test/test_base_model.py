@@ -6,71 +6,8 @@ from pytest import approx
 
 from csm.models.base_model import CSMBase
 
+from test.conftest import csm_2015_inputs
 
-csm_2015_inputs = {
-    # defaults
-    "blade_mass_coeff": 0.5,
-    "blade_mass_cost_coeff": 14.6,
-    "hub_mass_coeff": 2.3,
-    "hub_mass_intercept": 1320.0,
-    "hub_mass_cost_coeff": 3.9,
-    "pitch_bearing_mass_coeff": 0.1295,
-    "pitch_bearing_mass_intercept": 491.31,
-    "bearing_housing_fraction": 0.3280,
-    "mass_sys_offset": 555.0,
-    "pitch_system_mass_cost_coeff": 22.1,
-    "spinner_mass_coeff": 15.5,
-    "spinner_mass_intercept": -980.0,
-    "spinner_mass_cost_coeff": 11.1,
-    "lss_mass_coeff": 13.0,
-    "lss_mass_exp": 0.65,
-    "lss_mass_intercept": 775,
-    "lss_mass_cost_coeff": 11.9,
-    "bearing_mass_coeff": 0.0001,
-    "bearing_mass_exp": 3.5,
-    "bearing_mass_cost_coeff": 4.5,
-    "gearbox_torque_density": 200,
-    "gearbox_torque_cost": 50,
-    "brake_mass_coeff": 0.00122,
-    "brake_mass_cost_coeff": 3.6254,
-    "hss_mass_coeff": 0.19894,
-    "hss_mass_cost_coeff": 6.8,
-    "generator_mass_coeff": 2.3,
-    "generator_mass_intercept": 3400,
-    "generator_mass_cost_coeff": 12.4,
-    "bedplate_mass_exp": 2.2,
-    "bedplate_mass_cost_coeff": 2.9,
-    "yaw_system_non_bearing_mass_coeff": 1.5,
-    "yaw_system_mass_coeff": 0.0009,
-    "yaw_system_mass_exp": 3.314,
-    "yaw_system_mass_cost_coeff": 8.3,
-    "hvac_mass_coeff": 0.08,
-    "hvac_mass_cost_coeff": 124,
-    "nacelle_cover_mass_coeff": 1.2817,
-    "nacelle_cover_mass_intercept": 428.19,
-    "nacelle_cover_mass_cost_coeff": 5.7,
-    "crane_mass": 3000,
-    "crane_cost": 12000.0,
-    "platform_mainframe_mass_coeff": 0.125,
-    "platform_mainframe_mass_cost_coeff": 17.1,
-    "transformer_mass_coeff": 1.9150,
-    "transformer_mass_intercept": 1910.0,
-    "transformer_mass_cost_coeff": 18.8,
-    "tower_mass_coeff": 19.828,
-    "tower_mass_exp": 2.0282,
-    "tower_mass_cost_coeff": 2.9,
-    # WISDEM test input
-    "turbine_class": 1,
-    "efficiency_max": 0.9,
-    "num_blades": 3,
-    "num_bearings": 2,
-    "rated_power_kw": 5000,
-    "blade_has_carbon": False,
-    "has_crane": True,
-    "rotor_diameter": 126,
-    "max_tip_speed": 80,
-    "tower_length": 90,
-}
 
 csm_2015_outputs = {
     "rotor_angular_velocity_max": None,
@@ -84,6 +21,7 @@ csm_2015_outputs = {
 }
 
 
+@pytest.mark.unit
 def test_CSMBase_defaults_only(subtests):
     """Tests that all the individual model calculations fail individually and when run as a group.
     Ensures that all results (output) values are still their defaults. The combination of these
@@ -241,6 +179,7 @@ def test_CSMBase_defaults_only(subtests):
             )
 
 
+@pytest.mark.unit
 def test_CSMBase_with_inputs(subtests):
     """Tests the model functionality works as expected when all inputs are defined."""
     blade_variant1 = deepcopy(csm_2015_inputs)
@@ -270,6 +209,7 @@ def test_CSMBase_with_inputs(subtests):
         assert csm1.platform_mainframe_cost != csm2.platform_mainframe_cost
 
 
+@pytest.mark.regression
 def test_CSMBase_with_2015_inputs(subtests):
     """Tests against the WISDEM CSM test restults for the 2015 model."""
     csm = CSMBase(**csm_2015_inputs)
@@ -293,6 +233,8 @@ def test_CSMBase_with_2015_inputs(subtests):
         assert csm.rotor_torque == approx(4375.0)
     with subtests.test("Gearbox mass"):
         assert csm.gearbox_mass == approx(21875.0)
+    with subtests.test("Brake mass"):
+        assert csm.brake_mass == approx(5337.5)
     with subtests.test("High speed shaft mass"):
         assert csm.high_speed_shaft_mass == approx(994.7)
     with subtests.test("Generator mass"):
@@ -370,16 +312,17 @@ def test_CSMBase_with_2015_inputs(subtests):
         # assert csm.hub_system_mass_tcc == approx(55850.44282136)
         assert csm.hub_system_cost == approx(421362.41522849)
     with subtests.test("Rotor cost"):
-        assert csm.rotor_cost == approx(1)  # TODO
+        assert csm.rotor_cost == approx(1235633.68267274)
     with subtests.test("Turbine cost"):
         # assert csm.turbine_mass_tcc == approx(445414.81133358914)
         assert csm.turbine_cost == approx(3430022.404353479)
-        assert csm.turbine_cost_kW == approx(686.0044808706958)  # TODO
+        assert csm.turbine_cost_kW == approx(686.0044808706958)
 
     # TODO: check actual values
     # TODO: check the outputs
 
 
+@pytest.mark.unit
 def test_CSMBase_with_outputs_as_inputs(subtests):
 
     assert True
