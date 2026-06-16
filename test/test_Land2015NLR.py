@@ -192,6 +192,3 @@ def test_Land2015NLR_with_2015_inputs(subtests):
         # assert csm.turbine_mass_tcc == approx(445414.81133358914)
         assert csm.turbine_cost == approx(3430022.404353479)
         assert csm.turbine_cost_kW == approx(686.0044808706958)
-
-    # TODO: check actual values
-    # TODO: check the outputs
