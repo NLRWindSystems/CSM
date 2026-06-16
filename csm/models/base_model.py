@@ -20,11 +20,13 @@ class CustomModel(CSMBase):
 
 import math
 from typing import Any
+from functools import cached_property
 from itertools import product, zip_longest
 from collections.abc import Generator
 
 import pandas as pd
-from attrs import field, define, fields
+import networkx as nx
+from attrs import Attribute, field, define, fields
 
 from csm.models.utils import create_field
 
@@ -484,12 +486,20 @@ class CSMBase:
 
     # all else
     parameter_map: dict[str, tuple[str]] = field(default=parameter_map, init=False)
+    parameter_graph: nx.Digraph = field(init=False)
 
     # NOTE: temporary while prototyping
     power_converter_cost: float = field(default=1000.0)
     turbine_production_cost: float = field(default=1000.0)
     tower_flange_material_cost: float = field(default=1000.0)
     tower_flange_production_cost: float = field(default=1000.0)
+
+    def __attrs_post_init__(self):
+        """Post initialization setup."""
+        self.parameter_graph = nx.DiGraph()
+        for key, params in parameter_map.items():
+            for dependent in params:
+                self.parameter_graph.add_edge(key, dependent)
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]):
@@ -526,6 +536,32 @@ class CSMBase:
             )
             raise AttributeError(msg)
         return cls(**data)
+
+    @cached_property
+    def fields(self) -> tuple[Attribute]:
+        """Returns a tuple of :py:attr:`attrs.Attribute` that is a convenient shortcut for
+        ``attrs.fields(self)``.
+
+        Returns:
+            tuple[Attribute]: See documentation for `attrs.fields`_ for more
+
+        .. _attrs.fields:
+            https://www.attrs.org/en/stable/api.html#attrs.fields
+        """
+        return self.__attrs_attrs__
+
+    @cached_property
+    def fields_dict(self) -> dict[str, Attribute]:
+        """Returns a tuple of :py:attr:`attrs.Attribute` that is a convenient shortcut for
+        ``attrs.fields_dict(self)``.
+
+        Returns:
+            tuple[Attribute]: See documentation for `attrs.fields_dict`_ for more
+
+        .. _attrs.fields_dict:
+            https://www.attrs.org/en/stable/api.html#attrs.fields_dict
+        """
+        return {el.name: el for el in self.__attrs_attrs__}
 
     def _has_values(self, *args) -> Generator[bool]:
         """Checks if the user provided values for a given :py:attr:`arg` (True), or if they are
@@ -577,16 +613,35 @@ class CSMBase:
         self._validate_inputs(parameters=parameters)
         return False
 
+    def reset_values(self, *args: str) -> None:
+        """Resets the values for any provided :py:attr:`args` to the model default.
+
+        Raises:
+            KeyError: Raised if any of :py:attr:`args` are not a class attribute
+        """
+        for arg in args:
+            if (attribute := self.fields_dict.get(arg)) is None:
+                raise KeyError(f"'{arg}' is an invalid attribute, please check your spelling.")
+            setattr(self, arg, attribute.default)
+
     def update(self, data: dict[str, Any]):
         """Update the value of one or multiple model parameters.
 
         Args:
             data (dict[str, Any]): Dictionary of an attribute and its new value.
+
+        Raises:
+            KeyError: Raised if any of :py:attr:`args` are not a class attribute
         """
-        # TODO: determine which calculated results need to be reset
-        raise NotImplementedError("Not yet functional.")
-        # for name, value in data:
-        #     setattr(self, name, value)
+        to_reset = set()
+        for name, value in data.items():
+            if getattr(self, name) is None:
+                raise KeyError(f"'{name}' is an invalid attribute, please check your spelling.")
+            setattr(self, name, value)
+            to_reset.update(nx.ancestors(self.parameter_graph, name))
+
+        to_reset.difference(data)
+        self.reset_values(*to_reset)
 
     @classmethod
     def parameterize(
