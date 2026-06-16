@@ -445,6 +445,17 @@ class CSMBase:
             ]
             raise ValueError(f"Inputs for the following variables required: {', '.join(missing)}")
 
+    def update(self, data: dict[str, Any]):
+        """Update the value of one or multiple model parameters.
+
+        Args:
+            data (dict[str, Any]): Dictionary of an attribute and its new value.
+        """
+        # TODO: determine which calculated results need to be reset
+        raise NotImplementedError("Not yet functional.")
+        # for name, value in data:
+        #     setattr(self, name, value)
+
     def calculate_blade_mass(self):
         """Calculates and sets :py:attr:`blade_mass` if it was not provided by the user.
 
