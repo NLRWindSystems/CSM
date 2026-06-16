@@ -29,6 +29,115 @@ from attrs import field, define, fields
 from csm.models.utils import create_field
 
 
+parameter_map = {
+    "blade_mass": ("rotor_diameter", "turbine_class", "blade_has_carbon", "blade_mass_coeff"),
+    "blade_cost": ("blade_mass", "blade_mass_cost_coeff"),
+    "hub_mass": ("blade_mass", "hub_mass_coeff", "hub_mass_intercept"),
+    "hub_cost": ("hub_mass", "hub_mass_cost_coeff"),
+    "pitch_system_mass": (
+        "num_blades",
+        "pitch_bearing_mass_coeff",
+        "blade_mass",
+        "pitch_bearing_mass_intercept",
+        "bearing_housing_fraction",
+        "mass_sys_offset",
+    ),
+    "pitch_system_cost": ("pitch_system_mass", "pitch_system_mass_cost_coeff"),
+    "spinner_mass": ("spinner_mass_coeff", "rotor_diameter", "spinner_mass_intercept"),
+    "spinner_cost": ("spinner_mass", "spinner_mass_cost_coeff"),
+    "low_speed_shaft_mass": (
+        "rated_power_kw",
+        "blade_mass",
+        "lss_mass_coeff",
+        "lss_mass_exp",
+        "lss_mass_intercept",
+    ),
+    "low_speed_shaft_cost": ("low_speed_shaft_mass", "lss_mass_cost_coeff"),
+    "bearing_mass": ("bearing_mass_coeff", "rotor_diameter", "bearing_mass_exp"),
+    "bearing_cost": ("bearing_mass", "bearing_mass_cost_coeff"),
+    "rated_rpm": ("rotor_diameter", "rated_power_kw", "efficiency_max", "max_tip_speed"),
+    "rotor_torque": ("rotor_diameter", "rated_power_kw", "efficiency_max", "max_tip_speed"),
+    "gearbox_mass": ("rotor_torque", "gearbox_torque_density"),
+    "gearbox_cost": ("gearbox_mass", "gearbox_torque_density", "gearbox_torque_cost"),
+    "brake_mass": ("rotor_torque", "brake_mass_coeff"),
+    "brake_cost": ("brake_mass", "brake_mass_cost_coeff"),
+    "high_speed_shaft_mass": ("rated_power_kw", "hss_mass_coeff"),
+    "high_speed_shaft_cost": ("high_speed_shaft_mass", "hss_mass_cost_coeff"),
+    "generator_mass": ("rated_power_kw", "generator_mass_coeff", "generator_mass_intercept"),
+    "generator_cost": ("generator_mass", "generator_mass_cost_coeff"),
+    "bedplate_mass": ("rotor_diameter", "bedplate_mass_exp"),
+    "bedplate_cost": ("bedplate_mass", "bedplate_mass_cost_coeff"),
+    "yaw_system_mass": (
+        "rotor_diameter",
+        "yaw_system_non_bearing_mass_coeff",
+        "yaw_system_mass_coeff",
+        "yaw_system_mass_exp",
+    ),
+    "yaw_system_cost": ("yaw_system_mass", "yaw_system_mass_cost_coeff"),
+    "hydraulic_cooling_mass": ("rated_power_kw", "hvac_mass_coeff"),
+    "hydraulic_cooling_cost": ("hydraulic_cooling_mass", "hvac_mass_cost_coeff"),
+    "nacelle_cover_mass": (
+        "rated_power_kw",
+        "nacelle_cover_mass_coeff",
+        "nacelle_cover_mass_intercept",
+    ),
+    "nacelle_cover_cost": ("nacelle_cover_mass", "nacelle_cover_mass_cost_coeff"),
+    "platform_mainframe_mass": (
+        "bedplate_mass",
+        "platform_mainframe_mass_coeff",
+        "has_crane",
+        "crane_mass",
+    ),
+    "platform_mainframe_cost": (
+        "platform_mainframe_mass",
+        "platform_mainframe_mass_cost_coeff",
+        "has_crane",
+        "crane_mass",
+        "crane_cost",
+    ),
+    "transformer_mass": ("rated_power_kw", "transformer_mass_coeff", "transformer_mass_intercept"),
+    "transformer_cost": ("transformer_mass", "transformer_mass_cost_coeff"),
+    "tower_mass": ("tower_length", "tower_mass_coeff", "tower_mass_exp"),
+    "tower_cost": ("tower_mass", "tower_mass_cost_coeff"),
+    "nacelle_mass": (
+        "low_speed_shaft_mass",
+        "num_bearings",
+        "bearing_mass",
+        "gearbox_mass",
+        "brake_mass",
+        "high_speed_shaft_mass",
+        "generator_mass",
+        "bedplate_mass",
+        "yaw_system_mass",
+        "hydraulic_cooling_mass",
+        "nacelle_cover_mass",
+        "platform_mainframe_mass",
+        "transformer_mass",
+    ),
+    "nacelle_cost": (
+        "low_speed_shaft_cost",
+        "num_bearings",
+        "bearing_cost",
+        "gearbox_cost",
+        "brake_cost",
+        "high_speed_shaft_cost",
+        "generator_cost",
+        "bedplate_cost",
+        "yaw_system_cost",
+        "hydraulic_cooling_cost",
+        "nacelle_cover_cost",
+        "platform_mainframe_cost",
+        "transformer_cost",
+    ),
+    "hub_system_mass": ("hub_mass", "pitch_system_mass", "spinner_mass"),
+    "hub_system_cost": ("hub_cost", "pitch_system_cost", "spinner_cost"),
+    "rotor_mass": ("num_blades", "blade_mass", "hub_system_mass"),
+    "rotor_cost": ("num_blades", "blade_cost", "hub_system_cost"),
+    "turbine_mass": ("nacelle_mass", "rotor_mass", "tower_mass"),
+    "turbine_cost": ("nacelle_cost", "rotor_cost", "tower_cost"),
+}
+
+
 @define
 class CSMBase:
     """Base cost and scaling model that defines universally required inputs and calculations.
@@ -373,6 +482,9 @@ class CSMBase:
     turbine_cost: float = create_field(float, "USD", "output")
     turbine_cost_kw: float = create_field(float, "USD/kW", "output")
 
+    # all else
+    parameter_map: dict[str, tuple[str]] = field(default=parameter_map, init=False)
+
     # NOTE: temporary while prototyping
     power_converter_cost: float = field(default=1000.0)
     turbine_production_cost: float = field(default=1000.0)
@@ -445,6 +557,25 @@ class CSMBase:
                 name for exists, name in zip(has_values, parameters, strict=True) if not exists
             ]
             raise ValueError(f"Inputs for the following variables required: {', '.join(missing)}")
+
+    def _prepare_calculation(self, method: str) -> bool:
+        """Checks the existence of the attribute(s) a method will set, and returns True
+        if it exists already, or False if it still needs to be calculated. When False,
+        the dependent parameters from :py:attr:`parameter_map` have valid inputs.
+
+        Args:
+            method (str): Name of the attribute the method is setting.
+
+        Returns:
+            bool: True if the method can be returned early, or False if :py:attr:`method` still
+                needs to be calculated.
+        """
+        if next(self._has_values(method)):
+            return True
+
+        parameters = self.parameter_map[method]
+        self._validate_inputs(parameters=parameters)
+        return False
 
     def update(self, data: dict[str, Any]):
         """Update the value of one or multiple model parameters.
@@ -560,11 +691,9 @@ class CSMBase:
         Raises:
             ValueError: Raised if the required parameters have not been provided or calculated.
         """
-        if next(self._has_values("blade_mass")):
+        exists = self._prepare_calculation("blade_mass")
+        if exists:
             return
-
-        parameters = ("rotor_diameter", "turbine_class", "blade_has_carbon", "blade_mass_coeff")
-        self._validate_inputs(parameters=parameters)
 
         match self.turbine_class:
             case 1:
@@ -593,11 +722,9 @@ class CSMBase:
         Raises:
             ValueError: Raised if any of the required parameters have not been provided.
         """
-        if next(self._has_values("blade_cost")):
+        exists = self._prepare_calculation("blade_cost")
+        if exists:
             return
-
-        parameters = ("blade_mass", "blade_mass_cost_coeff")
-        self._validate_inputs(parameters=parameters)
 
         self.blade_cost = self.blade_mass_cost_coeff * self.blade_mass
 
@@ -621,11 +748,9 @@ class CSMBase:
         Raises:
             ValueError: Raised if the required parameters have not been provided or calculated.
         """
-        if next(self._has_values("hub_mass")):
+        exists = self._prepare_calculation("hub_mass")
+        if exists:
             return
-
-        parameters = ("blade_mass", "hub_mass_coeff", "hub_mass_intercept")
-        self._validate_inputs(parameters=parameters)
 
         self.hub_mass = self.hub_mass_coeff * self.blade_mass + self.hub_mass_intercept
 
@@ -647,11 +772,9 @@ class CSMBase:
         Raises:
             ValueError: Raised if any of the required parameters have not been provided.
         """
-        if next(self._has_values("hub_cost")):
+        exists = self._prepare_calculation("hub_cost")
+        if exists:
             return
-
-        parameters = ("hub_mass", "hub_mass_cost_coeff")
-        self._validate_inputs(parameters=parameters)
 
         self.hub_cost = self.hub_mass_cost_coeff * self.hub_mass
 
@@ -684,18 +807,9 @@ class CSMBase:
         Raises:
             ValueError: Raised if the required parameters have not been provided or calculated.
         """
-        if next(self._has_values("pitch_system_mass")):
+        exists = self._prepare_calculation("pitch_system_mass")
+        if exists:
             return
-
-        parameters = (
-            "num_blades",
-            "pitch_bearing_mass_coeff",
-            "blade_mass",
-            "pitch_bearing_mass_intercept",
-            "bearing_housing_fraction",
-            "mass_sys_offset",
-        )
-        self._validate_inputs(parameters=parameters)
 
         bearing_mass = (
             self.pitch_bearing_mass_coeff * self.blade_mass * self.num_blades
@@ -723,10 +837,11 @@ class CSMBase:
         Raises:
             ValueError: Raised if any of the required parameters have not been provided.
         """
-        if next(self._has_values("pitch_system_cost")):
+        method = "pitch_system_cost"
+        if next(self._has_values(method)):
             return
 
-        parameters = ("pitch_system_mass", "pitch_system_mass_cost_coeff")
+        parameters = self.parameter_map[method]
         self._validate_inputs(parameters=parameters)
 
         self.pitch_system_cost = self.pitch_system_mass_cost_coeff * self.pitch_system_mass
@@ -751,11 +866,9 @@ class CSMBase:
         Raises:
             ValueError: Raised if the required parameters have not been provided or calculated.
         """
-        if next(self._has_values("spinner_mass")):
+        exists = self._prepare_calculation("spinner_mass")
+        if exists:
             return
-
-        parameters = ("spinner_mass_coeff", "rotor_diameter", "spinner_mass_intercept")
-        self._validate_inputs(parameters=parameters)
 
         self.spinner_mass = (
             self.spinner_mass_coeff * self.rotor_diameter + self.spinner_mass_intercept
@@ -780,11 +893,9 @@ class CSMBase:
         Raises:
             ValueError: Raised if any of the required parameters have not been provided.
         """
-        if next(self._has_values("spinner_cost")):
+        exists = self._prepare_calculation("spinner_cost")
+        if exists:
             return
-
-        parameters = ("spinner_mass", "spinner_mass_cost_coeff")
-        self._validate_inputs(parameters=parameters)
 
         self.spinner_cost = self.spinner_mass_cost_coeff * self.spinner_mass
 
@@ -812,17 +923,9 @@ class CSMBase:
         Raises:
             ValueError: Raised if the required parameters have not been provided or calculated.
         """
-        if next(self._has_values("low_speed_shaft_mass")):
+        exists = self._prepare_calculation("low_speed_shaft_mass")
+        if exists:
             return
-
-        parameters = (
-            "rated_power_kw",
-            "blade_mass",
-            "lss_mass_coeff",
-            "lss_mass_exp",
-            "lss_mass_intercept",
-        )
-        self._validate_inputs(parameters=parameters)
 
         self.low_speed_shaft_mass = (
             self.lss_mass_coeff
@@ -848,11 +951,9 @@ class CSMBase:
         Raises:
             ValueError: Raised if any of the required parameters have not been provided.
         """
-        if next(self._has_values("low_speed_shaft_cost")):
+        exists = self._prepare_calculation("low_speed_shaft_cost")
+        if exists:
             return
-
-        parameters = ("low_speed_shaft_mass", "lss_mass_cost_coeff")
-        self._validate_inputs(parameters=parameters)
 
         self.low_speed_shaft_cost = self.lss_mass_cost_coeff * self.low_speed_shaft_mass
 
@@ -876,11 +977,9 @@ class CSMBase:
         Raises:
             ValueError: Raised if the required parameters have not been provided or calculated.
         """
-        if next(self._has_values("bearing_mass")):
+        exists = self._prepare_calculation("bearing_mass")
+        if exists:
             return
-
-        parameters = ("bearing_mass_coeff", "rotor_diameter", "bearing_mass_exp")
-        self._validate_inputs(parameters=parameters)
 
         self.bearing_mass = self.bearing_mass_coeff * self.rotor_diameter**self.bearing_mass_exp
 
@@ -903,11 +1002,9 @@ class CSMBase:
         Raises:
             ValueError: Raised if any of the required parameters have not been provided.
         """
-        if next(self._has_values("bearing_cost")):
+        exists = self._prepare_calculation("bearing_cost")
+        if exists:
             return
-
-        parameters = ("bearing_mass", "bearing_mass_cost_coeff")
-        self._validate_inputs(parameters=parameters)
 
         self.bearing_cost = self.bearing_mass_cost_coeff * self.bearing_mass
 
@@ -924,16 +1021,17 @@ class CSMBase:
         Raises:
             ValueError: Raised if any of the required parameters have not been provided.
         """
-        if all(self._has_values("rated_rpm", "rotor_torque")):
+        rpm_exists = self._prepare_calculation("rated_rpm")
+        torque_exists = self._prepare_calculation("rotor_torque")
+        if rpm_exists and torque_exists:
             return
-
-        parameters = ("rotor_diameter", "rated_power_kw", "efficiency_max", "max_tip_speed")
-        self._validate_inputs(parameters=parameters)
 
         rated_hub_power = self.rated_power_kw / self.efficiency_max
         rotor_speed = self.max_tip_speed / (0.5 * self.rotor_diameter)
-        self.rated_rpm = rotor_speed / (2.0 * math.pi) * 60.0
-        self.rotor_torque = rated_hub_power / rotor_speed
+        if not rpm_exists:
+            self.rated_rpm = rotor_speed / (2.0 * math.pi) * 60.0
+        if not torque_exists:
+            self.rotor_torque = rated_hub_power / rotor_speed
 
     def calculate_gearbox_mass(self):
         """Calculates and sets :py:attr:`gearbox_mass` for the gearbox if it was not provided
@@ -953,11 +1051,9 @@ class CSMBase:
         Raises:
             ValueError: Raised if the required parameters have not been provided or calculated.
         """
-        if next(self._has_values("gearbox_mass")):
+        exists = self._prepare_calculation("gearbox_mass")
+        if exists:
             return
-
-        parameters = ("rotor_torque", "gearbox_torque_density")
-        self._validate_inputs(parameters=parameters)
 
         self.gearbox_mass = self.rotor_torque * 1e3 / self.gearbox_torque_density
 
@@ -980,11 +1076,9 @@ class CSMBase:
         Raises:
             ValueError: Raised if any of the required parameters have not been provided.
         """
-        if next(self._has_values("gearbox_cost")):
+        exists = self._prepare_calculation("gearbox_cost")
+        if exists:
             return
-
-        parameters = ("gearbox_mass", "gearbox_torque_density", "gearbox_torque_cost")
-        self._validate_inputs(parameters=parameters)
 
         self.gearbox_cost = (
             self.gearbox_mass * self.gearbox_torque_density * self.gearbox_torque_cost * 1e-3
@@ -1007,7 +1101,8 @@ class CSMBase:
         Raises:
             ValueError: Raised if the required parameters have not been provided or calculated.
         """
-        if next(self._has_values("brake_mass")):
+        exists = self._prepare_calculation("brake_mass")
+        if exists:
             return
 
         parameters = ("rotor_torque", "brake_mass_coeff")
@@ -1034,11 +1129,9 @@ class CSMBase:
         Raises:
             ValueError: Raised if any of the required parameters have not been provided.
         """
-        if next(self._has_values("brake_cost")):
+        exists = self._prepare_calculation("brake_cost")
+        if exists:
             return
-
-        parameters = ("brake_mass", "brake_mass_cost_coeff")
-        self._validate_inputs(parameters=parameters)
 
         self.brake_cost = self.brake_mass * self.brake_mass_cost_coeff
 
@@ -1060,11 +1153,9 @@ class CSMBase:
         Raises:
             ValueError: Raised if the required parameters have not been provided or calculated.
         """
-        if next(self._has_values("high_speed_shaft_mass")):
+        exists = self._prepare_calculation("high_speed_shaft_mass")
+        if exists:
             return
-
-        parameters = ("rated_power_kw", "hss_mass_coeff")
-        self._validate_inputs(parameters=parameters)
 
         self.high_speed_shaft_mass = self.hss_mass_coeff * self.rated_power_kw
 
@@ -1087,11 +1178,9 @@ class CSMBase:
         Raises:
             ValueError: Raised if any of the required parameters have not been provided.
         """
-        if next(self._has_values("high_speed_shaft_cost")):
+        exists = self._prepare_calculation("high_speed_shaft_cost")
+        if exists:
             return
-
-        parameters = ("high_speed_shaft_mass", "hss_mass_cost_coeff")
-        self._validate_inputs(parameters=parameters)
 
         self.high_speed_shaft_cost = self.high_speed_shaft_mass * self.hss_mass_cost_coeff
 
@@ -1114,11 +1203,9 @@ class CSMBase:
         Raises:
             ValueError: Raised if the required parameters have not been provided or calculated.
         """
-        if next(self._has_values("generator_mass")):
+        exists = self._prepare_calculation("generator_mass")
+        if exists:
             return
-
-        parameters = ("rated_power_kw", "generator_mass_coeff", "generator_mass_intercept")
-        self._validate_inputs(parameters=parameters)
 
         self.generator_mass = (
             self.generator_mass_coeff * self.rated_power_kw + self.generator_mass_intercept
@@ -1142,11 +1229,9 @@ class CSMBase:
         Raises:
             ValueError: Raised if any of the required parameters have not been provided.
         """
-        if next(self._has_values("generator_cost")):
+        exists = self._prepare_calculation("generator_cost")
+        if exists:
             return
-
-        parameters = ("generator_mass", "generator_mass_cost_coeff")
-        self._validate_inputs(parameters=parameters)
 
         self.generator_cost = self.generator_mass_cost_coeff * self.generator_mass
 
@@ -1167,11 +1252,9 @@ class CSMBase:
         Raises:
             ValueError: Raised if the required parameters have not been provided or calculated.
         """
-        if next(self._has_values("bedplate_mass")):
+        exists = self._prepare_calculation("bedplate_mass")
+        if exists:
             return
-
-        parameters = ("rotor_diameter", "bedplate_mass_exp")
-        self._validate_inputs(parameters=parameters)
 
         self.bedplate_mass = self.rotor_diameter**self.bedplate_mass_exp
 
@@ -1193,11 +1276,9 @@ class CSMBase:
         Raises:
             ValueError: Raised if any of the required parameters have not been provided.
         """
-        if next(self._has_values("bedplate_cost")):
+        exists = self._prepare_calculation("bedplate_cost")
+        if exists:
             return
-
-        parameters = ("bedplate_mass", "bedplate_mass_cost_coeff")
-        self._validate_inputs(parameters=parameters)
 
         self.bedplate_cost = self.bedplate_mass_cost_coeff * self.bedplate_mass
 
@@ -1223,16 +1304,9 @@ class CSMBase:
         Raises:
             ValueError: Raised if the required parameters have not been provided or calculated.
         """
-        if next(self._has_values("yaw_system_mass")):
+        exists = self._prepare_calculation("yaw_system_mass")
+        if exists:
             return
-
-        parameters = (
-            "rotor_diameter",
-            "yaw_system_non_bearing_mass_coeff",
-            "yaw_system_mass_coeff",
-            "yaw_system_mass_exp",
-        )
-        self._validate_inputs(parameters=parameters)
 
         self.yaw_system_mass = self.yaw_system_non_bearing_mass_coeff * (
             self.yaw_system_mass_coeff * self.rotor_diameter**self.yaw_system_mass_exp
@@ -1256,11 +1330,9 @@ class CSMBase:
         Raises:
             ValueError: Raised if any of the required parameters have not been provided.
         """
-        if next(self._has_values("yaw_system_cost")):
+        exists = self._prepare_calculation("yaw_system_cost")
+        if exists:
             return
-
-        parameters = ("yaw_system_mass", "yaw_system_mass_cost_coeff")
-        self._validate_inputs(parameters=parameters)
 
         self.yaw_system_cost = self.yaw_system_mass_cost_coeff * self.yaw_system_mass
 
@@ -1282,11 +1354,9 @@ class CSMBase:
         Raises:
             ValueError: Raised if the required parameters have not been provided or calculated.
         """
-        if next(self._has_values("hydraulic_cooling_mass")):
+        exists = self._prepare_calculation("hydraulic_cooling_mass")
+        if exists:
             return
-
-        parameters = ("rated_power_kw", "hvac_mass_coeff")
-        self._validate_inputs(parameters=parameters)
 
         self.hydraulic_cooling_mass = self.hvac_mass_coeff * self.rated_power_kw
 
@@ -1309,11 +1379,9 @@ class CSMBase:
         Raises:
             ValueError: Raised if any of the required parameters have not been provided.
         """
-        if next(self._has_values("hydraulic_cooling_cost")):
+        exists = self._prepare_calculation("hydraulic_cooling_cost")
+        if exists:
             return
-
-        parameters = ("hydraulic_cooling_mass", "hvac_mass_cost_coeff")
-        self._validate_inputs(parameters=parameters)
 
         self.hydraulic_cooling_cost = self.hydraulic_cooling_mass * self.hvac_mass_cost_coeff
 
@@ -1336,11 +1404,9 @@ class CSMBase:
         Raises:
             ValueError: Raised if the required parameters have not been provided or calculated.
         """
-        if next(self._has_values("nacelle_cover_mass")):
+        exists = self._prepare_calculation("nacelle_cover_mass")
+        if exists:
             return
-
-        parameters = ("rated_power_kw", "nacelle_cover_mass_coeff", "nacelle_cover_mass_intercept")
-        self._validate_inputs(parameters=parameters)
 
         self.nacelle_cover_mass = (
             self.nacelle_cover_mass_coeff * self.rated_power_kw + self.nacelle_cover_mass_intercept
@@ -1364,11 +1430,9 @@ class CSMBase:
         Raises:
             ValueError: Raised if any of the required parameters have not been provided.
         """
-        if next(self._has_values("nacelle_cover_cost")):
+        exists = self._prepare_calculation("nacelle_cover_cost")
+        if exists:
             return
-
-        parameters = ("nacelle_cover_mass", "nacelle_cover_mass_cost_coeff")
-        self._validate_inputs(parameters=parameters)
 
         self.nacelle_cover_cost = self.nacelle_cover_mass_cost_coeff * self.nacelle_cover_mass
 
@@ -1402,11 +1466,9 @@ class CSMBase:
         Raises:
             ValueError: Raised if the required parameters have not been provided or calculated.
         """
-        if next(self._has_values("platform_mainframe_mass")):
+        exists = self._prepare_calculation("platform_mainframe_mass")
+        if exists:
             return
-
-        parameters = ("bedplate_mass", "platform_mainframe_mass_coeff", "has_crane", "crane_mass")
-        self._validate_inputs(parameters=parameters)
 
         self.platform_mainframe_mass = (
             self.platform_mainframe_mass_coeff * self.bedplate_mass
@@ -1449,17 +1511,9 @@ class CSMBase:
         Raises:
             ValueError: Raised if any of the required parameters have not been provided.
         """
-        if next(self._has_values("platform_mainframe_cost")):
+        exists = self._prepare_calculation("platform_mainframe_cost")
+        if exists:
             return
-
-        parameters = (
-            "platform_mainframe_mass",
-            "platform_mainframe_mass_cost_coeff",
-            "has_crane",
-            "crane_mass",
-            "crane_cost",
-        )
-        self._validate_inputs(parameters=parameters)
 
         has_crane = int(self.has_crane)
         self.platform_mainframe_cost = (
@@ -1487,11 +1541,9 @@ class CSMBase:
         Raises:
             ValueError: Raised if the required parameters have not been provided or calculated.
         """
-        if next(self._has_values("transformer_mass")):
+        exists = self._prepare_calculation("transformer_mass")
+        if exists:
             return
-
-        parameters = ("rated_power_kw", "transformer_mass_coeff", "transformer_mass_intercept")
-        self._validate_inputs(parameters=parameters)
 
         self.transformer_mass = (
             self.transformer_mass_coeff * self.rated_power_kw + self.transformer_mass_intercept
@@ -1515,11 +1567,9 @@ class CSMBase:
         Raises:
             ValueError: Raised if any of the required parameters have not been provided.
         """
-        if next(self._has_values("transformer_cost")):
+        exists = self._prepare_calculation("transformer_cost")
+        if exists:
             return
-
-        parameters = ("transformer_mass", "transformer_mass_cost_coeff")
-        self._validate_inputs(parameters=parameters)
 
         self.transformer_cost = self.transformer_mass_cost_coeff * self.transformer_mass
 
@@ -1544,11 +1594,9 @@ class CSMBase:
         Raises:
             ValueError: Raised if the required parameters have not been provided or calculated.
         """
-        if next(self._has_values("tower_mass")):
+        exists = self._prepare_calculation("tower_mass")
+        if exists:
             return
-
-        parameters = ("tower_length", "tower_mass_coeff", "tower_mass_exp")
-        self._validate_inputs(parameters=parameters)
 
         self.tower_mass = self.tower_mass_coeff * self.tower_length**self.tower_mass_exp
 
@@ -1570,11 +1618,9 @@ class CSMBase:
         Raises:
             ValueError: Raised if any of the required parameters have not been provided.
         """
-        if next(self._has_values("tower_cost")):
+        exists = self._prepare_calculation("tower_cost")
+        if exists:
             return
-
-        parameters = ("tower_mass", "tower_mass_cost_coeff")
-        self._validate_inputs(parameters=parameters)
 
         self.tower_cost = self.tower_mass_cost_coeff * self.tower_mass
 
@@ -1621,25 +1667,9 @@ class CSMBase:
         Raises:
             ValueError: Raised if the required parameters have not been provided or calculated.
         """
-        if next(self._has_values("nacelle_mass")):
+        exists = self._prepare_calculation("nacelle_mass")
+        if exists:
             return
-
-        parameters = (
-            "low_speed_shaft_mass",
-            "num_bearings",
-            "bearing_mass",
-            "gearbox_mass",
-            "brake_mass",
-            "high_speed_shaft_mass",
-            "generator_mass",
-            "bedplate_mass",
-            "yaw_system_mass",
-            "hydraulic_cooling_mass",
-            "nacelle_cover_mass",
-            "platform_mainframe_mass",
-            "transformer_mass",
-        )
-        self._validate_inputs(parameters=parameters)
 
         self.nacelle_mass = sum(
             (
@@ -1700,25 +1730,9 @@ class CSMBase:
         Raises:
             ValueError: Raised if the required parameters have not been provided or calculated.
         """
-        if next(self._has_values("nacelle_cost")):
+        exists = self._prepare_calculation("nacelle_cost")
+        if exists:
             return
-
-        parameters = (
-            "low_speed_shaft_cost",
-            "num_bearings",
-            "bearing_cost",
-            "gearbox_cost",
-            "brake_cost",
-            "high_speed_shaft_cost",
-            "generator_cost",
-            "bedplate_cost",
-            "yaw_system_cost",
-            "hydraulic_cooling_cost",
-            "nacelle_cover_cost",
-            "platform_mainframe_cost",
-            "transformer_cost",
-        )
-        self._validate_inputs(parameters=parameters)
 
         self.nacelle_cost = sum(
             (
@@ -1756,15 +1770,9 @@ class CSMBase:
         Raises:
             ValueError: Raised if the required parameters have not been provided or calculated.
         """
-        if next(self._has_values("hub_system_mass")):
+        exists = self._prepare_calculation("hub_system_mass")
+        if exists:
             return
-
-        parameters = (
-            "hub_mass",
-            "pitch_system_mass",
-            "spinner_mass",
-        )
-        self._validate_inputs(parameters=parameters)
 
         self.hub_system_mass = sum((self.hub_mass, self.pitch_system_mass, self.spinner_mass))
 
@@ -1786,15 +1794,9 @@ class CSMBase:
         Raises:
             ValueError: Raised if the required parameters have not been provided or calculated.
         """
-        if next(self._has_values("hub_system_cost")):
+        exists = self._prepare_calculation("hub_system_cost")
+        if exists:
             return
-
-        parameters = (
-            "hub_cost",
-            "pitch_system_cost",
-            "spinner_cost",
-        )
-        self._validate_inputs(parameters=parameters)
 
         self.hub_system_cost = sum(
             (
@@ -1818,11 +1820,9 @@ class CSMBase:
         Raises:
             ValueError: Raised if the required parameters have not been provided or calculated.
         """
-        if next(self._has_values("rotor_mass")):
+        exists = self._prepare_calculation("rotor_mass")
+        if exists:
             return
-
-        parameters = ("num_blades", "blade_mass", "hub_system_mass")
-        self._validate_inputs(parameters=parameters)
 
         self.rotor_mass = self.num_blades * self.blade_mass + self.hub_system_mass
 
@@ -1840,11 +1840,9 @@ class CSMBase:
         Raises:
             ValueError: Raised if the required parameters have not been provided or calculated.
         """
-        if next(self._has_values("rotor_cost")):
+        exists = self._prepare_calculation("rotor_cost")
+        if exists:
             return
-
-        parameters = ("num_blades", "blade_cost", "hub_system_cost")
-        self._validate_inputs(parameters=parameters)
 
         self.rotor_cost = self.num_blades * self.blade_cost + self.hub_system_cost
 
@@ -1866,15 +1864,9 @@ class CSMBase:
         Raises:
             ValueError: Raised if the required parameters have not been provided or calculated.
         """
-        if next(self._has_values("turbine_mass")):
+        exists = self._prepare_calculation("turbine_mass")
+        if exists:
             return
-
-        parameters = (
-            "nacelle_mass",
-            "rotor_mass",
-            "tower_mass",
-        )
-        self._validate_inputs(parameters=parameters)
 
         self.turbine_mass = self.nacelle_mass + self.rotor_mass + self.tower_mass
 
@@ -1896,15 +1888,9 @@ class CSMBase:
         Raises:
             ValueError: Raised if the required parameters have not been provided or calculated.
         """
-        if next(self._has_values("turbine_cost")):
+        exists = self._prepare_calculation("turbine_cost")
+        if exists:
             return
-
-        parameters = (
-            "nacelle_cost",
-            "rotor_cost",
-            "tower_cost",
-        )
-        self._validate_inputs(parameters=parameters)
 
         self.turbine_cost = self.nacelle_cost + self.rotor_cost + self.tower_cost
         self.turbine_cost_kw = self.turbine_cost / self.rated_power_kw
