@@ -24,6 +24,7 @@ from functools import cached_property
 from itertools import product, zip_longest
 from collections.abc import Generator
 
+import numpy as np
 import pandas as pd
 import networkx as nx
 from attrs import Attribute, field, define, fields
@@ -687,8 +688,8 @@ class CSMBase:
                 case "inputs":
                     _inputs = vals[1:]
                 case "range":
-                    _min, _max, _step = vals[1:]
-                    _inputs = list(range(_min, _max + 1, _step))
+                    _min, _max, _num = vals[1:]
+                    _inputs = list(np.linspace(_min, _max, _num))
                 case _:
                     raise ValueError(
                         f"First value for '{name}' must be 'inputs' or 'range', not '{how}'."
@@ -716,9 +717,11 @@ class CSMBase:
                 pd.DataFrame.from_dict(single_results, orient="index")
                 .assign(**kwargs)
                 .set_index(names, append=True)
+                .rename(columns={0: "result"})
             )
-
-        return pd.concat(all_results).unstack(level=names)
+        df = pd.concat(all_results).unstack(level=names)
+        df.columns = df.columns.droplevel(0)  # remove the "result" name for aesthetics
+        return df
 
     def calculate_blade_mass(self):
         """Calculates and sets :py:attr:`blade_mass` if it was not provided by the user.
