@@ -33,14 +33,14 @@ def create_field(
     """
     if obj is int:
         _field = field(
-            default=None,
+            default=default,
             validator=validators.optional(validators.instance_of(int)),
             metadata={"units": units, "io": io_type},
         )
         return _field
     if obj is float:
         _field = field(
-            default=None,
+            default=default,
             converter=converters.optional(float),
             validator=validators.optional(validators.instance_of(float)),
             metadata={"units": units, "io": io_type},
@@ -48,7 +48,7 @@ def create_field(
         return _field
     if obj is bool:
         _field = field(
-            default=None,
+            default=default,
             validator=validators.optional(validators.instance_of(bool)),
             metadata={"units": units, "io": io_type},
         )
