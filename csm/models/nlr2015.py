@@ -86,3 +86,7 @@ class Land2015NLR(CSMBase):
     tower_mass_coeff = base.tower_mass_coeff.reuse(default=19.828)
     tower_mass_exp = base.tower_mass_exp.reuse(default=2.0282)
     tower_mass_cost_coeff = base.tower_mass_cost_coeff.reuse(default=2.9)
+
+    # def __attrs_post_init__(self):
+    #     """Run the base model's post initialization hook."""
+    #     super().__attrs_post_init__()
