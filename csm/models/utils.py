@@ -6,17 +6,20 @@ from attrs import Attribute, field, converters, validators
 from attr._make import attrib
 
 
-def create_field(obj: type, units: str, io_type: str, *, default: int | None = None) -> field:
+def create_field(
+    obj: type, units: str = "unitless", io_type: str = "input", *, default: int | None = None
+) -> field:
     """Creates an :py:attr:`obj`-based field with pre-loaded defaults, conversions, validations,
     and metadata.
 
     Args:
         obj (type): A type. Currently only accepts ``int``, ``float``, or ``bool``.
-        units (str): OpenMDAO-compatible units. See
+        units (str, optional): OpenMDAO-compatible units. See
             <https://openmdao.org/newdocs/versions/latest/features/units.html> for more details.
-        io_type (str): One of "input", "output", or "both" for how the attribute should be
+            Defaults to "unitless".
+        io_type (str, optional): One of "input", "output", or "both" for how the attribute should be
             initialized within a WISDEM model. Typically ``xx_mass` and ``xx_cost`` attributes
-            are both inputs and outputs.
+            are both inputs and outputs. Defaults to "input".
         default (int, optional):  Value of the default, if not None. Should be used sparingly.
 
     Returns:
@@ -53,7 +56,7 @@ def create_field(obj: type, units: str, io_type: str, *, default: int | None = N
     raise NotImplementedError(f"No setup created for type: {obj}")
 
 
-def reuse(attribute: Attribute, default: Any) -> attrib:
+def reuse(attribute: Attribute, default: Any, *, init: bool | None = None) -> attrib:
     """Reuses an existing :py:attr:`attrs.Attribute` object with an updated default value.
 
     Borrowed idea from https://github.com/python-attrs/attrs/pull/1429 until the functionality
@@ -62,6 +65,9 @@ def reuse(attribute: Attribute, default: Any) -> attrib:
     Args:
         attribute (:py:attr:`attrs.Attribute`): The attribute to modify.
         default (Any): The new default value.
+        init (bool | None): Custom value for the `init` attribute, if modification is desired. If
+            None, then the existing value for the :py:attr:`attribute` will be used.
+            Defaults to False.
 
     Returns:
         attrib: The new attribute object used in class initialization.
@@ -75,7 +81,7 @@ def reuse(attribute: Attribute, default: Any) -> attrib:
         "repr": attribute.repr,
         "cmp": None,
         "hash": attribute.hash,
-        "init": attribute.init,
+        "init": attribute.init if init is None else init,
         "type": attribute.type,
         "kw_only": attribute.kw_only,
         "eq": attribute.eq,
