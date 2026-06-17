@@ -46,6 +46,7 @@ class CustomModel(CSMBase):
 """
 
 import math
+from copy import deepcopy
 from typing import Any
 from functools import cached_property
 from itertools import product, zip_longest
@@ -370,6 +371,7 @@ class CSMBase:
     # turbine general
     turbine_class: int = create_field(int, "unitless", "input")
     rated_power_kw: int = create_field(int, "kW", "input")
+    rotor_diameter: float = create_field(float, "m", "input")
 
     # blades
     num_blades: int = create_field(int, "unitless", "input", default=3)
@@ -387,7 +389,6 @@ class CSMBase:
     hub_cost: float = create_field(float, "USD", "both")
 
     # rotor
-    rotor_diameter: float = create_field(float, "m", "input")
     efficiency_max: float = create_field(float, "unitless", "input")
     max_tip_speed: float = create_field(float, "m/s", "input")
     rated_rpm: float = create_field(float, "rpm", "both")
@@ -513,7 +514,7 @@ class CSMBase:
     turbine_cost_kw: float = create_field(float, "USD/kW", "output")
 
     # all else
-    parameter_map: dict[str, tuple[str]] = field(default=parameter_map, init=False)
+    parameter_map: dict[str, tuple[str]] = field(init=False)
     parameter_graph: nx.Digraph = field(init=False)
 
     # NOTE: temporary while prototyping
@@ -522,10 +523,14 @@ class CSMBase:
     tower_flange_material_cost: float = field(default=1000.0)
     tower_flange_production_cost: float = field(default=1000.0)
 
+    def __attrs_pre_init__(self):
+        """Pre-initialization hook to set any hard-coded, mutable values."""
+        self.parameter_map = deepcopy(parameter_map)
+
     def __attrs_post_init__(self):
         """Post initialization setup."""
         self.parameter_graph = nx.DiGraph()
-        for key, params in parameter_map.items():
+        for key, params in self.parameter_map.items():
             for dependent in params:
                 self.parameter_graph.add_edge(key, dependent)
 
@@ -541,27 +546,25 @@ class CSMBase:
             cls: An instance of :py:class:`CSMBase` or one of its subclasses.
         """
         inputs = set(data)
-        attributes = {el.name for el in cls.__attrs_attrs__ if el.init}
+        _attrs = cls.__attrs_attrs__
+        _name = cls.__name__
+        valid_inputs = {
+            el.name for el in _attrs if el.init and el.metadata.get("io") in ("input", "both")
+        }
         required = {
             el.name
-            for el in cls.__attrs_attrs__
+            for el in _attrs
             if el.init and el.default is None and el.metadata["io"] == "input"
         }
 
-        extra = inputs.difference(attributes)
+        extra = inputs.difference(valid_inputs)
         if len(extra):
-            msg = (
-                f"The initialization for {cls.__name__} was given extraneous "
-                f"inputs: {', '.join(extra)}"
-            )
+            msg = f"The initialization for {_name} was given extraneous inputs: {', '.join(extra)}"
             raise AttributeError(msg)
 
         missing = required.difference(inputs)
         if missing:
-            msg = (
-                f"The class definition for {cls.__name__} is missing the following inputs: "
-                f"{missing}"
-            )
+            msg = f"The class definition for {_name} is missing the following inputs: {missing}"
             raise AttributeError(msg)
         return cls(**data)
 
@@ -591,7 +594,7 @@ class CSMBase:
         """
         return {el.name: el for el in self.__attrs_attrs__}
 
-    def _has_values(self, *args) -> Generator[bool]:
+    def _has_values(self, *args: str) -> Generator[bool]:
         """Checks if the user provided values for a given :py:attr:`arg` (True), or if they are
         model defaults (False).
 
@@ -600,7 +603,7 @@ class CSMBase:
                 by the user (True) or if the base class defaults are present (False).
         """
         for arg in args:
-            default = getattr(fields(CSMBase), arg).default
+            default = getattr(self.fields, arg).default
             value = getattr(self, arg)
             yield value != default or default is not None
 
@@ -652,6 +655,18 @@ class CSMBase:
                 raise KeyError(f"'{arg}' is an invalid attribute, please check your spelling.")
             setattr(self, arg, attribute.default)
 
+    def get_dependent_attributes(self, name: str) -> set[str]:
+        """Returns a set of model attributes that depend on the value of :py:attr:`name`.
+
+        Args:
+            name (str): The name of a model attribute that a user inputs or can be
+                calculated.
+
+        Returns:
+            set[str]: Set of model attribute names that rely on the value of :py:attr:`name`.
+        """
+        return nx.ancestors(self.parameter_graph, name)
+
     def update(self, data: dict[str, Any]):
         """Update the value of one or multiple model parameters.
 
@@ -666,7 +681,7 @@ class CSMBase:
             if getattr(self, name) is None:
                 raise KeyError(f"'{name}' is an invalid attribute, please check your spelling.")
             setattr(self, name, value)
-            to_reset.update(nx.ancestors(self.parameter_graph, name))
+            to_reset.update(self.get_dependent_attributes(name))
 
         to_reset.difference(data)
         self.reset_values(*to_reset)
