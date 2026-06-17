@@ -14,7 +14,34 @@ base = fields(CSMBase)
 
 @define
 class CustomModel(CSMBase):
-    rotor_efficiency_max: float = base.rotor_efficiency_max.evolve(default=1.0)
+
+    # NOTE: we use ``init=False`` to prohibit users overriding the new default
+    blade_has_carbon: float = base.blade_has_carbon.reuse(default=True, init=False)
+
+    def __attrs_post_init__(self):
+        # NOTE: we are changing the blade mass calculation's requirements, and need to
+        # update the parameter relationships
+        self.parameter_map["blade_mass"] = (
+            "rotor_diameter", "turbine_class","blade_mass_coeff"
+        )
+        super.__attrs_post_init__()
+
+    def calculate_blade_mass(self):
+        # NOTE: the first three lines are used to determine if the focal variable has
+        # already been calculated. If it has, then the calculation should return early.
+        exists = self._prepare_calculation("blade_mass")
+        if exists:
+            return
+
+        # A new relationship based on the assumption that all blades use carbon
+        match self.turbine_class:
+            case 1:
+                _exp = 2.47
+            case _ if self.turbine_class > 1:
+                _exp = 2.44
+            case _:
+                _exp = 2.5
+        self.blade_mass = self.blade_mass_coeff * (self.rotor_diameter / 2) ** exp
 ```
 """
 
