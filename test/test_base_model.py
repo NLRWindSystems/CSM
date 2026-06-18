@@ -1,7 +1,7 @@
 from copy import deepcopy
 
 import pytest
-from attrs import fields
+from attrs import fields, fields_dict
 from pytest import approx
 
 from csm.models.base_model import CSMBase
@@ -347,3 +347,21 @@ def test_from_dict(subtests):
             _extra = deepcopy(csm_2015_inputs)
             del _extra["rotor_diameter"]
             CSMBase.from_dict(_extra)
+
+
+@pytest.mark.unit
+def test_fields():
+    """Test :py:method:`CSMBase.fields`."""
+    correct_fields = fields(CSMBase)
+    model = CSMBase()
+    model_fields = model.fields
+    assert correct_fields == model_fields
+
+
+@pytest.mark.unit
+def test_fields_dict():
+    """Test :py:method:`CSMBase.fields_dict`."""
+    correct_fields_dict = fields_dict(CSMBase)
+    model = CSMBase()
+    model_fields_dict = model.fields_dict
+    assert correct_fields_dict == model_fields_dict
