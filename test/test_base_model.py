@@ -385,7 +385,7 @@ def test_get_dependent_attributes():
         "turbine_mass",
         "turbine_cost",
     }
-    assert blade_has_carbon_upstream == sorted(model.get_dependent_attributes("blade_has_carbon"))
+    assert blade_has_carbon_upstream == model.get_dependent_attributes("blade_has_carbon")
 
 
 @pytest.mark.unit
@@ -536,3 +536,8 @@ def test_update(subtests):
 
     with subtests.test("Invalid input fails"), pytest.raises(ValueError):
         model.update(("blade_has_more_carbon", 2))
+
+
+@pytest.mark.unit
+def test_parameterize(subtests):
+    """Test :py:method:`CSMBase.parameterize`."""
