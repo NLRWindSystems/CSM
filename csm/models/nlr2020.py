@@ -49,15 +49,16 @@ class Land2020NLR(CSMBase):
     spinner_mass_coeff = base.spinner_mass_coeff.reuse(default=2.3255)
     spinner_mass_intercept = base.spinner_mass_intercept.reuse(default=204.65)
     spinner_mass_cost_coeff = base.spinner_mass_cost_coeff.reuse(default=12.1212)
-    lss_mass_coeff = base.lss_mass_coeff.reuse(default=13.0)
-    lss_mass_exp = base.lss_mass_exp.reuse(default=0.65)
-    lss_mass_intercept = base.lss_mass_intercept.reuse(default=775.0)
-    lss_mass_cost_coeff = base.lss_mass_cost_coeff.reuse(default=11.9)
-    # bearing_mass_coeff = base.bearing_mass_coeff.reuse(default=0.0001)
-    # bearing_mass_exp = base.bearing_mass_exp.reuse(default=3.5)
-    # bearing_mass_cost_coeff = base.bearing_mass_cost_coeff.reuse(default=4.5)
-    # gearbox_torque_density = base.gearbox_torque_density.reuse(default=200)
-    # gearbox_torque_cost = base.gearbox_torque_cost.reuse(default=50)
+    lss_mass_coeff1 = create_field(float, units="unitless", io_type="input", default=2.1906)
+    lss_mass_coeff2 = create_field(float, units="unitless", io_type="input", default=-311.15)
+    lss_mass_intercept = base.lss_mass_intercept.reuse(default=13108.0)
+    lss_mass_cost_coeff = base.lss_mass_cost_coeff.reuse(default=12.9948)
+    bearing_mass_coeff = base.bearing_mass_coeff.reuse(default=0.0001)
+    bearing_mass_exp = base.bearing_mass_exp.reuse(default=3.5)
+    bearing_mass_cost_coeff = base.bearing_mass_cost_coeff.reuse(default=4.914)
+    gearbox_torque_density = base.gearbox_torque_density.reuse(default=156.46)
+    gearbox_mass_exp = base.gearbox_torque_density.reuse(default=0.6566)
+    gearbox_torque_cost = base.gearbox_torque_cost.reuse(default=14.0868)
     # brake_mass_coeff = base.brake_mass_coeff.reuse(default=0.00122)
     # brake_mass_cost_coeff = base.brake_mass_cost_coeff.reuse(default=3.6254)
     # hss_mass_coeff = base.hss_mass_coeff.reuse(default=0.19894)
@@ -91,6 +92,17 @@ class Land2020NLR(CSMBase):
     def __attrs_post_init__(self):
         """Updates the parameter mapping for new mass and cost relationships."""
         self.parameter_map["blade_mass"] = ("rotor_diameter", "blade_mass_coeff", "blade_mass_exp")
+        self.parameter_map["low_speed_shaft_mass"] = (
+            "rotor_diameter",
+            "lss_mass_coeff1",
+            "lss_mass_coeff2",
+            "lss_mass_intercept",
+        )
+        self.parameter_map["gearbox_mass"] = (
+            "rotor_torque",
+            "gearbox_torque_density",
+            "gearbox_mass_exp",
+        )
         super().__attrs_post_init__()
 
     def calculate_blade_mass(self):
@@ -102,12 +114,7 @@ class Land2020NLR(CSMBase):
 
         - :math:`k =` :py:attr:`blade_mass_coeff`
         - :math:`radius =` :py:attr:`rotor_diameter` / 2
-        - :math:`b =`
-          - 2.47 if :py:attr:`turbine_class` is 1 and :py:attr:`blade_has_carbon` is True
-          - 2.54 if :py:attr:`turbine_class` is 1 and :py:attr:`blade_has_carbon` is False
-          - 2.44 if :py:attr:`turbine_class` > 1 and :py:attr:`blade_has_carbon` is True
-          - 2.5 if :py:attr:`turbine_class` > 1 and :py:attr:`blade_has_carbon` is False
-          - 2.5 if :py:attr:`turbine_class` < 1
+        - :math:`b =` :py:attr:`blade_mass_exp`
 
         Args:
             blade_mass_coeff (float): :math:`k` in the mass equation above.
@@ -122,3 +129,62 @@ class Land2020NLR(CSMBase):
             return
 
         self.blade_mass = self.blade_mass_coeff * (self.rotor_diameter / 2) ** self.blade_mass_exp
+
+    def calculate_low_speed_shaft_mass(self):
+        """Calculates and sets :py:attr:`low_speed_shaft_mass` if it was not provided by the user.
+
+        :math:`m_{lss} = k1*rd^2 + k2*rd + b`.
+
+        where:
+
+        - :math:`k1 =` :py:attr:`lss_mass_coeff1`
+        - :math:`rd =` :py:attr:`rotor_diameter`
+        - :math:`k2 =` :py:attr:`lss_mass_coeff2`
+        - :math:`b =` :py:attr:`lss_mass_intercept`
+
+        Args:
+            rotor_diameter (int, optional): Turbine rotor diameter, (:math:`m`).
+            lss_mass_coeff1 (float): :math:`k1` in the polynomial low speed shaft mass equation.
+            lss_mass_coeff2 (float): :math:`k2` in the polynomial low speed shaft mass equation.
+            lss_mass_intercept (float): :math:`b1` in the low speed shaft mass equation.
+
+        Raises:
+            ValueError: Raised if the required parameters have not been provided or calculated.
+        """
+        exists = self._prepare_calculation("low_speed_shaft_mass")
+        if exists:
+            return
+
+        self.low_speed_shaft_mass = (
+            (self.lss_mass_coeff1 * self.rotor_diameter**2)
+            + (self.lss_mass_coeff2 * self.rotor_diameter)
+            + self.lss_mass_intercept
+        )
+
+    def calculate_gearbox_mass(self):
+        """Calculates and sets :py:attr:`gearbox_mass` for the gearbox if it was not provided
+        by the user.
+
+        .. math:: k * (torque * 1000) ** b
+
+        where:
+
+        - :math:`k =` :py:attr:`gearbox_torque_density`
+        - :math:`torque =` :py:attr:`rotor_torque`
+        - :math:`b =` :py:attr:`gearbox_torque_exp`
+
+        Args:
+            rotor_torque (float): Turbine rotor torque at rated power (:math:`kNm`).
+            gearbox_torque_density (float): :math:`k` in the mass equation above (:math:`N*m/kg`).
+            gearbox_torque_exp (float): :math:`k` in the mass equation above.
+
+        Raises:
+            ValueError: Raised if the required parameters have not been provided or calculated.
+        """
+        exists = self._prepare_calculation("gearbox_mass")
+        if exists:
+            return
+
+        self.gearbox_mass = (
+            self.gearbox_torque_density * (self.rotor_torque * 1e3) ** self.gearbox_torque_exp
+        )
