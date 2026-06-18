@@ -497,6 +497,9 @@ def test_reset_values(subtests):
     model.reset_values(*blade_mass_inputs)
     assert not all(model._has_values(*blade_mass_inputs))
 
+    with pytest.raises(KeyError):
+        model.reset_values(*["blade_mass_typo"])
+
 
 @pytest.mark.unit
 def test_update(subtests):
