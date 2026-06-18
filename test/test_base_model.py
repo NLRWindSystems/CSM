@@ -22,7 +22,7 @@ csm_2015_outputs = {
 
 
 @pytest.mark.unit
-def test_CSMBase_defaults_only(subtests):
+def test_defaults_only(subtests):
     """Tests that all the individual model calculations fail individually and when run as a group.
     Ensures that all results (output) values are still their defaults. The combination of these
     tests ensures that :py:method:`CSMBase._has_values` and validate_inputs work for models
@@ -180,7 +180,7 @@ def test_CSMBase_defaults_only(subtests):
 
 
 @pytest.mark.unit
-def test_CSMBase_with_inputs(subtests):
+def test_with_inputs(subtests):
     """Tests the model functionality works as expected when all inputs are defined."""
     blade_variant1 = deepcopy(csm_2015_inputs)
     blade_variant1["blade_has_carbon"] = True
@@ -210,7 +210,7 @@ def test_CSMBase_with_inputs(subtests):
 
 
 @pytest.mark.regression
-def test_CSMBase_with_2015_inputs(subtests):
+def test_with_2015_inputs(subtests):
     """Tests against the WISDEM CSM test restults for the 2015 model."""
     csm = CSMBase(**csm_2015_inputs)
     csm.run()
@@ -320,6 +320,30 @@ def test_CSMBase_with_2015_inputs(subtests):
 
 
 @pytest.mark.unit
-def test_CSMBase_with_outputs_as_inputs(subtests):
+def test_from_dict(subtests):
+    """Test :py:method:`CSMBase.from_dict`."""
+    with subtests.test("2015 inputs from_dict"):
+        model = CSMBase.from_dict(csm_2015_inputs)
+        for name, val in csm_2015_inputs.items():
+            assert val == getattr(model, name)
 
-    assert True
+    with subtests.test("Non-existent inputs"):
+        msg = "The initialization for CSMBase was given extraneous inputs: blade_exponent"
+        with pytest.raises(AttributeError, match=msg):
+            _extra = deepcopy(csm_2015_inputs)
+            _extra["blade_exponent"] = 1.22
+            CSMBase.from_dict(_extra)
+
+    with subtests.test("Exclusive output as input"):
+        msg = "The initialization for CSMBase was given extraneous inputs: turbine_mass"
+        with pytest.raises(AttributeError, match=msg):
+            _extra = deepcopy(csm_2015_inputs)
+            _extra["turbine_mass"] = 1.22
+            CSMBase.from_dict(_extra)
+
+    with subtests.test("Missing input"):
+        msg = "The class definition for CSMBase is missing the following inputs: rotor_diameter"
+        with pytest.raises(AttributeError, match=msg):
+            _extra = deepcopy(csm_2015_inputs)
+            del _extra["rotor_diameter"]
+            CSMBase.from_dict(_extra)

@@ -509,7 +509,7 @@ class CSMBase:
     hub_system_cost: float = create_field(float, "USD", "both")
     rotor_mass: float = create_field(float, "kg", "both")
     rotor_cost: float = create_field(float, "USD", "both")
-    turbine_mass: float = create_field(float, "kg", "both")
+    turbine_mass: float = create_field(float, "kg", "output")
     turbine_cost: float = create_field(float, "USD", "output")
     turbine_cost_kw: float = create_field(float, "USD/kW", "output")
 
@@ -564,7 +564,10 @@ class CSMBase:
 
         missing = required.difference(inputs)
         if missing:
-            msg = f"The class definition for {_name} is missing the following inputs: {missing}"
+            msg = (
+                f"The class definition for {_name} is missing the following"
+                f" inputs: {', '.join(missing)}"
+            )
             raise AttributeError(msg)
         return cls(**data)
 
