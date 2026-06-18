@@ -15,8 +15,9 @@ dependencies = [
   "numpy>=1.26",
   "pandas>=2.2",
   "pyyaml>=6",
-  "tqdm>=4",
-  "openpyxl>=3",
+  "networkx",
+  "tqdm>=4",  # TODO: delete
+  "openpyxl>=3",  # TODO: delete
 ]
 
 [project.optional-dependencies]
@@ -125,6 +126,20 @@ exclude = [
 # [tool.pytest.ini_options]
 # cache_dir = ".cache/pytest"
 # addopts = "--cov=csm --cov-report term-missing"
+
+[tool.pytest]
+addopts = [
+  "--strict-markers",
+  "-r fEsxX",
+]
+tmp_path_retention_count = "1"
+tmp_path_retention_policy = "failed"
+cache_dir = ".cache"
+markers = [
+    "unit: marks unit tests (deselect with '-m \"not unit\"')",
+    "regression: marks regression tests (deselect with '-m \"not regression\"')",
+    "integration: marks unit tests (deselect with '-m \"not integration\"')",
+]
 
 # [tool.coverage.run]
 # omit = ["./csm/model/*"]
