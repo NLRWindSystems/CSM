@@ -365,3 +365,33 @@ def test_fields_dict():
     model = CSMBase()
     model_fields_dict = model.fields_dict
     assert correct_fields_dict == model_fields_dict
+
+
+@pytest.mark.unit
+def test_has_values(subtests):
+    """Test :py:method:`CSMBase.from_dict`."""
+    model = CSMBase.from_dict(csm_2015_inputs)
+    with subtests.test("Ensure 2015 values registered"):
+        assert all(model._has_values(*csm_2015_inputs))
+
+    calculated = [
+        k for k, v in model.fields_dict.items() if v.metadata.get("io") in ("both", "output")
+    ]
+    with subtests.test("Check calculated values unregistered"):
+        assert not all(model._has_values(*calculated))
+
+    with subtests.test("Check calculated registered after run"):
+        model.run()
+        assert all(model._has_values(*calculated))
+
+    non_none_defaults = ("num_blades",)
+    model = CSMBase()
+    with subtests.test("Empty model has no registered values, except base defaults"):
+        no_none_defaults = set(csm_2015_inputs).union(calculated).difference(non_none_defaults)
+        assert not all(model._has_values(*no_none_defaults))
+        assert model._has_values(*non_none_defaults)
+
+    model = CSMBase(num_blades=None)
+    with subtests.test("Non-None default given None has no registered value"):
+        all_attributes = set(csm_2015_inputs).union(calculated)
+        assert not all(model._has_values(*all_attributes))

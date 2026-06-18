@@ -608,7 +608,9 @@ class CSMBase:
         for arg in args:
             default = getattr(self.fields, arg).default
             value = getattr(self, arg)
-            yield value != default or default is not None
+            non_none_has_val = value is not None and default is not None
+            none_has_value = value != default and default is None
+            yield non_none_has_val or none_has_value
 
     def _validate_inputs(self, parameters: tuple[str, ...]) -> None:
         """Validates if the required parameters to calculate an attribute's value have been
