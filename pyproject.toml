@@ -24,7 +24,7 @@ dependencies = [
 develop = [
     "pre-commit>=2.20",
     "isort>=5.10",
-    "pytest>=7",
+    "pytest>=9",
     "pytest-cov>=4",
     "pytest-check",
     "ruff>=0.2",
@@ -123,14 +123,22 @@ exclude = [
 "test/*" = ["D100", "D101", "D102", "D103"]
 "example/*.ipynb" = ["T201"]
 
-# [tool.pytest.ini_options]
-# cache_dir = ".cache/pytest"
-# addopts = "--cov=csm --cov-report term-missing"
+[tool.coverage.run]
+# Coverage.py configuration file
+# https://coverage.readthedocs.io/en/latest/config.html
+branch = true
+source = ["csm/*"]
+omit = [
+  "*/test/*",
+  "*/test_*.py"
+]
 
 [tool.pytest]
 addopts = [
   "--strict-markers",
   "-r fEsxX",
+  "--cov=csm",
+  "--cov-report=term-missing"
 ]
 tmp_path_retention_count = "1"
 tmp_path_retention_policy = "failed"
@@ -140,7 +148,3 @@ markers = [
     "regression: marks regression tests (deselect with '-m \"not regression\"')",
     "integration: marks unit tests (deselect with '-m \"not integration\"')",
 ]
-
-# [tool.coverage.run]
-# omit = ["./csm/model/*"]
-# data_file = "./.cache/coverage.sqlite"
