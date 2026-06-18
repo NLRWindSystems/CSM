@@ -679,12 +679,12 @@ class CSMBase:
             data (dict[str, Any]): Dictionary of an attribute and its new value.
 
         Raises:
-            KeyError: Raised if any of :py:attr:`args` are not a class attribute
+            Attribute: Raised if any of :py:attr:`args` are not a class attribute
         """
+        if not isinstance(data, dict):
+            raise ValueError("`data` must be a dictionary")
         to_reset = set()
         for name, value in data.items():
-            if getattr(self, name) is None:
-                raise KeyError(f"'{name}' is an invalid attribute, please check your spelling.")
             setattr(self, name, value)
             to_reset.update(self.get_dependent_attributes(name))
 

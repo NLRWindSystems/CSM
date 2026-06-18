@@ -1,10 +1,11 @@
 from copy import deepcopy
 
 import pytest
+import networkx as nx
 from attrs import fields, fields_dict
 from pytest import approx
 
-from csm.models.base_model import CSMBase
+from csm.models.base_model import CSMBase, parameter_map
 
 from test.conftest import csm_2015_inputs, csm_2015_defaults
 
@@ -350,6 +351,44 @@ def test_from_dict(subtests):
 
 
 @pytest.mark.unit
+def test_attrs_pre_post_initialization():
+    """Test :py:method:`CSMBase.__attrs_pre_init__` and :py:method:`CSMBase.__attrs_post_init__`."""
+    model = CSMBase()
+    assert model.parameter_map == parameter_map
+
+    parameter_graph = model.parameter_graph
+    assert isinstance(parameter_graph, nx.DiGraph)
+
+    expected_nodes = set(parameter_map).union(list(sum(parameter_map.values(), ())))
+    assert sorted(parameter_graph.nodes) == sorted(expected_nodes)
+
+
+@pytest.mark.unit
+def test_get_dependent_attributes():
+    """Test :py:method:`CSMBase.test_get_dependent_attributes`."""
+    model = CSMBase()
+    blade_has_carbon_upstream = {
+        "blade_mass",
+        "blade_cost",
+        "hub_mass",
+        "hub_cost",
+        "pitch_system_mass",
+        "pitch_system_cost",
+        "low_speed_shaft_mass",
+        "low_speed_shaft_cost",
+        "rotor_mass",
+        "rotor_cost",
+        "hub_system_mass",
+        "hub_system_cost",
+        "nacelle_mass",
+        "nacelle_cost",
+        "turbine_mass",
+        "turbine_cost",
+    }
+    assert blade_has_carbon_upstream == sorted(model.get_dependent_attributes("blade_has_carbon"))
+
+
+@pytest.mark.unit
 def test_fields():
     """Test :py:method:`CSMBase.fields`."""
     correct_fields = fields(CSMBase)
@@ -445,3 +484,55 @@ def test_prepare_calculation(subtests):
     with subtests.test("Existing value with all dependents returns True"):
         model.blade_mass = 100000
         assert model._prepare_calculation("blade_mass")
+
+
+@pytest.mark.unit
+def test_reset_values(subtests):
+    """Test :py:method:`CSMBase.reset_values`."""
+    model = CSMBase.from_dict(csm_2015_inputs)
+    blade_mass_inputs = model.parameter_map["blade_mass"]
+    assert all(model._has_values(*blade_mass_inputs))
+
+    model.reset_values(*blade_mass_inputs)
+    assert not all(model._has_values(*blade_mass_inputs))
+
+
+@pytest.mark.unit
+def test_update(subtests):
+    """Test :py:method:`CSMBase.update`."""
+    model = CSMBase.from_dict(csm_2015_inputs)
+    model.run()
+
+    blade_has_carbon_upstream = {
+        "blade_mass",
+        "blade_cost",
+        "hub_mass",
+        "hub_cost",
+        "pitch_system_mass",
+        "pitch_system_cost",
+        "low_speed_shaft_mass",
+        "low_speed_shaft_cost",
+        "rotor_mass",
+        "rotor_cost",
+        "hub_system_mass",
+        "hub_system_cost",
+        "nacelle_mass",
+        "nacelle_cost",
+        "turbine_mass",
+        "turbine_cost",
+    }
+
+    with subtests.test("Check expected values at initialization"):
+        assert all(model._has_values(*blade_has_carbon_upstream.union(["blade_has_carbon"])))
+        assert not model.blade_has_carbon
+
+    with subtests.test("Check update process changes value and resets dependents"):
+        model.update({"blade_has_carbon": True})
+        assert model.blade_has_carbon
+        assert not all(model._has_values(*blade_has_carbon_upstream))
+
+    with subtests.test("Invalid parameter fails"), pytest.raises(AttributeError):
+        model.update({"blade_has_more_carbon": 2})
+
+    with subtests.test("Invalid input fails"), pytest.raises(ValueError):
+        model.update(("blade_has_more_carbon", 2))
