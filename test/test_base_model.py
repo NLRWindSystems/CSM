@@ -6,7 +6,7 @@ from pytest import approx
 
 from csm.models.base_model import CSMBase
 
-from test.conftest import csm_2015_inputs
+from test.conftest import csm_2015_inputs, csm_2015_defaults
 
 
 csm_2015_outputs = {
@@ -369,7 +369,7 @@ def test_fields_dict():
 
 @pytest.mark.unit
 def test_has_values(subtests):
-    """Test :py:method:`CSMBase.from_dict`."""
+    """Test :py:method:`CSMBase._has_values`."""
     model = CSMBase.from_dict(csm_2015_inputs)
     with subtests.test("Ensure 2015 values registered"):
         assert all(model._has_values(*csm_2015_inputs))
@@ -395,3 +395,53 @@ def test_has_values(subtests):
     with subtests.test("Non-None default given None has no registered value"):
         all_attributes = set(csm_2015_inputs).union(calculated)
         assert not all(model._has_values(*all_attributes))
+
+
+@pytest.mark.unit
+def test_validate_inputs(subtests):
+    """Test :py:method:`CSMBase._validate_inputs`."""
+    # don't use from_dict since this is an incomplete model definition
+    model = CSMBase(**csm_2015_defaults)
+    blade_mass_inputs = model.parameter_map["blade_mass"]
+    with subtests.test("2015 defaults only can't validate"):
+        # order taken from parameter_map for consistency
+        missing = ("rotor_diameter", "turbine_class", "blade_has_carbon")
+
+        msg = f"Inputs for the following variables required: {', '.join(missing)}"
+        with pytest.raises(ValueError, match=msg):
+            model._validate_inputs(blade_mass_inputs)
+
+    with subtests.test("Complete definition doesn't raise an error"):
+        model.rotor_diameter = 126
+        model.turbine_class = 1
+        model.blade_has_carbon = True
+        assert model._validate_inputs(blade_mass_inputs) is None
+
+
+@pytest.mark.unit
+def test_prepare_calculation(subtests):
+    """Test :py:method:`CSMBase._prepare_calculation`."""
+    # don't use from_dict since this is an incomplete model definition
+    model = CSMBase(**csm_2015_defaults)
+    with subtests.test("2015 defaults only can't validate"):
+        # order taken from parameter_map for consistency
+        missing = ("rotor_diameter", "turbine_class", "blade_has_carbon")
+
+        msg = f"Inputs for the following variables required: {', '.join(missing)}"
+        with pytest.raises(ValueError, match=msg):
+            model._prepare_calculation("blade_mass")
+
+    with subtests.test("Existing value and dependents undefined is True"):
+        model.blade_mass = 100000
+        assert model._prepare_calculation("blade_mass")
+
+    with subtests.test("Complete definition doesn't raise an error but needs calculating"):
+        model.blade_mass = None
+        model.rotor_diameter = 126
+        model.turbine_class = 1
+        model.blade_has_carbon = True
+        assert not model._prepare_calculation("blade_mass")
+
+    with subtests.test("Existing value with all dependents returns True"):
+        model.blade_mass = 100000
+        assert model._prepare_calculation("blade_mass")
