@@ -480,8 +480,8 @@ class CSMBase:
 
     # platform mainframe
     has_crane: bool = create_field(bool, "unitless", "input")
-    crane_mass: float = create_field(float, "kg", "both")
-    crane_cost: float = create_field(float, "USD", "both")
+    crane_mass: float = create_field(float, "kg", "input")
+    crane_cost: float = create_field(float, "USD", "input")
     platform_mainframe_mass_coeff: float = create_field(float, "unitless", "input")
     platform_mainframe_mass_cost_coeff: float = create_field(float, "USD/kg", "input")
     platform_mainframe_mass: float = create_field(float, "kg", "both")
@@ -735,6 +735,12 @@ class CSMBase:
                 case "inputs":
                     _inputs = vals[1:]
                 case "range":
+                    if len(vals[1:]) != 3:
+                        msg = (
+                            f"'range' input for '{name}' must have 3 values: start, stop, and"
+                            " number of total values."
+                        )
+                        raise ValueError(msg)
                     _min, _max, _num = vals[1:]
                     _inputs = list(np.linspace(_min, _max, _num))
                 case _:
@@ -2110,6 +2116,8 @@ class CSMBase:
             "low_speed_shaft_cost": self.low_speed_shaft_cost,
             "bearing_mass": self.bearing_mass,
             "bearing_cost": self.bearing_cost,
+            "rated_rpm": self.rated_rpm,
+            "rotor_torque": self.rotor_torque,
             "gearbox_mass": self.gearbox_mass,
             "gearbox_cost": self.gearbox_cost,
             "brake_mass": self.brake_mass,
@@ -2140,6 +2148,7 @@ class CSMBase:
             "rotor_cost": self.rotor_cost,
             "turbine_mass": self.turbine_mass,
             "turbine_cost": self.turbine_cost,
+            "turbine_cost_kw": self.turbine_cost_kw,
         }
         return results
 
@@ -2194,6 +2203,7 @@ class CSMBase:
             "hub_system_cost": self.hub_system_cost,
             "rotor_cost": self.rotor_cost,
             "turbine_cost": self.turbine_cost,
+            "turbine_cost_kw": self.turbine_cost_kw,
         }
         return results
 

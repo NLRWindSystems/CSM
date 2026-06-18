@@ -1,4 +1,5 @@
 from copy import deepcopy
+from itertools import product
 
 import pytest
 import networkx as nx
@@ -541,3 +542,92 @@ def test_update(subtests):
 @pytest.mark.unit
 def test_parameterize(subtests):
     """Test :py:method:`CSMBase.parameterize`."""
+    base = deepcopy(csm_2015_inputs)
+    parameters = {
+        "efficiency_max": ("range", 0.85, 0.95, 3),
+        "rotor_diameter": ("range", 120, 130, 3),
+        "blade_has_carbon": ("inputs", True, False),
+    }
+    del base["efficiency_max"]
+    del base["rotor_diameter"]
+    del base["blade_has_carbon"]
+
+    with subtests.test("Working example for all input types"):
+        inputs = list(product((0.85, 0.9, 0.95), (120.0, 125.0, 130.0), (True, False)))
+        outputs = [
+            k
+            for k, val in fields_dict(CSMBase).items()
+            if val.metadata.get("io") in ("both", "output")
+        ]
+        results = CSMBase.parameterize(base_kwargs=base, parameterized_kwargs=parameters)
+
+        assert results.shape == (len(outputs), len(inputs))
+        assert results.index.tolist() == sorted(outputs)
+        for _output, _input in zip(results.columns, inputs, strict=True):
+            assert all(
+                _in == pytest.approx(_out) for _in, _out in zip(_input, _output, strict=True)
+            )
+
+    with subtests.test("Working example for subset of outputs"):
+        inputs = list(product((0.85, 0.9, 0.95), (120.0, 125.0, 130.0), (True, False)))
+        outputs = ["rotor_torque", "turbine_cost_kw"]
+        results = CSMBase.parameterize(
+            base_kwargs=base, parameterized_kwargs=parameters, results=outputs
+        )
+
+        assert results.shape == (len(outputs), len(inputs))
+        assert results.index.tolist() == sorted(outputs)
+
+    with subtests.test("Working example for single output"):
+        inputs = list(product((0.85, 0.9, 0.95), (120.0, 125.0, 130.0), (True, False)))
+        outputs = "turbine_cost_kw"
+        results = CSMBase.parameterize(
+            base_kwargs=base, parameterized_kwargs=parameters, results=outputs
+        )
+        outputs = [outputs]
+
+        assert results.shape == (len(outputs), len(inputs))
+        assert results.index.tolist() == sorted(outputs)
+
+    with subtests.test("Bad parameterization input type"):
+        parameters = {
+            "efficiency_max": ("linspace", 0.85, 0.95, 3),
+            "rotor_diameter": ("range", 120, 130, 3),
+            "blade_has_carbon": ("inputs", True, False),
+        }
+        msg = "First value for 'efficiency_max' must be 'inputs' or 'range', not 'linspace'."
+        with pytest.raises(ValueError, match=msg):
+            results = CSMBase.parameterize(base_kwargs=base, parameterized_kwargs=parameters)
+
+    with subtests.test("Bad range input specification"):
+        parameters = {
+            "efficiency_max": ("range", 0.85, 0.9, 3),
+            "rotor_diameter": ("range", 120, 130),
+            "blade_has_carbon": ("inputs", True, False),
+        }
+        msg = (
+            "'range' input for 'rotor_diameter' must have 3 values: start, stop, and number of"
+            " total values."
+        )
+        with pytest.raises(ValueError, match=msg):
+            results = CSMBase.parameterize(base_kwargs=base, parameterized_kwargs=parameters)
+
+    with subtests.test("Too few inputs for range-type"):
+        parameters = {
+            "efficiency_max": ("range", 0.85, 0.95, 1),
+            "rotor_diameter": ("range", 120, 130, 3),
+            "blade_has_carbon": ("inputs", True, False),
+        }
+        msg = "Parameterized inputs for 'efficiency_max' must have at least 2 values."
+        with pytest.raises(ValueError, match=msg):
+            results = CSMBase.parameterize(base_kwargs=base, parameterized_kwargs=parameters)
+
+    with subtests.test("Too few inputs for input-type"):
+        parameters = {
+            "efficiency_max": ("range", 0.85, 0.95, 3),
+            "rotor_diameter": ("range", 120, 130, 3),
+            "blade_has_carbon": ("inputs", False),
+        }
+        msg = "Parameterized inputs for 'blade_has_carbon' must have at least 2 values."
+        with pytest.raises(ValueError, match=msg):
+            results = CSMBase.parameterize(base_kwargs=base, parameterized_kwargs=parameters)
