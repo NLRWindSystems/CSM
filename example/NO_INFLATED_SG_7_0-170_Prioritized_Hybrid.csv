@@ -1,0 +1,21 @@
+Component,Mass (kg),Cost ($),IRS Component,IRS Cost %
+Blade (1x),"29,639","$472,536",Blades (3x),31.2%
+Hub (Incl. Pitch System),"97,133","$741,576",Rotor hub,9.9%
+Nose cone,600,"$7,273",,
+Main shaft,"23,521","$305,649",Nacelle,47.5%
+Main bearings (2),"12,812","$62,956",,
+Gearbox,"44,680","$293,715",,
+Braking system,"1,391","$10,332",,
+Generator,"15,782","$213,695",,
+Bedplate,"57,374","$181,691",,
+Yaw system,"12,330","$111,756",,
+Transformer,"15,315","$314,411",,
+Electrical cabling,,"$319,901",,
+Controls,,"$161,671",,
+Cooling system,221,"$29,925",,
+Nacelle cover,"9,400","$58,510",,
+Railing platform,287,"$5,357",,
+Crane,287,"$1,253",,
+Power converter,,"$350,000",Power converter,8.9%
+Tower,"451,482","$1,429,754",Iron/steel,N/A
+Of which flanges,"27,089","$85,785",Tower flanges,1.6%
