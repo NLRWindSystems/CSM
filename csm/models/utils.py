@@ -130,9 +130,9 @@ def reuse(attribute: Attribute, default: Any, *, init: bool | None = None) -> at
     Returns:
         attrib: The new attribute object used in class initialization.
     """
+    # NOTE: if adding factory, then only one of default or factory can be used.
     kwargs = {
         "default": default,
-        # "factory": attribute.default.factory,
         "converter": attribute.converter,
         "validator": attribute.validator,
         "metadata": attribute.metadata,
