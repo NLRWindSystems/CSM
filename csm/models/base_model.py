@@ -2182,7 +2182,6 @@ class CSMBase:
     def get_results(self) -> dict[str, float]:
         """Gathers the core results."""
         results = {
-            # "rotor_torque": self.rotor_torque,
             "blade_mass": self.blade_mass,
             "blade_cost": self.blade_cost,
             "hub_mass": self.hub_mass,

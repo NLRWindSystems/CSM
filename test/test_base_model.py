@@ -169,7 +169,8 @@ def test_defaults_only(subtests):
     mass_results = model.get_mass_results()
     cost_results = model.get_cost_results()
     with subtests.test("Ensure mass and cost results add to the joint results"):
-        assert len(mass_results) + len(cost_results) == len(results)
+        len_results = len(mass_results) + len(cost_results) + 2  # account for torque + rated rpm
+        assert len_results == len(results)
         assert not set(mass_results).intersection(cost_results)
 
     with subtests.test("Check default attribute values for results"):
