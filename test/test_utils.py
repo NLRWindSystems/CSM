@@ -2,7 +2,7 @@ import pytest
 from attrs import define, fields, validators
 from attr._make import _CountingAttr
 
-from csm.models.utils import create_field, convert_if_allowable_type
+from csm.models.utils import reuse, create_field, convert_if_allowable_type
 
 
 @pytest.mark.unit
@@ -164,3 +164,34 @@ def test_create_field(subtests):
             model.limited_float = 1.000001
         with pytest.raises(ValueError):
             model.limited_float = -0.000001
+
+
+@pytest.mark.unit
+def test_reuse():
+    """Test reuse of attributes in subclasses."""
+    base = fields(Demo)
+
+    @define
+    class SubDemo:
+        simple_int = reuse(base.simple_int, default=12)
+        simple_float = reuse(base.simple_int, default=1.2, init=False)
+
+    sub = fields(SubDemo)
+    base_simple_int = base.simple_int
+    sub_simple_int = sub.simple_int
+    assert sub_simple_int.default == 12
+    assert not sub.simple_float.init
+
+    assert sub_simple_int.converter == base_simple_int.converter
+    assert sub_simple_int.validator == base_simple_int.validator
+    assert sub_simple_int.metadata == base_simple_int.metadata
+    assert sub_simple_int.repr == base_simple_int.repr
+    assert sub_simple_int.init == base_simple_int.init
+    assert sub_simple_int.eq == base_simple_int.eq
+    assert sub_simple_int.type == base_simple_int.type
+    assert sub_simple_int.order == base_simple_int.order
+    assert sub_simple_int.on_setattr == base_simple_int.on_setattr
+    assert sub_simple_int.alias == base_simple_int.alias
+
+    with pytest.raises(TypeError):
+        SubDemo(simple_float=33.3)
