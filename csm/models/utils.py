@@ -66,6 +66,13 @@ def create_field(
             Raised if an unsupported type object is passed. Only ``int``, ``float``, and ``bool``
             are accepted at this time.
     """
+    io_types = ("input", "output", "both")
+    if not isinstance(io_type, str):
+        raise TypeError("`io_type` must be a `str` and one of 'input', 'output', or 'both'.")
+    io_type = io_type.lower()
+    if io_type not in io_types:
+        raise ValueError("`io_type` must be one of 'input', 'output', or 'both'.")
+
     _converters = None
     if additional_converters is not None:
         _converters = [converters.optional(el) for el in additional_converters]
@@ -94,6 +101,9 @@ def create_field(
         )
         return _field
     if obj is bool:
+        if _converters is None:
+            _converters = []
+        _converters = [converters.optional(converters.to_bool), *_converters]
         _field = field(
             default=default,
             converter=_converters,
