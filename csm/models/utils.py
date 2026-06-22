@@ -1,13 +1,44 @@
 """Provides all the ``attrs``-based utilities for the CSM base model and its subclasses."""
 
 from typing import Any
+from functools import partial
 
 from attrs import Attribute, field, converters, validators
 from attr._make import attrib
 
 
+def convert_if_allowable_type(value: Any, target: type, allowable: type | tuple[type]) -> Any:
+    """Converts the type of :py:attr:`value` to the :py:attr:`target` type if it is one of an
+    :py:attr:`allowable` type. If :py:attr:`value` is already the correct type, or is not of an
+    :py:attr:`allowable` type for conversion, the :py:attr:`value` will be returned unmodified.
+
+    Args:
+        value (Any): User input field value.
+        target (type): The type the :py:attr:`value` should be converted to if it is not already
+            of that type.
+        allowable (type | tuple[type]): The allowable type(s) for conversion, i.e., ``(str, int)``
+            for a target type of ``float``.
+
+    Returns:
+        Any: The original :py:attr:`value` or a converted :py:attr:`value` of type
+        :py:attr:`target`.
+    """
+    if isinstance(value, target) or not isinstance(value, allowable):
+        return value
+    return target(value)
+
+
+convert_float = partial(convert_if_allowable_type, target=float, allowable=(int, str))
+
+
 def create_field(
-    obj: type, units: str = "unitless", io_type: str = "input", *, default: int | None = None
+    obj: type,
+    units: str = "unitless",
+    io_type: str = "input",
+    *,
+    default: int | None = None,
+    additional_validators: list[callable] | None = None,
+    additional_converters: list[callable] | None = None,
 ) -> field:
     """Creates an :py:attr:`obj`-based field with pre-loaded defaults, conversions, validations,
     and metadata.
@@ -21,6 +52,10 @@ def create_field(
             initialized within a WISDEM model. Typically ``xx_mass` and ``xx_cost`` attributes
             are both inputs and outputs. Defaults to "input".
         default (int, optional):  Value of the default, if not None. Should be used sparingly.
+        additional_validators (list[callable], optional): A list of additional validator functions
+            to attach to the ``attrs.field`` initialization. Defaults to None
+        additional_converters (list[callable], optional): A list of additional converter functions
+            to attach to the ``attrs.field`` initialization. Defaults to None
 
     Returns:
         attrs.field:
@@ -31,25 +66,38 @@ def create_field(
             Raised if an unsupported type object is passed. Only ``int``, ``float``, and ``bool``
             are accepted at this time.
     """
+    _converters = None
+    if additional_converters is not None:
+        _converters = [converters.optional(el) for el in additional_converters]
+
+    _validators = [validators.optional(validators.instance_of(obj))]
+    if additional_validators is not None:
+        _validators += [validators.optional(el) for el in additional_validators]
+
     if obj is int:
         _field = field(
             default=default,
-            validator=validators.optional(validators.instance_of(int)),
+            converter=_converters,
+            validator=_validators,
             metadata={"units": units, "io": io_type},
         )
         return _field
     if obj is float:
+        if _converters is None:
+            _converters = []
+        _converters = [converters.optional(convert_float), *_converters]
         _field = field(
             default=default,
-            converter=converters.optional(float),
-            validator=validators.optional(validators.instance_of(float)),
+            converter=_converters,
+            validator=_validators,
             metadata={"units": units, "io": io_type},
         )
         return _field
     if obj is bool:
         _field = field(
             default=default,
-            validator=validators.optional(validators.instance_of(bool)),
+            converter=_converters,
+            validator=_validators,
             metadata={"units": units, "io": io_type},
         )
         return _field

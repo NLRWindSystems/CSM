@@ -55,7 +55,7 @@ from collections.abc import Generator
 import numpy as np
 import pandas as pd
 import networkx as nx
-from attrs import Attribute, field, define, fields
+from attrs import Attribute, field, define, fields, validators
 
 from csm.models.utils import create_field
 
@@ -369,30 +369,43 @@ class CSMBase:
     """
 
     # turbine general
-    turbine_class: int = create_field(int, "unitless", "input")
-    rated_power_kw: int = create_field(int, "kW", "input")
-    rotor_diameter: float = create_field(float, "m", "input")
+    turbine_class: int = create_field(
+        int, "unitless", "input", additional_validators=[validators.gt(0)]
+    )
+    rated_power_kw: int = create_field(int, "kW", "input", additional_validators=[validators.gt(0)])
+    rotor_diameter: float = create_field(
+        float, "m", "input", additional_validators=[validators.gt(0)]
+    )
+    efficiency_max: float = create_field(
+        float, "unitless", "input", additional_validators=[validators.gt(0), validators.le(1)]
+    )
+    num_bearings: int = create_field(
+        int, "unitless", "input", additional_validators=[validators.gt(0)]
+    )
 
     # blades
-    num_blades: int = create_field(int, "unitless", "input", default=3)
+    num_blades: int = create_field(
+        int, "unitless", "input", default=3, additional_validators=[validators.gt(0)]
+    )
     blade_has_carbon: bool = create_field(bool, "unitless", "input")
     blade_mass_coeff: float = create_field(float, "unitless", "input")
     blade_mass_cost_coeff: float = create_field(float, "USD/kg", "input")
-    blade_mass: float = create_field(float, "kg", "both")
-    blade_cost: float = create_field(float, "USD", "both")
+    blade_mass: float = create_field(float, "kg", "both", additional_validators=[validators.ge(0)])
+    blade_cost: float = create_field(float, "USD", "both", additional_validators=[validators.ge(0)])
 
     # hub
     hub_mass_coeff: float = create_field(float, "unitless", "input")
     hub_mass_intercept: float = create_field(float, "unitless", "input")
     hub_mass_cost_coeff: float = create_field(float, "USD/kg", "input")
-    hub_mass: float = create_field(float, "kg", "both")
-    hub_cost: float = create_field(float, "USD", "both")
+    hub_mass: float = create_field(float, "kg", "both", additional_validators=[validators.ge(0)])
+    hub_cost: float = create_field(float, "USD", "both", additional_validators=[validators.ge(0)])
 
     # rotor
-    efficiency_max: float = create_field(float, "unitless", "input")
     max_tip_speed: float = create_field(float, "m/s", "input")
-    rated_rpm: float = create_field(float, "rpm", "both")
-    rotor_torque: float = create_field(float, "MN*m", "both")
+    rated_rpm: float = create_field(float, "rpm", "both", additional_validators=[validators.ge(0)])
+    rotor_torque: float = create_field(
+        float, "MN*m", "both", additional_validators=[validators.ge(0)]
+    )
 
     # pitch system
     pitch_bearing_mass_coeff: float = create_field(float, "unitless", "input")
@@ -400,88 +413,133 @@ class CSMBase:
     bearing_housing_fraction: float = create_field(float, "unitless", "input")
     mass_sys_offset: float = create_field(float, "kg", "input")
     pitch_system_mass_cost_coeff: float = create_field(float, "USD/kg", "input")
-    pitch_system_mass: float = create_field(float, "kg", "both")
-    pitch_system_cost: float = create_field(float, "USD", "both")
+    pitch_system_mass: float = create_field(
+        float, "kg", "both", additional_validators=[validators.ge(0)]
+    )
+    pitch_system_cost: float = create_field(
+        float, "USD", "both", additional_validators=[validators.ge(0)]
+    )
 
     # spinner (nose cone)
     spinner_mass_coeff: float = create_field(float, "unitless", "input")
     spinner_mass_intercept: float = create_field(float, "kg", "input")
     spinner_mass_cost_coeff: float = create_field(float, "USD/kg", "input")
-    spinner_mass: float = create_field(float, "kg", "both")
-    spinner_cost: float = create_field(float, "USD", "both")
+    spinner_mass: float = create_field(
+        float, "kg", "both", additional_validators=[validators.ge(0)]
+    )
+    spinner_cost: float = create_field(
+        float, "USD", "both", additional_validators=[validators.ge(0)]
+    )
 
     # low speed shaft
     lss_mass_coeff: float = create_field(float, "unitless", "input")
     lss_mass_intercept: float = create_field(float, "kg", "input")
     lss_mass_exp: float = create_field(float, "unitless", "input")
     lss_mass_cost_coeff: float = create_field(float, "USD/kg", "input")
-    low_speed_shaft_mass: float = create_field(float, "kg", "both")
-    low_speed_shaft_cost: float = create_field(float, "USD", "both")
+    low_speed_shaft_mass: float = create_field(
+        float, "kg", "both", additional_validators=[validators.ge(0)]
+    )
+    low_speed_shaft_cost: float = create_field(
+        float, "USD", "both", additional_validators=[validators.ge(0)]
+    )
 
     # main bearing
-    num_bearings: int = create_field(int, "unitless", "input")
     bearing_mass_coeff: float = create_field(float, "unitless", "input")
     bearing_mass_exp: float = create_field(float, "units", "input")
     bearing_mass_cost_coeff: float = create_field(float, "USD/kg", "input")
-    bearing_mass: float = create_field(float, "kg", "both")
-    bearing_cost: float = create_field(float, "USD", "both")
+    bearing_mass: float = create_field(
+        float, "kg", "both", additional_validators=[validators.ge(0)]
+    )
+    bearing_cost: float = create_field(
+        float, "USD", "both", additional_validators=[validators.ge(0)]
+    )
 
     # gearbox
     gearbox_torque_density: float = create_field(float, "N*m/kg", "input")
     gearbox_torque_cost: float = create_field(float, "USD/kN/m", "input")
-    gearbox_mass: float = create_field(float, "kg", "both")
-    gearbox_cost: float = create_field(float, "USD", "both")
+    gearbox_mass: float = create_field(
+        float, "kg", "both", additional_validators=[validators.ge(0)]
+    )
+    gearbox_cost: float = create_field(
+        float, "USD", "both", additional_validators=[validators.ge(0)]
+    )
 
     # brakes
     brake_mass_coeff: float = create_field(float, "unitless", "input")
     brake_mass_cost_coeff: float = create_field(float, "USD/kg", "input")
-    brake_mass: float = create_field(float, "kg", "both")
-    brake_cost: float = create_field(float, "USD", "both")
+    brake_mass: float = create_field(float, "kg", "both", additional_validators=[validators.ge(0)])
+    brake_cost: float = create_field(float, "USD", "both", additional_validators=[validators.ge(0)])
 
     # high speed shaft
     hss_mass_coeff: float = create_field(float, "unitless", "input")
     hss_mass_cost_coeff: float = create_field(float, "USD/kg", "input")
-    high_speed_shaft_mass: float = create_field(float, "kg", "both")
-    high_speed_shaft_cost: float = create_field(float, "USD", "both")
+    high_speed_shaft_mass: float = create_field(
+        float, "kg", "both", additional_validators=[validators.ge(0)]
+    )
+    high_speed_shaft_cost: float = create_field(
+        float, "USD", "both", additional_validators=[validators.ge(0)]
+    )
 
     # generator
     generator_mass_coeff: float = create_field(float, "kg/kW", "input")
     generator_mass_intercept: float = create_field(float, "kg", "input")
     generator_mass_cost_coeff: float = create_field(float, "USD/kg", "input")
-    generator_mass: float = create_field(float, "kg", "both")
-    generator_cost: float = create_field(float, "USD", "both")
+    generator_mass: float = create_field(
+        float, "kg", "both", additional_validators=[validators.ge(0)]
+    )
+    generator_cost: float = create_field(
+        float, "USD", "both", additional_validators=[validators.ge(0)]
+    )
 
     # bedplate
     bedplate_mass_exp: float = create_field(float, "unitless", "input")
     bedplate_mass_cost_coeff: float = create_field(float, "USD/kg", "input")
-    bedplate_mass: float = create_field(float, "kg", "both")
-    bedplate_cost: float = create_field(float, "USD", "both")
+    bedplate_mass: float = create_field(
+        float, "kg", "both", additional_validators=[validators.ge(0)]
+    )
+    bedplate_cost: float = create_field(
+        float, "USD", "both", additional_validators=[validators.ge(0)]
+    )
 
     # yaw system
     yaw_system_non_bearing_mass_coeff: float = create_field(float, "unitless", "input")
     yaw_system_mass_coeff: float = create_field(float, "unitless", "input")
     yaw_system_mass_exp: float = create_field(float, "unitless", "input")
     yaw_system_mass_cost_coeff: float = create_field(float, "USD/kg", "input")
-    yaw_system_mass: float = create_field(float, "kg", "both")
-    yaw_system_cost: float = create_field(float, "USD", "both")
+    yaw_system_mass: float = create_field(
+        float, "kg", "both", additional_validators=[validators.ge(0)]
+    )
+    yaw_system_cost: float = create_field(
+        float, "USD", "both", additional_validators=[validators.ge(0)]
+    )
 
     # high speed shaft
     hvac_mass_coeff: float = create_field(float, "unitless", "input")
     hvac_mass_cost_coeff: float = create_field(float, "USD/kg", "input")
-    hydraulic_cooling_mass: float = create_field(float, "kg", "both")
-    hydraulic_cooling_cost: float = create_field(float, "USD", "both")
+    hydraulic_cooling_mass: float = create_field(
+        float, "kg", "both", additional_validators=[validators.ge(0)]
+    )
+    hydraulic_cooling_cost: float = create_field(
+        float, "USD", "both", additional_validators=[validators.ge(0)]
+    )
 
     # nacelle cover
     nacelle_cover_mass_coeff: float = create_field(float, "kg/kW", "input")
     nacelle_cover_mass_intercept: float = create_field(float, "kg", "input")
     nacelle_cover_mass_cost_coeff: float = create_field(float, "USD/kg", "input")
-    nacelle_cover_mass: float = create_field(float, "kg", "both")
-    nacelle_cover_cost: float = create_field(float, "USD", "both")
+    nacelle_cover_mass: float = create_field(
+        float, "kg", "both", additional_validators=[validators.ge(0)]
+    )
+    nacelle_cover_cost: float = create_field(
+        float, "USD", "both", additional_validators=[validators.ge(0)]
+    )
 
     # platform mainframe
     has_crane: bool = create_field(bool, "unitless", "input")
-    crane_mass: float = create_field(float, "kg", "input")
-    crane_cost: float = create_field(float, "USD", "input")
+    crane_mass: float = create_field(float, "kg", "input", additional_validators=[validators.ge(0)])
+    crane_cost: float = create_field(
+        float, "USD", "input", additional_validators=[validators.ge(0)]
+    )
     platform_mainframe_mass_coeff: float = create_field(float, "unitless", "input")
     platform_mainframe_mass_cost_coeff: float = create_field(float, "USD/kg", "input")
     platform_mainframe_mass: float = create_field(float, "kg", "both")
@@ -491,27 +549,45 @@ class CSMBase:
     transformer_mass_coeff: float = create_field(float, "kg/kW", "input")
     transformer_mass_intercept: float = create_field(float, "kg", "input")
     transformer_mass_cost_coeff: float = create_field(float, "USD/kg", "input")
-    transformer_mass: float = create_field(float, "kg", "both")
-    transformer_cost: float = create_field(float, "USD", "both")
+    transformer_mass: float = create_field(
+        float, "kg", "both", additional_validators=[validators.ge(0)]
+    )
+    transformer_cost: float = create_field(
+        float, "USD", "both", additional_validators=[validators.ge(0)]
+    )
 
     # tower
     tower_mass_coeff: float = create_field(float, "unitless", "input")
     tower_length: float = create_field(float, "m", "input")
     tower_mass_exp: float = create_field(float, "unitless", "input")
     tower_mass_cost_coeff: float = create_field(float, "USD/kg", "input")
-    tower_mass: float = create_field(float, "kg", "both")
-    tower_cost: float = create_field(float, "USD", "both")
+    tower_mass: float = create_field(float, "kg", "both", additional_validators=[validators.ge(0)])
+    tower_cost: float = create_field(float, "USD", "both", additional_validators=[validators.ge(0)])
 
     # totals
-    nacelle_mass: float = create_field(float, "kg", "both")
-    nacelle_cost: float = create_field(float, "USD", "both")
-    hub_system_mass: float = create_field(float, "kg", "both")
-    hub_system_cost: float = create_field(float, "USD", "both")
-    rotor_mass: float = create_field(float, "kg", "both")
-    rotor_cost: float = create_field(float, "USD", "both")
-    turbine_mass: float = create_field(float, "kg", "output")
-    turbine_cost: float = create_field(float, "USD", "output")
-    turbine_cost_kw: float = create_field(float, "USD/kW", "output")
+    nacelle_mass: float = create_field(
+        float, "kg", "both", additional_validators=[validators.ge(0)]
+    )
+    nacelle_cost: float = create_field(
+        float, "USD", "both", additional_validators=[validators.ge(0)]
+    )
+    hub_system_mass: float = create_field(
+        float, "kg", "both", additional_validators=[validators.ge(0)]
+    )
+    hub_system_cost: float = create_field(
+        float, "USD", "both", additional_validators=[validators.ge(0)]
+    )
+    rotor_mass: float = create_field(float, "kg", "both", additional_validators=[validators.ge(0)])
+    rotor_cost: float = create_field(float, "USD", "both", additional_validators=[validators.ge(0)])
+    turbine_mass: float = create_field(
+        float, "kg", "output", additional_validators=[validators.ge(0)]
+    )
+    turbine_cost: float = create_field(
+        float, "USD", "output", additional_validators=[validators.ge(0)]
+    )
+    turbine_cost_kw: float = create_field(
+        float, "USD/kW", "output", additional_validators=[validators.ge(0)]
+    )
 
     # all else
     parameter_map: dict[str, tuple[str]] = field(init=False)
