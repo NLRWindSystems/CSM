@@ -535,12 +535,14 @@ class CSMBase:
                 self.parameter_graph.add_edge(key, dependent)
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]):
+    def from_dict(cls, data: dict[str, Any], *, partial: bool = False):
         """Creates a new instance from a dictionary with simplified and intuitive error messages
         for extraneous and missing attributes.
 
         Args:
             data (dict): The data dictionary to be mapped.
+            partial (bool, optional): If True, don't raise errors for an incomplete definition of
+                the model. Defaults to False.
 
         Returns:-
             cls: An instance of :py:class:`CSMBase` or one of its subclasses.
@@ -563,7 +565,7 @@ class CSMBase:
             raise AttributeError(msg)
 
         missing = required.difference(inputs)
-        if missing:
+        if missing and not partial:
             msg = (
                 f"The class definition for {_name} is missing the following"
                 f" inputs: {', '.join(missing)}"
