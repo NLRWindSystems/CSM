@@ -758,8 +758,9 @@ class CSMBase:
         additional_kwargs = [dict(zip(*el, strict=True)) for el in inputs]
 
         all_results = []
+        model = cls.from_dict(base_kwargs, partial=True)
         for kwargs in additional_kwargs:
-            model = cls.from_dict(base_kwargs | kwargs)
+            model.update(kwargs)
             model.run()
 
             if results is None:
