@@ -350,6 +350,12 @@ def test_from_dict(subtests):
             del _extra["rotor_diameter"]
             CSMBase.from_dict(_extra)
 
+    with subtests.test("Missing input with partial allowed"):
+        _extra = deepcopy(csm_2015_inputs)
+        del _extra["rotor_diameter"]
+        model = CSMBase.from_dict(_extra, partial=True)
+        assert model.rotor_diameter is None
+
 
 @pytest.mark.unit
 def test_attrs_pre_post_initialization():
