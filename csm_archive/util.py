@@ -2,12 +2,12 @@ import types
 import typing
 import itertools
 import importlib.util
-import yaml
 from pathlib import Path
 from collections.abc import Generator
 
-import pandas as pd
+import yaml
 import numpy as np
+import pandas as pd
 
 
 def import_module(
@@ -22,7 +22,7 @@ def import_module(
 
 def check_file_exists(path: Path):
     if not path.is_file():
-        raise FileNotFoundError(f"File {str(path):s} does not exist.")
+        raise FileNotFoundError(f"File {path!s:s} does not exist.")
 
 
 def expand_dict_of_dicts(
@@ -41,7 +41,6 @@ def expand_dict_of_dicts(
     Yields:
         Generator[dict[str, typing.Any], None, None]: generator of flat dictionaries
     """
-
     # Determine which entries in the dict are and are not dicts themselves
     dict_entries = {}
     non_dict_entries = {}
@@ -78,10 +77,9 @@ def dict_list_product(**dict_of_lists) -> Generator[dict[str, typing.Any], None,
     Yields:
         Generator[dict[str, typing.Any], None, None]: dictionaries with no lists
     """
-
     # Any value can optionally be specified as [[start, end], count] instead a list of
     # values
-    for k in dict_of_lists.keys():
+    for k in dict_of_lists:
         v = dict_of_lists[k]
 
         if not isinstance(v, list):
@@ -92,9 +90,7 @@ def dict_list_product(**dict_of_lists) -> Generator[dict[str, typing.Any], None,
                 start, end = v[0]
                 dict_of_lists[k] = np.linspace(start, end, v[1])
 
-    yield from (
-        dict(zip(dict_of_lists, x)) for x in itertools.product(*dict_of_lists.values())
-    )
+    yield from (dict(zip(dict_of_lists, x)) for x in itertools.product(*dict_of_lists.values()))
 
 
 def expand_dict_of_lists(
@@ -110,7 +106,6 @@ def expand_dict_of_lists(
         Generator[dict[str, typing.Any], None, None]: iterator of dicts containing the
             cartesian product of the lists
     """
-
     non_list_entries = {}
     list_entries = {}
 
@@ -120,9 +115,7 @@ def expand_dict_of_lists(
         else:
             non_list_entries[k] = v
 
-    product_dict = (
-        dict(**d, **non_list_entries) for d in dict_list_product(**list_entries)
-    )
+    product_dict = (dict(**d, **non_list_entries) for d in dict_list_product(**list_entries))
     yield from product_dict
 
 
@@ -147,7 +140,6 @@ def generate_output_excel(
     Yields:
         Path: path to saved excel file
     """
-
     parameter_output, parameter_dataframe_output = model_output
 
     path_excel_output = output_dir / (model_name + ".xlsx")

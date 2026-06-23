@@ -1,3 +1,5 @@
+from csm.run import run_config
+from csm._csm import CSM
 from csm.models.nlr2015 import Land2015NLR
 from csm.models.base_model import CSMBase
 
