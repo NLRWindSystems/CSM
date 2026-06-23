@@ -59,8 +59,9 @@ class Land2020NLR(CSMBase):
     gearbox_torque_density = base.gearbox_torque_density.reuse(default=156.46)
     gearbox_mass_exp = base.gearbox_torque_density.reuse(default=0.6566)
     gearbox_torque_cost = base.gearbox_torque_cost.reuse(default=14.0868)
-    # brake_mass_coeff = base.brake_mass_coeff.reuse(default=0.00122)
-    # brake_mass_cost_coeff = base.brake_mass_cost_coeff.reuse(default=3.6254)
+    brake_mass_coeff = base.brake_mass_coeff.reuse(default=198.51)
+    brake_mass_intercept = create_field(float, units="unitless", io_type="input", default=1.893)
+    brake_mass_cost_coeff = base.brake_mass_cost_coeff.reuse(default=7.4256)
     # hss_mass_coeff = base.hss_mass_coeff.reuse(default=0.19894)
     # hss_mass_cost_coeff = base.hss_mass_cost_coeff.reuse(default=6.8)
     # generator_mass_coeff = base.generator_mass_coeff.reuse(default=2.3)
@@ -188,3 +189,28 @@ class Land2020NLR(CSMBase):
         self.gearbox_mass = (
             self.gearbox_torque_density * (self.rotor_torque * 1e3) ** self.gearbox_torque_exp
         )
+
+    def calculate_brake_mass(self):
+        """Calculates and sets :py:attr:`brake_mass` if it was not provided by the user.
+
+        .. math:: k * power + b
+
+        where:
+
+        - :math:`k =` :py:attr:`brake_mass_coeff`
+        - :math:`power =` :py:attr:`rated_power_kw`
+        - :math:`b =` :py:attr:`brake_mass_intercept`
+
+        Args:
+            brake_mass_coeff (float): :math:`k` in the mass equation above (:math:`kg/kW`).
+            rated_power_kw (float): Turbine nameplate capacity (rated power) (:math:`kW`).
+            brake_mass_intercept (bool): :math:`b` in the mass equation above (:math:`kg`).
+
+        Raises:
+            ValueError: Raised if the required parameters have not been provided or calculated.
+        """
+        exists = self._prepare_calculation("brake_mass")
+        if exists:
+            return
+
+        self.brake_mass = self.brake_mass_coeff * self.rated_power_kw + self.brake_mass_intercept
