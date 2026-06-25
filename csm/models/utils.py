@@ -84,39 +84,26 @@ def create_field(
         _validators += [validators.optional(el) for el in additional_validators]
 
     if obj is int:
-        _field = field(
-            default=default,
-            converter=_converters,
-            validator=_validators,
-            alias=alias,
-            metadata={"units": units, "io": io_type},
-        )
-        return _field
-    if obj is float:
+        pass
+    elif obj is float:
         if _converters is None:
             _converters = []
         _converters = [converters.optional(convert_float), *_converters]
-        _field = field(
-            default=default,
-            converter=_converters,
-            validator=_validators,
-            alias=alias,
-            metadata={"units": units, "io": io_type},
-        )
-        return _field
-    if obj is bool:
+    elif obj is bool:
         if _converters is None:
             _converters = []
         _converters = [converters.optional(converters.to_bool), *_converters]
-        _field = field(
-            default=default,
-            converter=_converters,
-            validator=_validators,
-            alias=alias,
-            metadata={"units": units, "io": io_type},
-        )
-        return _field
-    raise NotImplementedError(f"No setup created for type: {obj}")
+    else:
+        raise NotImplementedError(f"No setup created for type: {obj}")
+
+    _field = field(
+        default=default,
+        converter=_converters,
+        validator=_validators,
+        alias=alias,
+        metadata={"units": units, "io": io_type},
+    )
+    return _field
 
 
 def reuse(attribute: Attribute, default: Any, *, init: bool | None = None) -> attrib:
