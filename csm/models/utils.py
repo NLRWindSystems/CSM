@@ -37,7 +37,6 @@ def create_field(
     io_type: str = "input",
     *,
     default: int | float | bool | None = None,
-    alias: str | None = None,
     additional_validators: list[callable] | None = None,
     additional_converters: list[callable] | None = None,
     **kwargs,
@@ -54,7 +53,6 @@ def create_field(
             initialized within a WISDEM model. Typically ``xx_mass` and ``xx_cost`` attributes
             are both inputs and outputs. Defaults to "input".
         default (int | float | bool, optional): Value of the default, if not None.
-        alias (str | None, optional): A secondary name able to be used by the user for passing data.
         additional_validators (list[callable], optional): A list of additional validator functions
             to attach to the ``attrs.field`` initialization. Defaults to None
         additional_converters (list[callable], optional): A list of additional converter functions
@@ -102,7 +100,6 @@ def create_field(
         default=default,
         converter=_converters,
         validator=_validators,
-        alias=alias,
         metadata={"units": units, "io": io_type},
         **kwargs,
     )
