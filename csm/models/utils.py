@@ -40,6 +40,7 @@ def create_field(
     alias: str | None = None,
     additional_validators: list[callable] | None = None,
     additional_converters: list[callable] | None = None,
+    **kwargs,
 ) -> field:
     """Creates an :py:attr:`obj`-based field with pre-loaded defaults, conversions, validations,
     and metadata.
@@ -58,6 +59,7 @@ def create_field(
             to attach to the ``attrs.field`` initialization. Defaults to None
         additional_converters (list[callable], optional): A list of additional converter functions
             to attach to the ``attrs.field`` initialization. Defaults to None
+        kwargs (dict[str, Any], optional): Additional parameterizations to pass to ``attrs.field``.
 
     Returns:
         attrs.field:
@@ -102,6 +104,7 @@ def create_field(
         validator=_validators,
         alias=alias,
         metadata={"units": units, "io": io_type},
+        **kwargs,
     )
     return _field
 
