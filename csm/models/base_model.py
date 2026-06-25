@@ -128,6 +128,15 @@ parameter_map = {
     ),
     "transformer_mass": ("rated_power_kw", "transformer_mass_coeff", "transformer_mass_intercept"),
     "transformer_cost": ("transformer_mass", "transformer_mass_cost_coeff"),
+    "converter_mass": (),
+    "converter_cost": ("converter_mass", "converter_mass_cost_coeff"),
+    "electrical_connection_mass": (),
+    "electrical_connection_cost": (
+        "rated_power_kw",
+        "electrical_connection_rated_power_cost_coeff",
+    ),
+    "controls_mass": (),
+    "controls_cost": ("rated_power_kw", "controls_rated_power_cost_coeff"),
     "tower_mass": ("tower_length", "tower_mass_coeff", "tower_mass_exp"),
     "tower_cost": ("tower_mass", "tower_mass_cost_coeff"),
     "nacelle_mass": (
@@ -144,6 +153,9 @@ parameter_map = {
         "nacelle_cover_mass",
         "platform_mainframe_mass",
         "transformer_mass",
+        "converter_mass",
+        "controls_mass",
+        "electrical_connection_mass",
     ),
     "nacelle_cost": (
         "low_speed_shaft_cost",
@@ -271,7 +283,10 @@ class CSMBase:
             :py:method:`calculate_transformer_mass`.
         transformer_mass_intercept (bool): :math:`b` in the mass equation from
             :py:method:`calculate_transformer_mass`.
-        transformer_mass_cost_coeff (float): Nacelle cover cost per kilogram (USD/kg).
+        transformer_mass_cost_coeff (float): Transformer cost per kilogram (USD/kg).
+        controls_rated_power_cost_coeff (float): Controls cost per kilowatt of capacity (USD/kW).
+        electrical_connection_rated_power_cost_coeff (float): Electrical connection cost per
+            kilowatt (USD/kW).
         tower_mass_coeff (float): :math:`k` in the mass from :py:method:`calculate_tower_mass`
             (:math:`kg/m`).
         tower_length (float): For onshore turbines, this is the hub height (total length above
@@ -344,6 +359,20 @@ class CSMBase:
             :py:method:`calculate_transformer_mass` for more details.
         transformer_cost (float): Transformer cover cost (USD). See
             :py:method:`calculate_transformer_cost` for more details.
+        controls_mass (float): Controls mass (:math:`kg`). See
+            :py:method:`calculate_controls_mass` for more details.
+        controls_cost (float): Controls cost (USD). See
+            :py:method:`calculate_controls_cost` for more details.
+        electrical_connection_mass (float): Electrical connection mass (:math:`kg`). See
+            :py:method:`calculate_electrical_connection_mass` for more details.
+        electrical_connection_cost (float): Electrical connection cost (USD). See
+            :py:method:`calculate_electrical_connection_cost` for more details.
+        converter_mass (float): Converter mass (:math:`kg`). See
+            :py:method:`calculate_converter_mass` for more details.
+        converter_mass_cost_coeff (float): Electrical converter cost per kilogram (USD/kg). See
+            :py:method:`calculate_converter_cost` for more details.
+        converter_cost (float): Converter cost (USD). See
+            :py:method:`calculate_converter_cost` for more details.
         tower_mass (float): Tower mass (kg). See
             :py:method:`calculate_tower_mass` for more details.
         tower_cost (float): Tower cost (USD). See
@@ -553,6 +582,35 @@ class CSMBase:
         float, "kg", "both", additional_validators=[validators.ge(0)]
     )
     transformer_cost: float = create_field(
+        float, "USD", "both", additional_validators=[validators.ge(0)]
+    )
+
+    # electronics
+    controls_mass: float = create_field(
+        float, "kg", "both", additional_validators=[validators.ge(0)]
+    )
+    controls_rated_power_cost_coeff: float = create_field(
+        float, "USD/kW", "input", additional_validators=[validators.ge(0)]
+    )
+    controls_cost: float = create_field(
+        float, "USD", "both", additional_validators=[validators.ge(0)]
+    )
+
+    electrical_connection_mass: float = create_field(
+        float, "kg", "both", additional_validators=[validators.ge(0)]
+    )
+    electrical_connection_rated_power_cost_coeff: float = create_field(
+        float, "USD/kW", "input", additional_validators=[validators.ge(0)]
+    )
+    electrical_connection_cost: float = create_field(
+        float, "USD", "both", additional_validators=[validators.ge(0)]
+    )
+
+    converter_mass: float = create_field(
+        float, "kg", "both", additional_validators=[validators.ge(0)]
+    )
+    converter_mass_cost_coeff: float = create_field(float, "USD/kg", "input")
+    converter_cost: float = create_field(
         float, "USD", "both", additional_validators=[validators.ge(0)]
     )
 
@@ -1750,8 +1808,8 @@ class CSMBase:
         - :math:`m =` :py:attr:`transformer_mass` (:math:`kg`).
 
         Args:
-            transformer_mass_cost_coeff (float): Transformer cover cost per kilogram (USD/kg).
-            transformer_mass (float): Transformer cover mass (kg). See
+            transformer_mass_cost_coeff (float): Transformer cost per kilogram (USD/kg).
+            transformer_mass (float): Transformer mass (kg). See
                 :py:method:`calculate_transformer_mass` for more details.
 
         Raises:
@@ -1762,6 +1820,114 @@ class CSMBase:
             return
 
         self.transformer_cost = self.transformer_mass_cost_coeff * self.transformer_mass
+
+    def calculate_controls_mass(self):
+        """Calculates and sets the :py:attr:`controls_mass` if it was not provided by the user.
+
+        Currently sets the value to 0 as there is no base relationship.
+        """
+        exists = self._prepare_calculation("controls_mass")
+        if exists:
+            return
+
+        self.controls_mass = 0.0
+
+    def calculate_controls_cost(self):
+        r"""Calculates and sets :py:attr:`controls_cost` if it was not provided by the user.
+
+        .. math:: k * rated\_power
+
+        where:
+
+        - :math:`k =` :py:attr:`controls_rated_power_cost_coeff` (:math:`USD/kW`)
+        - :math:`m =` :py:attr:`rated_power` (:math:`kW`).
+
+        Args:
+            controls_rated_power_cost_coeff (float): Controls cost per kW of capacity (USD/kW).
+            rated_power_kw (float): Turbine nameplate capacity (rated power) (:math:`kW`).
+
+        Raises:
+            ValueError: Raised if any of the required parameters have not been provided.
+        """
+        exists = self._prepare_calculation("controls_cost")
+        if exists:
+            return
+
+        self.controls_cost = self.controls_rated_power_cost_coeff * self.rated_power_kw
+
+    def calculate_converter_mass(self):
+        """Calculates and sets the :py:attr:`converter_mass` if it was not provided by the user.
+
+        Currently sets the value to 0 as there is no base relationship.
+        """
+        exists = self._prepare_calculation("converter_mass")
+        if exists:
+            return
+
+        self.converter_mass = 0.0
+
+    def calculate_converter_cost(self):
+        """Calculates and sets :py:attr:`converter_cost` if it was not provided by the user.
+
+        .. math:: k * m
+
+        where:
+
+        - :math:`k =` :py:attr:`converter_mass_cost_coeff` (:math:`USD/kg`)
+        - :math:`m =` :py:attr:`converter_mass` (:math:`kg`).
+
+        Args:
+            converter_mass_cost_coeff (float): Electrical converter cost per kilogram (USD/kg).
+            converter_mass (float): Electrical converter mass (kg). See
+                :py:method:`calculate_converter_mass` for more details.
+
+        Raises:
+            ValueError: Raised if any of the required parameters have not been provided.
+        """
+        exists = self._prepare_calculation("converter_cost")
+        if exists:
+            return
+
+        self.converter_cost = self.converter_mass_cost_coeff * self.converter_mass
+
+    def calculate_electrical_connection_mass(self):
+        """Calculates and sets the :py:attr:`electrical_connection_mass` if it was not provided by
+        the user.
+
+        Currently sets the value to 0 as there is no base relationship.
+        """
+        exists = self._prepare_calculation("electrical_connection_mass")
+        if exists:
+            return
+
+        self.electrical_connection_mass = 0.0
+
+    def calculate_electrical_connection_cost(self):
+        r"""Calculates and sets :py:attr:`electrical_connection_cost` if it was not provided by the
+        user.
+
+        .. math:: k * rated\_power
+
+        where:
+
+        - :math:`k =` :py:attr:`electrical_connection_rated_power_cost_coeff` (:math:`USD/kW`)
+        - :math:`m =` :py:attr:`rated_power` (:math:`kW`).
+
+        Args:
+            electrical_connection_rated_power_cost_coeff (float): Electrical connection cost per
+                kW of capacity (USD/kW).
+            rated_power_kw (float): Turbine nameplate capacity (rated power) (:math:`kW`).
+
+        Raises:
+            ValueError: Raised if any of the required parameters have not been provided.
+        """
+        exists = self._prepare_calculation("electrical_connection_cost")
+        if exists:
+            return
+
+        self.electrical_connection_cost = (
+            self.electrical_connection_rated_power_cost_coeff * self.rated_power_kw
+        )
 
     def calculate_tower_mass(self):
         """Calculates and sets :py:attr:`tower_mass` if it was not provided by the user.
@@ -1833,6 +1999,9 @@ class CSMBase:
         - :py:attr:`nacelle_cover_mass`
         - :py:attr:`platform_mainframe_mass`
         - :py:attr:`transformer_mass`
+        - :py:attr:`controls_mass`
+        - :py:attr:`converter_mass`
+        - :py:attr:`electrical_connection_mass`
 
         Args:
             low_speed_shaft_mass (float): See :py:method:`calculate_low_speed_shaft_mass` for more
@@ -1853,6 +2022,10 @@ class CSMBase:
             platform_mainframe_mass (float): See :py:method:`calculate_platform_mainframe_mass` for
                 more details.
             transformer_mass (float): See :py:method:`calculate_transformer_mass` for more details.
+            controls_mass (float): See :py:method:`calculate_controls_mass` for more details.
+            converter_mass (float): See :py:method:`calculate_converter_mass` for more details.
+            electrical_connection_mass (float): See
+                :py:method:`calculate_electrical_connection_mass` for more details.
 
         Raises:
             ValueError: Raised if the required parameters have not been provided or calculated.
@@ -1875,6 +2048,9 @@ class CSMBase:
                 self.nacelle_cover_mass,
                 self.platform_mainframe_mass,
                 self.transformer_mass,
+                self.controls_mass,
+                self.converter_mass,
+                self.electrical_connection_mass,
             )
         )
 
@@ -1896,6 +2072,9 @@ class CSMBase:
         - :py:attr:`nacelle_cover_cost`
         - :py:attr:`platform_mainframe_cost`
         - :py:attr:`transformer_cost`
+        - :py:attr:`controls_cost`
+        - :py:attr:`converter_cost`
+        - :py:attr:`electrical_connection_cost`
 
         Args:
             low_speed_shaft_cost (float): See :py:method:`calculate_low_speed_shaft_cost` for more
@@ -1916,6 +2095,10 @@ class CSMBase:
             platform_mainframe_cost (float): See :py:method:`calculate_platform_mainframe_cost` for
                 more details.
             transformer_cost (float): See :py:method:`calculate_transformer_cost` for more details.
+            controls_cost (float): See :py:method:`calculate_controls_cost` for more details.
+            converter_cost (float): See :py:method:`calculate_converter_cost` for more details.
+            electrical_connection_cost (float): See
+                :py:method:`calculate_electrical_connection_cost` for more details.
 
         Raises:
             ValueError: Raised if the required parameters have not been provided or calculated.
@@ -1938,6 +2121,9 @@ class CSMBase:
                 self.nacelle_cover_cost,
                 self.platform_mainframe_cost,
                 self.transformer_cost,
+                self.controls_cost,
+                self.converter_cost,
+                self.electrical_connection_cost,
             )
         )
 
@@ -2105,6 +2291,9 @@ class CSMBase:
         self.calculate_nacelle_cover_mass()
         self.calculate_platform_mainframe_mass()
         self.calculate_transformer_mass()
+        self.calculate_converter_mass()
+        self.calculate_controls_mass()
+        self.calculate_electrical_connection_mass()
         self.calculate_tower_mass()
         self.calculate_nacelle_mass()
         self.calculate_hub_system_mass()
@@ -2127,7 +2316,13 @@ class CSMBase:
         self.calculate_nacelle_cover_cost()
         self.calculate_platform_mainframe_cost()
         self.calculate_transformer_cost()
+        self.calculate_converter_cost()
+        self.calculate_controls_cost()
+        self.calculate_electrical_connection_cost()
         self.calculate_tower_cost()
+        self.calculate_converter_cost()
+        self.calculate_electrical_connection_cost()
+        self.calculate_controls_cost()
         self.calculate_nacelle_cost()
         self.calculate_hub_system_cost()
         self.calculate_rotor_cost()
@@ -2216,6 +2411,12 @@ class CSMBase:
             "platform_mainframe_cost": self.platform_mainframe_cost,
             "transformer_mass": self.transformer_mass,
             "transformer_cost": self.transformer_cost,
+            "converter_mass": self.converter_mass,
+            "converter_cost": self.converter_cost,
+            "controls_mass": self.controls_mass,
+            "controls_cost": self.controls_cost,
+            "electrical_connection_mass": self.electrical_connection_mass,
+            "electrical_connection_cost": self.electrical_connection_cost,
             "tower_mass": self.tower_mass,
             "tower_cost": self.tower_cost,
             "nacelle_mass": self.nacelle_mass,
@@ -2249,6 +2450,9 @@ class CSMBase:
             "nacelle_cover_mass": self.nacelle_cover_mass,
             "platform_mainframe_mass": self.platform_mainframe_mass,
             "transformer_mass": self.transformer_mass,
+            "converter_mass": self.converter_mass,
+            "controls_mass": self.controls_mass,
+            "electrical_connection_mass": self.electrical_connection_mass,
             "tower_mass": self.tower_mass,
             "nacelle_mass": self.nacelle_mass,
             "hub_system_mass": self.hub_system_mass,
@@ -2276,6 +2480,9 @@ class CSMBase:
             "nacelle_cover_cost": self.nacelle_cover_cost,
             "platform_mainframe_cost": self.platform_mainframe_cost,
             "transformer_cost": self.transformer_cost,
+            "converter_cost": self.converter_cost,
+            "controls_cost": self.controls_cost,
+            "electrical_connection_cost": self.electrical_connection_cost,
             "tower_cost": self.tower_cost,
             "nacelle_cost": self.nacelle_cost,
             "hub_system_cost": self.hub_system_cost,

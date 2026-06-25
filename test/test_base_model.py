@@ -132,6 +132,27 @@ def test_defaults_only(subtests):
     with pytest.raises(ValueError, match=undefined_params_msg):
         model.calculate_transformer_cost()
 
+    # NOTE: no default relationship
+    # with pytest.raises(ValueError, match=undefined_params_msg):
+    #     model.calculate_converter_mass()
+
+    with pytest.raises(ValueError, match=undefined_params_msg):
+        model.calculate_converter_cost()
+
+    # NOTE: no default relationship
+    # with pytest.raises(ValueError, match=undefined_params_msg):
+    #     model.calculate_controls_mass()
+
+    with pytest.raises(ValueError, match=undefined_params_msg):
+        model.calculate_controls_cost()
+
+    # NOTE: no default relationship
+    # with pytest.raises(ValueError, match=undefined_params_msg):
+    #     model.calculate_electrical_connection_mass()
+
+    with pytest.raises(ValueError, match=undefined_params_msg):
+        model.calculate_electrical_connection_cost()
+
     with pytest.raises(ValueError, match=undefined_params_msg):
         model.calculate_nacelle_mass()
 
@@ -254,6 +275,12 @@ def test_with_2015_inputs(subtests):
         assert csm.platform_mainframe_mass == approx(8220.65761911)
     with subtests.test("Transformer mass"):
         assert csm.transformer_mass == approx(11485.0)
+    with subtests.test("Controls mass"):
+        assert csm.controls_mass == approx(0.0)
+    with subtests.test("Converter mass"):
+        assert csm.converter_mass == approx(0.0)
+    with subtests.test("Electrical connection mass"):
+        assert csm.electrical_connection_mass == approx(0.0)
     with subtests.test("Tower mass"):
         assert csm.tower_mass == approx(182336.48057717)
     with subtests.test("Hub system mass"):
@@ -294,10 +321,12 @@ def test_with_2015_inputs(subtests):
         assert csm.yaw_system_cost == approx(102338.68857747)
     with subtests.test("Hydraulic cooling cost"):
         assert csm.hydraulic_cooling_cost == approx(49600.0)
-    # with subtests.test("Hub cost"):
-    # assert csm.controls_cost == approx(105750.0)
-    # assert csm.converter_cost == approx(0.0)
-    # assert csm.elec_cost == approx(209250.0)
+    with subtests.test("Controls cost"):
+        assert csm.controls_cost == approx(105750.0)
+    with subtests.test("Converter cost"):
+        assert csm.converter_cost == approx(0.0)
+    with subtests.test("Electrical connection cost"):
+        assert csm.electrical_connection_cost == approx(209250.0)
     with subtests.test("Nacelle Cover cost"):
         assert csm.nacelle_cover_cost == approx(38969.133)
     with subtests.test("Platform mainframe cost"):
@@ -319,7 +348,7 @@ def test_with_2015_inputs(subtests):
     with subtests.test("Turbine cost"):
         # assert csm.turbine_mass_tcc == approx(445414.81133358914)
         assert csm.turbine_cost == approx(3430022.404353479)
-        assert csm.turbine_cost_kW == approx(686.0044808706958)
+        assert csm.turbine_cost_kw == approx(686.0044808706958)
 
 
 @pytest.mark.unit

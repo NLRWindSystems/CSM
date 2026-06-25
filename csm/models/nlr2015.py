@@ -81,6 +81,11 @@ class Land2015NLR(CSMBase):
     platform_mainframe_mass_cost_coeff = base.platform_mainframe_mass_cost_coeff.reuse(default=17.1)
     crane_cost = base.crane_cost.reuse(default=12000.0)
     transformer_mass_coeff = base.transformer_mass_coeff.reuse(default=1.9150)
+    controls_rated_power_cost_coeff = base.controls_rated_power_cost_coeff.reuse(21.15)
+    converter_mass_cost_coeff = base.converter_mass_cost_coeff.reuse(18.8)
+    electrical_connection_rated_power_cost_coeff = (
+        base.electrical_connection_rated_power_cost_coeff.reuse(41.85)
+    )
     transformer_mass_intercept = base.transformer_mass_intercept.reuse(default=1910.0)
     transformer_mass_cost_coeff = base.transformer_mass_cost_coeff.reuse(default=18.8)
     tower_mass_coeff = base.tower_mass_coeff.reuse(default=19.828)
