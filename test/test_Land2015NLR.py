@@ -67,12 +67,15 @@ def test_CSMBase_defaults_only(subtests):
     assert nlr2015.tower_mass_coeff == 19.828
     assert nlr2015.tower_mass_exp == 2.0282
     assert nlr2015.tower_mass_cost_coeff == 2.9
+    assert nlr2015.controls_rated_power_cost_coeff == 21.15
+    assert nlr2015.converter_mass_cost_coeff == 18.8
+    assert nlr2015.electrical_connection_rated_power_cost_coeff == 41.85
 
     results = nlr2015.get_results()
     mass_results = nlr2015.get_mass_results()
     cost_results = nlr2015.get_cost_results()
     with subtests.test("Ensure mass and cost results add to the joint results"):
-        assert len(mass_results) + len(cost_results) == len(results)
+        assert len(mass_results) + len(cost_results) + 2 == len(results)  # torque + rated rpm
         assert not set(mass_results).intersection(cost_results)
 
     with subtests.test("Check default attribute values for results"):
@@ -126,6 +129,12 @@ def test_Land2015NLR_with_2015_inputs(subtests):
         assert csm.platform_mainframe_mass == approx(8220.65761911)
     with subtests.test("Transformer mass"):
         assert csm.transformer_mass == approx(11485.0)
+    with subtests.test("Controls mass"):
+        assert csm.controls_mass == approx(0.0)
+    with subtests.test("Converter mass"):
+        assert csm.converter_mass == approx(0.0)
+    with subtests.test("Electrical connection mass"):
+        assert csm.electrical_connection_mass == approx(0.0)
     with subtests.test("Tower mass"):
         assert csm.tower_mass == approx(182336.48057717)
     with subtests.test("Hub system mass"):
@@ -176,6 +185,12 @@ def test_Land2015NLR_with_2015_inputs(subtests):
         assert csm.platform_mainframe_cost == approx(101273.24528671)
     with subtests.test("Transformer cost"):
         assert csm.transformer_cost == approx(215918.0)
+    with subtests.test("Controls cost"):
+        assert csm.controls_cost == approx(105750.0)
+    with subtests.test("Converter cost"):
+        assert csm.converter_cost == approx(0.0)
+    with subtests.test("Electrical connection cost"):
+        assert csm.electrical_connection_cost == approx(209250.0)
     with subtests.test("Nacelle cost"):
         assert csm.nacelle_cost == approx(1665612.9280069391)
         # with subtests.test("Hub cost"):
@@ -191,4 +206,4 @@ def test_Land2015NLR_with_2015_inputs(subtests):
     with subtests.test("Turbine cost"):
         # assert csm.turbine_mass_tcc == approx(445414.81133358914)
         assert csm.turbine_cost == approx(3430022.404353479)
-        assert csm.turbine_cost_kW == approx(686.0044808706958)
+        assert csm.turbine_cost_kw == approx(686.0044808706958)
