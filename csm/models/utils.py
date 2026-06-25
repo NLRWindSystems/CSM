@@ -36,7 +36,8 @@ def create_field(
     units: str = "unitless",
     io_type: str = "input",
     *,
-    default: int | None = None,
+    default: int | float | bool | None = None,
+    alias: str | None = None,
     additional_validators: list[callable] | None = None,
     additional_converters: list[callable] | None = None,
 ) -> field:
@@ -51,7 +52,8 @@ def create_field(
         io_type (str, optional): One of "input", "output", or "both" for how the attribute should be
             initialized within a WISDEM model. Typically ``xx_mass` and ``xx_cost`` attributes
             are both inputs and outputs. Defaults to "input".
-        default (int, optional):  Value of the default, if not None. Should be used sparingly.
+        default (int | float | bool, optional): Value of the default, if not None.
+        alias (str | None, optional): A secondary name able to be used by the user for passing data.
         additional_validators (list[callable], optional): A list of additional validator functions
             to attach to the ``attrs.field`` initialization. Defaults to None
         additional_converters (list[callable], optional): A list of additional converter functions
@@ -86,6 +88,7 @@ def create_field(
             default=default,
             converter=_converters,
             validator=_validators,
+            alias=alias,
             metadata={"units": units, "io": io_type},
         )
         return _field
@@ -97,6 +100,7 @@ def create_field(
             default=default,
             converter=_converters,
             validator=_validators,
+            alias=alias,
             metadata={"units": units, "io": io_type},
         )
         return _field
@@ -108,6 +112,7 @@ def create_field(
             default=default,
             converter=_converters,
             validator=_validators,
+            alias=alias,
             metadata={"units": units, "io": io_type},
         )
         return _field
