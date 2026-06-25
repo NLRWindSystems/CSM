@@ -367,11 +367,11 @@ class CSMBase:
             :py:method:`calculate_electrical_connection_mass` for more details.
         electrical_connection_cost (float): Electrical connection cost (USD). See
             :py:method:`calculate_electrical_connection_cost` for more details.
-        converter_mass (float): Converter mass (:math:`kg`). See
+        converter_mass (float): Power converter mass (:math:`kg`). See
             :py:method:`calculate_converter_mass` for more details.
-        converter_mass_cost_coeff (float): Electrical converter cost per kilogram (USD/kg). See
+        converter_mass_cost_coeff (float): Power converter cost per kilogram (USD/kg). See
             :py:method:`calculate_converter_cost` for more details.
-        converter_cost (float): Converter cost (USD). See
+        converter_cost (float): Power converter cost (USD). See
             :py:method:`calculate_converter_cost` for more details.
         tower_mass (float): Tower mass (kg). See
             :py:method:`calculate_tower_mass` for more details.
@@ -652,7 +652,6 @@ class CSMBase:
     parameter_graph: nx.Digraph = field(init=False)
 
     # NOTE: temporary while prototyping
-    power_converter_cost: float = field(default=1000.0)
     turbine_production_cost: float = field(default=1000.0)
     tower_flange_material_cost: float = field(default=1000.0)
     tower_flange_production_cost: float = field(default=1000.0)
@@ -1877,8 +1876,8 @@ class CSMBase:
         - :math:`m =` :py:attr:`converter_mass` (:math:`kg`).
 
         Args:
-            converter_mass_cost_coeff (float): Electrical converter cost per kilogram (USD/kg).
-            converter_mass (float): Electrical converter mass (kg). See
+            converter_mass_cost_coeff (float): Power converter cost per kilogram (USD/kg).
+            converter_mass (float): Power converter mass (kg). See
                 :py:method:`calculate_converter_mass` for more details.
 
         Raises:
@@ -2320,9 +2319,6 @@ class CSMBase:
         self.calculate_controls_cost()
         self.calculate_electrical_connection_cost()
         self.calculate_tower_cost()
-        self.calculate_converter_cost()
-        self.calculate_electrical_connection_cost()
-        self.calculate_controls_cost()
         self.calculate_nacelle_cost()
         self.calculate_hub_system_cost()
         self.calculate_rotor_cost()
@@ -2512,8 +2508,8 @@ class CSMBase:
             for complete details.
           - Nacelle: model-calculated :py:attr:`nacelle_cost`.
             See :py:method:`calculate_nacelle_cost for complete details.
-          - Power Converter: model-calculated :py:attr:`power_converter_cost`. See
-            :py:method:`calculate_power_converter_cost` for complete details.
+          - Power Converter: model-calculated :py:attr:`converter_cost`. See
+            :py:method:`calculate_converter_cost` for complete details.
           - Production: user-provided :py:attr:`turbine_production_cost`
         - Wind Tower Flanges
           - Material: user-provided :py:attr:`tower_flange_material_cost`
@@ -2539,7 +2535,7 @@ class CSMBase:
             "blade": self.blade_cost,
             "hub": self.hub_cost,
             "nacelle": self.nacelle_cost,
-            "power_converter": self.power_converter_cost,
+            "power_converter": self.converter_cost,
             "turbine_production": turbine_production_cost,
             "tower_flange_material": tower_flange_material_cost,
             "tower_flange_production": tower_flange_production_cost,
