@@ -490,7 +490,7 @@ c_{rotor} &= n_{blade} c_{blade} + c_{hubsys}
 
 For variable names access to override the default values see the :ref:`csmsource`.
 
-## Nacelle
+### Nacelle
 
 It is assumed that the nacelle and all of its sub-components are assembled and transported as a one
 unit, thus there are additional costs at this level of aggregation,
@@ -508,7 +508,7 @@ overhead cost multiplier, and $ka$ is an assembly cost multiplier. By default, $
 
 For variable names access to override the default values see the :ref:`csmsource`.
 
-## Tower System
+### Tower System
 
 The tower is not aggregated with any other component, but for consistency there are allowances for
 additional costs incurred from transportation and assembly complexity,
@@ -522,7 +522,7 @@ overhead cost multiplier, and $ka$ is an assembly cost multiplier. By default, $
 
 For variable names access to override the default values see the :ref:`csmsource`.
 
-## Turbine
+### Turbine
 
 The final turbine assembly also allows for user specification of other cost multipliers,
 

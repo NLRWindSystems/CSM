@@ -36,6 +36,10 @@ html:
   use_issues_button: true
   use_repository_button: true
   baseurl: https://nlrwindsystems.github.io/CSM/
+  show_toc_level: 3
+  show_nav_level: 2
+  navigation_depth: 2
+  collapse_navigation: true
 sphinx:
   extra_extensions:
     - sphinx.ext.autodoc

@@ -6,13 +6,13 @@ root: intro
 parts:
 - caption: Getting Started
   chapters:
-    - file: intro/install
-    - file: intro/contributing
-    - file: intro/new_model
+  - file: intro/install
+  - file: intro/contributing
+  - file: intro/new_model
 - caption: Model Background
   chapters:
-    - file: user_guide/theory
-    - file: user_guide/model_overview
-    - file: user_guide/model_overview
-- caption: API
-    - file: api/index
+  - file: user_guide/theory
+  - file: user_guide/model_overview
+- caption: API Reference
+  chapters:
+  - file: api/index
