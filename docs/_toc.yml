@@ -1,0 +1,18 @@
+# Table of contents
+# Learn more at https://jupyterbook.org/customize/toc.html
+
+format: jb-book
+root: intro
+parts:
+- caption: Getting Started
+  chapters:
+    - file: intro/install
+    - file: intro/contributing
+    - file: intro/new_model
+- caption: Model Background
+  chapters:
+    - file: user_guide/theory
+    - file: user_guide/model_overview
+    - file: user_guide/model_overview
+- caption: API
+    - file: api/index

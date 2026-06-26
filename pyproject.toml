@@ -29,6 +29,8 @@ develop = [
     "pytest-check",
     "ruff>=0.2",
     "ty",
+    "jupyter-book<2",
+    "sphinxcontrib-napoleon",
 ]
 
 [tool.setuptools]
@@ -137,8 +139,8 @@ omit = [
 addopts = [
   "--strict-markers",
   "-r fEsxX",
-  "--cov=csm",
-  "--cov-report=term-missing"
+  # "--cov=csm",
+  # "--cov-report=term-missing"
 ]
 tmp_path_retention_count = "1"
 tmp_path_retention_policy = "failed"
