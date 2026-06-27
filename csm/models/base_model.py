@@ -2270,9 +2270,8 @@ class CSMBase:
         self.turbine_cost = self.nacelle_cost + self.rotor_cost + self.tower_cost
         self.turbine_cost_kw = self.turbine_cost / self.rated_power_kw
 
-    def run(self):
-        """Run the mass and cost calculations."""
-        # self.calculate_rotor_torque()
+    def calculate_subsystem_mass(self):
+        """Runs all the mass calculations for the non-aggregated turbine subsytems."""
         self.calculate_blade_mass()
         self.calculate_hub_mass()
         self.calculate_pitch_system_mass()
@@ -2294,11 +2293,9 @@ class CSMBase:
         self.calculate_controls_mass()
         self.calculate_electrical_connection_mass()
         self.calculate_tower_mass()
-        self.calculate_nacelle_mass()
-        self.calculate_hub_system_mass()
-        self.calculate_rotor_mass()
-        self.calculate_turbine_mass()
 
+    def calculate_subsystem_cost(self):
+        """Runs all the cost calculations for the non-aggregated turbine subsystems."""
         self.calculate_blade_cost()
         self.calculate_hub_cost()
         self.calculate_pitch_system_cost()
@@ -2319,10 +2316,27 @@ class CSMBase:
         self.calculate_controls_cost()
         self.calculate_electrical_connection_cost()
         self.calculate_tower_cost()
+
+    def calculate_system_mass(self):
+        """Calculates the mass for all aggregate turbine systems."""
+        self.calculate_nacelle_mass()
+        self.calculate_hub_system_mass()
+        self.calculate_rotor_mass()
+        self.calculate_turbine_mass()
+
+    def calculate_system_cost(self):
+        """Calculates the cost for all aggregate turbine systems."""
         self.calculate_nacelle_cost()
         self.calculate_hub_system_cost()
         self.calculate_rotor_cost()
         self.calculate_turbine_cost()
+
+    def run(self):
+        """Run the mass and cost calculations."""
+        self._calculate_subsystem_mass()
+        self._calculate_system_mass()
+        self._calculate_subsystem_cost()
+        self._calculate_system_costs()
 
     @classmethod
     def _get_attr_map(
