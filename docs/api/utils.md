@@ -1,7 +1,7 @@
 (api:base-model)=
-# Base Model
+# Utilities
 
 ```{eval-rst}
-.. automodule:: csm.models.base_model
+.. automodule:: csm.models.utils
     :members:
 ```
