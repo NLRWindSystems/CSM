@@ -57,7 +57,7 @@ class Land2020NLR(CSMBase):
     bearing_mass_exp = base.bearing_mass_exp.reuse(default=3.5)
     bearing_mass_cost_coeff = base.bearing_mass_cost_coeff.reuse(default=4.914)
     gearbox_torque_density = base.gearbox_torque_density.reuse(default=156.46)
-    gearbox_mass_exp = base.gearbox_torque_density.reuse(default=0.6566)
+    gearbox_mass_exp = create_field(float, "unitless", "input", default=0.6566)
     gearbox_torque_cost = base.gearbox_torque_cost.reuse(default=14.0868)
     brake_mass_coeff = base.brake_mass_coeff.reuse(default=198.51)
     brake_mass_intercept = create_field(float, units="unitless", io_type="input", default=1.893)

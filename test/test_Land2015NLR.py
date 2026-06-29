@@ -11,7 +11,7 @@ from test.conftest import csm_2015_test_inputs
 def test_CSMBase_defaults_only(subtests):
     """Tests that all the individual model calculations fail individually and when run as a group.
     Ensures that all results (output) values are still their defaults. The combination of these
-    tests ensures that :py:method:`CSMBase._has_values` and validate_inputs work for models
+    tests ensures that :py:meth:`CSMBase._has_values` and validate_inputs work for models
     with missing inputs.
     """
     nlr2015 = Land2015NLR()

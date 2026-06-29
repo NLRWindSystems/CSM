@@ -27,7 +27,7 @@ csm_2015_outputs = {
 def test_defaults_only(subtests):
     """Tests that all the individual model calculations fail individually and when run as a group.
     Ensures that all results (output) values are still their defaults. The combination of these
-    tests ensures that :py:method:`CSMBase._has_values` and validate_inputs work for models
+    tests ensures that :py:meth:`CSMBase._has_values` and validate_inputs work for models
     with missing inputs.
     """
     model = CSMBase()
@@ -353,7 +353,7 @@ def test_with_2015_inputs(subtests):
 
 @pytest.mark.unit
 def test_from_dict(subtests):
-    """Test :py:method:`CSMBase.from_dict`."""
+    """Test :py:meth:`CSMBase.from_dict`."""
     with subtests.test("2015 inputs from_dict"):
         model = CSMBase.from_dict(csm_2015_inputs)
         for name, val in csm_2015_inputs.items():
@@ -389,7 +389,7 @@ def test_from_dict(subtests):
 
 @pytest.mark.unit
 def test_attrs_pre_post_initialization():
-    """Test :py:method:`CSMBase.__attrs_pre_init__` and :py:method:`CSMBase.__attrs_post_init__`."""
+    """Test :py:meth:`CSMBase.__attrs_pre_init__` and :py:meth:`CSMBase.__attrs_post_init__`."""
     model = CSMBase()
     assert model.parameter_map == parameter_map
 
@@ -402,7 +402,7 @@ def test_attrs_pre_post_initialization():
 
 @pytest.mark.unit
 def test_get_dependent_attributes():
-    """Test :py:method:`CSMBase.test_get_dependent_attributes`."""
+    """Test :py:meth:`CSMBase.test_get_dependent_attributes`."""
     model = CSMBase()
     blade_has_carbon_upstream = {
         "blade_mass",
@@ -427,7 +427,7 @@ def test_get_dependent_attributes():
 
 @pytest.mark.unit
 def test_fields():
-    """Test :py:method:`CSMBase.fields`."""
+    """Test :py:meth:`CSMBase.fields`."""
     correct_fields = fields(CSMBase)
     model = CSMBase()
     model_fields = model.fields
@@ -436,7 +436,7 @@ def test_fields():
 
 @pytest.mark.unit
 def test_fields_dict():
-    """Test :py:method:`CSMBase.fields_dict`."""
+    """Test :py:meth:`CSMBase.fields_dict`."""
     correct_fields_dict = fields_dict(CSMBase)
     model = CSMBase()
     model_fields_dict = model.fields_dict
@@ -445,7 +445,7 @@ def test_fields_dict():
 
 @pytest.mark.unit
 def test_has_values(subtests):
-    """Test :py:method:`CSMBase._has_values`."""
+    """Test :py:meth:`CSMBase._has_values`."""
     model = CSMBase.from_dict(csm_2015_inputs)
     with subtests.test("Ensure 2015 values registered"):
         assert all(model._has_values(*csm_2015_inputs))
@@ -475,7 +475,7 @@ def test_has_values(subtests):
 
 @pytest.mark.unit
 def test_validate_inputs(subtests):
-    """Test :py:method:`CSMBase._validate_inputs`."""
+    """Test :py:meth:`CSMBase._validate_inputs`."""
     # don't use from_dict since this is an incomplete model definition
     model = CSMBase(**csm_2015_defaults)
     blade_mass_inputs = model.parameter_map["blade_mass"]
@@ -496,7 +496,7 @@ def test_validate_inputs(subtests):
 
 @pytest.mark.unit
 def test_prepare_calculation(subtests):
-    """Test :py:method:`CSMBase._prepare_calculation`."""
+    """Test :py:meth:`CSMBase._prepare_calculation`."""
     # don't use from_dict since this is an incomplete model definition
     model = CSMBase(**csm_2015_defaults)
     with subtests.test("2015 defaults only can't validate"):
@@ -525,7 +525,7 @@ def test_prepare_calculation(subtests):
 
 @pytest.mark.unit
 def test_reset_values(subtests):
-    """Test :py:method:`CSMBase.reset_values`."""
+    """Test :py:meth:`CSMBase.reset_values`."""
     model = CSMBase.from_dict(csm_2015_inputs)
     blade_mass_inputs = model.parameter_map["blade_mass"]
     assert all(model._has_values(*blade_mass_inputs))
@@ -539,7 +539,7 @@ def test_reset_values(subtests):
 
 @pytest.mark.unit
 def test_update(subtests):
-    """Test :py:method:`CSMBase.update`."""
+    """Test :py:meth:`CSMBase.update`."""
     model = CSMBase.from_dict(csm_2015_inputs)
     model.run()
 
@@ -580,7 +580,7 @@ def test_update(subtests):
 
 @pytest.mark.unit
 def test_parameterize(subtests):
-    """Test :py:method:`CSMBase.parameterize`."""
+    """Test :py:meth:`CSMBase.parameterize`."""
     base = deepcopy(csm_2015_inputs)
     parameters = {
         "efficiency_max": ("range", 0.85, 0.95, 3),
