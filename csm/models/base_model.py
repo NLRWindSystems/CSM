@@ -4,8 +4,6 @@ that subsequent subclasses will use.
 Please see the :ref:`../../docs/user_guide/new_models` for creating new models to implement
 model-specific defaults while maintaining all input validation, metadata, and functionality from
 the base model.
-
-
 """
 
 import math
@@ -154,10 +152,11 @@ class CSMBase:
         rotor_diameter (float): Diameter of the swept area of the turbine blades (:math:`m`).
         turbine_class (int): Turbine classification; use 1 for IEC Wind-Class I, 2 fo
             IEC Wind-Class II or III.
+        num_bearings (int): Number of main bearings.
         blade_mass_coeff (float): :math:`k` in the blade mass equation from
             :py:meth:`calculate_blade_mass`.
         blade_has_carbon (bool): Use True if the blade has carbon, False if not.
-        blade_mass_cost_coeff (float): Blade cost per kilogram (USD/kg).
+        blade_mass_cost_coeff (float): Blade cost per kilogram (:math:`USD/kg`).
         blade_mass (float): Blade mass (kg).
         hub_mass_coeff (float): :math:`k` in the hub mass equation from
             :py:meth:`calculate_hub_mass`.
@@ -258,8 +257,6 @@ class CSMBase:
         tower_mass_exp (bool): :math:`b` in the mass equation from
             :py:meth:`calculate_tower_mass`.
         tower_mass_cost_coeff (float): Tower cover cost per kilogram (USD/kg).
-
-    Attributes:
         blade_mass (float): Blade mass (:math:`kg`). See :py:meth:`calculate_blade_mass`
             for details.
         blade_cost (float): Blade cost (USD). See :py:meth:`calculate_blade_cost`
@@ -284,16 +281,20 @@ class CSMBase:
             for more details.
         bearing_cost (float): Main bearing cost (USD). See :py:meth:`calculate_bearing_cost`
             for more details.
+        rated_rpm (float): Rated RPM of the turbine based on the :py:attr:`max_tip_speed`
+            and :py:attr:`rotor_diameter`. See :py:meth:`calculate_rotor_torque` for more details.
+        rotor_torque (float): Maximum torque produced under normal operations of the turbine
+            (kNm). See :py:meth:`calculate_rotor_torque` for more details.
         gearbox_mass (float): Gearbox mass (kg). See :py:meth:`calculate_gearbox_mass`
             for more details.
         gearbox_cost (float): Gearbox cost (USD). See :py:meth:`calculate_gearbox_cost`
             for more details.
-        brake_mass (float): Brake mass (kg). See :py:meth:`brake_mass` for more details.
-        brake_cost (float): Brake cost (USD). See :py:meth:`brake_cost` for more details.
+        brake_mass (float): Brake mass (kg). See :py:meth:`calculate_brake_mass` for more details.
+        brake_cost (float): Brake cost (USD). See :py:meth:`calculate_brake_cost` for more details.
         high_speed_shaft_mass (float): High speed shaft mass (kg).
-            See :py:meth:`high_speed_shaft_mass` for more details.
+            See :py:meth:`calculate_high_speed_shaft_mass` for more details.
         high_speed_shaft_cost (float): High speed shaft cost (USD).
-            See :py:meth:`high_speed_shaft_cost` for more details.
+            See :py:meth:`calculate_high_speed_shaft_cost` for more details.
         generator_mass (float): Generator mass (kg). See :py:meth:`calculate_generator_mass`
             for more details.
         generator_cost (float): Generator cost (USD). See :py:meth:`calculate_generator_cost`
@@ -2041,7 +2042,7 @@ class CSMBase:
         Args:
             low_speed_shaft_cost (float): See :py:meth:`calculate_low_speed_shaft_cost` for more
                 details.
-            num_bearings (float): Number of main bearings (:py:attr:`num_bearings`).
+            num_bearings (int): Number of main bearings (:py:attr:`num_bearings`).
             bearing_cost (float): See :py:meth:`calculate_bearing_cost` for more details.
             gearbox_cost (float): See :py:meth:`calculate_gearbox_cost` for more details.
             brake_cost (float): See :py:meth:`calculate_brake_cost` for more details.
@@ -2479,6 +2480,7 @@ class CSMBase:
         Component mapping is as follows:
 
         - Wind turbine
+
           - Blades: model-calculated :py:attr:`blade_cost`. See :py:meth:`calculate_blade_cost`
             for complete details.
           - Rotor Hub: model-calculated :py:attr:`hub_cost`. See :py:meth:`calculate_hub_cost`
@@ -2489,6 +2491,7 @@ class CSMBase:
             :py:meth:`calculate_converter_cost` for complete details.
           - Production: user-provided :py:attr:`turbine_production_cost`
         - Wind Tower Flanges
+
           - Material: user-provided :py:attr:`tower_flange_material_cost`
           - Production: user-provided :py:attr:`tower_flange_production_cost`
         - Tower: not counted steel or iron product
