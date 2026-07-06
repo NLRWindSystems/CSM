@@ -268,7 +268,7 @@ class CSMBase:
         pitch_system_mass (float): Pitch system mass (kg). See
             :py:meth:`calculate_pitch_system_mass` for more details.
         pitch_system_cost (float): Pitch system cost (USD). See
-            :py:meth:`calculate_pitch_system_cost for more details.
+            `s` for more details.
         spinner_mass (float): Spinner mass (kg). See :py:meth:`calculate_spinner_mass`
             for more details.
         spinner_cost (float): Spinner cost (USD). See :py:meth:`calculate_spinner_cost`
