@@ -2210,8 +2210,8 @@ class CSMBase:
         self.turbine_mass = self.nacelle_mass + self.rotor_mass + self.tower_mass
 
     def calculate_turbine_cost(self):
-        """Calculates and sets :py:attr:`turbine_cost` (:math:`kg`) if it was not provided by the
-        user.
+        """Calculates and sets :py:attr:`turbine_cost` (:math:`USD`) and :py:attr:`turbine_cost_kw`
+        (:math:USD/kW) if neither was provided by the user.
 
         Sum of the :py:attr:`rotor_cost` (:py:attr:`calculate_rotor_cost`),
         :py:attr:`hub_system_cost` (:py:attr:`calculate_hub_system_cost`),
@@ -2227,12 +2227,15 @@ class CSMBase:
         Raises:
             ValueError: Raised if the required parameters have not been provided or calculated.
         """
-        exists = self._prepare_calculation("turbine_cost")
-        if exists:
+        cost_exists = self._prepare_calculation("turbine_cost")
+        cost_kw_exists = self._prepare_calculation("turbine_cost")
+        if cost_exists and cost_kw_exists:
             return
 
-        self.turbine_cost = self.nacelle_cost + self.rotor_cost + self.tower_cost
-        self.turbine_cost_kw = self.turbine_cost / self.rated_power_kw
+        if not cost_exists:
+            self.turbine_cost = self.nacelle_cost + self.rotor_cost + self.tower_cost
+        if not cost_kw_exists:
+            self.turbine_cost_kw = self.turbine_cost / self.rated_power_kw
 
     def calculate_subsystem_mass(self):
         """Runs all the mass calculations for the non-aggregated turbine subsytems."""
@@ -2486,7 +2489,7 @@ class CSMBase:
           - Rotor Hub: model-calculated :py:attr:`hub_cost`. See :py:meth:`calculate_hub_cost`
             for complete details.
           - Nacelle: model-calculated :py:attr:`nacelle_cost`.
-            See :py:meth:`calculate_nacelle_cost for complete details.
+            See :py:meth:`calculate_nacelle_cost` for complete details.
           - Power Converter: model-calculated :py:attr:`converter_cost`. See
             :py:meth:`calculate_converter_cost` for complete details.
           - Production: user-provided :py:attr:`turbine_production_cost`
