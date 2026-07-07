@@ -103,7 +103,7 @@
 
 ## Model Helpers
 
-## Dependent Variable Tracking
+### Dependent Variable Tracking
 
 ```{eval-rst}
 .. automethod:: csm.models.base_model.CSMBase._get_attr_map
