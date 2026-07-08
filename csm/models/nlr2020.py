@@ -15,8 +15,7 @@ class Land2020NLR(CSMBase):
     methods. please see the :py:class:`csm.models.base_model.CSMBase` documentation. All listed
     attributes below describe the models defaults and any relevant contextual information.
 
-    Attributes:
-        sample (float): description. Set to 1.0.
+    Parameters:
         pitch_system_mass_cost_coeff (float): Not updated in 2015, so is the original $22.1 USD/kg.
         gearbox_torque_density (float): In 2024, modern 5-7MW gearboxes are able to reach 200 Nm/kg.
         gearbox_torque_cost (float): In 2024, modern 5-7MW gearboxes cost approximately $50/kNm.
@@ -26,6 +25,8 @@ class Land2020NLR(CSMBase):
         mass_sys_offset (float): Not updated in 2015, so is the original 555.0 kg.
         brake_mass_cost_coeff (float): In 2020, updated to $3.6254 USD/kg. Regression based sizing
             derived by J.Keller under FOA 1981 support project.
+        hss_mass_coeff (float): High speed shaft is not modeled for 2020. Defaults to 0
+        hss_mass_cost_coeff (float): High speed shaft is not modeled for 2020. Defaults to 0
         hvac_mass_coeff (float): Not updated in 2015, so is the original 0.08.
         hvac_mass_cost_coeff (float): Not updated in 2015, so is the original 124 USD/kg.
         platforms_mass_coeff (float): Not updated in 2015, so the original 0.125.
@@ -62,11 +63,11 @@ class Land2020NLR(CSMBase):
     brake_mass_coeff = base.brake_mass_coeff.reuse(default=198.51)
     brake_mass_intercept = create_field(float, units="unitless", io_type="input", default=1.893)
     brake_mass_cost_coeff = base.brake_mass_cost_coeff.reuse(default=7.4256)
-    # hss_mass_coeff = base.hss_mass_coeff.reuse(default=0.19894)
-    # hss_mass_cost_coeff = base.hss_mass_cost_coeff.reuse(default=6.8)
-    # generator_mass_coeff = base.generator_mass_coeff.reuse(default=2.3)
-    # generator_mass_intercept = base.generator_mass_intercept.reuse(default=3400)
-    # generator_mass_cost_coeff = base.generator_mass_cost_coeff.reuse(default=12.4)
+    hss_mass_coeff = base.hss_mass_coeff.reuse(default=0)
+    hss_mass_cost_coeff = base.hss_mass_cost_coeff.reuse(default=0)
+    generator_mass_coeff = base.generator_mass_coeff.reuse(default=1754)
+    generator_mass_intercept = base.generator_mass_intercept.reuse(default=3503.6)
+    generator_mass_cost_coeff = base.generator_mass_cost_coeff.reuse(default=13.5408)
     # bedplate_mass_exp = base.bedplate_mass_exp.reuse(default=2.2)
     # bedplate_mass_cost_coeff = base.bedplate_mass_cost_coeff.reuse(default=2.9)
     # yaw_system_non_bearing_mass_coeff = base.yaw_system_non_bearing_mass_coeff.reuse(default=1.5)
