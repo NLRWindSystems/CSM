@@ -11,18 +11,57 @@ base = fields(CSMBase)
 
 @define
 class Land2020NLR(CSMBase):
-    """NLR 2020 empirically-based model. For complete details on all arguments, attributes, and
-    methods. please see the :py:class:`csm.models.base_model.CSMBase` documentation. All listed
+    r"""NLR 2020 empirically-based model. For complete details on all arguments, attributes, and
+    methods, please see the :py:class:`csm.models.base_model.CSMBase` documentation. All listed
     attributes below describe the models defaults and any relevant contextual information.
 
+    Below the args will solely be the inputs that do not have a default value chose for the 2020
+    analysis year, and the parameters section will list the default values and any contextual
+    information when available.
+
+    Args:
+        num_blades (int): Number of turbine blades
+        num_bearings (int): Number of main bearings.
+        rated_power_kw (float): Turbine rated power (:math:`kW`).
+        rotor_diameter (float): Diameter of the swept area of the turbine blades (:math:`m`).
+        efficiency_max (float): Maximum possible drivetrain efficiency.
+        has_crane (bool): If True, apply :py:attr:`crane_mass` to
+            :py:meth:`calculate_platform_mainframe_mass` and :py:attr:`crane_cost` to
+            :py:meth:`calculate_platform_mainframe_cost`, otherwise ignore.
+        crane_mass (bool): Mass of onboard crane, if :py:attr:`has_crane`, :math:`m_{crane}` from
+            :py:meth:`calculate_platform_mainframe_mass`.
+        max_tip_speed (float): Maximum allowable blade tip speed (:math:`m/s`).
+        tower_length (float): For onshore turbines, this is the hub height (total length above
+            ground). For offshore turbines, this is length from transition piece to hub height
+            (:math:`m`).
+
     Parameters:
-        pitch_system_mass_cost_coeff (float): Not updated in 2015, so is the original $22.1 USD/kg.
+        turbine_class (int): Unused in the 2020 model. Defaults to 1.
+        blade_mass_coeff (float): Defaults to 9.2157.
+        blade_mass_exp (float): Defaults to 1.7679.
+        blade_mass_cost_coeff (float): Defaults to 15.9432.
+        blade_mass (float):
+            :math:`blade\_mass\_coeff * (\frac{rotor\_diameter}{2}) ^ {blade\_mass\_exp}`
+        blade_cost (float): :math:`{blade\_mass} * {blade\_mass\_cost\_coeff}`
+        hub_mass_coeff (float): Defaults to 3.5793.
+        hub_mass_intercept (float): Defaults to -25451.58.
+        hub_mass_cost_coeff (float): Defaults to 4.2588.
+        hub_mass (float): :math:`{hub\_mass\_coeff} * {blade\_mass} + {hub\_mass\_intercept}`.
+        hub_cost (float): :math:`{hub\_mass} * {hub\_mass_cost\_coeff}`.
+        pitch_bearing_mass_coeff (float): Not updated in 2015 or 2020. Defaults to 0.1295.
+        pitch_bearing_mass_intercept (float): Not updated in 2015 or 2020. Defaults to 491.31 kg.
+        bearing_housing_fraction (float): Not updated in 2015 or 2020. Defaults to 0.3280.
+        mass_sys_offset (float): Not updated in 2015 or 2020. Defaults to 555.0 kg.
+        pitch_system_mass_cost_coeff (float): Not updated in 2015 or 2020. Defaults to $22.1 USD/kg.
+        pitch_system_mass (float):
+            .. math::
+                bearing\_mass = {pitch\_bearing\_mass\_coeff}*{blade\_mass}*{num\_blades}
+                + {pitch\_bearing\_mass\_intercept} \\
+                {pitch\_system\_mass} = (1+{bearing\_housing\_fraction})*{bearing\_mass}
+                + {mass\_sys\_offset}
+
         gearbox_torque_density (float): In 2024, modern 5-7MW gearboxes are able to reach 200 Nm/kg.
         gearbox_torque_cost (float): In 2024, modern 5-7MW gearboxes cost approximately $50/kNm.
-        pitch_bearing_mass_coeff (float): Not updated in 2015, so is the original 0.1295.
-        pitch_bearing_mass_intercept (float): Not updated in 2015, so is the original 491.31 kg.
-        bearing_housing_fraction (float): Not updated in 2015, so is the original 0.3280.
-        mass_sys_offset (float): Not updated in 2015, so is the original 555.0 kg.
         brake_mass_cost_coeff (float): In 2020, updated to $3.6254 USD/kg. Regression based sizing
             derived by J.Keller under FOA 1981 support project.
         hss_mass_coeff (float): High speed shaft is not modeled for 2020. Defaults to 0
