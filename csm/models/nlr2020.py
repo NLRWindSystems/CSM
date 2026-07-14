@@ -60,13 +60,27 @@ class Land2020NLR(CSMBase):
                 {pitch\_system\_mass} = (1+{bearing\_housing\_fraction})*{bearing\_mass}
                 + {mass\_sys\_offset}
 
-        pitch_system_cost (float): :math:`{pitch_system\_mass} * {pitch_system\_mass\_cost\_coeff}`
-        spinner_mass_coeff (float): Defaults to 2.3255 :math:`kg/m^2`.
+        pitch_system_cost (float):
+            :math:`{pitch\_system\_mass} * {pitch\_system\_mass\_cost\_coeff}`
+        spinner_mass_coeff (float): Defaults to 2.3255 :math:`kg/m`.
         spinner_mass_intercept (float): Defaults to 204.65 :math:`kg`.
         spinner_mass_cost_coeff (float): Defaults to 12.1212 :math:`USD/kg`.
         spinner_mass (float):
             :math:`spinner\_mass\_coeff * {rotor\_diameter} + {spinner\_mass\_intercept}`
         spinner_cost (float): :math:`{spinner\_mass} * {spinner\_mass\_cost\_coeff}`
+        lss_mass_coeff1 (float): Defaults to 2.1906 :math:`kg/m^2`.
+        lss_mass_coeff2 (float): Defaults to -311.15 :math:`kg/m`.
+        lss_mass_intercept (float): Defaults to 13108.0 :math:`kg`.
+        lss_mass_cost_coeff (float): Defaults to 12.9948 :math:`USD/kg`.
+        low_speed_shaft_mass (float):
+
+            .. math::
+                lss\_mass\_coeff1 * {rotor\_diameter} ^ 2
+                + lss\_mass\_coeff2 * {rotor\_diameter}
+                + {lss\_mass\_intercept}
+
+        low_speed_shaft_cost (float):
+            :math:`{low\_speed\_shaft\_mass} * {spinner\_mass\_cost\_coeff}`
         gearbox_torque_density (float): In 2024, modern 5-7MW gearboxes are able to reach 200 Nm/kg.
         gearbox_torque_cost (float): In 2024, modern 5-7MW gearboxes cost approximately $50/kNm.
         brake_mass_cost_coeff (float): In 2020, updated to $3.6254 USD/kg. Regression based sizing
