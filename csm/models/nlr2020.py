@@ -42,32 +42,17 @@ class Land2020NLR(CSMBase):
         blade_mass_cost_coeff (float): Defaults to 15.9432.
         blade_mass (float):
             :math:`blade\_mass\_coeff * (\frac{rotor\_diameter}{2}) ^ {blade\_mass\_exp}`
-        blade_cost (float): :math:`{blade\_mass} * {blade\_mass\_cost\_coeff}`
         hub_mass_coeff (float): Defaults to 3.5793.
         hub_mass_intercept (float): Defaults to -25451.58.
         hub_mass_cost_coeff (float): Defaults to 4.2588.
-        hub_mass (float): :math:`{hub\_mass\_coeff} * {blade\_mass} + {hub\_mass\_intercept}`.
-        hub_cost (float): :math:`{hub\_mass} * {hub\_mass_cost\_coeff}`.
         pitch_bearing_mass_coeff (float): Not updated in 2015 or 2020. Defaults to 0.1295.
         pitch_bearing_mass_intercept (float): Not updated in 2015 or 2020. Defaults to 491.31 kg.
         bearing_housing_fraction (float): Not updated in 2015 or 2020. Defaults to 0.3280.
         mass_sys_offset (float): Not updated in 2015 or 2020. Defaults to 555.0 kg.
         pitch_system_mass_cost_coeff (float): Not updated in 2015 or 2020. Defaults to $22.1 USD/kg.
-        pitch_system_mass (float):
-            .. math::
-                bearing\_mass = {pitch\_bearing\_mass\_coeff}*{blade\_mass}*{num\_blades}
-                + {pitch\_bearing\_mass\_intercept} \\
-                {pitch\_system\_mass} = (1+{bearing\_housing\_fraction})*{bearing\_mass}
-                + {mass\_sys\_offset}
-
-        pitch_system_cost (float):
-            :math:`{pitch\_system\_mass} * {pitch\_system\_mass\_cost\_coeff}`
         spinner_mass_coeff (float): Defaults to 2.3255 :math:`kg/m`.
         spinner_mass_intercept (float): Defaults to 204.65 :math:`kg`.
         spinner_mass_cost_coeff (float): Defaults to 12.1212 :math:`USD/kg`.
-        spinner_mass (float):
-            :math:`spinner\_mass\_coeff * {rotor\_diameter} + {spinner\_mass\_intercept}`
-        spinner_cost (float): :math:`{spinner\_mass} * {spinner\_mass\_cost\_coeff}`
         lss_mass_coeff1 (float): Defaults to 2.1906 :math:`kg/m^2`.
         lss_mass_coeff2 (float): Defaults to -311.15 :math:`kg/m`.
         lss_mass_intercept (float): Defaults to 13108.0 :math:`kg`.

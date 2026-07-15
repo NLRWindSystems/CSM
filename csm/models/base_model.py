@@ -144,7 +144,7 @@ parameter_map = {
 
 @define
 class CSMBase:
-    """Base cost and scaling model that defines universally required inputs and calculations.
+    r"""Base cost and scaling model that defines universally required inputs and calculations.
 
     Args:
         num_blades (int, optional): Number of turbine blades. Defaults to 3.
@@ -260,28 +260,45 @@ class CSMBase:
         tower_mass_cost_coeff (float): Tower cover cost per kilogram (:math:`USD/kg`).
         blade_mass (float): Blade mass (:math:`kg`). See :py:meth:`calculate_blade_mass`
             for details.
+            :math:`blade\_mass = blade\_mass\_coeff * {rotor\_diameter}^b`.
         blade_cost (float): Blade cost (:math:`USD`). See :py:meth:`calculate_blade_cost`
             for details.
+            :math:`blade\_cost = blade\_mass\_cost\_coeff * blade\_mass`
         hub_mass (float): Hub mass (:math:`kg`). See :py:meth:`calculate_hub_mass`
             for more details.
+            :math:`hub\_mass = hub\_mass\_coeff * blade\_mass + hub\_mass\_intercept`
         hub_cost (float): Hub cost (:math:`USD`). See :py:meth:`calculate_hub_cost`
             for more details.
+            :math:`hub\_cost = hub\_mass\_cost\_coeff * hub\_mass`
         pitch_system_mass (float): Pitch system mass (:math:`kg`). See
             :py:meth:`calculate_pitch_system_mass` for more details.
+
+            .. math::
+                bearing\_mass = {pitch\_bearing\_mass\_coeff}*{blade\_mass}*{num\_blades}
+                + {pitch\_bearing\_mass\_intercept} \\
+                {pitch\_system\_mass} = (1+{bearing\_housing\_fraction})*{bearing\_mass}
+                + {mass\_sys\_offset}
+
         pitch_system_cost (float): Pitch system cost (:math:`USD`). See
-            `s` for more details.
+            :py:meth:`calculate_pitch_system_cost` for more details.
+            :math:`pitch\_system\_cost = pitch\_system\_mass * pitch\_system\_mass\_cost\_coeff`
         spinner_mass (float): Spinner mass (:math:`kg`). See :py:meth:`calculate_spinner_mass`
             for more details.
+            .. math::
+                spinner\_mass = spinner\_mass\_coeff * {rotor\_diameter} + spinner\_mass\_intercept
         spinner_cost (float): Spinner cost (:math:`USD`). See :py:meth:`calculate_spinner_cost`
             for more details.
+            :math:`spinner\_cost = {spinner\_mass} * {spinner\_mass\_cost\_coeff}`
         low_speed_shaft_mass (float): Low speed shaft mass (:math:`kg`). See
             :py:meth:`calculate_low_speed_shaft_mass` for more details.
         low_speed_shaft_cost (float): Low speed shaft cost (:math:`USD`). See
             :py:meth:`calculate_low_speed_shaft_cost` for more details.
         bearing_mass (float): Main bearing mass (:math:`kg`). See :py:meth:`calculate_bearing_mass`
             for more details.
+            :math:`bearing\_mass = bearing\_mass\_coeff * rotor\_diameter ^ {bearing\_mass\_exp}`
         bearing_cost (float): Main bearing cost (:math:`USD`). See :py:meth:`calculate_bearing_cost`
             for more details.
+            :math:`bearing\_cost = {bearing\_mass} * {bearing\_mass\_cost\_coeff}`
         rated_rpm (float): Rated RPM of the turbine based on the :py:attr:`max_tip_speed`
             and :py:attr:`rotor_diameter`. See :py:meth:`calculate_rotor_torque` for more details.
         rotor_torque (float): Maximum torque produced under normal operations of the turbine
