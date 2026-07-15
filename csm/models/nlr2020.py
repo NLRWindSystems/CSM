@@ -69,8 +69,6 @@ class Land2020NLR(CSMBase):
         bearing_mass_coeff (float): Defaults to 0.0001.
         bearing_mass_exp (float): Defaults to 3.5.
         bearing_mass_cost_coeff (float): Defaults to 4.914 :math:`USD/kg`.
-        bearing_mass (float): :math:`bearing\_mass\_coeff * rotor\_diameter ^ {bearing\_mass\_exp}`
-        bearing_cost (float): :math:`{bearing\_mass} * {bearing\_mass\_cost\_coeff}`
         gearbox_torque_density (float): In 2024, modern 5-7MW gearboxes are able to reach 200 Nm/kg.
         gearbox_torque_cost (float): In 2024, modern 5-7MW gearboxes cost approximately $50/kNm.
         brake_mass_cost_coeff (float): In 2020, updated to $3.6254 USD/kg. Regression based sizing
