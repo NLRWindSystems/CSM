@@ -85,7 +85,7 @@ class Land2020NLR(CSMBase):
         bedplate_mass_exp (float): Unused in the 2020 model. Defaults to 0.
         bedplate_mass_coeff (float): Defaults to 737.88.
         bedplate_mass_intercept (float): Defaults to -68066.
-        bedplate_mass_cost_coeff (float): Defaults to 3.1668.
+        bedplate_mass_cost_coeff (float): Defaults to 3.1668 :math:`USD/kg`.
         bedplate_mass (float):
 
             .. math::
@@ -94,10 +94,11 @@ class Land2020NLR(CSMBase):
         yaw_system_non_bearing_mass_coeff (float): Defaults to 1.6.
         yaw_system_mass_coeff (float): Defaults to 0.0007.
         yaw_system_mass_exp (float): Defaults to 3.1571.
-        yaw_system_mass_cost_coeff (float): Defaults to 9.0636.
-        hvac_mass_coeff (float): Not updated in 2015, so is the original 0.08.
-        hvac_mass_cost_coeff (float): Not updated in 2015, so is the original 124 USD/kg.
-        platforms_mass_coeff (float): Not updated in 2015, so the original 0.125.
+        yaw_system_mass_cost_coeff (float): Defaults to 9.0636 :math:`USD/kg`.
+        hvac_mass_coeff (float): Not used in 2020. Defaults to 0.
+        hvac_mass_cost_coeff (float): Defaults to 135.408 :math:`USD/kg`.
+        hvac_mass (float): Defaults to 221 :math:`kg`.
+        platforms_mass_coeff (float): .
         crane_mass (float): Not updated in 2015, so the original 3000.
         platforms_mass_cost_coeff (float): Not updated in 2015, so the original 17.1.
         crane_cost (float): Not updated in 2015, so the original 12000.
@@ -146,8 +147,9 @@ class Land2020NLR(CSMBase):
     yaw_system_mass_coeff = base.yaw_system_mass_coeff.reuse(default=0.0007)
     yaw_system_mass_exp = base.yaw_system_mass_exp.reuse(default=3.1571)
     yaw_system_mass_cost_coeff = base.yaw_system_mass_cost_coeff.reuse(default=9.0636)
-    # hvac_mass_coeff = base.hvac_mass_coeff.reuse(default=0.08)
-    # hvac_mass_cost_coeff = base.hvac_mass_cost_coeff.reuse(default=124)
+    hvac_mass_coeff = base.hvac_mass_coeff.reuse(default=0)
+    hvac_mass_cost_coeff = base.hvac_mass_cost_coeff.reuse(default=135.408)
+    hvac_mass = base.hvac_mass_coeff.reuse(default=221)
     # nacelle_cover_mass_coeff = base.nacelle_cover_mass_coeff.reuse(default=1.2817)
     # nacelle_cover_mass_intercept = base.nacelle_cover_mass_intercept.reuse(default=428.19)
     # nacelle_cover_mass_cost_coeff = base.nacelle_cover_mass_cost_coeff.reuse(default=5.7)
@@ -182,6 +184,7 @@ class Land2020NLR(CSMBase):
             "rotor_diameter",
             "bedplate_mass_intercept",
         )
+        self.parameter_map["hvac_mass"] = ("hvac_mass",)
 
         # Removes unmodeled high speed shaft
         self.parameter_map["nacelle_mass"] = (
