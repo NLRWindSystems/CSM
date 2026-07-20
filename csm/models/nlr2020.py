@@ -91,6 +91,10 @@ class Land2020NLR(CSMBase):
             .. math::
                 bedplate\_mass = bedplate\_mass\_coeff * rotor\_diameter + bedplate\_mass\_intercept
 
+        yaw_system_non_bearing_mass_coeff (float): Defaults to 1.6.
+        yaw_system_mass_coeff (float): Defaults to 0.0007.
+        yaw_system_mass_exp (float): Defaults to 3.1571.
+        yaw_system_mass_cost_coeff (float): Defaults to 9.0636.
         hvac_mass_coeff (float): Not updated in 2015, so is the original 0.08.
         hvac_mass_cost_coeff (float): Not updated in 2015, so is the original 124 USD/kg.
         platforms_mass_coeff (float): Not updated in 2015, so the original 0.125.
@@ -138,10 +142,10 @@ class Land2020NLR(CSMBase):
     bedplate_mass_coeff = create_field(float, "unitless", "input", default=737.88)
     bedplate_mass_intercept = create_field(float, "unitless", "input", default=-68066)
     bedplate_mass_cost_coeff = base.bedplate_mass_cost_coeff.reuse(default=3.1668)
-    # yaw_system_non_bearing_mass_coeff = base.yaw_system_non_bearing_mass_coeff.reuse(default=1.5)
-    # yaw_system_mass_coeff = base.yaw_system_mass_coeff.reuse(default=0.0009)
-    # yaw_system_mass_exp = base.yaw_system_mass_exp.reuse(default=3.314)
-    # yaw_system_mass_cost_coeff = base.yaw_system_mass_cost_coeff.reuse(default=8.3)
+    yaw_system_non_bearing_mass_coeff = base.yaw_system_non_bearing_mass_coeff.reuse(default=1.6)
+    yaw_system_mass_coeff = base.yaw_system_mass_coeff.reuse(default=0.0007)
+    yaw_system_mass_exp = base.yaw_system_mass_exp.reuse(default=3.1571)
+    yaw_system_mass_cost_coeff = base.yaw_system_mass_cost_coeff.reuse(default=9.0636)
     # hvac_mass_coeff = base.hvac_mass_coeff.reuse(default=0.08)
     # hvac_mass_cost_coeff = base.hvac_mass_cost_coeff.reuse(default=124)
     # nacelle_cover_mass_coeff = base.nacelle_cover_mass_coeff.reuse(default=1.2817)
