@@ -341,6 +341,11 @@ class CSMBase:
             :py:meth:`calculate_hydraulic_cooling_cost` for more details.
         nacelle_cover_mass (float): nacelle_cover mass (:math:`kg`). See
             :py:meth:`calculate_nacelle_cover_mass` for more details.
+
+            ..math::
+                nacelle\_cover|_mass = nacelle_cover_mass_coeff * rated\_power\_kw
+                + nacelle\_cover\_mass\_intercept
+
         nacelle_cover_cost (float): nacelle_cover mass (:math:`USD`). See
             :py:meth:`calculate_nacelle_cover_cost` for more details.
         platform_mainframe_mass (float): Platform mainframe mass (:math:`kg`).

@@ -98,6 +98,9 @@ class Land2020NLR(CSMBase):
         hvac_mass_coeff (float): Not used in 2020. Defaults to 0.
         hvac_mass_cost_coeff (float): Defaults to 135.408 :math:`USD/kg`.
         hvac_mass (float): Defaults to 221 :math:`kg`.
+        nacelle_cover_mass_coeff (float): Defaults to 1281.7 :math:`kg/kW`.
+        nacelle_cover_mass_intercept (float): Defaults to 428.19.
+        nacelle_cover_mass_cost_coeff (float): Defaults to 6.2244 :math:`USD/kg`.
         platforms_mass_coeff (float): .
         crane_mass (float): Not updated in 2015, so the original 3000.
         platforms_mass_cost_coeff (float): Not updated in 2015, so the original 17.1.
@@ -150,9 +153,9 @@ class Land2020NLR(CSMBase):
     hvac_mass_coeff = base.hvac_mass_coeff.reuse(default=0)
     hvac_mass_cost_coeff = base.hvac_mass_cost_coeff.reuse(default=135.408)
     hvac_mass = base.hvac_mass_coeff.reuse(default=221)
-    # nacelle_cover_mass_coeff = base.nacelle_cover_mass_coeff.reuse(default=1.2817)
-    # nacelle_cover_mass_intercept = base.nacelle_cover_mass_intercept.reuse(default=428.19)
-    # nacelle_cover_mass_cost_coeff = base.nacelle_cover_mass_cost_coeff.reuse(default=5.7)
+    nacelle_cover_mass_coeff = base.nacelle_cover_mass_coeff.reuse(default=1281.7)
+    nacelle_cover_mass_intercept = base.nacelle_cover_mass_intercept.reuse(default=428.19)
+    nacelle_cover_mass_cost_coeff = base.nacelle_cover_mass_cost_coeff.reuse(default=6.2244)
     # platform_mainframe_mass_coeff = base.platform_mainframe_mass_coeff.reuse(default=0.125)
     # has_crane = base.has_crane.reuse(default=False)
     # crane_mass = base.crane_mass.reuse(default=3000)
@@ -328,3 +331,13 @@ class Land2020NLR(CSMBase):
             return
 
         self.brake_mass = self.brake_mass_coeff * self.rated_power_kw + self.brake_mass_intercept
+
+    def calculate_hvac_mass(self):
+        """Sets :py:attr:`hvac_mass` as provided by the user.
+
+        Raises:
+            ValueError: Raised if the required parameters have not been provided or calculated.
+        """
+        exists = self._prepare_calculation("hvac_mass")
+        if not exists:
+            raise ValueError("`hvac_mass` should be set by the user at initialization.")
