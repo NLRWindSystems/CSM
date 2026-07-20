@@ -75,6 +75,9 @@ class Land2020NLR(CSMBase):
             derived by J.Keller under FOA 1981 support project.
         hss_mass_coeff (float): High speed shaft is not modeled for 2020. Defaults to 0
         hss_mass_cost_coeff (float): High speed shaft is not modeled for 2020. Defaults to 0
+        generator_mass_coeff (float): Defaults to 1754.
+        generator_mass_intercept (float): Defaults to 3503.6.
+        generator_mass_cost_coeff (float): Defaults to 13.5408 :math:`USD/kg`.
         hvac_mass_coeff (float): Not updated in 2015, so is the original 0.08.
         hvac_mass_cost_coeff (float): Not updated in 2015, so is the original 124 USD/kg.
         platforms_mass_coeff (float): Not updated in 2015, so the original 0.125.
@@ -113,6 +116,8 @@ class Land2020NLR(CSMBase):
     brake_mass_cost_coeff = base.brake_mass_cost_coeff.reuse(default=7.4256)
     hss_mass_coeff = base.hss_mass_coeff.reuse(default=0)
     hss_mass_cost_coeff = base.hss_mass_cost_coeff.reuse(default=0)
+    high_speed_shaft_mass = base.hss_mass_cost_coeff.reuse(default=0)
+    high_speed_shaft_cost = base.hss_mass_cost_coeff.reuse(default=0)
     generator_mass_coeff = base.generator_mass_coeff.reuse(default=1754)
     generator_mass_intercept = base.generator_mass_intercept.reuse(default=3503.6)
     generator_mass_cost_coeff = base.generator_mass_cost_coeff.reuse(default=13.5408)
@@ -152,6 +157,39 @@ class Land2020NLR(CSMBase):
             "rotor_torque",
             "gearbox_torque_density",
             "gearbox_mass_exp",
+        )
+
+        # Removes unmodeled high speed shaft
+        self.parameter_map["nacelle_mass"] = (
+            "low_speed_shaft_mass",
+            "num_bearings",
+            "bearing_mass",
+            "gearbox_mass",
+            "brake_mass",
+            "generator_mass",
+            "bedplate_mass",
+            "yaw_system_mass",
+            "hydraulic_cooling_mass",
+            "nacelle_cover_mass",
+            "platform_mainframe_mass",
+            "transformer_mass",
+            "converter_mass",
+            "controls_mass",
+            "electrical_connection_mass",
+        )
+        self.parameter_map["nacelle_cost"] = (
+            "low_speed_shaft_cost",
+            "num_bearings",
+            "bearing_cost",
+            "gearbox_cost",
+            "brake_cost",
+            "generator_cost",
+            "bedplate_cost",
+            "yaw_system_cost",
+            "hydraulic_cooling_cost",
+            "nacelle_cover_cost",
+            "platform_mainframe_cost",
+            "transformer_cost",
         )
         super().__attrs_post_init__()
 
