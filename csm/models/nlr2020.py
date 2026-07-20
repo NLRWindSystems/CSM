@@ -41,7 +41,8 @@ class Land2020NLR(CSMBase):
         blade_mass_exp (float): Defaults to 1.7679.
         blade_mass_cost_coeff (float): Defaults to 15.9432.
         blade_mass (float):
-            :math:`blade\_mass\_coeff * (\frac{rotor\_diameter}{2}) ^ {blade\_mass\_exp}`
+            ..math::
+                blade\_mass = blade\_mass\_coeff * (\frac{rotor\_diameter}{2}) ^ {blade\_mass\_exp}
         hub_mass_coeff (float): Defaults to 3.5793.
         hub_mass_intercept (float): Defaults to -25451.58.
         hub_mass_cost_coeff (float): Defaults to 4.2588.
@@ -60,12 +61,15 @@ class Land2020NLR(CSMBase):
         low_speed_shaft_mass (float):
 
             .. math::
-                lss\_mass\_coeff1 * {rotor\_diameter} ^ 2
+                low\_speed\_shaft\_mass = lss\_mass\_coeff1 * {rotor\_diameter} ^ 2
                 + lss\_mass\_coeff2 * {rotor\_diameter}
                 + {lss\_mass\_intercept}
 
         low_speed_shaft_cost (float):
-            :math:`{low\_speed\_shaft\_mass} * {spinner\_mass\_cost\_coeff}`
+
+            .. math::
+                low\_speed\_shaft\_cost = {low\_speed\_shaft\_mass} * {spinner\_mass\_cost\_coeff}
+
         bearing_mass_coeff (float): Defaults to 0.0001.
         bearing_mass_exp (float): Defaults to 3.5.
         bearing_mass_cost_coeff (float): Defaults to 4.914 :math:`USD/kg`.
@@ -78,6 +82,15 @@ class Land2020NLR(CSMBase):
         generator_mass_coeff (float): Defaults to 1754.
         generator_mass_intercept (float): Defaults to 3503.6.
         generator_mass_cost_coeff (float): Defaults to 13.5408 :math:`USD/kg`.
+        bedplate_mass_exp (float): Unused in the 2020 model. Defaults to 0.
+        bedplate_mass_coeff (float): Defaults to 737.88.
+        bedplate_mass_intercept (float): Defaults to -68066.
+        bedplate_mass_cost_coeff (float): Defaults to 3.1668.
+        bedplate_mass (float):
+
+            .. math::
+                bedplate\_mass = bedplate\_mass\_coeff * rotor\_diameter + bedplate\_mass\_intercept
+
         hvac_mass_coeff (float): Not updated in 2015, so is the original 0.08.
         hvac_mass_cost_coeff (float): Not updated in 2015, so is the original 124 USD/kg.
         platforms_mass_coeff (float): Not updated in 2015, so the original 0.125.
@@ -121,8 +134,10 @@ class Land2020NLR(CSMBase):
     generator_mass_coeff = base.generator_mass_coeff.reuse(default=1754)
     generator_mass_intercept = base.generator_mass_intercept.reuse(default=3503.6)
     generator_mass_cost_coeff = base.generator_mass_cost_coeff.reuse(default=13.5408)
-    # bedplate_mass_exp = base.bedplate_mass_exp.reuse(default=2.2)
-    # bedplate_mass_cost_coeff = base.bedplate_mass_cost_coeff.reuse(default=2.9)
+    bedplate_mass_exp = base.bedplate_mass_exp.reuse(default=0)
+    bedplate_mass_coeff = create_field(float, "unitless", "input", default=737.88)
+    bedplate_mass_intercept = create_field(float, "unitless", "input", default=-68066)
+    bedplate_mass_cost_coeff = base.bedplate_mass_cost_coeff.reuse(default=3.1668)
     # yaw_system_non_bearing_mass_coeff = base.yaw_system_non_bearing_mass_coeff.reuse(default=1.5)
     # yaw_system_mass_coeff = base.yaw_system_mass_coeff.reuse(default=0.0009)
     # yaw_system_mass_exp = base.yaw_system_mass_exp.reuse(default=3.314)
@@ -157,6 +172,11 @@ class Land2020NLR(CSMBase):
             "rotor_torque",
             "gearbox_torque_density",
             "gearbox_mass_exp",
+        )
+        self.parameter_map["bedplate_mass"] = (
+            "bedplate_mass_coeff",
+            "rotor_diameter",
+            "bedplate_mass_intercept",
         )
 
         # Removes unmodeled high speed shaft

@@ -321,12 +321,20 @@ class CSMBase:
             :py:meth:`calculate_generator_cost` for more details.
         bedplate_mass (float): Bedplate mass (:math:`kg`). See :py:meth:`calculate_bedplate_mass`
             for more details.
+            :math:`bedplate\_mass = rotor\_diameter ^ bedplate\_mass\_exp`
         bedplate_cost (float): Bedplate cost (:math:`USD`). See :py:meth:`calculate_bedplate_cost`
             for more details.
+            :math:`bedplate\_cost = bedplate\_mass ^ bedplate\_mass\_cost\_coeff`
         yaw_system_mass (float): Yaw system mass (:math:`kg`). See
             :py:meth:`calculate_yaw_system_mass` for more details.
+
+            .. math::
+                yaw\_system\_mass = yaw\_system\_non\_bearing\_mass\_coeff
+                * (yaw\_system\_mass\_coeff * rotor\_diameter ^ yaw\_system\_mass\_exp)
+
         yaw_system_cost (float): Yaw system cost (:math:`USD`). See
             :py:meth:`calculate_yaw_system_cost` for more details.
+            :math:`yaw\_system\_cost = yaw\_system\_mass\_cost\_coeff * yaw\_system\_mass`
         hydraulic_cooling_mass (float): Hydraulic cooling mass (:math:`kg`). See
             :py:meth:`calculate_hydraulic_cooling_mass` for more details.
         hydraulic_cooling_cost (float): Hydraulic cooling cost (:math:`USD`). See
