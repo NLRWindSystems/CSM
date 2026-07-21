@@ -1934,7 +1934,7 @@ class CSMBase:
         where:
 
         - :math:`k =` :py:attr:`tower_mass_coeff`
-        - :math:`H_{hub} =` :py:attr:`hub_height`
+        - :math:`H_{hub} =` :py:attr:`tower_length`
         - :math:`b =` :py:attr:`tower_mass_exp`
 
         Args:

@@ -1,5 +1,7 @@
 """Experimental generic new model generation and 2015 replication."""
 
+from math import pi
+
 from attrs import define, fields
 
 from csm.models.utils import create_field
@@ -116,14 +118,16 @@ class Land2020NLR(CSMBase):
             (:math:`USD/kW`).
         electrical_connection_rated_power_cost_coeff (float): Electrical connection cost per
             kilowatt (:math:`USD/kW`).
-        tower_mass_coeff (float): :math:`k` in the mass from :py:meth:`calculate_tower_mass`
-            (:math:`kg/m`).
-        tower_length (float): For onshore turbines, this is the hub height (total length above
-            ground). For offshore turbines, this is length from transition piece to hub height
-            (:math:`m`).
-        tower_mass_exp (bool): :math:`b` in the mass equation from
-            :py:meth:`calculate_tower_mass`.
-        tower_mass_cost_coeff (float): Tower cover cost per kilogram (:math:`USD/kg`).
+        tower_mass_coeff (float): Defaults to 0.152 :math:`kg/m`.
+        tower_mass_intercept (bool): Defaults to -14281.
+        tower_mass_cost_coeff (float): Defaults to 3.1668 :math:`USD/kg`.
+        tower_mass (float): Tower mass (:math:`kg`). See
+            :py:meth:`calculate_tower_mass` for more details.
+
+            .. math::
+                tower\_mass = tower\_mass\_coeff * tower\_height
+                * (\pi * (rotor\_diameter / 2) ^ 2) + tower\_mass\_intercept
+
         controls_mass (float): Controls mass (:math:`kg`). See
             :py:meth:`calculate_controls_mass` for more details.
         controls_cost (float): Controls cost (:math:`USD`). See
@@ -138,8 +142,6 @@ class Land2020NLR(CSMBase):
             :py:meth:`calculate_converter_cost` for more details.
         converter_cost (float): Power converter cost (:math:`USD`). See
             :py:meth:`calculate_converter_cost` for more details.
-        tower_mass (float): Tower mass (:math:`kg`). See
-            :py:meth:`calculate_tower_mass` for more details.
         tower_cost (float): Tower cost (:math:`USD`). See
             :py:meth:`calculate_tower_cost` for more details.
     """
@@ -203,9 +205,9 @@ class Land2020NLR(CSMBase):
     transformer_mass_coeff = base.transformer_mass_coeff.reuse(default=1915.0)
     transformer_mass_intercept = base.transformer_mass_intercept.reuse(default=1910.0)
     transformer_mass_cost_coeff = base.transformer_mass_cost_coeff.reuse(default=20.5296)
-    # tower_mass_coeff = base.tower_mass_coeff.reuse(default=19.828)
-    # tower_mass_exp = base.tower_mass_exp.reuse(default=2.0282)
-    # tower_mass_cost_coeff = base.tower_mass_cost_coeff.reuse(default=2.9)
+    tower_mass_coeff = base.tower_mass_coeff.reuse(default=0.152)
+    tower_mass_intercept = base.tower_mass_exp.reuse(default=-14281.0)
+    tower_mass_cost_coeff = base.tower_mass_cost_coeff.reuse(default=3.1668)
 
     def __attrs_post_init__(self):
         """Updates the parameter mapping for new mass and cost relationships."""
@@ -237,6 +239,12 @@ class Land2020NLR(CSMBase):
         )
         self.parameter_map["crane_mass"] = ("platform_mainframe_mass",)
         self.parameter_map["crane_cost"] = ("crane_mass_cost_coeff", "crane_mass")
+        self.parameter_map["tower_mass"] = (
+            "tower_mass_coeff",
+            "tower_length",
+            "rotor_diameter",
+            "tower_mass_intercept",
+        )
 
         # Removes unmodeled high speed shaft
         self.parameter_map["nacelle_mass"] = (
@@ -495,3 +503,34 @@ class Land2020NLR(CSMBase):
             return
 
         self.crane_cost = self.crane_mass_cost_coeff * self.crane_mass
+
+    def calculate_tower_mass(self):
+        r"""Calculates and sets :py:attr:`tower_mass` if it was not provided by the user.
+
+        .. math:: k * H_{hub} * swept\_area + b
+
+        where:
+
+        - :math:`k =` :py:attr:`tower_mass_coeff`
+        - :math:`H_{hub} =` :py:attr:`tower_length`
+        - :math:`swept\_area = \pi * r^2` where :math:`r` = :py:attr:`rotor_diameter` / 2
+        - :math:`b =` :py:attr:`tower_mass_intercept`
+
+        Args:
+            tower_mass_coeff (float): :math:`k` in the mass equation above (:math:`kg/m`).
+            tower_length (float): For onshore turbines, this is the hub height (total length above
+                ground). For offshore turbines, this is length from transition piece to hub height
+                (:math:`m`).
+            tower_mass_intercept (bool): :math:`b` in the mass equation above (:math:`kg`).
+
+        Raises:
+            ValueError: Raised if the required parameters have not been provided or calculated.
+        """
+        exists = self._prepare_calculation("tower_mass")
+        if exists:
+            return
+
+        self.tower_mass = (
+            self.tower_mass_coeff * self.tower_length * (pi * (self.rotor_diameter / 2) ** 2)
+            + self.tower_mass_intercept
+        )
