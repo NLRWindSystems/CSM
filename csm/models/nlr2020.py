@@ -25,11 +25,7 @@ class Land2020NLR(CSMBase):
         rated_power_kw (float): Turbine rated power (:math:`kW`).
         rotor_diameter (float): Diameter of the swept area of the turbine blades (:math:`m`).
         efficiency_max (float): Maximum possible drivetrain efficiency.
-        has_crane (bool): If True, apply :py:attr:`crane_mass` to
-            :py:meth:`calculate_platform_mainframe_mass` and :py:attr:`crane_cost` to
-            :py:meth:`calculate_platform_mainframe_cost`, otherwise ignore.
-        crane_mass (bool): Mass of onboard crane, if :py:attr:`has_crane`, :math:`m_{crane}` from
-            :py:meth:`calculate_platform_mainframe_mass`.
+        has_crane (bool): In the 2020 model, a crane is assumed to exist. Defaults to True.
         max_tip_speed (float): Maximum allowable blade tip speed (:math:`m/s`).
         tower_length (float): For onshore turbines, this is the hub height (total length above
             ground). For offshore turbines, this is length from transition piece to hub height
@@ -101,10 +97,18 @@ class Land2020NLR(CSMBase):
         nacelle_cover_mass_coeff (float): Defaults to 1281.7 :math:`kg/kW`.
         nacelle_cover_mass_intercept (float): Defaults to 428.19.
         nacelle_cover_mass_cost_coeff (float): Defaults to 6.2244 :math:`USD/kg`.
-        platforms_mass_coeff (float): .
-        crane_mass (float): Not updated in 2015, so the original 3000.
-        platforms_mass_cost_coeff (float): Not updated in 2015, so the original 17.1.
-        crane_cost (float): Not updated in 2015, so the original 12000.
+        platform_mainframe_mass_coeff (float): Defaults to 0.005.
+        platform_mainframe_mass_cost_coeff (float): Defaults to 18.6732 :math:`USD/kg`.
+        platform_mainframe_mass (float):
+            :math:`platform\_mainframe\_mass = platform\_mainframe\_mass\_coeff * bedplate\_mass`
+        platform_mainframe_cost (float):
+
+            ..math::
+                platform\_mainframe\_cost = platform\_mainframe\_mass\_cost\_coeff
+                * platform\_mainframe\_mass
+
+        crane_mass_cost_coeff (float): Defaults to 4.368 :math:`USD/kg`.
+        crane_mass (float): If not provided, defaults to :py:attr:`platform_mainframe_mass`.
     """
 
     turbine_class = base.turbine_class.reuse(default=1)
@@ -156,11 +160,13 @@ class Land2020NLR(CSMBase):
     nacelle_cover_mass_coeff = base.nacelle_cover_mass_coeff.reuse(default=1281.7)
     nacelle_cover_mass_intercept = base.nacelle_cover_mass_intercept.reuse(default=428.19)
     nacelle_cover_mass_cost_coeff = base.nacelle_cover_mass_cost_coeff.reuse(default=6.2244)
-    # platform_mainframe_mass_coeff = base.platform_mainframe_mass_coeff.reuse(default=0.125)
-    # has_crane = base.has_crane.reuse(default=False)
-    # crane_mass = base.crane_mass.reuse(default=3000)
-    # platform_mainframe_mass_cost_coeff = base.platform_mainframe_mass_cost_coeff.reuse(default=17.1)  # noqa: E501
-    # crane_cost = base.crane_cost.reuse(default=12000.0)
+    has_crane = base.has_crane.reuse(default=True)
+    platform_mainframe_mass_coeff = base.platform_mainframe_mass_coeff.reuse(default=0.005)
+    platform_mainframe_mass_cost_coeff = base.platform_mainframe_mass_cost_coeff.reuse(
+        default=18.6732
+    )
+    crane_mass = base.crane_mass.reuse(default=3000)
+    crane_mass_cost_coeff = create_field(float, "USD/kg", "input", default=4.368)
     # transformer_mass_coeff = base.transformer_mass_coeff.reuse(default=1.9150)
     # transformer_mass_intercept = base.transformer_mass_intercept.reuse(default=1910.0)
     # transformer_mass_cost_coeff = base.transformer_mass_cost_coeff.reuse(default=18.8)
@@ -188,6 +194,16 @@ class Land2020NLR(CSMBase):
             "bedplate_mass_intercept",
         )
         self.parameter_map["hvac_mass"] = ("hvac_mass",)
+        self.parameter_map["platform_mainframe_mass"] = (
+            "bedplate_mass",
+            "platform_mainframe_mass_coeff",
+        )
+        self.parameter_map["platform_mainframe_cost"] = (
+            "platform_mainframe_mass",
+            "platform_mainframe_mass_cost_coeff",
+        )
+        self.parameter_map["crane_mass"] = ("platform_mainframe_mass",)
+        self.parameter_map["crane_cost"] = ("crane_mass_cost_coeff", "crane_mass")
 
         # Removes unmodeled high speed shaft
         self.parameter_map["nacelle_mass"] = (
@@ -341,3 +357,108 @@ class Land2020NLR(CSMBase):
         exists = self._prepare_calculation("hvac_mass")
         if not exists:
             raise ValueError("`hvac_mass` should be set by the user at initialization.")
+
+    def calculate_platform_mainframe_mass(self):
+        """Calculates and sets :py:attr:`platform_mainframe_mass` if it was not provided by the
+        user.
+
+        .. math::
+            k * m_{bedplate}
+
+        where:
+
+        - :math:`k =` :py:attr:`platform_mainframe_mass_coeff`
+        - :math:`m_{bedplate} =` :py:attr:`bedplate_mass`
+
+        Args:
+            platform_mainframe_mass_coeff (float): :math:`k` in the mass equation above.
+            bedplate_mass (float): Bedplate mass (:math:`kg`). See
+                :py:meth:`calculate_bedplate_mass` for details.
+
+        Raises:
+            ValueError: Raised if the required parameters have not been provided or calculated.
+        """
+        exists = self._prepare_calculation("platform_mainframe_mass")
+        if exists:
+            return
+
+        self.platform_mainframe_mass = self.platform_mainframe_mass_coeff * self.bedplate_mass
+
+    def calculate_platform_mainframe_cost(self):
+        r"""Calculates and sets :py:attr:`platform_mainframe_cost` if it was not provided by the
+        user.
+
+        .. math::
+            k * m_{platform\_mainframe}
+
+        where:
+
+        - :math:`k =` :py:attr:`platform_mainframe_mass_cost_coeff` (:math:`USD/kg`)
+        - :math:`m =` :py:attr:`platform_mainframe_mass` (:math:`kg`).
+
+        Args:
+            platform_mainframe_mass_cost_coeff (float): Platform mainframe cost per kilogram
+                (:math:`USD/kg`).
+            platform_mainframe_mass (float): Platform mainframe mass (:math:`kg`).
+                See :py:meth:`calculate_platform_mainframe_mass` for more details.
+
+        Raises:
+            ValueError: Raised if any of the required parameters have not been provided.
+        """
+        exists = self._prepare_calculation("platform_mainframe_cost")
+        if exists:
+            return
+
+        self.platform_mainframe_cost = (
+            self.platform_mainframe_mass_cost_coeff * self.platform_mainframe_mass
+        )
+
+    def calculate_crane_mass(self):
+        r"""Calculates and sets :py:attr:`platform_mainframe_mass` if it was not provided by the
+        user.
+
+        .. math::
+            m_{platform\_mainframe}
+
+        where:
+
+        - :math:`m_{platform\_mainframe} =` :py:attr:`platform_mainframe_mass`
+
+        Args:
+            platform_mainframe_mass (float): Platform mainframe mass (:math:`kg`). See
+                :py:meth:`calculate_platform_mainframe_mass` for details.
+
+        Raises:
+            ValueError: Raised if the required parameters have not been provided or calculated.
+        """
+        exists = self._prepare_calculation("crane_mass")
+        if exists:
+            return
+
+        self.crane_mass = self.platform_mainframe_mass
+
+    def calculate_crane_cost(self):
+        r"""Calculates and sets :py:attr:`platform_mainframe_cost` if it was not provided by the
+        user.
+
+        .. math::
+            k * m_crane
+
+        where:
+
+        - :math:`k =` :py:attr:`crane_mass_cost_coeff` (:math:`USD/kg`)
+        - :math:`m =` :py:attr:`crane_mass` (:math:`kg`).
+
+        Args:
+            crane_mass_cost_coeff (float): Crane cost per kilogram (:math:`USD/kg`).
+            crane_mass (float): Crane mass (:math:`kg`).
+                See :py:meth:`calculate_platform_mainframe_mass` for more details.
+
+        Raises:
+            ValueError: Raised if any of the required parameters have not been provided.
+        """
+        exists = self._prepare_calculation("crane_cost")
+        if exists:
+            return
+
+        self.crane_cost = self.crane_mass_cost_coeff * self.crane_mass
