@@ -94,7 +94,7 @@ parameter_map = {
     "electrical_connection_mass": (),
     "electrical_connection_cost": (
         "rated_power_kw",
-        "electrical_connection_rated_power_cost_coeff",
+        "electrical_connection_cost_coeff",
     ),
     "controls_mass": (),
     "controls_cost": ("rated_power_kw", "controls_cost_coeff"),
@@ -248,7 +248,7 @@ class CSMBase:
         transformer_mass_cost_coeff (float): Transformer cost per kilogram (:math:`USD/kg`).
         controls_cost_coeff (float): Controls cost per kilowatt of capacity
             (:math:`USD/kW`).
-        electrical_connection_rated_power_cost_coeff (float): Electrical connection cost per
+        electrical_connection_cost_coeff (float): Electrical connection cost per
             kilowatt (:math:`USD/kW`).
         tower_mass_coeff (float): :math:`k` in the mass from :py:meth:`calculate_tower_mass`
             (:math:`kg/m`).
@@ -596,7 +596,7 @@ class CSMBase:
     electrical_connection_mass: float = create_field(
         float, "kg", "both", additional_validators=[validators.ge(0)]
     )
-    electrical_connection_rated_power_cost_coeff: float = create_field(
+    electrical_connection_cost_coeff: float = create_field(
         float, "USD/kW", "input", additional_validators=[validators.ge(0)]
     )
     electrical_connection_cost: float = create_field(
@@ -1907,11 +1907,11 @@ class CSMBase:
 
         where:
 
-        - :math:`k =` :py:attr:`electrical_connection_rated_power_cost_coeff` (:math:`USD/kW`)
+        - :math:`k =` :py:attr:`electrical_connection_cost_coeff` (:math:`USD/kW`)
         - :math:`m =` :py:attr:`rated_power` (:math:`kW`).
 
         Args:
-            electrical_connection_rated_power_cost_coeff (float): Electrical connection cost per
+            electrical_connection_cost_coeff (float): Electrical connection cost per
                 kW of capacity (:math:`USD/kW`).
             rated_power_kw (float): Turbine nameplate capacity (rated power) (:math:`kW`).
 
@@ -1923,7 +1923,7 @@ class CSMBase:
             return
 
         self.electrical_connection_cost = (
-            self.electrical_connection_rated_power_cost_coeff * self.rated_power_kw
+            self.electrical_connection_cost_coeff * self.rated_power_kw
         )
 
     def calculate_tower_mass(self):

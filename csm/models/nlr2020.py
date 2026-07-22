@@ -114,10 +114,9 @@ class Land2020NLR(CSMBase):
         transformer_mass_coeff (float): Defaults to 1915 :math:`kg/kW`.
         transformer_mass_intercept (bool): Defaults to 1910.
         transformer_mass_cost_coeff (float): Defaults to 20.5296 :math:`USD/kg`.
-        controls_rated_power_cost_coeff (float): Controls cost per kilowatt of capacity
-            (:math:`USD/kW`).
-        electrical_connection_rated_power_cost_coeff (float): Electrical connection cost per
-            kilowatt (:math:`USD/kW`).
+        converter_mass_cost_coeff (float): Defaults to 18.8 :math:`USD/kg`.
+        controls_cost_coeff (float): 23.0958 :math:`USD/kW`.
+        electrical_connection_cost_coeff (float): Defaults to 45.7002 :math:`USD/kW`.
         tower_mass_coeff (float): Defaults to 0.152 :math:`kg/m`.
         tower_mass_intercept (bool): Defaults to -14281.
         tower_mass_cost_coeff (float): Defaults to 3.1668 :math:`USD/kg`.
@@ -128,8 +127,7 @@ class Land2020NLR(CSMBase):
                 tower\_mass = tower\_mass\_coeff * tower\_height
                 * (\pi * (rotor\_diameter / 2) ^ 2) + tower\_mass\_intercept
 
-        controls_mass (float): Controls mass (:math:`kg`). See
-            :py:meth:`calculate_controls_mass` for more details.
+        controls_mass (float): Controls mass (:math:`kg`). Defaults to 0 :math:`kg`.
         controls_cost (float): Controls cost (:math:`USD`). See
             :py:meth:`calculate_controls_cost` for more details.
         electrical_connection_mass (float): Electrical connection mass (:math:`kg`). See
@@ -138,8 +136,6 @@ class Land2020NLR(CSMBase):
             :py:meth:`calculate_electrical_connection_cost` for more details.
         converter_mass (float): Power converter mass (:math:`kg`). See
             :py:meth:`calculate_converter_mass` for more details.
-        converter_mass_cost_coeff (float): Power converter cost per kilogram (:math:`USD/kg`). See
-            :py:meth:`calculate_converter_cost` for more details.
         converter_cost (float): Power converter cost (:math:`USD`). See
             :py:meth:`calculate_converter_cost` for more details.
         tower_cost (float): Tower cost (:math:`USD`). See
@@ -205,6 +201,9 @@ class Land2020NLR(CSMBase):
     transformer_mass_coeff = base.transformer_mass_coeff.reuse(default=1915.0)
     transformer_mass_intercept = base.transformer_mass_intercept.reuse(default=1910.0)
     transformer_mass_cost_coeff = base.transformer_mass_cost_coeff.reuse(default=20.5296)
+    converter_mass_cost_coeff = base.converter_mass_cost_coeff.reuse(18.8)
+    controls_cost_coeff = base.controls_cost_coeff.reuse(default=23.0958)
+    electrical_connection_cost_coeff = base.electrical_connection_cost_coeff.reuse(default=45.7002)
     tower_mass_coeff = base.tower_mass_coeff.reuse(default=0.152)
     tower_mass_intercept = base.tower_mass_exp.reuse(default=-14281.0)
     tower_mass_cost_coeff = base.tower_mass_cost_coeff.reuse(default=3.1668)
@@ -214,9 +213,6 @@ class Land2020NLR(CSMBase):
     # TODO: blade transport
     # TODO: hub transport
     # TODO: nacelle power electronics (2020)
-    # TODO: controls
-    # TODO: electrical connection
-    # TODO: converter
 
     def __attrs_post_init__(self):
         """Updates the parameter mapping for new mass and cost relationships."""
