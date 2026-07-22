@@ -1,7 +1,6 @@
 """Experimental generic new model generation and 2015 replication."""
 
-from math import pi
-
+import numpy as np
 from attrs import define, fields
 
 from csm.models.utils import create_field
@@ -207,12 +206,20 @@ class Land2020NLR(CSMBase):
     tower_mass_coeff = base.tower_mass_coeff.reuse(default=0.152)
     tower_mass_intercept = base.tower_mass_exp.reuse(default=-14281.0)
     tower_mass_cost_coeff = base.tower_mass_cost_coeff.reuse(default=3.1668)
+    transport_power_electronics_cost_coeff = create_field(float, "USD", "input", default=9)
+    transport_drivetrain_cost_coeff1 = create_field(float, "USD", "input", default=9000)
+    transport_drivetrain_cost_coeff2 = create_field(float, "USD", "input", default=45000)
+    transport_blade_cost_coeff1 = create_field(float, "USD", "input", default=0.543)
+    transport_blade_cost_coeff2 = create_field(float, "USD", "input", default=-7.4903)
+    transport_blade_cost_coeff3 = create_field(float, "USD", "input", default=-2847.5)
+    transport_blade_cost_intercept = create_field(float, "USD", "input", default=103627)
+    transport_hub_cost_intercept = create_field(float, "USD", "input", default=5000)
+    transport_tower_cost_coeff = create_field(float, "USD", "input", default=34083)
+    tower_section_mass_max = create_field(float, "USD", "input", default=80000)
+    transport_misc_parts_cost_coeff = create_field(float, "USD", "input", default=0.025)
+    transport_cost = create_field(float, "USD", "both")
 
-    # TODO: tower sections, sections data, and transport
-    # TODO: shipped loose parts
-    # TODO: blade transport
-    # TODO: hub transport
-    # TODO: nacelle power electronics (2020)
+    # TODO: tower sections data
 
     def __attrs_post_init__(self):
         """Updates the parameter mapping for new mass and cost relationships."""
@@ -250,7 +257,19 @@ class Land2020NLR(CSMBase):
             "rotor_diameter",
             "tower_mass_intercept",
         )
-
+        self.parameter_map["transport_cost"] = (
+            "transport_power_electronics_cost_coeff",
+            "transport_drivetrain_cost_coeff1",
+            "transport_drivetrain_cost_coeff2",
+            "transport_blade_cost_coeff1",
+            "transport_blade_cost_coeff2",
+            "transport_blade_cost_coeff3",
+            "transport_blade_cost_intercept",
+            "transport_hub_cost_intercept",
+            "transport_tower_cost_coeff",
+            "tower_section_mass_max",
+            "transport_misc_parts_cost_coeff",
+        )
         # Removes unmodeled high speed shaft
         self.parameter_map["nacelle_mass"] = (
             "low_speed_shaft_mass",
@@ -536,6 +555,64 @@ class Land2020NLR(CSMBase):
             return
 
         self.tower_mass = (
-            self.tower_mass_coeff * self.tower_length * (pi * (self.rotor_diameter / 2) ** 2)
+            self.tower_mass_coeff * self.tower_length * (np.pi * (self.rotor_diameter / 2) ** 2)
             + self.tower_mass_intercept
+        )
+
+    def calculate_transport_cost(self):
+        r"""Calculates and sets :py:attr:`platform_mainframe_cost` if it was not provided by the
+        user.
+
+        .. math::
+            k * m_crane
+
+        where:
+
+        - :math:`k =` :py:attr:`crane_mass_cost_coeff` (:math:`USD/kg`)
+        - :math:`m =` :py:attr:`crane_mass` (:math:`kg`).
+
+        Args:
+            crane_mass_cost_coeff (float): Crane cost per kilogram (:math:`USD/kg`).
+            crane_mass (float): Crane mass (:math:`kg`).
+                See :py:meth:`calculate_platform_mainframe_mass` for more details.
+
+        Raises:
+            ValueError: Raised if any of the required parameters have not been provided.
+        """
+        exists = self._prepare_calculation("transport_cost")
+        if exists:
+            return
+
+        drivetrain_cost = (
+            np.ceil(self.nacelle_mass / self.transport_drivetrain_cost_coeff1)
+            * self.transport_drivetrain_cost_coeff2
+        )
+        power_electronics_cost = (
+            np.maximum(self.rated_power_kw - 30000, 0.0)
+            * self.transport_power_electronics_cost_coeff
+        )
+
+        rotor_radius = self.rotor_diameter / 2.0
+        blade_cost = self.num_blades * (
+            self.transport_blade_cost_coeff1 * rotor_radius**3
+            + self.transport_blade_cost_coeff2 * rotor_radius**2
+            + self.transport_blade_cost_coeff3 * rotor_radius
+            + self.transport_blade_cost_intercept
+        )
+        hub_cost = self.hub_mass + self.transport_hub_cost_intercept
+
+        num_tower_sections = int(np.ceil(self.tower_mass / self.tower_section_mass_max))
+        tower_cost = num_tower_sections * self.transport_tower_cost_coeff
+
+        misc_parts_cost = self.transport_misc_parts_cost_coeff * self.turbine_mass
+
+        self.transport_cost = sum(
+            (
+                power_electronics_cost,
+                drivetrain_cost,
+                blade_cost,
+                hub_cost,
+                tower_cost,
+                misc_parts_cost,
+            )
         )
