@@ -209,6 +209,15 @@ class Land2020NLR(CSMBase):
     tower_mass_intercept = base.tower_mass_exp.reuse(default=-14281.0)
     tower_mass_cost_coeff = base.tower_mass_cost_coeff.reuse(default=3.1668)
 
+    # TODO: tower sections, sections data, and transport
+    # TODO: shipped loose parts
+    # TODO: blade transport
+    # TODO: hub transport
+    # TODO: nacelle power electronics (2020)
+    # TODO: controls
+    # TODO: electrical connection
+    # TODO: converter
+
     def __attrs_post_init__(self):
         """Updates the parameter mapping for new mass and cost relationships."""
         self.parameter_map["blade_mass"] = ("rotor_diameter", "blade_mass_coeff", "blade_mass_exp")

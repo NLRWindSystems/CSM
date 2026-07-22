@@ -97,7 +97,7 @@ parameter_map = {
         "electrical_connection_rated_power_cost_coeff",
     ),
     "controls_mass": (),
-    "controls_cost": ("rated_power_kw", "controls_rated_power_cost_coeff"),
+    "controls_cost": ("rated_power_kw", "controls_cost_coeff"),
     "tower_mass": ("tower_length", "tower_mass_coeff", "tower_mass_exp"),
     "tower_cost": ("tower_mass", "tower_mass_cost_coeff"),
     "nacelle_mass": (
@@ -246,7 +246,7 @@ class CSMBase:
         transformer_mass_intercept (bool): :math:`b` in the mass equation from
             :py:meth:`calculate_transformer_mass`.
         transformer_mass_cost_coeff (float): Transformer cost per kilogram (:math:`USD/kg`).
-        controls_rated_power_cost_coeff (float): Controls cost per kilowatt of capacity
+        controls_cost_coeff (float): Controls cost per kilowatt of capacity
             (:math:`USD/kW`).
         electrical_connection_rated_power_cost_coeff (float): Electrical connection cost per
             kilowatt (:math:`USD/kW`).
@@ -586,7 +586,7 @@ class CSMBase:
     controls_mass: float = create_field(
         float, "kg", "both", additional_validators=[validators.ge(0)]
     )
-    controls_rated_power_cost_coeff: float = create_field(
+    controls_cost_coeff: float = create_field(
         float, "USD/kW", "input", additional_validators=[validators.ge(0)]
     )
     controls_cost: float = create_field(
@@ -1835,11 +1835,11 @@ class CSMBase:
 
         where:
 
-        - :math:`k =` :py:attr:`controls_rated_power_cost_coeff` (:math:`USD/kW`)
+        - :math:`k =` :py:attr:`controls_cost_coeff` (:math:`USD/kW`)
         - :math:`m =` :py:attr:`rated_power` (:math:`kW`).
 
         Args:
-            controls_rated_power_cost_coeff (float): Controls cost per kW of capacity
+            controls_cost_coeff (float): Controls cost per kW of capacity
                 (:math:`USD/kW`).
             rated_power_kw (float): Turbine nameplate capacity (rated power) (:math:`kW`).
 
@@ -1850,7 +1850,7 @@ class CSMBase:
         if exists:
             return
 
-        self.controls_cost = self.controls_rated_power_cost_coeff * self.rated_power_kw
+        self.controls_cost = self.controls_cost_coeff * self.rated_power_kw
 
     def calculate_converter_mass(self):
         """Calculates and sets the :py:attr:`converter_mass` if it was not provided by the user.
