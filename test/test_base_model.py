@@ -453,6 +453,9 @@ def test_has_values(subtests):
     calculated = [
         k for k, v in model.fields_dict.items() if v.metadata.get("io") in ("both", "output")
     ]
+
+    # remove placeholder for transport cost
+    calculated.pop(calculated.index("transport_cost"))
     with subtests.test("Check calculated values unregistered"):
         assert not all(model._has_values(*calculated))
 
@@ -600,7 +603,10 @@ def test_parameterize(subtests):
         ]
         results = CSMBase.parameterize(base_kwargs=base, parameterized_kwargs=parameters)
 
-        assert results.shape == (len(outputs), len(inputs))
+        # account for crane and transport cost as an input below
+        assert results.shape == (len(outputs) - 2, len(inputs))
+        _ = outputs.pop(outputs.index("crane_cost"))
+        _ = outputs.pop(outputs.index("transport_cost"))
         assert results.index.tolist() == sorted(outputs)
         for _output, _input in zip(results.columns, inputs, strict=True):
             assert all(

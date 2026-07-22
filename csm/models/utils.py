@@ -106,7 +106,13 @@ def create_field(
     return _field
 
 
-def reuse(attribute: Attribute, default: Any, *, init: bool | None = None) -> attrib:
+def reuse(
+    attribute: Attribute,
+    *,
+    default: Any = None,
+    metadata: dict | None = None,
+    init: bool | None = None,
+) -> attrib:
     """Reuses an existing :py:attr:`attrs.Attribute` object with an updated default value.
 
     Borrowed idea from https://github.com/python-attrs/attrs/pull/1429 until the functionality
@@ -114,7 +120,9 @@ def reuse(attribute: Attribute, default: Any, *, init: bool | None = None) -> at
 
     Args:
         attribute (:py:attr:`attrs.Attribute`): The attribute to modify.
-        default (Any): The new default value.
+        default (Any, optional): The new default value.
+        metadata (None, optional): Updated metadata dictionary to change attributes such as
+            "units" or "io". Defaults to None.
         init (bool | None): Custom value for the `init` attribute, if modification is desired. If
             None, then the existing value for the :py:attr:`attribute` will be used.
             Defaults to False.
@@ -122,12 +130,15 @@ def reuse(attribute: Attribute, default: Any, *, init: bool | None = None) -> at
     Returns:
         attrib: The new attribute object used in class initialization.
     """
+    attribute_metadata = dict(attribute.metadata)
+    attribute_metadata.update(metadata if metadata is not None else {})
+
     # NOTE: if adding factory, then only one of default or factory can be used.
     kwargs = {
-        "default": default,
+        "default": attribute.default if default is None else default,
         "converter": attribute.converter,
         "validator": attribute.validator,
-        "metadata": attribute.metadata,
+        "metadata": attribute_metadata,
         "repr": attribute.repr,
         "cmp": None,
         "hash": attribute.hash,

@@ -71,6 +71,7 @@ class Land2020NLR(CSMBase):
         bearing_mass_exp (float): Defaults to 3.5.
         bearing_mass_cost_coeff (float): Defaults to 4.914 :math:`USD/kg`.
         gearbox_torque_density (float): In 2024, modern 5-7MW gearboxes are able to reach 200 Nm/kg.
+        gearbox_torque_exp (float): Defaults to 0.6566.
         gearbox_torque_cost (float): In 2024, modern 5-7MW gearboxes cost approximately $50/kNm.
         brake_mass_cost_coeff (float): In 2020, updated to $3.6254 USD/kg. Regression based sizing
             derived by J.Keller under FOA 1981 support project.
@@ -94,7 +95,7 @@ class Land2020NLR(CSMBase):
         yaw_system_mass_cost_coeff (float): Defaults to 9.0636 :math:`USD/kg`.
         hvac_mass_coeff (float): Not used in 2020. Defaults to 0.
         hvac_mass_cost_coeff (float): Defaults to 135.408 :math:`USD/kg`.
-        hvac_mass (float): Defaults to 221 :math:`kg`.
+        hydraulic_cooling_mass (float): Defaults to 221 :math:`kg`.
         nacelle_cover_mass_coeff (float): Defaults to 1281.7 :math:`kg/kW`.
         nacelle_cover_mass_intercept (float): Defaults to 428.19.
         nacelle_cover_mass_cost_coeff (float): Defaults to 6.2244 :math:`USD/kg`.
@@ -148,9 +149,12 @@ class Land2020NLR(CSMBase):
     hub_mass_coeff = base.hub_mass_coeff.reuse(default=3.5793)
     hub_mass_intercept = base.hub_mass_intercept.reuse(default=-25451.58)
     hub_mass_cost_coeff = base.hub_mass_cost_coeff.reuse(default=4.2588)
-    pitch_bearing_mass_coeff = base.pitch_bearing_mass_coeff.reuse(default=0.1295)
-    pitch_bearing_mass_intercept = base.pitch_bearing_mass_intercept.reuse(default=491.31)
-    bearing_housing_fraction = base.bearing_housing_fraction.reuse(default=0.3280)
+    bearing_housing_fraction = base.bearing_housing_fraction.reuse(default=0)
+    pitch_bearing_mass_coeff = base.pitch_bearing_mass_coeff.reuse(default=0)
+    pitch_bearing_mass_intercept = base.pitch_bearing_mass_intercept.reuse(default=0)
+    pitch_blade_mass_coeff = create_field(float, "unitless", "input", default=0.1295)
+    pitch_system_mass_coeff = create_field(float, "unitless", "input", default=1.328)
+    pitch_blade_mass_intercept = create_field(float, "unitless", "input", default=491.31)
     mass_sys_offset = base.mass_sys_offset.reuse(default=555.0)
     pitch_system_mass_cost_coeff = base.pitch_system_mass_cost_coeff.reuse(default=24.1332)
     spinner_mass_coeff = base.spinner_mass_coeff.reuse(default=2.3255)
@@ -164,15 +168,15 @@ class Land2020NLR(CSMBase):
     bearing_mass_exp = base.bearing_mass_exp.reuse(default=3.5)
     bearing_mass_cost_coeff = base.bearing_mass_cost_coeff.reuse(default=4.914)
     gearbox_torque_density = base.gearbox_torque_density.reuse(default=156.46)
-    gearbox_mass_exp = create_field(float, "unitless", "input", default=0.6566)
+    gearbox_torque_exp = create_field(float, "unitless", "input", default=0.6566)
     gearbox_torque_cost = base.gearbox_torque_cost.reuse(default=14.0868)
-    brake_mass_coeff = base.brake_mass_coeff.reuse(default=198.51)
+    brake_mass_coeff = base.brake_mass_coeff.reuse(default=0.19851)
     brake_mass_intercept = create_field(float, units="unitless", io_type="input", default=1.893)
     brake_mass_cost_coeff = base.brake_mass_cost_coeff.reuse(default=7.4256)
     hss_mass_coeff = base.hss_mass_coeff.reuse(default=0)
     hss_mass_cost_coeff = base.hss_mass_cost_coeff.reuse(default=0)
-    high_speed_shaft_mass = base.hss_mass_cost_coeff.reuse(default=0)
-    high_speed_shaft_cost = base.hss_mass_cost_coeff.reuse(default=0)
+    high_speed_shaft_mass = base.high_speed_shaft_mass.reuse(default=0)
+    high_speed_shaft_cost = base.high_speed_shaft_cost.reuse(default=0)
     generator_mass_coeff = base.generator_mass_coeff.reuse(default=1754)
     generator_mass_intercept = base.generator_mass_intercept.reuse(default=3503.6)
     generator_mass_cost_coeff = base.generator_mass_cost_coeff.reuse(default=13.5408)
@@ -186,8 +190,8 @@ class Land2020NLR(CSMBase):
     yaw_system_mass_cost_coeff = base.yaw_system_mass_cost_coeff.reuse(default=9.0636)
     hvac_mass_coeff = base.hvac_mass_coeff.reuse(default=0)
     hvac_mass_cost_coeff = base.hvac_mass_cost_coeff.reuse(default=135.408)
-    hvac_mass = base.hvac_mass_coeff.reuse(default=221)
-    nacelle_cover_mass_coeff = base.nacelle_cover_mass_coeff.reuse(default=1281.7)
+    hydraulic_cooling_mass = base.hydraulic_cooling_mass.reuse(default=221)
+    nacelle_cover_mass_coeff = base.nacelle_cover_mass_coeff.reuse(default=1.2817)
     nacelle_cover_mass_intercept = base.nacelle_cover_mass_intercept.reuse(default=428.19)
     nacelle_cover_mass_cost_coeff = base.nacelle_cover_mass_cost_coeff.reuse(default=6.2244)
     has_crane = base.has_crane.reuse(default=True)
@@ -195,16 +199,16 @@ class Land2020NLR(CSMBase):
     platform_mainframe_mass_cost_coeff = base.platform_mainframe_mass_cost_coeff.reuse(
         default=18.6732
     )
-    crane_mass = base.crane_mass.reuse(default=3000)
     crane_mass_cost_coeff = create_field(float, "USD/kg", "input", default=4.368)
+    crane_mass = base.crane_mass.reuse(default=3000)
     transformer_mass_coeff = base.transformer_mass_coeff.reuse(default=1915.0)
     transformer_mass_intercept = base.transformer_mass_intercept.reuse(default=1910.0)
     transformer_mass_cost_coeff = base.transformer_mass_cost_coeff.reuse(default=20.5296)
-    converter_mass_cost_coeff = base.converter_mass_cost_coeff.reuse(18.8)
+    converter_mass_cost_coeff = base.converter_mass_cost_coeff.reuse(default=18.8)
     controls_cost_coeff = base.controls_cost_coeff.reuse(default=23.0958)
     electrical_connection_cost_coeff = base.electrical_connection_cost_coeff.reuse(default=45.7002)
     tower_mass_coeff = base.tower_mass_coeff.reuse(default=0.152)
-    tower_mass_intercept = base.tower_mass_exp.reuse(default=-14281.0)
+    tower_mass_intercept = create_field(float, "unitless", "input", default=-14281.0)
     tower_mass_cost_coeff = base.tower_mass_cost_coeff.reuse(default=3.1668)
     transport_power_electronics_cost_coeff = create_field(float, "USD", "input", default=9)
     transport_drivetrain_cost_coeff1 = create_field(float, "USD", "input", default=9000)
@@ -217,13 +221,24 @@ class Land2020NLR(CSMBase):
     transport_tower_cost_coeff = create_field(float, "USD", "input", default=34083)
     tower_section_mass_max = create_field(float, "USD", "input", default=80000)
     transport_misc_parts_cost_coeff = create_field(float, "USD", "input", default=0.025)
-    transport_cost = create_field(float, "USD", "both")
+    blade_has_carbon = base.blade_has_carbon.reuse(default=False)
+    tower_mass_exp = base.tower_mass_exp.reuse(default=0)
+    lss_mass_exp = base.lss_mass_exp.reuse(default=0)
+    lss_mass_coeff = base.lss_mass_coeff.reuse(default=0)
 
-    # TODO: tower sections data
+    # TODO: pitch system docstrings (top and calculate)
 
     def __attrs_post_init__(self):
         """Updates the parameter mapping for new mass and cost relationships."""
         self.parameter_map["blade_mass"] = ("rotor_diameter", "blade_mass_coeff", "blade_mass_exp")
+        self.parameter_map["pitch_system_mass"] = (
+            "pitch_system_mass_coeff",
+            "pitch_blade_mass_coeff",
+            "num_blades",
+            "blade_mass",
+            "pitch_blade_mass_intercept",
+            "mass_sys_offset",
+        )
         self.parameter_map["low_speed_shaft_mass"] = (
             "rotor_diameter",
             "lss_mass_coeff1",
@@ -233,14 +248,14 @@ class Land2020NLR(CSMBase):
         self.parameter_map["gearbox_mass"] = (
             "rotor_torque",
             "gearbox_torque_density",
-            "gearbox_mass_exp",
+            "gearbox_torque_exp",
         )
         self.parameter_map["bedplate_mass"] = (
             "bedplate_mass_coeff",
             "rotor_diameter",
             "bedplate_mass_intercept",
         )
-        self.parameter_map["hvac_mass"] = ("hvac_mass",)
+        self.parameter_map["hydraulic_cooling_mass"] = ("hydraulic_cooling_mass",)
         self.parameter_map["platform_mainframe_mass"] = (
             "bedplate_mass",
             "platform_mainframe_mass_coeff",
@@ -329,6 +344,46 @@ class Land2020NLR(CSMBase):
 
         self.blade_mass = self.blade_mass_coeff * (self.rotor_diameter / 2) ** self.blade_mass_exp
 
+    def calculate_pitch_system_mass(self):
+        """Calculates and sets :py:attr:`pitch_system_mass` if it was not provided by the user.
+
+        :math:`mass = k1*(k2*m_{blade}*n_{blades} + b1) + b2`
+
+        where:
+
+        - :math:`k1 =` :py:attr:`pitch_system_mass_coeff`
+        - :math:`k2 =` :py:attr:`pitch_blade_mass_coeff`
+        - :math:`n_{blades} =` :py:attr:`num_blades`
+        - :math:`m_{blade} =` :py:attr:`blade_mass`
+        - :math:`b1 =` :py:attr:`pitch_blade_mass_intercept`
+        - :math:`b2 =` :py:attr:`mass_sys_offset`
+
+        Args:
+            num_blades (int, optional): Number of turbine blades. Defaults to 3.
+            pitch_bearing_mass_coeff (float): :math:`k` in the pitch bearing mass equation.
+            blade_mass (float): Blade mass (:math:`kg`). See :py:meth:`calculate_blade_mass`
+                for details.
+            pitch_bearing_mass_intercept (float): :math:`b1` in the pitch bearing mass equation.
+            bearing_housing_fraction (float): Mass of the housing for the bearing as a fraction of
+                the bearing mass. :math:`h` in the pitch system mass equation.
+            mass_sys_offset (float): :math:`b2` in the pitch system mass equation.
+
+        Raises:
+            ValueError: Raised if the required parameters have not been provided or calculated.
+        """
+        exists = self._prepare_calculation("pitch_system_mass")
+        if exists:
+            return
+
+        self.pitch_system_mass = (
+            self.pitch_system_mass_coeff
+            * (
+                self.pitch_blade_mass_coeff * self.num_blades * self.blade_mass
+                + self.pitch_blade_mass_intercept
+            )
+            + self.mass_sys_offset
+        )
+
     def calculate_low_speed_shaft_mass(self):
         """Calculates and sets :py:attr:`low_speed_shaft_mass` if it was not provided by the user.
 
@@ -364,7 +419,7 @@ class Land2020NLR(CSMBase):
         """Calculates and sets :py:attr:`gearbox_mass` for the gearbox if it was not provided
         by the user.
 
-        .. math:: k * (torque * 1000) ** b
+        .. math:: k * torque ** b
 
         where:
 
@@ -384,9 +439,7 @@ class Land2020NLR(CSMBase):
         if exists:
             return
 
-        self.gearbox_mass = (
-            self.gearbox_torque_density * (self.rotor_torque * 1e3) ** self.gearbox_torque_exp
-        )
+        self.gearbox_mass = self.gearbox_torque_density * self.rotor_torque**self.gearbox_torque_exp
 
     def calculate_brake_mass(self):
         """Calculates and sets :py:attr:`brake_mass` if it was not provided by the user.
@@ -413,15 +466,44 @@ class Land2020NLR(CSMBase):
 
         self.brake_mass = self.brake_mass_coeff * self.rated_power_kw + self.brake_mass_intercept
 
-    def calculate_hvac_mass(self):
-        """Sets :py:attr:`hvac_mass` as provided by the user.
+    def calculate_hydraulic_cooling_mass(self):
+        """Sets :py:attr:`hydraulic_cooling_mass` as provided by the user.
 
         Raises:
             ValueError: Raised if the required parameters have not been provided or calculated.
         """
-        exists = self._prepare_calculation("hvac_mass")
+        exists = self._prepare_calculation("hydraulic_cooling_mass")
         if not exists:
-            raise ValueError("`hvac_mass` should be set by the user at initialization.")
+            raise ValueError(
+                "`hydraulic_cooling_mass` should be set by the user at initialization."
+            )
+
+    def calculate_bedplate_mass(self):
+        """Calculates and sets :py:attr:`bedplate_mass` if it was not provided by the user.
+
+        .. math:: k * rotor_diameter + b
+
+        where:
+
+        - :math:`b =` :py:attr:`bedplate_mass_coeff`
+        - :math:`rotor_diameter =` :py:attr:`rotor_diameter`
+        - :math:`b =` :py:attr:`bedplate_mass_intercept`
+
+        Args:
+            rotor_diameter (float): Turbine rotor diameter (:math:`m`).
+            bedplate_mass_coeff (bool): :math:`b` in the mass equation above.
+            bedplate_mass_intercept (bool): :math:`k` in the mass equation above.
+
+        Raises:
+            ValueError: Raised if the required parameters have not been provided or calculated.
+        """
+        exists = self._prepare_calculation("bedplate_mass")
+        if exists:
+            return
+
+        self.bedplate_mass = (
+            self.bedplate_mass_coeff * self.rotor_diameter + self.bedplate_mass_intercept
+        )
 
     def calculate_platform_mainframe_mass(self):
         """Calculates and sets :py:attr:`platform_mainframe_mass` if it was not provided by the
@@ -616,3 +698,17 @@ class Land2020NLR(CSMBase):
                 misc_parts_cost,
             )
         )
+
+    def calculate_subsystem_mass(self):
+        """Runs the base model's ``calculate_subsystem_mass``, then calculates additional
+        subsystem masses added to the model.
+        """
+        super().calculate_subsystem_mass()
+        self.calculate_crane_mass()
+
+    def calculate_subsystem_cost(self):
+        """Runs the base model's ``calculate_subsystem_mass``, then calculates additional
+        subsystem costs added to the model.
+        """
+        super().calculate_subsystem_cost()
+        self.calculate_crane_cost()

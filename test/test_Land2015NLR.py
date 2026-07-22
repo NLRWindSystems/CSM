@@ -8,7 +8,7 @@ from test.conftest import csm_2015_test_inputs
 
 
 @pytest.mark.unit
-def test_CSMBase_defaults_only(subtests):
+def test_Land2015NLR_defaults_only(subtests):
     """Tests that all the individual model calculations fail individually and when run as a group.
     Ensures that all results (output) values are still their defaults. The combination of these
     tests ensures that :py:meth:`CSMBase._has_values` and validate_inputs work for models
@@ -67,9 +67,9 @@ def test_CSMBase_defaults_only(subtests):
     assert nlr2015.tower_mass_coeff == 19.828
     assert nlr2015.tower_mass_exp == 2.0282
     assert nlr2015.tower_mass_cost_coeff == 2.9
-    assert nlr2015.controls_rated_power_cost_coeff == 21.15
+    assert nlr2015.controls_cost_coeff == 21.15
     assert nlr2015.converter_mass_cost_coeff == 18.8
-    assert nlr2015.electrical_connection_rated_power_cost_coeff == 41.85
+    assert nlr2015.electrical_connection_cost_coeff == 41.85
 
     results = nlr2015.get_results()
     mass_results = nlr2015.get_mass_results()

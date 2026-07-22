@@ -563,9 +563,7 @@ class CSMBase:
     # platform mainframe
     has_crane: bool = create_field(bool, "unitless", "input")
     crane_mass: float = create_field(float, "kg", "input", additional_validators=[validators.ge(0)])
-    crane_cost: float = create_field(
-        float, "USD", "input", additional_validators=[validators.ge(0)]
-    )
+    crane_cost: float = create_field(float, "USD", "both", additional_validators=[validators.ge(0)])
     platform_mainframe_mass_coeff: float = create_field(float, "unitless", "input")
     platform_mainframe_mass_cost_coeff: float = create_field(float, "USD/kg", "input")
     platform_mainframe_mass: float = create_field(float, "kg", "both")
@@ -634,6 +632,9 @@ class CSMBase:
     )
     rotor_mass: float = create_field(float, "kg", "both", additional_validators=[validators.ge(0)])
     rotor_cost: float = create_field(float, "USD", "both", additional_validators=[validators.ge(0)])
+    transport_cost: float = create_field(
+        float, "USD", "both", additional_validators=[validators.ge(0)]
+    )
     turbine_mass: float = create_field(
         float, "kg", "output", additional_validators=[validators.ge(0)]
     )
@@ -2336,10 +2337,10 @@ class CSMBase:
 
     def run(self):
         """Run the mass and cost calculations."""
-        self._calculate_subsystem_mass()
-        self._calculate_system_mass()
-        self._calculate_subsystem_cost()
-        self._calculate_system_costs()
+        self.calculate_subsystem_mass()
+        self.calculate_system_mass()
+        self.calculate_subsystem_cost()
+        self.calculate_system_cost()
 
     @classmethod
     def _get_attr_map(
