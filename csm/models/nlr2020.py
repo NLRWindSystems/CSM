@@ -72,7 +72,8 @@ class Land2020NLR(CSMBase):
         bearing_mass_cost_coeff (float): Defaults to 4.914 :math:`USD/kg`.
         gearbox_torque_density (float): In 2024, modern 5-7MW gearboxes are able to reach 200 Nm/kg.
         gearbox_torque_exp (float): Defaults to 0.6566.
-        gearbox_torque_cost (float): In 2024, modern 5-7MW gearboxes cost approximately $50/kNm.
+        gearbox_torque_cost (float): Unused in 2020. Defaults to 0.
+        gearbox_mass_cost_coeff (float): Defaults to 14.0868.
         brake_mass_cost_coeff (float): In 2020, updated to $3.6254 USD/kg. Regression based sizing
             derived by J.Keller under FOA 1981 support project.
         hss_mass_coeff (float): High speed shaft is not modeled for 2020. Defaults to 0
@@ -169,7 +170,8 @@ class Land2020NLR(CSMBase):
     bearing_mass_cost_coeff = base.bearing_mass_cost_coeff.reuse(default=4.914)
     gearbox_torque_density = base.gearbox_torque_density.reuse(default=156.46)
     gearbox_torque_exp = create_field(float, "unitless", "input", default=0.6566)
-    gearbox_torque_cost = base.gearbox_torque_cost.reuse(default=14.0868)
+    gearbox_torque_cost = base.gearbox_torque_cost.reuse(default=0)
+    gearbox_mass_cost_coeff = create_field(float, "USD/kg", "input", default=14.0868)
     brake_mass_coeff = base.brake_mass_coeff.reuse(default=0.19851)
     brake_mass_intercept = create_field(float, units="unitless", io_type="input", default=1.893)
     brake_mass_cost_coeff = base.brake_mass_cost_coeff.reuse(default=7.4256)
@@ -250,6 +252,7 @@ class Land2020NLR(CSMBase):
             "gearbox_torque_density",
             "gearbox_torque_exp",
         )
+        self.parameter_map["gearbox_cost"] = ("gearbox_mass", "gearbox_mass_cost_coeff")
         self.parameter_map["bedplate_mass"] = (
             "bedplate_mass_coeff",
             "rotor_diameter",
@@ -442,6 +445,30 @@ class Land2020NLR(CSMBase):
             return
 
         self.gearbox_mass = self.gearbox_torque_density * self.rotor_torque**self.gearbox_torque_exp
+
+    def calculate_gearbox_cost(self):
+        """Calculates and sets :py:attr:`gearbox_cost` if it was not provided by the user.
+
+        .. math:: k * m_{gearbox}
+
+        where:
+
+        - :math:`k =` :py:attr:`gearbox_mass_cost_coeff` (:math:`USD/kg`)
+        - :math:`m =` :py:attr:`gearbox_mass` (:math:`kg`).
+
+        Args:
+            gearbox_mass_cost_coeff (float): :math:`k` in the mass equation above.
+            gearbox_mass (float): Main bearing mass (:math:`kg`). See
+                :py:meth:`calculate_gearbox_mass` for more details.
+
+        Raises:
+            ValueError: Raised if any of the required parameters have not been provided.
+        """
+        exists = self._prepare_calculation("gearbox_cost")
+        if exists:
+            return
+
+        self.gearbox_cost = self.gearbox_mass * self.gearbox_mass_cost_coeff
 
     def calculate_brake_mass(self):
         """Calculates and sets :py:attr:`brake_mass` if it was not provided by the user.

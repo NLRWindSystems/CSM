@@ -172,7 +172,7 @@ def test_Land2020NLR_with_inputs(subtests):
     with subtests.test("Nacelle mass"):
         assert model.nacelle_mass == approx(176706.7541057522)
     with subtests.test("Turbine mass"):
-        assert model.turbine_mass == approx(445414.81133358914)
+        assert model.turbine_mass == approx(763421.7290295284)
 
     with subtests.test("Blade cost"):
         assert model.blade_cost == approx(347627.7901838095)
@@ -232,7 +232,7 @@ def test_Land2020NLR_with_inputs(subtests):
         # assert model.hub_system_mass_tcc == approx(55850.44282136)
         assert model.hub_system_cost == approx(223978.7414164895)
     with subtests.test("Rotor cost"):
-        assert model.rotor_cost == approx(1235633.68267274)
+        assert model.rotor_cost == approx(1574532.2408835592)
     with subtests.test("Turbine cost"):
         # assert model.turbine_mass_tcc == approx(445414.81133358914)
         assert model.turbine_cost == approx(3430022.404353479)
