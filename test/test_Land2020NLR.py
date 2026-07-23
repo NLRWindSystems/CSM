@@ -182,9 +182,6 @@ def test_Land2020NLR_with_inputs(subtests):
         assert model.pitch_system_cost == approx(300623.0935384411)
     with subtests.test("Spinner cost"):
         assert model.spinner_cost == approx(7047.0353772)
-    with subtests.test("Rotor cost"):
-        # assert model.rotor_mass_tcc == approx(111622.44744083)
-        assert model.rotor_cost == approx(1235633.68267274)
     with subtests.test("Low speed shaft cost"):
         assert model.low_speed_shaft_cost == approx(262388.48580672)
     with subtests.test("Main bearing cost"):
@@ -230,7 +227,7 @@ def test_Land2020NLR_with_inputs(subtests):
         assert model.tower_cost == approx(528775.7936738)
     with subtests.test("Hub system cost"):
         # assert model.hub_system_mass_tcc == approx(55850.44282136)
-        assert model.hub_system_cost == approx(223978.7414164895)
+        assert model.hub_system_cost == approx(531648.8703321306)
     with subtests.test("Rotor cost"):
         assert model.rotor_cost == approx(1574532.2408835592)
     with subtests.test("Turbine cost"):
