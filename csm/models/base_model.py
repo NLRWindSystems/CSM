@@ -756,7 +756,10 @@ class CSMBase:
 
     # all else
     parameter_map: dict[str, tuple[str]] = field(init=False)
-    parameter_graph: nx.DiGraph = field(init=False)
+    parameter_graph: nx.Digraph = field(init=False)
+    _all_result_names: dict = field(init=False, default=ALL_RESULT_NAMES)
+    _mass_result_names: dict = field(init=False, default=MASS_RESULT_NAMES)
+    _cost_result_names: dict = field(init=False, default=COST_RESULT_NAMES)
 
     # NOTE: temporary while prototyping
     turbine_production_cost: float = field(default=1000.0)
@@ -2512,19 +2515,19 @@ class CSMBase:
             names = [names]
         if not isinstance(names, Sequence):
             raise ValueError("`names` must be a single or iterable of strings.")
-        return {name: getattr(self, name) for name in ALL_RESULT_NAMES}
+        return {name: getattr(self, name) for name in names}
 
     def get_all_results(self) -> dict[str, float]:
         """Gathers the core results."""
-        return {name: getattr(self, name) for name in ALL_RESULT_NAMES}
+        return {name: getattr(self, name) for name in self._all_result_names}
 
     def get_mass_results(self) -> dict[str, float]:
         """Gathers all the mass-specific outputs into a dictionary of attribute: value."""
-        return {name: getattr(self, name) for name in MASS_RESULT_NAMES}
+        return {name: getattr(self, name) for name in self._mass_result_names}
 
     def get_cost_results(self) -> dict[str, float]:
         """Gathers all the cost-specific outputs into a dictionary of attribute: value."""
-        return {name: getattr(self, name) for name in COST_RESULT_NAMES}
+        return {name: getattr(self, name) for name in self._cost_result_names}
 
     def irs_mpc_breakdown(  # noqa: D417
         self,
