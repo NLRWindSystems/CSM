@@ -144,13 +144,15 @@ def test_Land2020NLR_with_inputs(subtests):
     with subtests.test("Generator mass"):
         assert model.generator_mass == approx(14378.400000000001)
     with subtests.test("Bedplate mass"):
-        assert model.bedplate_mass == approx(41765.26095285)
+        assert model.bedplate_mass == approx(51470.56)
     with subtests.test("Yaw system mass"):
         assert model.yaw_system_mass == approx(10589.55901713559)
     with subtests.test("Hydraulic cooling mass"):
         assert model.hydraulic_cooling_mass == approx(221.0)
     with subtests.test("Nacelle cover mass"):
         assert model.nacelle_cover_mass == approx(8374.73)
+    with subtests.test("Platform mainframe mass"):
+        assert model.platform_mainframe_mass == approx(257.3528)
     with subtests.test("Crane mass"):
         assert model.crane_mass == approx(257.3528)
     with subtests.test("Transformer mass"):
@@ -164,9 +166,9 @@ def test_Land2020NLR_with_inputs(subtests):
     with subtests.test("Tower mass"):
         assert model.tower_mass == approx(455672.35832462006)
     with subtests.test("Hub system mass"):
-        assert model.hub_system_mass == approx(52591.98398997124)
+        assert model.hub_system_mass == approx(65630.19183176765)
     with subtests.test("Rotor mass"):
-        assert model.rotor_mass == approx(111622.44744083)
+        assert model.rotor_mass == approx(131042.61659915617)
     with subtests.test("Nacelle mass"):
         assert model.nacelle_mass == approx(176706.7541057522)
     with subtests.test("Turbine mass"):
@@ -196,7 +198,7 @@ def test_Land2020NLR_with_inputs(subtests):
     with subtests.test("Generator cost"):
         assert model.generator_cost == approx(194695.03872000004)
     with subtests.test("Bedplate cost"):
-        assert model.bedplate_cost == approx(121119.25676326)
+        assert model.bedplate_cost == approx(162996.969408)
     with subtests.test("Yaw system cost"):
         assert model.yaw_system_cost == approx(95979.52710771014)
     with subtests.test("Hydraulic cooling cost"):

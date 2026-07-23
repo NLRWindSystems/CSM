@@ -177,7 +177,7 @@ class Land2020NLR(CSMBase):
     hss_mass_cost_coeff = base.hss_mass_cost_coeff.reuse(default=0)
     high_speed_shaft_mass = base.high_speed_shaft_mass.reuse(default=0)
     high_speed_shaft_cost = base.high_speed_shaft_cost.reuse(default=0)
-    generator_mass_coeff = base.generator_mass_coeff.reuse(default=1754)
+    generator_mass_coeff = base.generator_mass_coeff.reuse(default=1.754)
     generator_mass_intercept = base.generator_mass_intercept.reuse(default=3503.6)
     generator_mass_cost_coeff = base.generator_mass_cost_coeff.reuse(default=13.5408)
     bedplate_mass_exp = base.bedplate_mass_exp.reuse(default=0)
@@ -200,8 +200,8 @@ class Land2020NLR(CSMBase):
         default=18.6732
     )
     crane_mass_cost_coeff = create_field(float, "USD/kg", "input", default=4.368)
-    crane_mass = base.crane_mass.reuse(default=3000)
-    transformer_mass_coeff = base.transformer_mass_coeff.reuse(default=1915.0)
+    crane_mass = base.crane_mass.reuse(metadata={"io": "both"})
+    transformer_mass_coeff = base.transformer_mass_coeff.reuse(default=1.915)
     transformer_mass_intercept = base.transformer_mass_intercept.reuse(default=1910.0)
     transformer_mass_cost_coeff = base.transformer_mass_cost_coeff.reuse(default=20.5296)
     converter_mass_cost_coeff = base.converter_mass_cost_coeff.reuse(default=18.8)
@@ -285,7 +285,7 @@ class Land2020NLR(CSMBase):
             "tower_section_mass_max",
             "transport_misc_parts_cost_coeff",
         )
-        # Removes unmodeled high speed shaft
+        # Removes unmodeled high speed shaft and adds crane
         self.parameter_map["nacelle_mass"] = (
             "low_speed_shaft_mass",
             "num_bearings",
@@ -302,6 +302,7 @@ class Land2020NLR(CSMBase):
             "converter_mass",
             "controls_mass",
             "electrical_connection_mass",
+            "crane_mass",
         )
         self.parameter_map["nacelle_cost"] = (
             "low_speed_shaft_cost",
@@ -316,6 +317,7 @@ class Land2020NLR(CSMBase):
             "nacelle_cover_cost",
             "platform_mainframe_cost",
             "transformer_cost",
+            "crane_cost",
         )
         super().__attrs_post_init__()
 
@@ -639,6 +641,154 @@ class Land2020NLR(CSMBase):
         self.tower_mass = (
             self.tower_mass_coeff * self.tower_length * (np.pi * (self.rotor_diameter / 2) ** 2)
             + self.tower_mass_intercept
+        )
+
+    def calculate_nacelle_mass(self):
+        """Calculates and sets :py:attr:`nacelle_mass` (:math:`kg`) if it was not provided by the
+        user.
+
+        Sum of all above-tower components, excluding the blades (:py:meth:`calculate_rotor_mass`)
+        and hub (:py:meth:`calculate_hub_system_mass`):
+
+        - :py:attr:`low_speed_shaft_mass`
+        - :py:attr:`bearing_mass` * :py:attr:`num_bearings`
+        - :py:attr:`gearbox_mass`
+        - :py:attr:`brake_mass`
+        - :py:attr:`generator_mass`
+        - :py:attr:`bedplate_mass`
+        - :py:attr:`yaw_system_mass`
+        - :py:attr:`hydraulic_cooling_mass`
+        - :py:attr:`nacelle_cover_mass`
+        - :py:attr:`platform_mainframe_mass`
+        - :py:attr:`transformer_mass`
+        - :py:attr:`controls_mass`
+        - :py:attr:`converter_mass`
+        - :py:attr:`electrical_connection_mass`
+        - :py:attr:`crane_mass`
+
+        Args:
+            low_speed_shaft_mass (float): See :py:meth:`calculate_low_speed_shaft_mass` for more
+                details.
+            num_bearings (float): Number of main bearings (:py:attr:`num_bearings`).
+            bearing_mass (float): See :py:meth:`calculate_bearing_mass` for more details.
+            gearbox_mass (float): See :py:meth:`calculate_gearbox_mass` for more details.
+            brake_mass (float): See :py:meth:`calculate_brake_mass` for more details.
+            high_speed_shaft_mass (float): See :py:meth:`calculate_high_speed_shaft_mass` for
+                more details.
+            generator_mass (float): See :py:meth:`calculate_generator_mass` for more details.
+            bedplate_mass (float): See :py:meth:`calculate_bedplate_mass` for more details.
+            yaw_system_mass (float): See :py:meth:`calculate_yaw_system_mass` for more details.
+            hydraulic_cooling_mass (float): See :py:meth:`calculate_hydraulic_cooling_mass` for
+                more details.
+            nacelle_cover_mass (float): See :py:meth:`calculate_nacelle_cover_mass` for more
+                details.
+            platform_mainframe_mass (float): See :py:meth:`calculate_platform_mainframe_mass` for
+                more details.
+            transformer_mass (float): See :py:meth:`calculate_transformer_mass` for more details.
+            controls_mass (float): See :py:meth:`calculate_controls_mass` for more details.
+            converter_mass (float): See :py:meth:`calculate_converter_mass` for more details.
+            electrical_connection_mass (float): See
+                :py:meth:`calculate_electrical_connection_mass` for more details.
+            crane_mass (float): See :py:meth:`calculate_crane_mass` for more details.
+
+        Raises:
+            ValueError: Raised if the required parameters have not been provided or calculated.
+        """
+        exists = self._prepare_calculation("nacelle_mass")
+        if exists:
+            return
+
+        self.nacelle_mass = sum(
+            (
+                self.low_speed_shaft_mass,
+                self.num_bearings * self.bearing_mass,
+                self.gearbox_mass,
+                self.brake_mass,
+                self.generator_mass,
+                self.bedplate_mass,
+                self.yaw_system_mass,
+                self.hydraulic_cooling_mass,
+                self.nacelle_cover_mass,
+                self.platform_mainframe_mass,
+                self.transformer_mass,
+                self.controls_mass,
+                self.converter_mass,
+                self.electrical_connection_mass,
+                self.crane_mass,
+            )
+        )
+
+    def calculate_nacelle_cost(self):
+        """Calculates and sets :py:attr:`nacelle_cost`  (:math:`USD`) if it was not provided by the
+        user.
+
+        Sum of all above-tower components, excluding the blades (:py:meth:`calculate_rotor_cost`)
+        and hub (:py:meth:`calculate_hub_system_cost`):
+
+        - :py:attr:`low_speed_shaft_cost`
+        - :py:attr:`bearing_cost` * :py:attr:`num_bearings`
+        - :py:attr:`gearbox_cost`
+        - :py:attr:`brake_cost`
+        - :py:attr:`generator_cost`
+        - :py:attr:`bedplate_cost`
+        - :py:attr:`yaw_system_cost`
+        - :py:attr:`hydraulic_cooling_cost`
+        - :py:attr:`nacelle_cover_cost`
+        - :py:attr:`platform_mainframe_cost`
+        - :py:attr:`transformer_cost`
+        - :py:attr:`controls_cost`
+        - :py:attr:`converter_cost`
+        - :py:attr:`electrical_connection_cost`
+        - :py:attr:`crane_cost`
+
+        Args:
+            low_speed_shaft_cost (float): See :py:meth:`calculate_low_speed_shaft_cost` for more
+                details.
+            num_bearings (int): Number of main bearings (:py:attr:`num_bearings`).
+            bearing_cost (float): See :py:meth:`calculate_bearing_cost` for more details.
+            gearbox_cost (float): See :py:meth:`calculate_gearbox_cost` for more details.
+            brake_cost (float): See :py:meth:`calculate_brake_cost` for more details.
+            generator_cost (float): See :py:meth:`calculate_generator_cost` for more details.
+            bedplate_cost (float): See :py:meth:`calculate_bedplate_cost` for more details.
+            yaw_system_cost (float): See :py:meth:`calculate_yaw_system_cost` for more details.
+            hydraulic_cooling_cost (float): See :py:meth:`calculate_hydraulic_cooling_cost` for
+                more details.
+            nacelle_cover_cost (float): See :py:meth:`calculate_nacelle_cover_cost` for more
+                details.
+            platform_mainframe_cost (float): See :py:meth:`calculate_platform_mainframe_cost` for
+                more details.
+            transformer_cost (float): See :py:meth:`calculate_transformer_cost` for more details.
+            controls_cost (float): See :py:meth:`calculate_controls_cost` for more details.
+            converter_cost (float): See :py:meth:`calculate_converter_cost` for more details.
+            electrical_connection_cost (float): See
+                :py:meth:`calculate_electrical_connection_cost` for more details.
+            crane_cost (float): See :py:meth:`calculate_crane_cost` for more details.
+
+        Raises:
+            ValueError: Raised if the required parameters have not been provided or calculated.
+        """
+        exists = self._prepare_calculation("nacelle_cost")
+        if exists:
+            return
+
+        self.nacelle_cost = sum(
+            (
+                self.low_speed_shaft_cost,
+                self.num_bearings * self.bearing_cost,
+                self.gearbox_cost,
+                self.brake_cost,
+                self.generator_cost,
+                self.bedplate_cost,
+                self.yaw_system_cost,
+                self.hydraulic_cooling_cost,
+                self.nacelle_cover_cost,
+                self.platform_mainframe_cost,
+                self.transformer_cost,
+                self.controls_cost,
+                self.converter_cost,
+                self.electrical_connection_cost,
+                self.crane_cost,
+            )
         )
 
     def calculate_transport_cost(self):
