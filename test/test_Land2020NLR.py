@@ -14,79 +14,122 @@ def test_Land2020NLR_defaults_only(subtests):
     """
     nlr2020 = Land2020NLR()
     assert nlr2020.turbine_class == 1
-    assert nlr2020.blade_mass_coeff == 9.2157
-    assert nlr2020.blade_mass_exp == 1.7679
-    assert nlr2020.blade_mass_cost_coeff == 15.9432
-    assert nlr2020.hub_mass_coeff == 3.5793
-    assert nlr2020.hub_mass_intercept == -25451.58
-    assert nlr2020.hub_mass_cost_coeff == 4.2588
-    assert nlr2020.pitch_bearing_mass_coeff == 0.1295
-    assert nlr2020.pitch_bearing_mass_intercept == 491.31
-    assert nlr2020.bearing_housing_fraction == 0.3280
-    assert nlr2020.mass_sys_offset == 555.0
-    assert nlr2020.pitch_system_mass_cost_coeff == 24.1332
-    assert nlr2020.spinner_mass_coeff == 2.3255
-    assert nlr2020.spinner_mass_intercept == 204.65
-    assert nlr2020.spinner_mass_cost_coeff == 12.1212
-    assert nlr2020.lss_mass_coeff1 == 2.1906
-    assert nlr2020.lss_mass_coeff2 == -311.15
-    assert nlr2020.lss_mass_intercept == 13108.0
-    assert nlr2020.lss_mass_cost_coeff == 12.9948
-    assert nlr2020.bearing_mass_coeff == 0.0001
-    assert nlr2020.bearing_mass_exp == 3.5
-    assert nlr2020.bearing_mass_cost_coeff == 4.914
-    assert nlr2020.gearbox_torque_density == 156.46
-    assert nlr2020.gearbox_torque_exp == 0.6566
-    assert nlr2020.gearbox_torque_cost == 14.0868
-    assert nlr2020.brake_mass_coeff == 198.51
-    assert nlr2020.brake_mass_intercept == 1.893
-    assert nlr2020.brake_mass_cost_coeff == 7.4256
-    assert nlr2020.hss_mass_coeff == 0
-    assert nlr2020.hss_mass_cost_coeff == 0
-    assert nlr2020.high_speed_shaft_mass == 0
-    assert nlr2020.high_speed_shaft_cost == 0
-    assert nlr2020.generator_mass_coeff == 1754
-    assert nlr2020.generator_mass_intercept == 3503.6
-    assert nlr2020.generator_mass_cost_coeff == 13.5408
-    assert nlr2020.bedplate_mass_exp == 0
-    assert nlr2020.bedplate_mass_coeff == 737.88
-    assert nlr2020.bedplate_mass_intercept == -68066
-    assert nlr2020.bedplate_mass_cost_coeff == 3.1668
-    assert nlr2020.yaw_system_non_bearing_mass_coeff == 1.6
-    assert nlr2020.yaw_system_mass_coeff == 0.0007
-    assert nlr2020.yaw_system_mass_exp == 3.1571
-    assert nlr2020.yaw_system_mass_cost_coeff == 9.0636
-    assert nlr2020.hvac_mass_coeff == 0
-    assert nlr2020.hvac_mass_cost_coeff == 135.408
-    assert nlr2020.hydraulic_cooling_mass == 221
-    assert nlr2020.nacelle_cover_mass_coeff == 1281.7
-    assert nlr2020.nacelle_cover_mass_intercept == 428.19
-    assert nlr2020.nacelle_cover_mass_cost_coeff == 6.2244
-    assert nlr2020.has_crane
-    assert nlr2020.platform_mainframe_mass_coeff == 0.005
-    assert nlr2020.platform_mainframe_mass_cost_coeff == 18.6732
-    assert nlr2020.crane_mass == 3000
-    assert nlr2020.crane_mass_cost_coeff == 4.368
-    assert nlr2020.transformer_mass_coeff == 1915.0
-    assert nlr2020.transformer_mass_intercept == 1910.0
-    assert nlr2020.transformer_mass_cost_coeff == 20.5296
-    assert nlr2020.converter_mass_cost_coeff == 18.8
-    assert nlr2020.controls_cost_coeff == 23.0958
-    assert nlr2020.electrical_connection_cost_coeff == 45.7002
-    assert nlr2020.tower_mass_coeff == 0.152
-    assert nlr2020.tower_mass_intercept == -14281.0
-    assert nlr2020.tower_mass_cost_coeff == 3.1668
-    assert nlr2020.transport_power_electronics_cost_coeff == 9
-    assert nlr2020.transport_drivetrain_cost_coeff1 == 9000
-    assert nlr2020.transport_drivetrain_cost_coeff2 == 45000
-    assert nlr2020.transport_blade_cost_coeff1 == 0.543
-    assert nlr2020.transport_blade_cost_coeff2 == -7.4903
-    assert nlr2020.transport_blade_cost_coeff3 == -2847.5
-    assert nlr2020.transport_blade_cost_intercept == 103627
-    assert nlr2020.transport_hub_cost_intercept == 5000
-    assert nlr2020.transport_tower_cost_coeff == 34083
-    assert nlr2020.tower_section_mass_max == 80000
-    assert nlr2020.transport_misc_parts_cost_coeff == 0.025
+
+    with subtests.test("Blade mass parameters"):
+        assert nlr2020.blade_mass_coeff == 9.2157
+        assert nlr2020.blade_mass_exp == 1.7679
+        assert nlr2020.blade_mass_cost_coeff == 15.9432
+        assert nlr2020.hub_mass_coeff == 3.5793
+
+    with subtests.test("Hub parameters"):
+        assert nlr2020.hub_mass_intercept == -25451.58
+        assert nlr2020.hub_mass_cost_coeff == 4.2588
+
+    with subtests.test("Pitch System parameters"):
+        assert nlr2020.pitch_bearing_mass_coeff == 0
+        assert nlr2020.pitch_bearing_mass_intercept == 0
+        assert nlr2020.bearing_housing_fraction == 0
+        assert nlr2020.pitch_blade_mass_intercept == 491.31
+        assert nlr2020.pitch_system_mass_coeff == 1.3280
+        assert nlr2020.mass_sys_offset == 555.0
+        assert nlr2020.pitch_system_mass_cost_coeff == 24.1332
+
+    with subtests.test("Spinner parameters"):
+        assert nlr2020.spinner_mass_coeff == 2.3255
+        assert nlr2020.spinner_mass_intercept == 204.65
+        assert nlr2020.spinner_mass_cost_coeff == 12.1212
+
+    with subtests.test("Low Speed Shaft parameters"):
+        assert nlr2020.lss_mass_coeff1 == 2.1906
+        assert nlr2020.lss_mass_coeff2 == -311.15
+        assert nlr2020.lss_mass_intercept == 13108.0
+        assert nlr2020.lss_mass_cost_coeff == 12.9948
+
+    with subtests.test("Main bearing parameters"):
+        assert nlr2020.bearing_mass_coeff == 0.0001
+        assert nlr2020.bearing_mass_exp == 3.5
+        assert nlr2020.bearing_mass_cost_coeff == 4.914
+
+    with subtests.test("Gearbox parameters"):
+        assert nlr2020.gearbox_torque_density == 156.46
+        assert nlr2020.gearbox_torque_exp == 0.6566
+        assert nlr2020.gearbox_torque_cost == 0
+        assert nlr2020.gearbox_mass_cost_coeff == 14.0868
+
+    with subtests.test("Brake Mass parameters"):
+        assert nlr2020.brake_mass_coeff == 0.19851
+        assert nlr2020.brake_mass_intercept == 1.893
+        assert nlr2020.brake_mass_cost_coeff == 7.4256
+
+    with subtests.test("High Speed Shaft parameters"):
+        assert nlr2020.hss_mass_coeff == 0
+        assert nlr2020.hss_mass_cost_coeff == 0
+        assert nlr2020.high_speed_shaft_mass == 0
+        assert nlr2020.high_speed_shaft_cost == 0
+
+    with subtests.test("Generator parameters"):
+        assert nlr2020.generator_mass_coeff == 1.754
+        assert nlr2020.generator_mass_intercept == 3503.6
+        assert nlr2020.generator_mass_cost_coeff == 13.5408
+
+    with subtests.test("Bedplate parameters"):
+        assert nlr2020.bedplate_mass_exp == 0
+        assert nlr2020.bedplate_mass_coeff == 737.88
+        assert nlr2020.bedplate_mass_intercept == -68066
+        assert nlr2020.bedplate_mass_cost_coeff == 3.1668
+
+    with subtests.test("Yaw System parameters"):
+        assert nlr2020.yaw_system_non_bearing_mass_coeff == 1.6
+        assert nlr2020.yaw_system_mass_coeff == 0.0007
+        assert nlr2020.yaw_system_mass_exp == 3.1571
+        assert nlr2020.yaw_system_mass_cost_coeff == 9.0636
+
+    with subtests.test("Hydraulic Cooling parameters"):
+        assert nlr2020.hvac_mass_coeff == 0
+        assert nlr2020.hvac_mass_cost_coeff == 135.408
+        assert nlr2020.hydraulic_cooling_mass == 221
+
+    with subtests.test("Nacelle Cover parameters"):
+        assert nlr2020.nacelle_cover_mass_coeff == 1.2817
+        assert nlr2020.nacelle_cover_mass_intercept == 428.19
+        assert nlr2020.nacelle_cover_mass_cost_coeff == 6.2244
+
+    with subtests.test("Platform mainframe parameters"):
+        assert nlr2020.platform_mainframe_mass_coeff == 0.005
+        assert nlr2020.platform_mainframe_mass_cost_coeff == 18.6732
+
+    with subtests.test("Crane parameters"):
+        assert nlr2020.has_crane
+        assert nlr2020.crane_mass is None
+        assert nlr2020.crane_mass_cost_coeff == 4.368
+
+    with subtests.test("Transformer parameters"):
+        assert nlr2020.transformer_mass_coeff == 1.9150
+        assert nlr2020.transformer_mass_intercept == 1910.0
+        assert nlr2020.transformer_mass_cost_coeff == 20.5296
+
+    with subtests.test("Misc. single parameters"):
+        assert nlr2020.converter_mass_cost_coeff == 18.8
+        assert nlr2020.controls_cost_coeff == 23.0958
+        assert nlr2020.electrical_connection_cost_coeff == 45.7002
+
+    with subtests.test("Tower parameters"):
+        assert nlr2020.tower_mass_coeff == 0.152
+        assert nlr2020.tower_mass_intercept == -14281.0
+        assert nlr2020.tower_mass_cost_coeff == 3.1668
+
+    with subtests.test("Transport parameters"):
+        assert nlr2020.transport_power_electronics_cost_coeff == 9
+        assert nlr2020.transport_drivetrain_cost_coeff1 == 9000
+        assert nlr2020.transport_drivetrain_cost_coeff2 == 45000
+        assert nlr2020.transport_blade_cost_coeff1 == 0.543
+        assert nlr2020.transport_blade_cost_coeff2 == -7.4903
+        assert nlr2020.transport_blade_cost_coeff3 == -2847.5
+        assert nlr2020.transport_blade_cost_intercept == 103627
+        assert nlr2020.transport_hub_cost_intercept == 5000
+        assert nlr2020.transport_tower_cost_coeff == 34083
+        assert nlr2020.tower_section_mass_max == 80000
+        assert nlr2020.transport_misc_parts_cost_coeff == 0.025
 
     results = nlr2020.get_results()
     mass_results = nlr2020.get_mass_results()
@@ -222,9 +265,9 @@ def test_Land2020NLR_with_inputs(subtests):
         assert model.nacelle_cost == approx(2211577.918173882)
         # with subtests.test("Hub cost"):
         # assert model.nacelle_mass_tcc == approx(151455.88331558352 )
-        # with subtests.test("Tower parts cost"):
+    with subtests.test("Tower parts cost"):
         # assert model.tower_parts_cost == approx(528775.7936738)
-        assert model.tower_cost == approx(528775.7936738)
+        assert model.tower_cost == approx(1443023.2243424067)
     with subtests.test("Hub system cost"):
         # assert model.hub_system_mass_tcc == approx(55850.44282136)
         assert model.hub_system_cost == approx(531648.8703321306)
@@ -232,5 +275,5 @@ def test_Land2020NLR_with_inputs(subtests):
         assert model.rotor_cost == approx(1574532.2408835592)
     with subtests.test("Turbine cost"):
         # assert model.turbine_mass_tcc == approx(445414.81133358914)
-        assert model.turbine_cost == approx(3430022.404353479)
-        assert model.turbine_cost_kw == approx(686.0044808706958)
+        assert model.turbine_cost == approx(5229133.3833998479)
+        assert model.turbine_cost_kw == approx(843.4086102257819)
