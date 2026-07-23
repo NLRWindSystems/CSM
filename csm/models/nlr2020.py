@@ -10,6 +10,118 @@ from csm.models.base_model import CSMBase
 base = fields(CSMBase)
 
 
+ALL_RESULT_NAMES = (
+    "blade_mass",
+    "blade_cost",
+    "hub_mass",
+    "hub_cost",
+    "pitch_system_mass",
+    "pitch_system_cost",
+    "spinner_mass",
+    "spinner_cost",
+    "low_speed_shaft_mass",
+    "low_speed_shaft_cost",
+    "bearing_mass",
+    "bearing_cost",
+    "rated_rpm",
+    "rotor_torque",
+    "gearbox_mass",
+    "gearbox_cost",
+    "brake_mass",
+    "brake_cost",
+    "generator_mass",
+    "generator_cost",
+    "bedplate_mass",
+    "bedplate_cost",
+    "yaw_system_mass",
+    "yaw_system_cost",
+    "hydraulic_cooling_mass",
+    "hydraulic_cooling_cost",
+    "nacelle_cover_mass",
+    "nacelle_cover_cost",
+    "platform_mainframe_mass",
+    "platform_mainframe_cost",
+    "crane_mass",
+    "crane_cost",
+    "transformer_mass",
+    "transformer_cost",
+    "converter_mass",
+    "converter_cost",
+    "controls_mass",
+    "controls_cost",
+    "electrical_connection_mass",
+    "electrical_connection_cost",
+    "tower_mass",
+    "tower_cost",
+    "nacelle_mass",
+    "nacelle_cost",
+    "hub_system_mass",
+    "hub_system_cost",
+    "rotor_mass",
+    "rotor_cost",
+    "turbine_mass",
+    "turbine_cost",
+    "turbine_cost_kw",
+    "transport_cost",
+)
+
+MASS_RESULT_NAMES = (
+    "blade_mass",
+    "hub_mass",
+    "pitch_system_mass",
+    "spinner_mass",
+    "low_speed_shaft_mass",
+    "bearing_mass",
+    "gearbox_mass",
+    "brake_mass",
+    "generator_mass",
+    "bedplate_mass",
+    "yaw_system_mass",
+    "hydraulic_cooling_mass",
+    "nacelle_cover_mass",
+    "platform_mainframe_mass",
+    "crane_mass",
+    "transformer_mass",
+    "converter_mass",
+    "controls_mass",
+    "electrical_connection_mass",
+    "tower_mass",
+    "nacelle_mass",
+    "hub_system_mass",
+    "rotor_mass",
+    "turbine_mass",
+)
+
+COST_RESULT_NAMES = (
+    "blade_cost",
+    "hub_cost",
+    "pitch_system_cost",
+    "spinner_cost",
+    "low_speed_shaft_cost",
+    "bearing_cost",
+    "gearbox_cost",
+    "brake_cost",
+    "generator_cost",
+    "bedplate_cost",
+    "yaw_system_cost",
+    "hydraulic_cooling_cost",
+    "nacelle_cover_cost",
+    "platform_mainframe_cost",
+    "crane_cost",
+    "transformer_cost",
+    "converter_cost",
+    "controls_cost",
+    "electrical_connection_cost",
+    "tower_cost",
+    "nacelle_cost",
+    "hub_system_cost",
+    "rotor_cost",
+    "turbine_cost",
+    "turbine_cost_kw",
+    "transport_cost",
+)
+
+
 @define
 class Land2020NLR(CSMBase):
     r"""NLR 2020 empirically-based model. For complete details on all arguments, attributes, and
@@ -227,6 +339,10 @@ class Land2020NLR(CSMBase):
     tower_mass_exp = base.tower_mass_exp.reuse(default=0)
     lss_mass_exp = base.lss_mass_exp.reuse(default=0)
     lss_mass_coeff = base.lss_mass_coeff.reuse(default=0)
+
+    _all_result_names = base._all_result_names.reuse(default=ALL_RESULT_NAMES)
+    _mass_result_name = base._mass_result_names.reuse(default=MASS_RESULT_NAMES)
+    _cost_result_names = base._cost_result_names.reuse(default=COST_RESULT_NAMES)
 
     # TODO: pitch system docstrings (top and calculate)
     # TODO: transport cost tests
@@ -866,15 +982,13 @@ class Land2020NLR(CSMBase):
 
         misc_parts_cost = self.transport_misc_parts_cost_coeff * self.turbine_mass
 
-        self.transport_cost = sum(
-            (
-                power_electronics_cost,
-                drivetrain_cost,
-                blade_cost,
-                hub_cost,
-                tower_cost,
-                misc_parts_cost,
-            )
+        self.transport_cost = (
+            power_electronics_cost
+            + drivetrain_cost
+            + blade_cost
+            + hub_cost
+            + tower_cost
+            + misc_parts_cost
         )
 
     def calculate_subsystem_mass(self):
@@ -890,3 +1004,8 @@ class Land2020NLR(CSMBase):
         """
         super().calculate_subsystem_cost()
         self.calculate_crane_cost()
+
+    def run(self):
+        """Run the mass and cost calculations."""
+        super().run()
+        self.calculate_transport_cost()
