@@ -963,7 +963,7 @@ class Land2020NLR(CSMBase):
             np.ceil(self.nacelle_mass / self.transport_drivetrain_cost_coeff1)
             * self.transport_drivetrain_cost_coeff2
         )
-        power_electronics_cost = (
+        power_electronics_cost = float(
             np.maximum(self.rated_power_kw - 30000, 0.0)
             * self.transport_power_electronics_cost_coeff
         )
