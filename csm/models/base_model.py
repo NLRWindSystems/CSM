@@ -11,7 +11,7 @@ from copy import deepcopy
 from typing import Any
 from functools import cached_property
 from itertools import product, zip_longest
-from collections.abc import Generator
+from collections.abc import Sequence, Generator
 
 import numpy as np
 import pandas as pd
@@ -140,6 +140,115 @@ parameter_map = {
     "turbine_mass": ("nacelle_mass", "rotor_mass", "tower_mass"),
     "turbine_cost": ("nacelle_cost", "rotor_cost", "tower_cost"),
 }
+
+ALL_RESULT_NAMES = (
+    "blade_mass",
+    "blade_cost",
+    "hub_mass",
+    "hub_cost",
+    "pitch_system_mass",
+    "pitch_system_cost",
+    "spinner_mass",
+    "spinner_cost",
+    "low_speed_shaft_mass",
+    "low_speed_shaft_cost",
+    "bearing_mass",
+    "bearing_cost",
+    "rated_rpm",
+    "rotor_torque",
+    "gearbox_mass",
+    "gearbox_cost",
+    "brake_mass",
+    "brake_cost",
+    "high_speed_shaft_mass",
+    "high_speed_shaft_cost",
+    "generator_mass",
+    "generator_cost",
+    "bedplate_mass",
+    "bedplate_cost",
+    "yaw_system_mass",
+    "yaw_system_cost",
+    "hydraulic_cooling_mass",
+    "hydraulic_cooling_cost",
+    "nacelle_cover_mass",
+    "nacelle_cover_cost",
+    "platform_mainframe_mass",
+    "platform_mainframe_cost",
+    "transformer_mass",
+    "transformer_cost",
+    "converter_mass",
+    "converter_cost",
+    "controls_mass",
+    "controls_cost",
+    "electrical_connection_mass",
+    "electrical_connection_cost",
+    "tower_mass",
+    "tower_cost",
+    "nacelle_mass",
+    "nacelle_cost",
+    "hub_system_mass",
+    "hub_system_cost",
+    "rotor_mass",
+    "rotor_cost",
+    "turbine_mass",
+    "turbine_cost",
+    "turbine_cost_kw",
+)
+
+MASS_RESULT_NAMES = (
+    "blade_mass",
+    "hub_mass",
+    "pitch_system_mass",
+    "spinner_mass",
+    "low_speed_shaft_mass",
+    "bearing_mass",
+    "gearbox_mass",
+    "brake_mass",
+    "high_speed_shaft_mass",
+    "generator_mass",
+    "bedplate_mass",
+    "yaw_system_mass",
+    "hydraulic_cooling_mass",
+    "nacelle_cover_mass",
+    "platform_mainframe_mass",
+    "transformer_mass",
+    "converter_mass",
+    "controls_mass",
+    "electrical_connection_mass",
+    "tower_mass",
+    "nacelle_mass",
+    "hub_system_mass",
+    "rotor_mass",
+    "turbine_mass",
+)
+
+COST_RESULT_NAMES = (
+    "blade_cost",
+    "hub_cost",
+    "pitch_system_cost",
+    "spinner_cost",
+    "low_speed_shaft_cost",
+    "bearing_cost",
+    "gearbox_cost",
+    "brake_cost",
+    "high_speed_shaft_cost",
+    "generator_cost",
+    "bedplate_cost",
+    "yaw_system_cost",
+    "hydraulic_cooling_cost",
+    "nacelle_cover_cost",
+    "platform_mainframe_cost",
+    "transformer_cost",
+    "converter_cost",
+    "controls_cost",
+    "electrical_connection_cost",
+    "tower_cost",
+    "nacelle_cost",
+    "hub_system_cost",
+    "rotor_cost",
+    "turbine_cost",
+    "turbine_cost_kw",
+)
 
 
 @define
@@ -849,7 +958,7 @@ class CSMBase:
                    model varying ``efficiency_max`` with values 0.8, 0.85, 0.9, 0.95, and 1.0.
 
             results (str | list[str] | None, optional): A specific list of model results to capture.
-                 If None, then :py:meth:`get_results` will be used. Defaults to None.
+                 If None, then :py:meth:`get_all_results` will be used. Defaults to None.
 
         Raises:
             ValueError: Raised if any of the keys of :py:attr:`parameterized_kwargs` are not defined
@@ -895,7 +1004,7 @@ class CSMBase:
             model.run()
 
             if results is None:
-                single_results = model.get_results()
+                single_results = model.get_all_results()
             else:
                 if isinstance(results, str):
                     results = [results]
@@ -2388,123 +2497,34 @@ class CSMBase:
                         attr_map["outputs"][name] = val
         return attr_map
 
-    def get_results(self) -> dict[str, float]:
+    def get_results(self, names: str | Sequence[str]) -> dict[str, bool | int | float | None]:
+        """Retrieves a user-specified sequence of results, or single result. `None` will be returned
+        for any non-matching attribute name.
+
+        Args:
+            names (str | Sequence[str]): The name(s) of the attributes to get values for.
+
+        Returns:
+            dict[str, bool | int | float | None]: Dictionary with names as keys and their
+                respective values as values.
+        """
+        if isinstance(names, str):
+            names = [names]
+        if not isinstance(names, Sequence):
+            raise ValueError("`names` must be a single or iterable of strings.")
+        return {name: getattr(self, name) for name in ALL_RESULT_NAMES}
+
+    def get_all_results(self) -> dict[str, float]:
         """Gathers the core results."""
-        results = {
-            "blade_mass": self.blade_mass,
-            "blade_cost": self.blade_cost,
-            "hub_mass": self.hub_mass,
-            "hub_cost": self.hub_cost,
-            "pitch_system_mass": self.pitch_system_mass,
-            "pitch_system_cost": self.pitch_system_cost,
-            "spinner_mass": self.spinner_mass,
-            "spinner_cost": self.spinner_cost,
-            "low_speed_shaft_mass": self.low_speed_shaft_mass,
-            "low_speed_shaft_cost": self.low_speed_shaft_cost,
-            "bearing_mass": self.bearing_mass,
-            "bearing_cost": self.bearing_cost,
-            "rated_rpm": self.rated_rpm,
-            "rotor_torque": self.rotor_torque,
-            "gearbox_mass": self.gearbox_mass,
-            "gearbox_cost": self.gearbox_cost,
-            "brake_mass": self.brake_mass,
-            "brake_cost": self.brake_cost,
-            "high_speed_shaft_mass": self.high_speed_shaft_mass,
-            "high_speed_shaft_cost": self.high_speed_shaft_cost,
-            "generator_mass": self.generator_mass,
-            "generator_cost": self.generator_cost,
-            "bedplate_mass": self.bedplate_mass,
-            "bedplate_cost": self.bedplate_cost,
-            "yaw_system_mass": self.yaw_system_mass,
-            "yaw_system_cost": self.yaw_system_cost,
-            "hydraulic_cooling_mass": self.hydraulic_cooling_mass,
-            "hydraulic_cooling_cost": self.hydraulic_cooling_cost,
-            "nacelle_cover_mass": self.nacelle_cover_mass,
-            "nacelle_cover_cost": self.nacelle_cover_cost,
-            "platform_mainframe_mass": self.platform_mainframe_mass,
-            "platform_mainframe_cost": self.platform_mainframe_cost,
-            "transformer_mass": self.transformer_mass,
-            "transformer_cost": self.transformer_cost,
-            "converter_mass": self.converter_mass,
-            "converter_cost": self.converter_cost,
-            "controls_mass": self.controls_mass,
-            "controls_cost": self.controls_cost,
-            "electrical_connection_mass": self.electrical_connection_mass,
-            "electrical_connection_cost": self.electrical_connection_cost,
-            "tower_mass": self.tower_mass,
-            "tower_cost": self.tower_cost,
-            "nacelle_mass": self.nacelle_mass,
-            "nacelle_cost": self.nacelle_cost,
-            "hub_system_mass": self.hub_system_mass,
-            "hub_system_cost": self.hub_system_cost,
-            "rotor_mass": self.rotor_mass,
-            "rotor_cost": self.rotor_cost,
-            "turbine_mass": self.turbine_mass,
-            "turbine_cost": self.turbine_cost,
-            "turbine_cost_kw": self.turbine_cost_kw,
-        }
-        return results
+        return {name: getattr(self, name) for name in ALL_RESULT_NAMES}
 
     def get_mass_results(self) -> dict[str, float]:
         """Gathers all the mass-specific outputs into a dictionary of attribute: value."""
-        results = {
-            "blade_mass": self.blade_mass,
-            "hub_mass": self.hub_mass,
-            "pitch_system_mass": self.pitch_system_mass,
-            "spinner_mass": self.spinner_mass,
-            "low_speed_shaft_mass": self.low_speed_shaft_mass,
-            "bearing_mass": self.bearing_mass,
-            "gearbox_mass": self.gearbox_mass,
-            "brake_mass": self.brake_mass,
-            "high_speed_shaft_mass": self.high_speed_shaft_mass,
-            "generator_mass": self.generator_mass,
-            "bedplate_mass": self.bedplate_mass,
-            "yaw_system_mass": self.yaw_system_mass,
-            "hydraulic_cooling_mass": self.hydraulic_cooling_mass,
-            "nacelle_cover_mass": self.nacelle_cover_mass,
-            "platform_mainframe_mass": self.platform_mainframe_mass,
-            "transformer_mass": self.transformer_mass,
-            "converter_mass": self.converter_mass,
-            "controls_mass": self.controls_mass,
-            "electrical_connection_mass": self.electrical_connection_mass,
-            "tower_mass": self.tower_mass,
-            "nacelle_mass": self.nacelle_mass,
-            "hub_system_mass": self.hub_system_mass,
-            "rotor_mass": self.rotor_mass,
-            "turbine_mass": self.turbine_mass,
-        }
-        return results
+        return {name: getattr(self, name) for name in MASS_RESULT_NAMES}
 
     def get_cost_results(self) -> dict[str, float]:
         """Gathers all the cost-specific outputs into a dictionary of attribute: value."""
-        results = {
-            "blade_cost": self.blade_cost,
-            "hub_cost": self.hub_cost,
-            "pitch_system_cost": self.pitch_system_cost,
-            "spinner_cost": self.spinner_cost,
-            "low_speed_shaft_cost": self.low_speed_shaft_cost,
-            "bearing_cost": self.bearing_cost,
-            "gearbox_cost": self.gearbox_cost,
-            "brake_cost": self.brake_cost,
-            "high_speed_shaft_cost": self.high_speed_shaft_cost,
-            "generator_cost": self.generator_cost,
-            "bedplate_cost": self.bedplate_cost,
-            "yaw_system_cost": self.yaw_system_cost,
-            "hydraulic_cooling_cost": self.hydraulic_cooling_cost,
-            "nacelle_cover_cost": self.nacelle_cover_cost,
-            "platform_mainframe_cost": self.platform_mainframe_cost,
-            "transformer_cost": self.transformer_cost,
-            "converter_cost": self.converter_cost,
-            "controls_cost": self.controls_cost,
-            "electrical_connection_cost": self.electrical_connection_cost,
-            "tower_cost": self.tower_cost,
-            "nacelle_cost": self.nacelle_cost,
-            "hub_system_cost": self.hub_system_cost,
-            "rotor_cost": self.rotor_cost,
-            "turbine_cost": self.turbine_cost,
-            "turbine_cost_kw": self.turbine_cost_kw,
-        }
-        return results
+        return {name: getattr(self, name) for name in COST_RESULT_NAMES}
 
     def irs_mpc_breakdown(  # noqa: D417
         self,

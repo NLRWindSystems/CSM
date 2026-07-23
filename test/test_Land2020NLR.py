@@ -131,7 +131,7 @@ def test_Land2020NLR_defaults_only(subtests):
         assert nlr2020.tower_section_mass_max == 80000
         assert nlr2020.transport_misc_parts_cost_coeff == 0.025
 
-    results = nlr2020.get_results()
+    results = nlr2020.get_all_results()
     mass_results = nlr2020.get_mass_results()
     cost_results = nlr2020.get_cost_results()
     with subtests.test("Ensure mass and cost results add to the joint results"):
