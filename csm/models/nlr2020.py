@@ -229,6 +229,7 @@ class Land2020NLR(CSMBase):
     lss_mass_coeff = base.lss_mass_coeff.reuse(default=0)
 
     # TODO: pitch system docstrings (top and calculate)
+    # TODO: transport cost tests
 
     def __attrs_post_init__(self):
         """Updates the parameter mapping for new mass and cost relationships."""

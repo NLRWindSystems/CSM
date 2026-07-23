@@ -186,7 +186,7 @@ def test_defaults_only(subtests):
     with pytest.raises(ValueError, match=undefined_params_msg):
         model.run()
 
-    results = model.get_results()
+    results = model.get_all_results()
     mass_results = model.get_mass_results()
     cost_results = model.get_cost_results()
     with subtests.test("Ensure mass and cost results add to the joint results"):

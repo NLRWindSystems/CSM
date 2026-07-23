@@ -71,7 +71,7 @@ def test_Land2015NLR_defaults_only(subtests):
     assert nlr2015.converter_mass_cost_coeff == 18.8
     assert nlr2015.electrical_connection_cost_coeff == 41.85
 
-    results = nlr2015.get_results()
+    results = nlr2015.get_all_results()
     mass_results = nlr2015.get_mass_results()
     cost_results = nlr2015.get_cost_results()
     with subtests.test("Ensure mass and cost results add to the joint results"):

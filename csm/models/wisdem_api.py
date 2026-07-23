@@ -43,4 +43,4 @@ class WisdemCSMBase(om.ExplicitComponent):
         """Runs the ``ExplicitComponent.compute()`` method after custom setup."""
         self.model = self.csm_model(**inputs)
         self.model.run()
-        outputs |= self.model.get_results()
+        outputs |= self.model.get_all_results()
