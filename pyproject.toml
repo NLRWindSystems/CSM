@@ -18,6 +18,9 @@ dependencies = [
   "networkx",
   "tqdm>=4",  # TODO: delete
   "openpyxl>=3",  # TODO: delete
+  "matplotlib>=3.8",
+  "scipy>=1.11",
+  "python-pptx>=1.0",
 ]
 
 [project.optional-dependencies]
