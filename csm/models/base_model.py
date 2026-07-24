@@ -647,7 +647,7 @@ class CSMBase:
 
     # all else
     parameter_map: dict[str, tuple[str]] = field(init=False)
-    parameter_graph: nx.Digraph = field(init=False)
+    parameter_graph: nx.DiGraph = field(init=False)
 
     # NOTE: temporary while prototyping
     turbine_production_cost: float = field(default=1000.0)
