@@ -1,0 +1,393 @@
+﻿Component,MW,RD (m),hh (m),mass (kg),cost ($),model,source,note,OEM,outlier?,US market model?
+blade,2.5,96.1,70,11800,,aerodyn aM 2.5/96,https://en.wind-turbine-models.com/turbines/1111-aerodyn-am-2-5-96,,aerodyn,No,Yes
+blade,0.75,47,50,2400,,Aeronautica 47-750,https://en.wind-turbine-models.com/turbines/499-aeronautica-47-750,,Aeronautica,No,Yes
+blade,0.75,54,50,2400,,Aeronautica 54-750,https://en.wind-turbine-models.com/turbines/500-aeronautica-54-750,,Aeronautica,No,Yes
+blade,0.1,23,42.6,300,,Autoflug A 100,https://en.wind-turbine-models.com/turbines/375-autoflug-a-100,,Autoflug,No,Yes
+blade,2,93,70,8800,,CSIC H93-2.0,https://en.wind-turbine-models.com/turbines/2073-csic-h93-2-0,,CSIC,No,Yes
+blade,2,111,70,11600,,CSIC H111-2.0,https://en.wind-turbine-models.com/turbines/2075-csic-h111-2-0,,CSIC,No,Yes
+blade,1.5,77,65,5500,,Dongfang FD77-1500 geared,https://en.wind-turbine-models.com/turbines/2221-dongfang-fd77-1500-geared,,Dongfang,No,Yes
+blade,0.5,40.3,42,900,,Enercon E-40/5.40,https://en.wind-turbine-models.com/turbines/67-enercon-e-40-5-40,,Enercon,No,Yes
+blade,0.25,29.5,42,800,,FuhrlÃ¤nder FL 250,https://en.wind-turbine-models.com/turbines/280-fuhrlaender-fl-250,,FuhrlÃ¤nder,No,Yes
+blade,0.6,44,40.5,1500,,Gamesa G44,https://en.wind-turbine-models.com/turbines/771-gamesa-g44,,Gamesa,No,Yes
+blade,0.66,47,40,1300,,Gamesa G47,https://en.wind-turbine-models.com/turbines/772-gamesa-g47,,Gamesa,No,Yes
+blade,2,80,60,6500,,Gamesa G80,https://en.wind-turbine-models.com/turbines/34-gamesa-g80,,Gamesa,No,Yes
+blade,2,83,67,7300,,Gamesa G83,https://en.wind-turbine-models.com/turbines/773-gamesa-g83,,Gamesa,No,Yes
+blade,2,87,67,6200,,Gamesa G87,https://en.wind-turbine-models.com/turbines/548-gamesa-g87,,Gamesa,No,Yes
+blade,2,90,67,5800,,Gamesa G90,https://en.wind-turbine-models.com/turbines/763-gamesa-g90,,Gamesa,No,Yes
+blade,1,57,60,4000,,GC China GC57,https://en.wind-turbine-models.com/turbines/2034-gc-china-gc57,,GC China,No,Yes
+blade,0.225,29.8,30,800,,Micon M 700-225,https://en.wind-turbine-models.com/turbines/377-micon-m-700-225,,Micon,No,Yes
+blade,0.6,37,45,1800,,Micon M 1100-600,https://en.wind-turbine-models.com/turbines/1302-micon-m-1100-600,,Micon,No,Yes
+blade,3,112,85,14000,,MingYang MySE3.0-112,https://en.wind-turbine-models.com/turbines/1914-mingyang-myse3-0-112,,MingYang,No,Yes
+blade,0.5,40.8,39,2700,,NedWind NW 40/500,https://en.wind-turbine-models.com/turbines/1090-nedwind-nw-40-500,,NedWind,No,Yes
+blade,1.65,72,70,5800,,NEG Micon NM 72/1650,https://en.wind-turbine-models.com/turbines/1300-neg-micon-nm-72-1650,,NEG Micon,No,Yes
+blade,0.6,43,40,2000,,Nordex N43,https://en.wind-turbine-models.com/turbines/390-nordex-n43,,Nordex,No,Yes
+blade,0.8,52,60,3700,,Nordex N52,https://en.wind-turbine-models.com/turbines/387-nordex-n52,,Nordex,No,Yes
+blade,1,54,60,4700,,Nordex N54,https://en.wind-turbine-models.com/turbines/397-nordex-n54,,Nordex,No,Yes
+blade,2.3,90,80,9600,,Nordex N90 Beta,https://en.wind-turbine-models.com/turbines/21-nordex-n90-beta,,Nordex,No,Yes
+blade,4.5,149.1,105,21500,,Nordex N149/4.0-4.5,https://en.wind-turbine-models.com/turbines/1705-nordex-n149-4-0-4-5,,Nordex,No,Yes
+blade,0.5,41,42.1,1900,,Nordtank NTK 500/41,https://en.wind-turbine-models.com/turbines/384-nordtank-ntk-500-41,,Nordtank,No,Yes
+blade,0.05,15,30,100,,Seaforth Energy AOC15/50,https://en.wind-turbine-models.com/turbines/513-seaforth-energy-aoc15-50,,Seaforth Energy,No,Yes
+blade,2.05,92.5,68.5,8000,,Senvion MM92,https://en.wind-turbine-models.com/turbines/889-senvion-mm92,,Senvion,No,Yes
+blade,3,101,80,10300,,Siemens SWT-3.0-101,https://en.wind-turbine-models.com/turbines/66-siemens-swt-3-0-101,,Siemens,No,Yes
+blade,0.225,27,30,600,,Vestas V27,https://en.wind-turbine-models.com/turbines/274-vestas-v27,,Vestas,No,Yes
+blade,0.5,39,40.5,1100,,Vestas V39,https://en.wind-turbine-models.com/turbines/383-vestas-v39,,Vestas,No,Yes
+blade,0.6,42,40.5,1200,,Vestas V42,https://en.wind-turbine-models.com/turbines/109-vestas-v42,,Vestas,No,Yes
+blade,0.6,44,40.5,1500,,Vestas V44,https://en.wind-turbine-models.com/turbines/272-vestas-v44,,Vestas,No,Yes
+blade,2,66,60,3800,,Vestas V66-2.0,https://en.wind-turbine-models.com/turbines/1277-vestas-v66-2-0,,Vestas,No,Yes
+blade,1.8,80,60,6500,,Vestas V80-1.8,https://en.wind-turbine-models.com/turbines/1350-vestas-v80-1-8,,Vestas,No,Yes
+blade,0.1,17.9,18,100,,WES 18/100,https://en.wind-turbine-models.com/turbines/924-wes-18-100,,WES,No,Yes
+blade,0.066,15.5,18,1200,,Windmatic WM 15s-66,https://en.wind-turbine-models.com/turbines/593-windmatic-wm-15s-66,,Windmatic,No,Yes
+blade,0.075,17,18,300,,Windmatic WM 17-75,https://en.wind-turbine-models.com/turbines/683-windmatic-wm-17-75,,Windmatic,No,Yes
+blade,0.25,29.2,31,800,,Wind World W3000/250,https://en.wind-turbine-models.com/turbines/379-wind-world-w3000-250,,Wind World,No,Yes
+blade,5.5,158,y,20000,,GE 5.X-158,GE 5.X-158 technical documentation,,,No,Yes
+blade,5.6,162,y,28100,,V162-5.6,traffic impact assessment,,,No,Yes
+gearbox,3.2,103,,24000,,GE 3.2-103,GE 3.X technical documentation,,,No,Yes
+gearbox,5.5,158,,39900,,GE 5.X-158,GE 5.X-158 technical documentation,,,No,Yes
+generator,3.2,103,,11000,,GE 3.2-103,GE 3.X technical documentation,,,No,Yes
+generator,5.5,158,,12800,,GE 5.X-158,GE 5.X-158 technical documentation,,,No,Yes
+hub,5.5,158,,47400,,GE 5.X-158,GE 5.X-158 technical documentation,,,No,Yes
+hub,5.6,162,,64000,,V162-5.6,traffic impact assessment,,,No,Yes
+hub,2.5,120,,27500,,GE 2.5-120,GE 3.X technical documentation,,,No,Yes
+hub,3.2,103,,30500,,GE 3.2-103,GE 3.X technical documentation,,,No,Yes
+nacelle,1.5,70,60,52200,,Acciona AW-70/1500,https://en.wind-turbine-models.com/turbines/777-acciona-aw-70-1500,,Acciona,No,Yes
+nacelle,1.5,77,60,52300,,Acciona AW-77/1500,https://en.wind-turbine-models.com/turbines/778-acciona-aw-77-1500,,Acciona,No,Yes
+nacelle,1.5,82,80,52300,,Acciona AW-82/1500,https://en.wind-turbine-models.com/turbines/585-acciona-aw-82-1500,,Acciona,No,Yes
+nacelle,3,100,100,118000,,Acciona AW-100/3000,https://en.wind-turbine-models.com/turbines/142-acciona-aw-100-3000,,Acciona,No,Yes
+nacelle,3,109,100,118000,,Acciona AW-109/3000,https://en.wind-turbine-models.com/turbines/783-acciona-aw-109-3000,,Acciona,No,Yes
+nacelle,3,116,100,118000,,Acciona AW-116/3000,https://en.wind-turbine-models.com/turbines/784-acciona-aw-116-3000,,Acciona,No,Yes
+nacelle,3,125,120,111600,,Acciona AW-125/3000,https://en.wind-turbine-models.com/turbines/785-acciona-aw-125-3000,,Acciona,No,Yes
+nacelle,3,132,84,111000,,Acciona AW-132/3000,https://en.wind-turbine-models.com/turbines/980-acciona-aw-132-3000,,Acciona,No,Yes
+nacelle,3,140,82,108000,,Acciona AW-140/3000,https://en.wind-turbine-models.com/turbines/1740-acciona-aw-140-3000,,Acciona,No,Yes
+nacelle,2.5,96.1,70,93200,,aerodyn aM 2.5/96,https://en.wind-turbine-models.com/turbines/1111-aerodyn-am-2-5-96,,aerodyn,No,Yes
+nacelle,0.75,47,50,22000,,Aeronautica 47-750,https://en.wind-turbine-models.com/turbines/499-aeronautica-47-750,,Aeronautica,No,Yes
+nacelle,0.75,54,50,22000,,Aeronautica 54-750,https://en.wind-turbine-models.com/turbines/500-aeronautica-54-750,,Aeronautica,No,Yes
+nacelle,0.1,23,42.6,3800,,Autoflug A 100,https://en.wind-turbine-models.com/turbines/375-autoflug-a-100,,Autoflug,No,Yes
+nacelle,0.05,16,22,6500,,awinco L50-200,https://en.wind-turbine-models.com/turbines/1186-awinco-l50-200,,awinco,No,Yes
+nacelle,1.3,62,68,50000,,Bonus B62/1300,https://en.wind-turbine-models.com/turbines/1348-bonus-b62-1300,,Bonus,No,Yes
+nacelle,1.5,93,80,65000,,CRRC CWT1500-D93,https://en.wind-turbine-models.com/turbines/2694-crrc-cwt1500-d93,,CRRC,No,Yes
+nacelle,2,93,70,87000,,CSIC H93-2.0,https://en.wind-turbine-models.com/turbines/2073-csic-h93-2-0,,CSIC,No,Yes
+nacelle,2,111,70,87000,,CSIC H111-2.0,https://en.wind-turbine-models.com/turbines/2075-csic-h111-2-0,,CSIC,No,Yes
+nacelle,0.16,23,22.5,7500,,Danwin Danwin 23/160,https://en.wind-turbine-models.com/turbines/599-danwin-danwin-23-160,,Danwin,No,Yes
+nacelle,2,80,100,73000,,DeWind D8.2 WinDriveÂ®,https://en.wind-turbine-models.com/turbines/85-dewind-d8-2-windrive,,DeWind,No,Yes
+nacelle,1.5,77,65,55000,,Dongfang FD77-1500 geared,https://en.wind-turbine-models.com/turbines/2221-dongfang-fd77-1500-geared,,Dongfang,No,Yes
+nacelle,0.5,40.3,42,26500,,Enercon E-40/5.40,https://en.wind-turbine-models.com/turbines/67-enercon-e-40-5-40,,Enercon,No,Yes
+nacelle,1.5,70.5,65,49000,,Enron 1.5 s,https://en.wind-turbine-models.com/turbines/371-enron-1-5-s,,Enron,No,Yes
+nacelle,0.25,29.5,42,9500,,FuhrlÃ¤nder FL 250,https://en.wind-turbine-models.com/turbines/280-fuhrlaender-fl-250,,FuhrlÃ¤nder,No,Yes
+nacelle,1,54,70,40500,,FuhrlÃ¤nder FL 1000,https://en.wind-turbine-models.com/turbines/70-fuhrlaender-fl-1000,,FuhrlÃ¤nder,No,Yes
+nacelle,2.5,100,85,96000,,FuhrlÃ¤nder FL 2500/100,https://en.wind-turbine-models.com/turbines/347-fuhrlaender-fl-2500-100,,FuhrlÃ¤nder,No,Yes
+nacelle,2.5,90,85,96000,,FuhrlÃ¤nder LLC WTU2.5-90,https://en.wind-turbine-models.com/turbines/1497-fuhrlaender-llc-wtu2-5-90,,FuhrlÃ¤nder LLC,No,Yes
+nacelle,0.6,44,40.5,19800,,Gamesa G44,https://en.wind-turbine-models.com/turbines/771-gamesa-g44,,Gamesa,No,Yes
+nacelle,0.66,47,40,20400,,Gamesa G47,https://en.wind-turbine-models.com/turbines/772-gamesa-g47,,Gamesa,No,Yes
+nacelle,0.85,52,44,23000,,Gamesa G52,https://en.wind-turbine-models.com/turbines/45-gamesa-g52,,Gamesa,No,Yes
+nacelle,2,80,60,70000,,Gamesa G80,https://en.wind-turbine-models.com/turbines/34-gamesa-g80,,Gamesa,No,Yes
+nacelle,2,87,67,107000,,Gamesa G87,https://en.wind-turbine-models.com/turbines/548-gamesa-g87,,Gamesa,No,Yes
+nacelle,2,90,67,70000,,Gamesa G90,https://en.wind-turbine-models.com/turbines/763-gamesa-g90,,Gamesa,No,Yes
+nacelle,1,57,60,40000,,GC China GC57,https://en.wind-turbine-models.com/turbines/2034-gc-china-gc57,,GC China,No,Yes
+nacelle,1.6,100,80,65000,,GE Vernova GE 1.6 - 100,https://en.wind-turbine-models.com/turbines/370-ge-vernova-ge-1-6-100,,GE Vernova,No,Yes
+nacelle,0.095,24.4,37,6900,,WEG AGW 100,https://en.wind-turbine-models.com/turbines/1698-weg-agw-100,,WEG,No,Yes
+nacelle,1.5,77.1,61.4,59000,,HEAG HW2/S1500(77),https://en.wind-turbine-models.com/turbines/1440-heag-hw2-s1500-77,,HEAG,No,Yes
+nacelle,2.5,100,85,90000,,Kenersys K100 2.5MW,https://en.wind-turbine-models.com/turbines/760-kenersys-k100-2-5mw,,Kenersys,No,Yes
+nacelle,1.5,77,60,70000,,M.Torres TWT 1.5-77,https://en.wind-turbine-models.com/turbines/809-m-torres-twt-1-5-77,,M.Torres,No,Yes
+nacelle,0.065,16,25,5700,,Micon M 65/13/US,https://en.wind-turbine-models.com/turbines/606-micon-m-65-13-us,,Micon,No,Yes
+nacelle,0.108,18.9,23.8,6200,,Micon 108,https://en.wind-turbine-models.com/turbines/562-micon-108,,Micon,No,Yes
+nacelle,0.225,29.8,30,8000,,Micon M 700-225,https://en.wind-turbine-models.com/turbines/377-micon-m-700-225,,Micon,No,Yes
+nacelle,0.6,37,45,21000,,Micon M 1100-600,https://en.wind-turbine-models.com/turbines/1302-micon-m-1100-600,,Micon,No,Yes
+nacelle,3,112,85,83000,,MingYang MySE3.0-112,https://en.wind-turbine-models.com/turbines/1914-mingyang-myse3-0-112,,MingYang,No,Yes
+nacelle,1,61.4,50,75000,,Mitsubishi MWT-62/1000A,https://en.wind-turbine-models.com/turbines/589-mitsubishi-mwt-62-1000a,,Mitsubishi,No,Yes
+nacelle,1,57,60,75000,,Mitsubishi MWT-57/1000,https://en.wind-turbine-models.com/turbines/608-mitsubishi-mwt-57-1000,,Mitsubishi,No,Yes
+nacelle,0.5,40.8,39,38500,,NedWind NW 40/500,https://en.wind-turbine-models.com/turbines/1090-nedwind-nw-40-500,,NedWind,No,Yes
+nacelle,0.6,48,46,23000,,NEG Micon NM 48/600,https://en.wind-turbine-models.com/turbines/1173-neg-micon-nm-48-600,,NEG Micon,No,Yes
+nacelle,0.75,48.2,50,22000,,NEG Micon NM 48/750,https://en.wind-turbine-models.com/turbines/311-neg-micon-nm-48-750,,NEG Micon,No,Yes
+nacelle,0.9,52.2,60,24500,,NEG Micon NM 52/900,https://en.wind-turbine-models.com/turbines/43-neg-micon-nm-52-900,,NEG Micon,No,Yes
+nacelle,1.5,72,64,44000,,NEG Micon NM 72c/1500,https://en.wind-turbine-models.com/turbines/151-neg-micon-nm-72c-1500,,NEG Micon,No,Yes
+nacelle,1.65,72,70,51000,,NEG Micon NM 72/1650,https://en.wind-turbine-models.com/turbines/1300-neg-micon-nm-72-1650,,NEG Micon,No,Yes
+nacelle,0.6,43,40,24000,,Nordex N43,https://en.wind-turbine-models.com/turbines/390-nordex-n43,,Nordex,No,Yes
+nacelle,0.8,52,60,57000,,Nordex N52,https://en.wind-turbine-models.com/turbines/387-nordex-n52,,Nordex,No,Yes
+nacelle,1,54,60,56000,,Nordex N54,https://en.wind-turbine-models.com/turbines/397-nordex-n54,,Nordex,No,Yes
+nacelle,1.3,60,60,51400,,Nordex N60,https://en.wind-turbine-models.com/turbines/77-nordex-n60,,Nordex,No,Yes
+nacelle,1.5,77,62,56000,,Nordex N77,https://en.wind-turbine-models.com/turbines/76-nordex-n77,,Nordex,No,Yes
+nacelle,2.3,90,80,95000,,Nordex N90 Beta,https://en.wind-turbine-models.com/turbines/21-nordex-n90-beta,,Nordex,No,Yes
+nacelle,4.5,149.1,105,140700,,Nordex N149/4.0-4.5,https://en.wind-turbine-models.com/turbines/1705-nordex-n149-4-0-4-5,,Nordex,No,Yes
+nacelle,0.065,16.5,24,5700,,Nordtank NTK 65,https://en.wind-turbine-models.com/turbines/564-nordtank-ntk-65,,Nordtank,No,Yes
+nacelle,0.5,41,42.1,16800,,Nordtank NTK 500/41,https://en.wind-turbine-models.com/turbines/384-nordtank-ntk-500-41,,Nordtank,No,Yes
+nacelle,0.1,20.7,29,6500,,NPS Northern Power NPS 100C-21,https://en.wind-turbine-models.com/turbines/1269-nps-northern-power-nps-100c-21,,NPS Northern Power,No,Yes
+nacelle,0.225,29.1,30,7600,,Norwin 29 STALL 225,https://en.wind-turbine-models.com/turbines/226-norwin-29-stall-225,,Norwin,No,Yes
+nacelle,2.5,100,75,72000,,"NovaWind L100-2,5 MW",https://en.wind-turbine-models.com/turbines/1968-novawind-l100-2-5-mw,,NovaWind,No,Yes
+nacelle,0.9,56,59,30000,,PowerWind PW56,https://en.wind-turbine-models.com/turbines/10-powerwind-pw56,,PowerWind,No,Yes
+nacelle,0.6,48.4,50,25000,,REpower 48/600,https://en.wind-turbine-models.com/turbines/703-repower-48-600,,REpower,No,Yes
+nacelle,2,87,70,68000,,SANY SE8720,https://en.wind-turbine-models.com/turbines/2038-sany-se8720,,SANY,No,Yes
+nacelle,2,93,70,68000,,SANY SE9320,https://en.wind-turbine-models.com/turbines/2086-sany-se9320,,SANY,No,Yes
+nacelle,2,102,80,79000,,SANY SE10020,https://en.wind-turbine-models.com/turbines/2087-sany-se10020,,SANY,No,Yes
+nacelle,2,103,80,68000,,SANY SE10520,https://en.wind-turbine-models.com/turbines/2088-sany-se10520,,SANY,No,Yes
+nacelle,0.05,15,30,2000,,Seaforth Energy AOC15/50,https://en.wind-turbine-models.com/turbines/513-seaforth-energy-aoc15-50,,Seaforth Energy,No,Yes
+nacelle,2.05,92.5,68.5,71000,,Senvion MM92,https://en.wind-turbine-models.com/turbines/889-senvion-mm92,,Senvion,No,Yes
+nacelle,2.3,82.4,80,82000,,Siemens SWT-2.3-82,https://en.wind-turbine-models.com/turbines/204-siemens-swt-2-3-82,,Siemens,No,Yes
+nacelle,2.3,93,80,82000,,Siemens SWT-2.3-93,https://en.wind-turbine-models.com/turbines/551-siemens-swt-2-3-93,,Siemens,No,Yes
+nacelle,2.3,93,80,82000,,Siemens SWT-2.3-93,https://en.wind-turbine-models.com/turbines/989-siemens-swt-2-3-93,,Siemens,No,Yes
+nacelle,2.3,101,80,82000,,Siemens SWT-2.3-101,https://en.wind-turbine-models.com/turbines/341-siemens-swt-2-3-101,,Siemens,No,Yes
+nacelle,2.3,108,80,82000,,Siemens SWT-2.3-108,https://en.wind-turbine-models.com/turbines/647-siemens-swt-2-3-108,,Siemens,No,Yes
+nacelle,2.3,120,80,88000,,Siemens SWT-2.3-120,https://en.wind-turbine-models.com/turbines/1240-siemens-swt-2-3-120,,Siemens,No,Yes
+nacelle,3,101,80,78000,,Siemens SWT-3.0-101,https://en.wind-turbine-models.com/turbines/66-siemens-swt-3-0-101,,Siemens,No,Yes
+nacelle,3.2,113,79.5,78000,,Siemens SWT-3.2-113,https://en.wind-turbine-models.com/turbines/966-siemens-swt-3-2-113,,Siemens,No,Yes
+nacelle,6,154,,360000,,Siemens SWT-6.0-154,https://en.wind-turbine-models.com/turbines/657-siemens-swt-6-0-154,,Siemens,No,Yes
+nacelle,0.25,30,30,10500,,Siva 250/50,https://en.wind-turbine-models.com/turbines/477-siva-250-50,,Siva,No,Yes
+nacelle,0.4,34,30,18000,,TURBOWINDS T400-34,https://en.wind-turbine-models.com/turbines/570-turbowinds-t400-34,,TURBOWINDS,No,Yes
+nacelle,0.6,48,50,35000,,TURBOWINDS T600-48,https://en.wind-turbine-models.com/turbines/149-turbowinds-t600-48,,TURBOWINDS,No,Yes
+nacelle,0.225,30,32,8800,,Vergnet GEV MP R 225/30,https://en.wind-turbine-models.com/turbines/2002-vergnet-gev-mp-r-225-30,,Vergnet,No,Yes
+nacelle,0.12,20,23.4,4600,,Vestas V20-120,https://en.wind-turbine-models.com/turbines/2707-vestas-v20-120,,Vestas,No,Yes
+nacelle,0.225,27,30,7900,,Vestas V27,https://en.wind-turbine-models.com/turbines/274-vestas-v27,,Vestas,No,Yes
+nacelle,0.5,39,40.5,18000,,Vestas V39,https://en.wind-turbine-models.com/turbines/383-vestas-v39,,Vestas,No,Yes
+nacelle,0.6,42,40.5,17300,,Vestas V42,https://en.wind-turbine-models.com/turbines/109-vestas-v42,,Vestas,No,Yes
+nacelle,0.6,44,40.5,19800,,Vestas V44,https://en.wind-turbine-models.com/turbines/272-vestas-v44,,Vestas,No,Yes
+nacelle,0.66,47,40,20400,,Vestas V47,https://en.wind-turbine-models.com/turbines/13-vestas-v47,,Vestas,No,Yes
+nacelle,1.65,66,60,53000,,Vestas V66-1.65,https://en.wind-turbine-models.com/turbines/15-vestas-v66-1-65,,Vestas,No,Yes
+nacelle,2,66,60,57000,,Vestas V66-2.0,https://en.wind-turbine-models.com/turbines/1277-vestas-v66-2-0,,Vestas,No,Yes
+nacelle,1.8,80,60,67000,,Vestas V80-1.8,https://en.wind-turbine-models.com/turbines/1350-vestas-v80-1-8,,Vestas,No,Yes
+nacelle,2,80,60,61200,,Vestas V80-2.0,https://en.wind-turbine-models.com/turbines/19-vestas-v80-2-0,,Vestas,No,Yes
+nacelle,1.5,82,94,48000,,Vestas V82-1.5,https://en.wind-turbine-models.com/turbines/1727-vestas-v82-1-5,,Vestas,No,Yes
+nacelle,1.65,82,59,51000,,Vestas V82-1.65,https://en.wind-turbine-models.com/turbines/81-vestas-v82-1-65,,Vestas,No,Yes
+nacelle,1.8,90,80,68000,,Vestas V90-1.8,https://en.wind-turbine-models.com/turbines/971-vestas-v90-1-8,,Vestas,No,Yes
+nacelle,3,90,80,70000,,Vestas V90-3.0,https://en.wind-turbine-models.com/turbines/603-vestas-v90-3-0,,Vestas,No,Yes
+nacelle,0.108,19.3,23,6300,,Wenergy M 108/ M 95,https://en.wind-turbine-models.com/turbines/2185-wenergy-m-108-m-95,,Wenergy,No,Yes
+nacelle,0.1,17.9,18,2200,,WES 18/100,https://en.wind-turbine-models.com/turbines/924-wes-18-100,,WES,No,Yes
+nacelle,0.099,19.6,23,5500,,Wincon W99,https://en.wind-turbine-models.com/turbines/707-wincon-w99,,Wincon,No,Yes
+nacelle,0.066,15.5,18,4000,,Windmatic WM 15s-66,https://en.wind-turbine-models.com/turbines/593-windmatic-wm-15s-66,,Windmatic,No,Yes
+nacelle,0.075,17,18,4100,,Windmatic WM 17-75,https://en.wind-turbine-models.com/turbines/683-windmatic-wm-17-75,,Windmatic,No,Yes
+nacelle,0.25,29.2,31,7900,,Wind World W3000/250,https://en.wind-turbine-models.com/turbines/379-wind-world-w3000-250,,Wind World,No,Yes
+nacelle,4,136,100,135000,,Goldwind GW 136 / 4000,https://en.wind-turbine-models.com/turbines/1973-goldwind-gw-136-4000,,Goldwind,No,Yes
+nacelle,5.5,158,,164500,,GE 5.X-158,GE 5.X-158 technical documentation,,,No,Yes
+nacelle,5.6,162,125,169963,,V162-5.6,traffic impact assessment,,,No,Yes
+rotor,1.5,70,60,15200,,Acciona AW-70/1500,https://en.wind-turbine-models.com/turbines/777-acciona-aw-70-1500,,Acciona,No,Yes
+rotor,1.5,77,60,15200,,Acciona AW-77/1500,https://en.wind-turbine-models.com/turbines/778-acciona-aw-77-1500,,Acciona,No,Yes
+rotor,1.5,82,80,15200,,Acciona AW-82/1500,https://en.wind-turbine-models.com/turbines/585-acciona-aw-82-1500,,Acciona,No,Yes
+rotor,3,100,100,66000,,Acciona AW-100/3000,https://en.wind-turbine-models.com/turbines/142-acciona-aw-100-3000,,Acciona,No,Yes
+rotor,3,109,100,66000,,Acciona AW-109/3000,https://en.wind-turbine-models.com/turbines/783-acciona-aw-109-3000,,Acciona,No,Yes
+rotor,2.5,96.1,70,55500,,aerodyn aM 2.5/96,https://en.wind-turbine-models.com/turbines/1111-aerodyn-am-2-5-96,,aerodyn,No,Yes
+rotor,0.75,47,50,15200,,Aeronautica 47-750,https://en.wind-turbine-models.com/turbines/499-aeronautica-47-750,,Aeronautica,No,Yes
+rotor,0.75,54,50,15200,,Aeronautica 54-750,https://en.wind-turbine-models.com/turbines/500-aeronautica-54-750,,Aeronautica,No,Yes
+rotor,1.3,62,68,30000,,Bonus B62/1300,https://en.wind-turbine-models.com/turbines/1348-bonus-b62-1300,,Bonus,No,Yes
+rotor,1.5,93,80,33200,,CRRC CWT1500-D93,https://en.wind-turbine-models.com/turbines/2694-crrc-cwt1500-d93,,CRRC,No,Yes
+rotor,2,93,70,45300,,CSIC H93-2.0,https://en.wind-turbine-models.com/turbines/2073-csic-h93-2-0,,CSIC,No,Yes
+rotor,2,111,70,54800,,CSIC H111-2.0,https://en.wind-turbine-models.com/turbines/2075-csic-h111-2-0,,CSIC,No,Yes
+rotor,0.16,23,22.5,5000,,Danwin Danwin 23/160,https://en.wind-turbine-models.com/turbines/599-danwin-danwin-23-160,,Danwin,No,Yes
+rotor,1.5,77,65,31500,,Dongfang FD77-1500 geared,https://en.wind-turbine-models.com/turbines/2221-dongfang-fd77-1500-geared,,Dongfang,No,Yes
+rotor,0.5,40.3,42,2700,,Enercon E-40/5.40,https://en.wind-turbine-models.com/turbines/67-enercon-e-40-5-40,,Enercon,No,Yes
+rotor,1.5,70.5,65,28000,,Enron 1.5 s,https://en.wind-turbine-models.com/turbines/371-enron-1-5-s,,Enron,No,Yes
+rotor,0.25,29.5,42,2300,,FuhrlÃ¤nder FL 250,https://en.wind-turbine-models.com/turbines/280-fuhrlaender-fl-250,,FuhrlÃ¤nder,No,Yes
+rotor,1,54,70,18500,,FuhrlÃ¤nder FL 1000,https://en.wind-turbine-models.com/turbines/70-fuhrlaender-fl-1000,,FuhrlÃ¤nder,No,Yes
+rotor,2.5,100,85,52000,,FuhrlÃ¤nder FL 2500/100,https://en.wind-turbine-models.com/turbines/347-fuhrlaender-fl-2500-100,,FuhrlÃ¤nder,No,Yes
+rotor,2.5,90,85,50000,,FuhrlÃ¤nder LLC WTU2.5-90,https://en.wind-turbine-models.com/turbines/1497-fuhrlaender-llc-wtu2-5-90,,FuhrlÃ¤nder LLC,No,Yes
+rotor,0.66,47,40,7200,,Gamesa G47,https://en.wind-turbine-models.com/turbines/772-gamesa-g47,,Gamesa,No,Yes
+rotor,0.85,52,44,33000,,Gamesa G52,https://en.wind-turbine-models.com/turbines/45-gamesa-g52,,Gamesa,No,Yes
+rotor,2,80,60,38000,,Gamesa G80,https://en.wind-turbine-models.com/turbines/34-gamesa-g80,,Gamesa,No,Yes
+rotor,2,87,67,37000,,Gamesa G87,https://en.wind-turbine-models.com/turbines/548-gamesa-g87,,Gamesa,No,Yes
+rotor,2,90,67,36000,,Gamesa G90,https://en.wind-turbine-models.com/turbines/763-gamesa-g90,,Gamesa,No,Yes
+rotor,1,57,60,12000,,GC China GC57,https://en.wind-turbine-models.com/turbines/2034-gc-china-gc57,,GC China,No,Yes
+rotor,1.5,77.1,61.4,31000,,HEAG HW2/S1500(77),https://en.wind-turbine-models.com/turbines/1440-heag-hw2-s1500-77,,HEAG,No,Yes
+rotor,2.5,100,85,55000,,Kenersys K100 2.5MW,https://en.wind-turbine-models.com/turbines/760-kenersys-k100-2-5mw,,Kenersys,No,Yes
+rotor,3,112,85,78000,,MingYang MySE3.0-112,https://en.wind-turbine-models.com/turbines/1914-mingyang-myse3-0-112,,MingYang,No,Yes
+rotor,0.6,48,46,17000,,NEG Micon NM 48/600,https://en.wind-turbine-models.com/turbines/1173-neg-micon-nm-48-600,,NEG Micon,No,Yes
+rotor,0.75,48.2,50,12000,,NEG Micon NM 48/750,https://en.wind-turbine-models.com/turbines/311-neg-micon-nm-48-750,,NEG Micon,No,Yes
+rotor,0.9,52.2,60,16500,,NEG Micon NM 52/900,https://en.wind-turbine-models.com/turbines/43-neg-micon-nm-52-900,,NEG Micon,No,Yes
+rotor,1.5,72,64,31400,,NEG Micon NM 72c/1500,https://en.wind-turbine-models.com/turbines/151-neg-micon-nm-72c-1500,,NEG Micon,No,Yes
+rotor,1.65,72,70,28000,,NEG Micon NM 72/1650,https://en.wind-turbine-models.com/turbines/1300-neg-micon-nm-72-1650,,NEG Micon,No,Yes
+rotor,0.6,43,40,15400,,Nordex N43,https://en.wind-turbine-models.com/turbines/390-nordex-n43,,Nordex,No,Yes
+rotor,1,54,60,18600,,Nordex N54,https://en.wind-turbine-models.com/turbines/397-nordex-n54,,Nordex,No,Yes
+rotor,1.3,60,60,21500,,Nordex N60,https://en.wind-turbine-models.com/turbines/77-nordex-n60,,Nordex,No,Yes
+rotor,1.5,77,62,32000,,Nordex N77,https://en.wind-turbine-models.com/turbines/76-nordex-n77,,Nordex,No,Yes
+rotor,2.3,90,80,51000,,Nordex N90 Beta,https://en.wind-turbine-models.com/turbines/21-nordex-n90-beta,,Nordex,No,Yes
+rotor,4.5,149.1,105,134400,,Nordex N149/4.0-4.5,https://en.wind-turbine-models.com/turbines/1705-nordex-n149-4-0-4-5,,Nordex,No,Yes
+rotor,0.225,29.1,30,5300,,Norwin 29 STALL 225,https://en.wind-turbine-models.com/turbines/226-norwin-29-stall-225,,Norwin,No,Yes
+rotor,2.5,100,75,32000,,"NovaWind L100-2,5 MW",https://en.wind-turbine-models.com/turbines/1968-novawind-l100-2-5-mw,,NovaWind,No,Yes
+rotor,0.9,56,59,18500,,PowerWind PW56,https://en.wind-turbine-models.com/turbines/10-powerwind-pw56,,PowerWind,No,Yes
+rotor,0.6,48.4,50,9500,,REpower 48/600,https://en.wind-turbine-models.com/turbines/703-repower-48-600,,REpower,No,Yes
+rotor,2,87,70,47000,,SANY SE8720,https://en.wind-turbine-models.com/turbines/2038-sany-se8720,,SANY,No,Yes
+rotor,2,93,70,49000,,SANY SE9320,https://en.wind-turbine-models.com/turbines/2086-sany-se9320,,SANY,No,Yes
+rotor,2,102,80,52000,,SANY SE10020,https://en.wind-turbine-models.com/turbines/2087-sany-se10020,,SANY,No,Yes
+rotor,2,103,80,52000,,SANY SE10520,https://en.wind-turbine-models.com/turbines/2088-sany-se10520,,SANY,No,Yes
+rotor,0.05,15,30,500,,Seaforth Energy AOC15/50,https://en.wind-turbine-models.com/turbines/513-seaforth-energy-aoc15-50,,Seaforth Energy,No,Yes
+rotor,2.05,92.5,68.5,41500,,Senvion MM92,https://en.wind-turbine-models.com/turbines/889-senvion-mm92,,Senvion,No,Yes
+rotor,2.3,82.4,80,54000,,Siemens SWT-2.3-82,https://en.wind-turbine-models.com/turbines/204-siemens-swt-2-3-82,,Siemens,No,Yes
+rotor,2.3,93,80,60000,,Siemens SWT-2.3-93,https://en.wind-turbine-models.com/turbines/551-siemens-swt-2-3-93,,Siemens,No,Yes
+rotor,2.3,93,80,60000,,Siemens SWT-2.3-93,https://en.wind-turbine-models.com/turbines/989-siemens-swt-2-3-93,,Siemens,No,Yes
+rotor,2.3,101,80,62000,,Siemens SWT-2.3-101,https://en.wind-turbine-models.com/turbines/341-siemens-swt-2-3-101,,Siemens,No,Yes
+rotor,2.3,108,80,60000,,Siemens SWT-2.3-108,https://en.wind-turbine-models.com/turbines/647-siemens-swt-2-3-108,,Siemens,No,Yes
+rotor,2.3,120,80,70000,,Siemens SWT-2.3-120,https://en.wind-turbine-models.com/turbines/1240-siemens-swt-2-3-120,,Siemens,No,Yes
+rotor,3,101,80,60000,,Siemens SWT-3.0-101,https://en.wind-turbine-models.com/turbines/66-siemens-swt-3-0-101,,Siemens,No,Yes
+rotor,3.2,113,79.5,67000,,Siemens SWT-3.2-113,https://en.wind-turbine-models.com/turbines/966-siemens-swt-3-2-113,,Siemens,No,Yes
+rotor,0.25,30,30,3900,,Siva 250/50,https://en.wind-turbine-models.com/turbines/477-siva-250-50,,Siva,No,Yes
+rotor,0.12,20,23.4,1700,,Vestas V20-120,https://en.wind-turbine-models.com/turbines/2707-vestas-v20-120,,Vestas,No,Yes
+rotor,0.225,27,30,2900,,Vestas V27,https://en.wind-turbine-models.com/turbines/274-vestas-v27,,Vestas,No,Yes
+rotor,0.6,42,40.5,8400,,Vestas V42,https://en.wind-turbine-models.com/turbines/109-vestas-v42,,Vestas,No,Yes
+rotor,0.6,44,40.5,8400,,Vestas V44,https://en.wind-turbine-models.com/turbines/272-vestas-v44,,Vestas,No,Yes
+rotor,0.66,47,40,7200,,Vestas V47,https://en.wind-turbine-models.com/turbines/13-vestas-v47,,Vestas,No,Yes
+rotor,1.65,66,60,22800,,Vestas V66-1.65,https://en.wind-turbine-models.com/turbines/15-vestas-v66-1-65,,Vestas,No,Yes
+rotor,2,66,60,23000,,Vestas V66-2.0,https://en.wind-turbine-models.com/turbines/1277-vestas-v66-2-0,,Vestas,No,Yes
+rotor,1.8,80,60,27000,,Vestas V80-1.8,https://en.wind-turbine-models.com/turbines/1350-vestas-v80-1-8,,Vestas,No,Yes
+rotor,2,80,60,37200,,Vestas V80-2.0,https://en.wind-turbine-models.com/turbines/19-vestas-v80-2-0,,Vestas,No,Yes
+rotor,1.5,82,94,42000,,Vestas V82-1.5,https://en.wind-turbine-models.com/turbines/1727-vestas-v82-1-5,,Vestas,No,Yes
+rotor,1.65,82,59,40000,,Vestas V82-1.65,https://en.wind-turbine-models.com/turbines/81-vestas-v82-1-65,,Vestas,No,Yes
+rotor,1.8,90,80,38000,,Vestas V90-1.8,https://en.wind-turbine-models.com/turbines/971-vestas-v90-1-8,,Vestas,No,Yes
+rotor,3,90,80,41000,,Vestas V90-3.0,https://en.wind-turbine-models.com/turbines/603-vestas-v90-3-0,,Vestas,No,Yes
+rotor,0.1,17.9,18,1100,,WES 18/100,https://en.wind-turbine-models.com/turbines/924-wes-18-100,,WES,No,Yes
+rotor,0.075,17,18,1300,,Windmatic WM 17-75,https://en.wind-turbine-models.com/turbines/683-windmatic-wm-17-75,,Windmatic,No,Yes
+rotor,0.25,29.2,31,5000,,Wind World W3000/250,https://en.wind-turbine-models.com/turbines/379-wind-world-w3000-250,,Wind World,No,Yes
+rotor,4,136,100,95300,,Goldwind GW 136 / 4000,https://en.wind-turbine-models.com/turbines/1973-goldwind-gw-136-4000,,Goldwind,No,Yes
+tower,5.5,158,125.4,362100,,GE 5.X-158,GE 5.X-158 technical documentation,,,No,Yes
+tower,2.5,100,85,350000,,FuhrlÃ¤nder FL 2500/100,https://en.wind-turbine-models.com/turbines/347-fuhrlaender-fl-2500-100,,FuhrlÃ¤nder,No,Yes
+tower,2.5,90,85,350000,,FuhrlÃ¤nder LLC WTU2.5-90,https://en.wind-turbine-models.com/turbines/1497-fuhrlaender-llc-wtu2-5-90,,FuhrlÃ¤nder LLC,No,Yes
+tower,1.65,82,59,322000,,Vestas V82-1.65,https://en.wind-turbine-models.com/turbines/81-vestas-v82-1-65,,Vestas,No,Yes
+tower,3,90,80,285000,,Vestas V90-3.0,https://en.wind-turbine-models.com/turbines/603-vestas-v90-3-0,,Vestas,No,Yes
+tower,5.5,158,107.4,274700,,GE 5.X-158,GE 5.X-158 technical documentation,,,No,Yes
+tower,1.5,77,62,260000,,Nordex N77,https://en.wind-turbine-models.com/turbines/76-nordex-n77,,Nordex,No,Yes
+tower,2,90,67,255000,,Gamesa G90,https://en.wind-turbine-models.com/turbines/763-gamesa-g90,,Gamesa,No,Yes
+tower,2,87,67,242000,,Gamesa G87,https://en.wind-turbine-models.com/turbines/548-gamesa-g87,,Gamesa,No,Yes
+tower,2,80,60,238000,,Gamesa G80,https://en.wind-turbine-models.com/turbines/34-gamesa-g80,,Gamesa,No,Yes
+tower,1.5,82,94,230000,,Vestas V82-1.5,https://en.wind-turbine-models.com/turbines/1727-vestas-v82-1-5,,Vestas,No,Yes
+tower,1.8,90,80,225000,,Vestas V90-1.8,https://en.wind-turbine-models.com/turbines/971-vestas-v90-1-8,,Vestas,No,Yes
+tower,2,80,60,220000,,Vestas V80-2.0,https://en.wind-turbine-models.com/turbines/19-vestas-v80-2-0,,Vestas,No,Yes
+tower,2,80,70,204000,,Beijing North BZD80-2000,https://en.wind-turbine-models.com/turbines/271-beijing-north-bzd80-2000,,Beijing North,No,Yes
+tower,2,83,67,203000,,Gamesa G83,https://en.wind-turbine-models.com/turbines/773-gamesa-g83,,Gamesa,No,Yes
+tower,1.8,80,60,203000,,Vestas V80-1.8,https://en.wind-turbine-models.com/turbines/1350-vestas-v80-1-8,,Vestas,No,Yes
+tower,1.5,72,64,201000,,NEG Micon NM 72c/1500,https://en.wind-turbine-models.com/turbines/151-neg-micon-nm-72c-1500,,NEG Micon,No,Yes
+tower,1.3,62,68,198000,,Bonus B62/1300,https://en.wind-turbine-models.com/turbines/1348-bonus-b62-1300,,Bonus,No,Yes
+tower,2.3,93,80,162000,,Siemens SWT-2.3-93,https://en.wind-turbine-models.com/turbines/989-siemens-swt-2-3-93,,Siemens,No,Yes
+tower,2.3,101,80,162000,,Siemens SWT-2.3-101,https://en.wind-turbine-models.com/turbines/341-siemens-swt-2-3-101,,Siemens,No,Yes
+tower,3,101,80,162000,,Siemens SWT-3.0-101,https://en.wind-turbine-models.com/turbines/66-siemens-swt-3-0-101,,Siemens,No,Yes
+tower,2.3,82.4,80,158000,,Siemens SWT-2.3-82,https://en.wind-turbine-models.com/turbines/204-siemens-swt-2-3-82,,Siemens,No,Yes
+tower,2,80,100,155000,,DeWind D8.2 WinDriveÂ®,https://en.wind-turbine-models.com/turbines/85-dewind-d8-2-windrive,,DeWind,No,Yes
+tower,1.3,60,60,154000,,Nordex N60,https://en.wind-turbine-models.com/turbines/77-nordex-n60,,Nordex,No,Yes
+tower,2,66,60,146000,,Vestas V66-2.0,https://en.wind-turbine-models.com/turbines/1277-vestas-v66-2-0,,Vestas,No,Yes
+tower,1.65,66,60,141000,,Vestas V66-1.65,https://en.wind-turbine-models.com/turbines/15-vestas-v66-1-65,,Vestas,No,Yes
+tower,1.5,70,60,135000,,Acciona AW-70/1500,https://en.wind-turbine-models.com/turbines/777-acciona-aw-70-1500,,Acciona,No,Yes
+tower,1.5,77,60,135000,,Acciona AW-77/1500,https://en.wind-turbine-models.com/turbines/778-acciona-aw-77-1500,,Acciona,No,Yes
+tower,1.5,82,80,135000,,Acciona AW-82/1500,https://en.wind-turbine-models.com/turbines/585-acciona-aw-82-1500,,Acciona,No,Yes
+tower,1.5,70.5,65,132000,,Enron 1.5 s,https://en.wind-turbine-models.com/turbines/371-enron-1-5-s,,Enron,No,Yes
+tower,0.5,40.3,42,120000,,Enercon E-40/5.40,https://en.wind-turbine-models.com/turbines/67-enercon-e-40-5-40,,Enercon,No,Yes
+tower,1,54,70,120000,,FuhrlÃ¤nder FL 1000,https://en.wind-turbine-models.com/turbines/70-fuhrlaender-fl-1000,,FuhrlÃ¤nder,No,Yes
+tower,1.65,72,70,120000,,NEG Micon NM 72/1650,https://en.wind-turbine-models.com/turbines/1300-neg-micon-nm-72-1650,,NEG Micon,No,Yes
+tower,1.5,77.1,61.4,117000,,HEAG HW2/S1500(77),https://en.wind-turbine-models.com/turbines/1440-heag-hw2-s1500-77,,HEAG,No,Yes
+tower,1,54,60,105000,,Nordex N54,https://en.wind-turbine-models.com/turbines/397-nordex-n54,,Nordex,No,Yes
+tower,0.9,52.2,60,97000,,NEG Micon NM 52/900,https://en.wind-turbine-models.com/turbines/43-neg-micon-nm-52-900,,NEG Micon,No,Yes
+tower,1,61.4,50,94000,,Mitsubishi MWT-62/1000A,https://en.wind-turbine-models.com/turbines/589-mitsubishi-mwt-62-1000a,,Mitsubishi,No,Yes
+tower,1,57,60,94000,,Mitsubishi MWT-57/1000,https://en.wind-turbine-models.com/turbines/608-mitsubishi-mwt-57-1000,,Mitsubishi,No,Yes
+tower,0.85,52,44,90000,,Gamesa G52,https://en.wind-turbine-models.com/turbines/45-gamesa-g52,,Gamesa,No,Yes
+tower,0.8,52,60,86000,,Nordex N52,https://en.wind-turbine-models.com/turbines/387-nordex-n52,,Nordex,No,Yes
+tower,0.75,48.2,50,81000,,NEG Micon NM 48/750,https://en.wind-turbine-models.com/turbines/311-neg-micon-nm-48-750,,NEG Micon,No,Yes
+tower,3.2,113,79.5,75000,,Siemens SWT-3.2-113,https://en.wind-turbine-models.com/turbines/966-siemens-swt-3-2-113,,Siemens,No,Yes
+tower,0.6,48,46,70000,,NEG Micon NM 48/600,https://en.wind-turbine-models.com/turbines/1173-neg-micon-nm-48-600,,NEG Micon,No,Yes
+tower,0.6,43,40,67000,,Nordex N43,https://en.wind-turbine-models.com/turbines/390-nordex-n43,,Nordex,No,Yes
+tower,0.66,47,40,66400,,Gamesa G47,https://en.wind-turbine-models.com/turbines/772-gamesa-g47,,Gamesa,No,Yes
+tower,0.66,47,40,66400,,Vestas V47,https://en.wind-turbine-models.com/turbines/13-vestas-v47,,Vestas,No,Yes
+tower,1,57,60,63000,,GC China GC57,https://en.wind-turbine-models.com/turbines/2034-gc-china-gc57,,GC China,No,Yes
+tower,0.6,48,50,61000,,TURBOWINDS T600-48,https://en.wind-turbine-models.com/turbines/149-turbowinds-t600-48,,TURBOWINDS,No,Yes
+tower,0.6,44,40.5,58000,,Gamesa G44,https://en.wind-turbine-models.com/turbines/771-gamesa-g44,,Gamesa,No,Yes
+tower,0.5,39,40.5,58000,,Vestas V39,https://en.wind-turbine-models.com/turbines/383-vestas-v39,,Vestas,No,Yes
+tower,0.6,44,40.5,58000,,Vestas V44,https://en.wind-turbine-models.com/turbines/272-vestas-v44,,Vestas,No,Yes
+tower,0.6,37,45,55000,,Micon M 1100-600,https://en.wind-turbine-models.com/turbines/1302-micon-m-1100-600,,Micon,No,Yes
+tower,0.5,41,42.1,42000,,Nordtank NTK 500/41,https://en.wind-turbine-models.com/turbines/384-nordtank-ntk-500-41,,Nordtank,No,Yes
+tower,0.6,42,40.5,41000,,Vestas V42,https://en.wind-turbine-models.com/turbines/109-vestas-v42,,Vestas,No,Yes
+tower,0.75,47,50,36900,,Aeronautica 47-750,https://en.wind-turbine-models.com/turbines/499-aeronautica-47-750,,Aeronautica,No,Yes
+tower,0.75,54,50,36900,,Aeronautica 54-750,https://en.wind-turbine-models.com/turbines/500-aeronautica-54-750,,Aeronautica,No,Yes
+tower,0.4,34,30,36000,,TURBOWINDS T400-34,https://en.wind-turbine-models.com/turbines/570-turbowinds-t400-34,,TURBOWINDS,No,Yes
+tower,0.25,29.2,31,34000,,Wind World W3000/250,https://en.wind-turbine-models.com/turbines/379-wind-world-w3000-250,,Wind World,No,Yes
+tower,0.25,29.5,42,32000,,FuhrlÃ¤nder FL 250,https://en.wind-turbine-models.com/turbines/280-fuhrlaender-fl-250,,FuhrlÃ¤nder,No,Yes
+tower,0.5,40.8,39,30800,,NedWind NW 40/500,https://en.wind-turbine-models.com/turbines/1090-nedwind-nw-40-500,,NedWind,No,Yes
+tower,0.25,30,30,25500,,Siva 250/50,https://en.wind-turbine-models.com/turbines/477-siva-250-50,,Siva,No,Yes
+tower,0.225,29.8,30,24000,,Micon M 700-225,https://en.wind-turbine-models.com/turbines/377-micon-m-700-225,,Micon,No,Yes
+tower,0.225,29.1,30,20700,,Norwin 29 STALL 225,https://en.wind-turbine-models.com/turbines/226-norwin-29-stall-225,,Norwin,No,Yes
+tower,0.1,23,42.6,14000,,Autoflug A 100,https://en.wind-turbine-models.com/turbines/375-autoflug-a-100,,Autoflug,No,Yes
+tower,0.16,23,22.5,13000,,Danwin Danwin 23/160,https://en.wind-turbine-models.com/turbines/599-danwin-danwin-23-160,,Danwin,No,Yes
+tower,0.095,24.4,37,12000,,WEG AGW 100,https://en.wind-turbine-models.com/turbines/1698-weg-agw-100,,WEG,No,Yes
+tower,0.1,20.7,29,12000,,NPS Northern Power NPS 100C-21,https://en.wind-turbine-models.com/turbines/1269-nps-northern-power-nps-100c-21,,NPS Northern Power,No,Yes
+tower,0.225,27,30,12000,,Vestas V27,https://en.wind-turbine-models.com/turbines/274-vestas-v27,,Vestas,No,Yes
+tower,0.225,30,32,11000,,Vergnet GEV MP R 225/30,https://en.wind-turbine-models.com/turbines/2002-vergnet-gev-mp-r-225-30,,Vergnet,No,Yes
+tower,0.05,15,30,8600,,Seaforth Energy AOC15/50,https://en.wind-turbine-models.com/turbines/513-seaforth-energy-aoc15-50,,Seaforth Energy,No,Yes
+tower,0.1,17.9,18,7800,,WES 18/100,https://en.wind-turbine-models.com/turbines/924-wes-18-100,,WES,No,Yes
+tower,0.108,18.9,23.8,7200,,Micon 108,https://en.wind-turbine-models.com/turbines/562-micon-108,,Micon,No,Yes
+tower,0.108,19.3,23,7200,,Wenergy M 108/ M 95,https://en.wind-turbine-models.com/turbines/2185-wenergy-m-108-m-95,,Wenergy,No,Yes
+tower,0.099,19.6,23,7200,,Wincon W99,https://en.wind-turbine-models.com/turbines/707-wincon-w99,,Wincon,No,Yes
+tower,0.065,16,25,6500,,Micon M 65/13/US,https://en.wind-turbine-models.com/turbines/606-micon-m-65-13-us,,Micon,No,Yes
+tower,0.065,16.5,24,6500,,Nordtank NTK 65,https://en.wind-turbine-models.com/turbines/564-nordtank-ntk-65,,Nordtank,No,Yes
+tower,0.12,20,23.4,5600,,Vestas V20-120,https://en.wind-turbine-models.com/turbines/2707-vestas-v20-120,,Vestas,No,Yes
+tower,0.075,17,18,4800,,Windmatic WM 17-75,https://en.wind-turbine-models.com/turbines/683-windmatic-wm-17-75,,Windmatic,No,Yes
+transformer,5.5,158,,14000,,GE 5.X-158,GE 5.X-158 technical documentation,,,No,Yes
+turbine,1.5,70,60,202400,,Acciona AW-70/1500,https://en.wind-turbine-models.com/turbines/777-acciona-aw-70-1500,,Acciona,No,Yes
+turbine,1.5,77,60,202500,,Acciona AW-77/1500,https://en.wind-turbine-models.com/turbines/778-acciona-aw-77-1500,,Acciona,No,Yes
+turbine,1.5,82,80,202500,,Acciona AW-82/1500,https://en.wind-turbine-models.com/turbines/585-acciona-aw-82-1500,,Acciona,No,Yes
+turbine,3,100,100,1284000,,Acciona AW-100/3000,https://en.wind-turbine-models.com/turbines/142-acciona-aw-100-3000,,Acciona,No,Yes
+turbine,3,109,100,1284000,,Acciona AW-109/3000,https://en.wind-turbine-models.com/turbines/783-acciona-aw-109-3000,,Acciona,No,Yes
+turbine,0.75,47,50,74100,,Aeronautica 47-750,https://en.wind-turbine-models.com/turbines/499-aeronautica-47-750,,Aeronautica,No,Yes
+turbine,0.75,54,50,74100,,Aeronautica 54-750,https://en.wind-turbine-models.com/turbines/500-aeronautica-54-750,,Aeronautica,No,Yes
+turbine,1.3,62,68,280000,,Bonus B62/1300,https://en.wind-turbine-models.com/turbines/1348-bonus-b62-1300,,Bonus,No,Yes
+turbine,0.16,23,22.5,25500,,Danwin Danwin 23/160,https://en.wind-turbine-models.com/turbines/599-danwin-danwin-23-160,,Danwin,No,Yes
+turbine,0.5,40.3,42,150000,,Enercon E-40/5.40,https://en.wind-turbine-models.com/turbines/67-enercon-e-40-5-40,,Enercon,No,Yes
+turbine,0.25,29.5,42,44000,,FuhrlÃ¤nder FL 250,https://en.wind-turbine-models.com/turbines/280-fuhrlaender-fl-250,,FuhrlÃ¤nder,No,Yes
+turbine,1,54,70,180000,,FuhrlÃ¤nder FL 1000,https://en.wind-turbine-models.com/turbines/70-fuhrlaender-fl-1000,,FuhrlÃ¤nder,No,Yes
+turbine,2.5,100,85,500000,,FuhrlÃ¤nder FL 2500/100,https://en.wind-turbine-models.com/turbines/347-fuhrlaender-fl-2500-100,,FuhrlÃ¤nder,No,Yes
+turbine,2.5,90,85,496000,,FuhrlÃ¤nder LLC WTU2.5-90,https://en.wind-turbine-models.com/turbines/1497-fuhrlaender-llc-wtu2-5-90,,FuhrlÃ¤nder LLC,No,Yes
+turbine,0.66,47,40,94000,,Gamesa G47,https://en.wind-turbine-models.com/turbines/772-gamesa-g47,,Gamesa,No,Yes
+turbine,2,80,60,391000,,Gamesa G80,https://en.wind-turbine-models.com/turbines/34-gamesa-g80,,Gamesa,No,Yes
+turbine,2,87,67,386000,,Gamesa G87,https://en.wind-turbine-models.com/turbines/548-gamesa-g87,,Gamesa,No,Yes
+turbine,2,90,67,361000,,Gamesa G90,https://en.wind-turbine-models.com/turbines/763-gamesa-g90,,Gamesa,No,Yes
+turbine,1,57,60,115000,,GC China GC57,https://en.wind-turbine-models.com/turbines/2034-gc-china-gc57,,GC China,No,Yes
+turbine,0.095,24.4,37,18900,,WEG AGW 100,https://en.wind-turbine-models.com/turbines/1698-weg-agw-100,,WEG,No,Yes
+turbine,1.5,77.1,61.4,207000,,HEAG HW2/S1500(77),https://en.wind-turbine-models.com/turbines/1440-heag-hw2-s1500-77,,HEAG,No,Yes
+turbine,0.225,29.8,30,40000,,Micon M 700-225,https://en.wind-turbine-models.com/turbines/377-micon-m-700-225,,Micon,No,Yes
+turbine,0.6,37,45,85000,,Micon M 1100-600,https://en.wind-turbine-models.com/turbines/1302-micon-m-1100-600,,Micon,No,Yes
+turbine,1,61.4,50,169000,,Mitsubishi MWT-62/1000A,https://en.wind-turbine-models.com/turbines/589-mitsubishi-mwt-62-1000a,,Mitsubishi,No,Yes
+turbine,1,57,60,169000,,Mitsubishi MWT-57/1000,https://en.wind-turbine-models.com/turbines/608-mitsubishi-mwt-57-1000,,Mitsubishi,No,Yes
+turbine,0.5,40.8,39,67000,,NedWind NW 40/500,https://en.wind-turbine-models.com/turbines/1090-nedwind-nw-40-500,,NedWind,No,Yes
+turbine,0.6,48,46,110000,,NEG Micon NM 48/600,https://en.wind-turbine-models.com/turbines/1173-neg-micon-nm-48-600,,NEG Micon,No,Yes
+turbine,0.75,48.2,50,115000,,NEG Micon NM 48/750,https://en.wind-turbine-models.com/turbines/311-neg-micon-nm-48-750,,NEG Micon,No,Yes
+turbine,1.65,72,70,200000,,NEG Micon NM 72/1650,https://en.wind-turbine-models.com/turbines/1300-neg-micon-nm-72-1650,,NEG Micon,No,Yes
+turbine,0.6,43,40,108000,,Nordex N43,https://en.wind-turbine-models.com/turbines/390-nordex-n43,,Nordex,No,Yes
+turbine,0.8,52,60,160000,,Nordex N52,https://en.wind-turbine-models.com/turbines/387-nordex-n52,,Nordex,No,Yes
+turbine,1,54,60,179000,,Nordex N54,https://en.wind-turbine-models.com/turbines/397-nordex-n54,,Nordex,No,Yes
+turbine,1.3,60,60,227000,,Nordex N60,https://en.wind-turbine-models.com/turbines/77-nordex-n60,,Nordex,No,Yes
+turbine,0.5,41,42.1,65000,,Nordtank NTK 500/41,https://en.wind-turbine-models.com/turbines/384-nordtank-ntk-500-41,,Nordtank,No,Yes
+turbine,1.5,64,57,193000,,Nordtank NTK 1500 64,https://en.wind-turbine-models.com/turbines/3-nordtank-ntk-1500-64,,Nordtank,No,Yes
+turbine,0.225,29.1,30,33600,,Norwin 29 STALL 225,https://en.wind-turbine-models.com/turbines/226-norwin-29-stall-225,,Norwin,No,Yes
+turbine,2.3,82.4,80,294000,,Siemens SWT-2.3-82,https://en.wind-turbine-models.com/turbines/204-siemens-swt-2-3-82,,Siemens,No,Yes
+turbine,2.3,93,80,304000,,Siemens SWT-2.3-93,https://en.wind-turbine-models.com/turbines/989-siemens-swt-2-3-93,,Siemens,No,Yes
+turbine,2.3,101,80,306000,,Siemens SWT-2.3-101,https://en.wind-turbine-models.com/turbines/341-siemens-swt-2-3-101,,Siemens,No,Yes
+turbine,3,101,80,300000,,Siemens SWT-3.0-101,https://en.wind-turbine-models.com/turbines/66-siemens-swt-3-0-101,,Siemens,No,Yes
+turbine,0.25,30,30,39900,,Siva 250/50,https://en.wind-turbine-models.com/turbines/477-siva-250-50,,Siva,No,Yes
+turbine,0.4,34,30,54000,,TURBOWINDS T400-34,https://en.wind-turbine-models.com/turbines/570-turbowinds-t400-34,,TURBOWINDS,No,Yes
+turbine,0.6,48,50,96000,,TURBOWINDS T600-48,https://en.wind-turbine-models.com/turbines/149-turbowinds-t600-48,,TURBOWINDS,No,Yes
+turbine,0.225,30,32,19800,,Vergnet GEV MP R 225/30,https://en.wind-turbine-models.com/turbines/2002-vergnet-gev-mp-r-225-30,,Vergnet,No,Yes
+turbine,0.12,20,23.4,11900,,Vestas V20-120,https://en.wind-turbine-models.com/turbines/2707-vestas-v20-120,,Vestas,No,Yes
+turbine,0.225,27,30,19800,,Vestas V27,https://en.wind-turbine-models.com/turbines/274-vestas-v27,,Vestas,No,Yes
+turbine,0.5,39,40.5,85000,,Vestas V39,https://en.wind-turbine-models.com/turbines/383-vestas-v39,,Vestas,No,Yes
+turbine,0.6,42,40.5,67000,,Vestas V42,https://en.wind-turbine-models.com/turbines/109-vestas-v42,,Vestas,No,Yes
+turbine,0.6,44,40.5,87000,,Vestas V44,https://en.wind-turbine-models.com/turbines/272-vestas-v44,,Vestas,No,Yes
+turbine,0.66,47,40,94000,,Vestas V47,https://en.wind-turbine-models.com/turbines/13-vestas-v47,,Vestas,No,Yes
+turbine,1.65,66,60,220000,,Vestas V66-1.65,https://en.wind-turbine-models.com/turbines/15-vestas-v66-1-65,,Vestas,No,Yes
+turbine,2,66,60,226000,,Vestas V66-2.0,https://en.wind-turbine-models.com/turbines/1277-vestas-v66-2-0,,Vestas,No,Yes
+turbine,1.8,80,60,309000,,Vestas V80-1.8,https://en.wind-turbine-models.com/turbines/1350-vestas-v80-1-8,,Vestas,No,Yes
+turbine,1.5,82,94,320000,,Vestas V82-1.5,https://en.wind-turbine-models.com/turbines/1727-vestas-v82-1-5,,Vestas,No,Yes
+turbine,1.8,90,80,331000,,Vestas V90-1.8,https://en.wind-turbine-models.com/turbines/971-vestas-v90-1-8,,Vestas,No,Yes
+turbine,3,90,80,396000,,Vestas V90-3.0,https://en.wind-turbine-models.com/turbines/603-vestas-v90-3-0,,Vestas,No,Yes
+turbine,0.1,17.9,18,11500,,WES 18/100,https://en.wind-turbine-models.com/turbines/924-wes-18-100,,WES,No,Yes
+turbine,0.075,17,18,10100,,Windmatic WM 17-75,https://en.wind-turbine-models.com/turbines/683-windmatic-wm-17-75,,Windmatic,No,Yes
+turbine,0.25,29.2,31,47000,,Wind World W3000/250,https://en.wind-turbine-models.com/turbines/379-wind-world-w3000-250,,Wind World,No,Yes
+turbine,2,100,80,230000,,V100-2.0,Vestas material use brochure,,,No,Yes
+turbine,2,110,80,248000,,V110-2.0,Vestas material use brochure,,,No,Yes
+turbine,2.2,120,122,317000,,V120-2.2,Vestas material use brochure,,,No,Yes
+turbine,3.5,112,94,438000,,V112-3.45,Vestas material use brochure,,,No,Yes
+turbine,3.5,117,91.5,436000,,V117-3.45,Vestas material use brochure,,,No,Yes
+turbine,3.5,126,117,530000,,V126-3.45,Vestas material use brochure,,,No,Yes
+turbine,3.5,136,112,570000,,V136-3.45,Vestas material use brochure,,,No,Yes
+turbine,4.2,136,112,544000,,V136-4.2,Vestas material use brochure,,,No,Yes
+turbine,4.5,136,112,466000,,V136-4.5,Vestas material use brochure,,,No,Yes
+turbine,4.2,150,155,682000,,V150-4.2,Vestas material use brochure,,,No,Yes
+turbine,4.5,150,105,446000,,V150-4.5,Vestas material use brochure,,,No,Yes
+turbine,4.5,163,98,501000,,V163-4.5,Vestas material use brochure,,,No,Yes
+turbine,6,150,155,773000,,V150-6.0,Vestas material use brochure,,,No,Yes
+turbine,2.5,100,85,309842,,GE2.5-100,GE 3.X technical documentation,,,No,Yes
+turbine,2.5,120,85,316685,,GE2.5-120,GE 3.X technical documentation,,,No,Yes
+turbine,2.8,100,85,309842,,GE2.75-100,GE 3.X technical documentation,,,No,Yes
+turbine,2.9,103,85,310217,,GE2.85-103,GE 3.X technical documentation,,,No,Yes
+turbine,2.5,120,110,432493,,GE2.5-120,GE 3.X technical documentation,,,No,Yes
+turbine,2.5,120,120,487593,,GE2.5-120,GE 3.X technical documentation,,,No,Yes
+turbine,2.9,103,98,386200,,GE2.85-103,GE 3.X technical documentation,,,No,Yes

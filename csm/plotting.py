@@ -32,6 +32,11 @@ future empirically-fit "Custom" model) can be included simply by adding them to 
 dictionary passed to :py:func:`generate_comparison` — no other changes are required. If a new
 model doesn't override a component's ``calculate_*`` method, it inherits the base (2015) formula
 and therefore its driver and formula text, via each lookup's fallback to the component's default.
+
+An empirical measurements CSV can optionally be overlaid as faint points behind the model curves
+(see the `empirical_csv` argument on :py:func:`generate_comparison`/:py:func:`generate_all_figures`
+and :py:func:`load_empirical_data` for the expected columns); passing None (the default) leaves
+plots unchanged. A component only gets an overlay on the panels the CSV actually has data for.
 """
 
 import math
@@ -442,6 +447,146 @@ DEFAULT_TURBINE_SPECS = {
 MODEL_COLORS = {"2015": "#4C72B0", "2020": "#DD5A48", "Custom": "#E8A33D"}
 CONFIG_MARKERS = ["*", "^", "s", "D", "P", "X", "o"]
 
+# Optional empirical-measurements overlay (e.g. csm/lbw_csm_2026_data.csv): a CSV with one row
+# per measured turbine component, columns "Component", "MW", "RD (m)", "hh (m)", "mass (kg)",
+# and optionally "cost ($)" and "outlier?" ("Yes" rows are dropped). Passing a path via the
+# `empirical_csv` argument on :py:func:`generate_comparison`/:py:func:`generate_all_figures`
+# overlays it as faint points behind the model curves; omitting it (the default) leaves plots
+# unchanged. A component only gets an overlay on the panels its rows actually have data for —
+# it's skipped entirely wherever the CSV doesn't cover it, same principle as everywhere else in
+# this module.
+EMPIRICAL_COMPONENT_COLUMN = "Component"
+EMPIRICAL_MASS_COLUMN = "mass (kg)"
+EMPIRICAL_COST_COLUMN = "cost ($)"
+EMPIRICAL_OUTLIER_COLUMN = "outlier?"
+
+EMPIRICAL_COMPONENT_LABELS: dict[str, str] = {
+    "blade": "Blade",
+    "hub": "Hub",
+    "spinner": "Spinner",
+    "gearbox": "Gearbox",
+    "generator": "Generator",
+    "transformer": "Transformer",
+    "tower": "Tower",
+    "nacelle": "Nacelle (Total)",
+    "rotor": "Rotor (Total)",
+    "turbine": "Turbine (Total)",
+}
+
+# Raw CSV columns, mapped to the same raw kwarg names sweeps and configuration markers use, so
+# a row's driver value can be computed via the same `_driver_display_value` they already go
+# through. MW is scaled kW->none here since `_derive_empirical_entry` does that conversion.
+EMPIRICAL_ROW_COLUMNS: dict[str, str] = {
+    "rotor_diameter": "RD (m)",
+    "rated_power_kw": "MW",
+    "tower_length": "hh (m)",
+}
+
+
+def load_empirical_data(csv_path: str | Path | None) -> pd.DataFrame | None:
+    """Loads an empirical measurements CSV for the overlay described above.
+
+    Args:
+        csv_path (str | Path | None): Path to the CSV, or None to disable the overlay (the
+            functions that accept an `empirical_csv` argument call this for you).
+
+    Returns:
+        pd.DataFrame | None: The loaded data with "outlier?" rows removed, or None if `csv_path`
+            is None.
+    """
+    if csv_path is None:
+        return None
+    df = pd.read_csv(csv_path)
+    df.columns = [c.strip().lstrip("﻿") for c in df.columns]
+    if EMPIRICAL_OUTLIER_COLUMN in df.columns:
+        is_outlier = df[EMPIRICAL_OUTLIER_COLUMN].astype(str).str.strip().str.lower() == "yes"
+        df = df[~is_outlier]
+    return df
+
+
+def _empirical_rows(
+    empirical_df: pd.DataFrame | None, component: ComponentSpec
+) -> pd.DataFrame | None:
+    """Rows of `empirical_df` for `component`, or None if it isn't covered at all."""
+    if empirical_df is None:
+        return None
+    csv_label = next(
+        (k for k, v in EMPIRICAL_COMPONENT_LABELS.items() if v == component.label), None
+    )
+    if csv_label is None:
+        return None
+    names = empirical_df[EMPIRICAL_COMPONENT_COLUMN].astype(str).str.strip().str.lower()
+    rows = empirical_df[names == csv_label]
+    return rows if len(rows) else None
+
+
+def _derive_empirical_entry(row: pd.Series, base_kwargs: dict) -> dict:
+    """Builds a driver-lookup dict for one empirical CSV row from its raw RD/MW/hh columns,
+    additionally deriving rotor torque with the exact same formula
+    (:py:meth:`CSMBase.calculate_rotor_torque`) the swept model curves use — the CSV doesn't
+    record the efficiency/tip-speed a torque calculation needs, so those are taken from
+    `base_kwargs`, the same reference values used elsewhere for whatever a sweep isn't varying.
+    This lets every driver this module supports, including rotor torque and any composite driver
+    built from these four quantities, be evaluated for empirical data through the same
+    :py:func:`_driver_display_value` used for model curves and configuration markers.
+    """
+    entry: dict = {}
+    for attr, column in EMPIRICAL_ROW_COLUMNS.items():
+        value = pd.to_numeric(row.get(column), errors="coerce")
+        if pd.notna(value):
+            entry[attr] = float(value) * 1000 if attr == "rated_power_kw" else float(value)
+    if "rotor_diameter" in entry and "rated_power_kw" in entry:
+        rotor_speed = base_kwargs["max_tip_speed"] / (0.5 * entry["rotor_diameter"])
+        rated_hub_power = entry["rated_power_kw"] / base_kwargs["efficiency_max"]
+        entry["rotor_torque"] = rated_hub_power / rotor_speed
+    return entry
+
+
+def _empirical_mass_points(
+    empirical_df: pd.DataFrame | None,
+    component: ComponentSpec,
+    driver: Driver,
+    base_kwargs: dict,
+) -> tuple[np.ndarray, np.ndarray] | None:
+    """(x_display, mass_tonnes) arrays of `component` rows with both a `driver` value (computed
+    or derived — see :py:func:`_derive_empirical_entry`) and a measured mass, or None if
+    unavailable.
+    """
+    rows = _empirical_rows(empirical_df, component)
+    if rows is None:
+        return None
+    xs, ys = [], []
+    for _, row in rows.iterrows():
+        mass = row.get(EMPIRICAL_MASS_COLUMN)
+        if pd.isna(mass):
+            continue
+        x = _driver_display_value(driver, _derive_empirical_entry(row, base_kwargs))
+        if x is None:
+            continue
+        xs.append(x)
+        ys.append(float(mass) * MASS_SCALE)
+    if not xs:
+        return None
+    return np.array(xs), np.array(ys)
+
+
+def _empirical_cost_points(
+    empirical_df: pd.DataFrame | None, component: ComponentSpec
+) -> tuple[np.ndarray, np.ndarray] | None:
+    """(mass_tonnes, cost_$k) arrays of `component` rows with both a measured mass and cost, or
+    None if unavailable.
+    """
+    rows = _empirical_rows(empirical_df, component)
+    if rows is None or EMPIRICAL_COST_COLUMN not in rows.columns:
+        return None
+    valid = rows[[EMPIRICAL_MASS_COLUMN, EMPIRICAL_COST_COLUMN]].dropna()
+    if valid.empty:
+        return None
+    return (
+        valid[EMPIRICAL_MASS_COLUMN].to_numpy(dtype=float) * MASS_SCALE,
+        valid[EMPIRICAL_COST_COLUMN].to_numpy(dtype=float) * COST_SCALE,
+    )
+
 
 def to_model_kwargs(spec: dict) -> dict:
     """Converts a raw turbine specification into ``CSMBase`` subclass constructor kwargs.
@@ -648,7 +793,14 @@ def _sweep_single(
 ) -> dict[str, np.ndarray]:
     """Sweeps `model_cls` across `raw_range` of `driver`'s underlying raw attribute.
 
-    All non-driver model inputs are held fixed at `base_kwargs`.
+    All non-driver model inputs are held fixed at `base_kwargs`. `model.run()` computes every
+    component's mass as a side effect, not just `component`'s, in a fixed sequence — so a raw
+    value can make some *other*, later-computed component's mass formula go invalid (e.g.
+    negative) even where `component` itself, computed earlier in that sequence, would have been
+    fine. Rather than discarding the whole point, whatever `component` already managed to
+    compute before that happened is salvaged from the partially-run model; only a point where
+    `component` itself couldn't be computed is left as NaN (which matplotlib simply skips,
+    leaving a gap rather than truncating the curve early).
 
     Returns:
         dict[str, np.ndarray]: "driver_display", "mass", "cost", "mass_sorted", and "cost_sorted"
@@ -657,21 +809,35 @@ def _sweep_single(
     """
     override_attr = _override_attr(driver)
     raw_grid = np.linspace(*raw_range, n_points)
-    masses = np.empty(n_points)
-    costs = np.empty(n_points)
-    display = np.empty(n_points)
+    masses = np.full(n_points, np.nan)
+    costs = np.full(n_points, np.nan)
+    display = np.full(n_points, np.nan)
     for i, raw_value in enumerate(raw_grid):
         kwargs = dict(base_kwargs)
         kwargs[override_attr] = _cast_driver_value(override_attr, raw_value)
-        model = model_cls(**kwargs)
-        model.run()
-        masses[i] = getattr(model, component.mass_attr)
-        costs[i] = getattr(model, component.cost_attr)
+        try:
+            model = model_cls(**kwargs)
+        except ValueError:
+            continue
+        try:
+            model.run()
+        except ValueError:
+            pass
+        mass = getattr(model, component.mass_attr, None)
+        if mass is None:
+            continue
+        masses[i] = mass
+        cost = getattr(model, component.cost_attr, None)
+        if cost is not None:
+            costs[i] = cost
         if isinstance(driver, str):
             _label, _units, scale = DRIVER_INFO.get(driver, (driver, "", 1.0))
             display[i] = raw_value * scale
         else:
-            display[i] = driver.display_from_entry({**kwargs, **model.get_results()})
+            try:
+                display[i] = driver.display_from_entry({**kwargs, **model.get_results()})
+            except TypeError:
+                pass
     order = np.argsort(masses)
     return {
         "driver_display": display,
@@ -715,34 +881,56 @@ def _raw_range_for_display(
     """
     if isinstance(driver, str):
         _label, _units, scale = DRIVER_INFO.get(driver, (driver, "", 1.0))
-        return display_bounds[0] / scale, display_bounds[1] / scale
+        # Floor at a small positive raw value: the captured display bound can dip to (or below)
+        # zero once empirical points are included in autoscale, but every model input this
+        # inverts back to (rotor_diameter, rated_power_kw, tower_length, ...) must stay positive.
+        return max(display_bounds[0] / scale, 1.0), max(display_bounds[1] / scale, 1.0)
 
     override_attr = _override_attr(driver)
 
     def display_at(raw_value: float) -> float:
+        """The composite driver's display value at `raw_value`. `model.run()` computes every
+        component's mass as a side effect, in a fixed sequence, so it can raise on some *other*,
+        later-computed component going invalid — but the quantities `driver.display_from_entry`
+        actually needs (raw kwargs, or a component computed earlier in that sequence) are often
+        already set on the model by that point, so a run() failure is salvaged the same way
+        :py:func:`_sweep_single` does rather than immediately giving up. Returns NaN only if the
+        needed quantities genuinely aren't available, which the search below treats as "outside
+        the domain" and backs off from rather than crashing.
+        """
         kwargs = dict(base_kwargs)
         kwargs[override_attr] = _cast_driver_value(override_attr, raw_value)
-        model = model_cls(**kwargs)
-        model.run()
-        return driver.display_from_entry({**kwargs, **model.get_results()})
+        try:
+            model = model_cls(**kwargs)
+        except ValueError:
+            return math.nan
+        try:
+            model.run()
+        except ValueError:
+            pass
+        try:
+            return driver.display_from_entry({**kwargs, **model.get_results()})
+        except TypeError:
+            return math.nan
 
     results = []
     for target in display_bounds:
         lo, hi = search_raw_range
         d_lo, d_hi = display_at(lo), display_at(hi)
         tries = 0
-        while d_hi < target and tries < 25:
+        while not math.isnan(d_hi) and d_hi < target and tries < 25:
             hi *= 1.5
             d_hi = display_at(hi)
             tries += 1
         tries = 0
-        while d_lo > target and tries < 25:
-            lo = max(lo / 1.5, 1e-6)
+        while not math.isnan(d_lo) and d_lo > target and tries < 25:
+            lo = max(lo / 1.5, 1.0)
             d_lo = display_at(lo)
             tries += 1
         for _ in range(40):
             mid = (lo + hi) / 2
-            if display_at(mid) < target:
+            d_mid = display_at(mid)
+            if math.isnan(d_mid) or d_mid < target:
                 lo = mid
             else:
                 hi = mid
@@ -799,7 +987,7 @@ def _draw_mass_panel(
 ) -> None:
     if component.label not in NO_LINE_COMPONENTS:
         for model_name, data in curves.items():
-            ax.plot(data["driver_display"], data["mass"] * MASS_SCALE, color=color_map[model_name], lw=2)
+            ax.plot(data["driver_display"], data["mass"] * MASS_SCALE, color=color_map[model_name], lw=2.5)
     for model_name in models:
         for config_name in configs:
             entry = config_cache[model_name].get(config_name)
@@ -823,7 +1011,7 @@ def _draw_cost_panel(
             for model_name, data in curves.items():
                 ax.plot(
                     data["mass_sorted"] * MASS_SCALE, data["cost_sorted"] * COST_SCALE,
-                    color=color_map[model_name], lw=2,
+                    color=color_map[model_name], lw=2.5,
                 )
     for model_name in models:
         for config_name in configs:
@@ -863,6 +1051,7 @@ def plot_component(
     panel_width: float = 4.6,
     height: float = 5.8,
     n_points: int = 60,
+    empirical_df: pd.DataFrame | None = None,
 ):
     """Plots `component` mass vs. each driving parameter next to cost vs. mass.
 
@@ -902,10 +1091,16 @@ def plot_component(
     is_aggregate = component.label in AGGREGATE_COMPONENTS
     show_lines = component.label not in NO_LINE_COMPONENTS
 
-    # ---- pass 1: natural (padded) ranges, draw curves + markers, then capture axis limits ----
+    # ---- pass 1: natural (padded) ranges, draw curves + markers + empirical points, then
+    # capture axis limits. The empirical overlay is drawn here (not after limits are frozen) so
+    # every empirical point participates in autoscale and stays visible inside the plot, even one
+    # that falls outside the model curves' own natural sweep range. Applies regardless of
+    # `show_lines`, since a no-line total (nacelle, turbine, ...) can still be directly measured
+    # in the data even though it has no single driving parameter to sweep.
     natural_curves: dict[str, dict] = {}
     owners_by_key: dict[str, dict[str, type]] = {}
     natural_raw_ranges: dict[str, tuple[float, float]] = {}
+    has_empirical = False
     for ax, driver in zip(mass_axes, panel_drivers):
         owners = _owners_for_driver(component, models, driver)
         owners_by_key[_driver_key(driver)] = owners
@@ -914,8 +1109,16 @@ def plot_component(
         curves = _sweep_curve(component, driver, owners, base_kwargs, raw_range, n_points)
         natural_curves[_driver_key(driver)] = curves
         _draw_mass_panel(ax, component, driver, curves, config_cache, models, configs, marker_map, color_map)
+        points = _empirical_mass_points(empirical_df, component, driver, base_kwargs)
+        if points is not None:
+            ax.scatter(*points, color="0.55", s=16, alpha=0.35, linewidths=0, zorder=8)
+            has_empirical = True
 
     _draw_cost_panel(ax_cost, component, natural_curves, config_cache, models, configs, marker_map, color_map)
+    cost_points = _empirical_cost_points(empirical_df, component)
+    if cost_points is not None:
+        ax_cost.scatter(*cost_points, color="0.55", s=16, alpha=0.35, linewidths=0, zorder=8)
+        has_empirical = True
 
     captured = {}
     for ax in axes:
@@ -948,13 +1151,13 @@ def plot_component(
                 )
                 raw_range = (min(raw_lo, raw_hi), max(raw_lo, raw_hi))
                 data = _sweep_single(component, driver, model_cls, base_kwargs, raw_range, n_points)
-                ax.plot(data["driver_display"], data["mass"] * MASS_SCALE, color=color_map[model_name], lw=2)
+                ax.plot(data["driver_display"], data["mass"] * MASS_SCALE, color=color_map[model_name], lw=2.5)
             for model_name in constant_models:
                 const_mass = _constant_value(model_name, config_cache, component.mass_attr)
                 if const_mass is not None:
                     ax.plot(
                         xlim, [const_mass * MASS_SCALE, const_mass * MASS_SCALE],
-                        color=color_map[model_name], lw=2, ls="--",
+                        color=color_map[model_name], lw=2.5, ls="--",
                     )
 
         cost_xlim, _cost_ylim = captured[ax_cost]
@@ -964,7 +1167,7 @@ def plot_component(
             if slope is None:
                 continue
             style = "--" if is_aggregate else "-"
-            ax_cost.plot(mass_line, mass_line * slope, color=color_map[model_name], lw=2, ls=style)
+            ax_cost.plot(mass_line, mass_line * slope, color=color_map[model_name], lw=2.5, ls=style)
 
     for ax in axes:
         ax.set_xlim(*captured[ax][0])
@@ -1005,7 +1208,7 @@ def plot_component(
         max_title_lines = max(max_title_lines, _set_stacked_title(ax_cost, cost_lines))
 
     model_handles = [
-        Line2D([0], [0], color=color_map[name], lw=2, label=name) for name in model_names
+        Line2D([0], [0], color=color_map[name], lw=2.5, label=name) for name in model_names
     ]
     config_handles = [
         Line2D(
@@ -1014,8 +1217,21 @@ def plot_component(
         )
         for name in config_names
     ]
+    empirical_handle = (
+        [
+            Line2D(
+                [0], [0], marker="o", color="none", markerfacecolor="0.55",
+                markeredgecolor="none", alpha=0.6, markersize=7, label="Empirical data",
+            )
+        ]
+        if has_empirical
+        else []
+    )
+    # Cap columns at the models+configs count (known to fit on one row within any panel width
+    # this module uses) and let "Empirical data" wrap onto its own row rather than widening the
+    # row past the figure's edge.
     fig.legend(
-        handles=model_handles + config_handles,
+        handles=model_handles + config_handles + empirical_handle,
         loc="lower center",
         ncol=len(model_handles) + len(config_handles),
         bbox_to_anchor=(0.5, 0.01),
@@ -1023,7 +1239,7 @@ def plot_component(
         fontsize=9,
     )
 
-    fig.tight_layout(rect=(0, 0.09, 1, 0.90))
+    fig.tight_layout(rect=(0, 0.13 if has_empirical else 0.09, 1, 0.90))
 
     if is_aggregate:
         wrapped = textwrap.fill(f"= {AGGREGATE_COMPONENTS[component.label]}", width=18 * n_panels)
@@ -1045,6 +1261,7 @@ def generate_all_figures(
     models: dict[str, type] | None = None,
     configs: dict[str, dict] | None = None,
     components: list[ComponentSpec] | None = None,
+    empirical_csv: str | Path | None = None,
 ) -> dict[str, Path]:
     """Generates and saves one mass-vs-cost figure per component.
 
@@ -1057,6 +1274,9 @@ def generate_all_figures(
             :py:data:`DEFAULT_TURBINE_SPECS`.
         components (list[ComponentSpec] | None, optional): Components to plot. Defaults to
             :py:data:`PLOT_COMPONENTS` (all components with a non-trivial mass relationship).
+        empirical_csv (str | Path | None, optional): Path to an empirical measurements CSV to
+            overlay as faint points behind the model curves (see :py:func:`load_empirical_data`
+            for the expected columns). Defaults to None (no overlay).
 
     Returns:
         dict[str, Path]: Mapping of component label to the saved PNG path.
@@ -1070,12 +1290,15 @@ def generate_all_figures(
 
     base_kwargs = _base_config(configs)
     config_cache = _evaluate_all_configs(models, configs)
+    empirical_df = load_empirical_data(empirical_csv)
 
     figure_paths = {}
     for component in components:
-        fig = plot_component(component, models, config_cache, base_kwargs, configs)
+        fig = plot_component(
+            component, models, config_cache, base_kwargs, configs, empirical_df=empirical_df
+        )
         path = output_dir / f"{_slugify(component.label)}.png"
-        fig.savefig(path, dpi=150)
+        fig.savefig(path, dpi=175)
         plt.close(fig)
         figure_paths[component.label] = path
     return figure_paths
@@ -1231,6 +1454,7 @@ def generate_comparison(
     output_dir: str | Path = "output/csm_comparison",
     models: dict[str, type] | None = None,
     configs: dict[str, dict] | None = None,
+    empirical_csv: str | Path | None = None,
 ) -> dict[str, Path]:
     """Runs the full pipeline: per-component figures, a summary report, and a slide deck.
 
@@ -1241,13 +1465,18 @@ def generate_comparison(
             subclass to compare. Defaults to :py:data:`DEFAULT_MODELS`.
         configs (dict[str, dict] | None, optional): Mapping of configuration name to a raw
             turbine spec. Defaults to :py:data:`DEFAULT_TURBINE_SPECS`.
+        empirical_csv (str | Path | None, optional): Path to an empirical measurements CSV to
+            overlay behind the figures' model curves (see :py:func:`load_empirical_data`).
+            Defaults to None (no overlay); the summary report table is unaffected either way.
 
     Returns:
         dict[str, Path]: Paths to the figures directory, summary report image, and presentation.
     """
     output_dir = Path(output_dir).resolve()
     figures_dir = output_dir / "figures"
-    figure_paths = generate_all_figures(figures_dir, models=models, configs=configs)
+    figure_paths = generate_all_figures(
+        figures_dir, models=models, configs=configs, empirical_csv=empirical_csv
+    )
 
     report_df = build_report_dataframe(models=models, configs=configs)
     report_image_path = render_report_image(report_df, output_dir / "summary_report.png")
@@ -1263,5 +1492,7 @@ def generate_comparison(
 
 
 if __name__ == "__main__":
-    for key, path in generate_comparison().items():
+    # Set empirical_csv=None to fall back to the plain model-vs-model comparison.
+    paths = generate_comparison(empirical_csv="csm/us_lbw_csm_2026_data.csv")
+    for key, path in paths.items():
         print(f"{key}: {path}")
