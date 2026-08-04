@@ -2,11 +2,14 @@
 
 For every turbine component (blade, hub, gearbox, tower, ...), this module sweeps the parameter
 that actually drives that component's mass in each requested cost and scaling model, plots mass
-vs. that driving parameter next to cost vs. mass, and marks a set of named turbine configurations
-on every curve. Different models frequently use genuinely different formulas for the same
-component (e.g. the 2015 brake mass is a function of rotor torque while the 2020 brake mass is a
-function of turbine rating), so the number of "mass vs. driver" panels adapts automatically: one
-panel per distinct driver among the models being compared.
+vs. that driving parameter next to cost vs. its own relevant parameter (rotor diameter for the
+blade/rotor family, hub height for the tower, turbine rating for everything else — see
+:py:data:`COST_PANEL_DRIVER`), and marks a set of named turbine configurations on every curve.
+Different models frequently use genuinely different formulas for the same component (e.g. the
+2015 brake mass is a function of rotor torque while the 2020 brake mass is a function of turbine
+rating), so the number of "mass vs. driver" panels adapts automatically: one panel per distinct
+driver among the models being compared. The cost panel's title keeps showing "cost = k·mass"
+regardless, since that's the literal formula CSMBase uses and remains useful on its own.
 
 Every x-axis is a turbine-level parameter — rotor diameter, hub height, or turbine rating — even
 for components whose formula is actually written in terms of another component's mass (e.g. hub
@@ -33,13 +36,24 @@ dictionary passed to :py:func:`generate_comparison` — no other changes are req
 model doesn't override a component's ``calculate_*`` method, it inherits the base (2015) formula
 and therefore its driver and formula text, via each lookup's fallback to the component's default.
 
-An empirical measurements CSV can optionally be overlaid as faint points behind the model curves
-(see the `empirical_csv` argument on :py:func:`generate_comparison`/:py:func:`generate_all_figures`
-and :py:func:`load_empirical_data` for the expected columns); passing None (the default) leaves
-plots unchanged. A component only gets an overlay on the panels the CSV actually has data for.
+An empirical measurements CSV can optionally be overlaid as faint gray points behind the model
+curves (see the `empirical_csv` argument on
+:py:func:`generate_comparison`/:py:func:`generate_all_figures` and :py:func:`load_empirical_data`
+for the expected columns); passing None (the default) leaves plots unchanged. A component only
+gets an overlay on the panels the CSV actually has data for.
+
+A 2026 industry cost benchmark CSV (Wood Mackenzie RACM-style, one row per turbine-rating/rotor-
+diameter/hub-height bin combination and cost category, given as a $/MW rate) can similarly be
+overlaid on cost panels, in a distinct color — see the `benchmark_csv` argument on the same
+functions and :py:func:`load_benchmark_data`. Benchmark categories that bundle several CSM
+components together (see :py:data:`WM_CATEGORY_MAPPING`) can't be shown as a direct overlay on any
+single component's own figure; those instead get their own combined comparison figure via
+:py:func:`generate_wm_comparison_figures`, plotting the *sum* of their mapped CSM components'
+costs (with any needed multiplier, e.g. blades x num_blades) against the benchmark.
 """
 
 import math
+import re
 import textwrap
 from pathlib import Path
 from typing import NamedTuple
@@ -47,6 +61,7 @@ from collections.abc import Callable
 
 import numpy as np
 import pandas as pd
+import networkx as nx
 import matplotlib.pyplot as plt
 from PIL import Image
 from attrs import fields as attrs_fields
@@ -187,6 +202,26 @@ AGGREGATE_COMPONENTS: dict[str, str] = {
     "Turbine (Total)": "Rotor (Total) + Nacelle (Total) + Tower",
 }
 
+# Same information as AGGREGATE_COMPONENTS above, but as component labels rather than prose, so
+# code can check whether an aggregate's *real* leaf subcomponents all agree on a driver (see
+# _cost_line_valid) rather than checking the aggregate's own default_driver, which is just an
+# assigned label for its cost panel, not a decomposition of what it actually sums.
+AGGREGATE_LEAF_COMPONENTS: dict[str, list[str]] = {
+    "Hub System": ["Hub", "Pitch System", "Spinner"],
+    "Rotor (Total)": ["Blade", "Hub", "Pitch System", "Spinner"],
+    "Nacelle (Total)": [
+        "Low Speed Shaft", "Main Bearing", "Gearbox", "Brake", "High Speed Shaft", "Generator",
+        "Bedplate", "Yaw System", "Hydraulic Cooling", "Nacelle Cover", "Platform & Mainframe",
+        "Transformer", "Converter", "Controls", "Electrical Connection",
+    ],
+    "Turbine (Total)": [
+        "Blade", "Hub", "Pitch System", "Spinner", "Low Speed Shaft", "Main Bearing", "Gearbox",
+        "Brake", "High Speed Shaft", "Generator", "Bedplate", "Yaw System", "Hydraulic Cooling",
+        "Nacelle Cover", "Platform & Mainframe", "Transformer", "Converter", "Controls",
+        "Electrical Connection", "Tower",
+    ],
+}
+
 # "Total" components sum subcomponents that scale at different rates (even Hub System / Rotor
 # (Total), whose subcomponents are all rotor-diameter driven but not at the same rate), so a
 # single swept curve would misrepresent them. Markers are still shown for these; only the
@@ -216,6 +251,252 @@ DRIVER_INFO: dict[str, tuple[str, str, float]] = {
 
 MASS_SCALE = 1e-3  # kg -> t, used for every mass axis
 COST_SCALE = 1e-3  # USD -> $k, used for every cost axis
+
+# Which single turbine-level parameter each component's cost panel is plotted against, instead of
+# mass (see the module docstring). A coarser, single-driver grouping than the mass panels' own
+# (possibly multi-panel, composite) drivers, since there's one cost panel regardless of how many
+# mass panels a component has. Matches WM_CATEGORY_MAPPING's driver choices where they overlap.
+COST_PANEL_DRIVER: dict[str, str] = {
+    "Blade": "rotor_diameter",
+    "Hub": "rotor_diameter",
+    "Pitch System": "rotor_diameter",
+    "Spinner": "rotor_diameter",
+    "Hub System": "rotor_diameter",
+    "Rotor (Total)": "rotor_diameter",
+    "Low Speed Shaft": "rotor_diameter",
+    "Main Bearing": "rotor_diameter",
+    "Bedplate": "rotor_diameter",
+    "Yaw System": "rotor_diameter",
+    "Platform & Mainframe": "rotor_diameter",
+    "Tower": "tower_length",
+    "Gearbox": "rated_power_kw",
+    "Brake": "rated_power_kw",
+    "High Speed Shaft": "rated_power_kw",
+    "Generator": "rated_power_kw",
+    "Hydraulic Cooling": "rated_power_kw",
+    "Nacelle Cover": "rated_power_kw",
+    "Transformer": "rated_power_kw",
+    "Converter": "rated_power_kw",
+    "Controls": "rated_power_kw",
+    "Electrical Connection": "rated_power_kw",
+    "Nacelle (Total)": "rated_power_kw",
+    "Turbine (Total)": "rated_power_kw",
+}
+
+
+class WMMapping(NamedTuple):
+    """How one 2026 industry cost benchmark category (a ``cost_element_item`` in the RACM data,
+    e.g. "Hub and Pitch") relates to this module's CSM components.
+    """
+
+    csm_components: tuple[str, ...]
+    """ComponentSpec labels that sum to this benchmark category."""
+    multipliers: dict[str, str]
+    """Component label -> a `base_kwargs`/configuration key (e.g. "num_bearings") to scale that
+    component's cost by before summing, for benchmark categories priced per-turbine rather than
+    per-part."""
+    driver: str
+    """Which of the three turbine-level parameters this category is benchmarked against."""
+
+
+# From the Wood Mackenzie RACM category definitions, mapped onto CSM components. Used by
+# generate_wm_comparison_figures for the three categories with no CSM component or aggregate that
+# sums to exactly the same thing (Balance of Nacelle, Bearings and Shaft, Structure — see
+# COMBINED_WM_CATEGORIES below): those get their own combined comparison figure, computing the
+# *sum* of their mapped CSM components' costs (with any needed multiplier, e.g. blades x
+# num_blades) since no single CSM field already represents that sum.
+WM_CATEGORY_MAPPING: dict[str, WMMapping] = {
+    "Balance of Nacelle": WMMapping(
+        (
+            "Nacelle Cover", "Electrical Connection", "Hydraulic Cooling", "Brake",
+            "Transformer", "Controls",
+        ),
+        {}, "rated_power_kw",
+    ),
+    "Bearings and Shaft": WMMapping(
+        ("Main Bearing", "Low Speed Shaft", "High Speed Shaft"),
+        {"Main Bearing": "num_bearings"}, "rated_power_kw",
+    ),
+    "Blades": WMMapping(("Blade",), {"Blade": "num_blades"}, "rotor_diameter"),
+    "Converter": WMMapping(("Converter",), {}, "rated_power_kw"),
+    "Gearbox": WMMapping(("Gearbox",), {}, "rated_power_kw"),
+    "Generator": WMMapping(("Generator",), {}, "rated_power_kw"),
+    "Hub and Pitch": WMMapping(("Hub", "Pitch System", "Spinner"), {}, "rotor_diameter"),
+    "Structure": WMMapping(
+        ("Yaw System", "Bedplate", "Platform & Mainframe"), {}, "rated_power_kw"
+    ),
+    "Tower": WMMapping(("Tower",), {}, "tower_length"),
+}
+
+# Component (or CSM aggregate) label -> (WoodMac categories to compare it against, multiplier key
+# or None). These overlay directly onto that component's *own* existing cost panel rather than
+# needing a separate combined figure, because CSM already has a single field for the comparison:
+#   - a lone WM category with a multiplier (Blades / num_blades) divides the benchmark by that
+#     multiplier to become a per-part figure comparable to CSM's own per-part cost_attr;
+#   - several WM categories with no multiplier are summed (see `_benchmark_points`) because CSM's
+#     aggregate cost fields (hub_system_cost, nacelle_cost, rotor_cost, turbine_cost) already sum
+#     the exact same set of components those categories cover, so no `_sweep_combined_cost` is
+#     needed — Hub and Pitch sums to exactly CSM's Hub System, and Nacelle/Rotor/Turbine (Total)
+#     sum every WoodMac "Turbine Purchase" sub-category that falls in each respective group.
+BENCHMARK_OVERLAY: dict[str, tuple[list[str], str | None]] = {
+    "Blade": (["Blades"], "num_blades"),
+    "Gearbox": (["Gearbox"], None),
+    "Generator": (["Generator"], None),
+    "Converter": (["Converter"], None),
+    "Tower": (["Tower"], None),
+    "Hub System": (["Hub and Pitch"], None),
+    "Rotor (Total)": (["Blades", "Hub and Pitch"], None),
+    "Nacelle (Total)": (
+        [
+            "Balance of Nacelle", "Bearings and Shaft", "Converter", "Gearbox", "Generator",
+            "Structure",
+        ],
+        None,
+    ),
+    "Turbine (Total)": (
+        [
+            "Balance of Nacelle", "Bearings and Shaft", "Blades", "Converter", "Gearbox",
+            "Generator", "Hub and Pitch", "Structure", "Tower",
+        ],
+        None,
+    ),
+}
+
+# The only WoodMac categories with no CSM component or aggregate summing to exactly the same
+# thing (see BENCHMARK_OVERLAY above) — these still get their own combined comparison figure.
+COMBINED_WM_CATEGORIES: list[str] = ["Balance of Nacelle", "Bearings and Shaft", "Structure"]
+
+# Optional 2026 industry cost benchmark overlay (e.g.
+# csm/WM_wind_capex_benchmark_data_geared.csv): one row per (turbine rating bin, rotor diameter
+# bin, tower height bin, cost category) combination, given as a $/MW rate. Passing a path via the
+# `benchmark_csv` argument on
+# :py:func:`generate_comparison`/:py:func:`generate_all_figures`/
+# :py:func:`generate_wm_comparison_figures` overlays it, in a distinct color from the empirical
+# measurements overlay, on the cost panel of any component (or combined WM category) it covers;
+# omitting it (the default) leaves plots unchanged.
+BENCHMARK_ITEM_COLUMN = "cost_element_item"
+BENCHMARK_VALUE_COLUMN = "value_$/MW"
+BENCHMARK_CAPACITY_COLUMN = "turbine_nameplate_capacity"
+BENCHMARK_RD_COLUMN = "rotor_diameter"
+BENCHMARK_TOWER_COLUMN = "tower_height"
+BENCHMARK_PERIOD_COLUMN = "time_period"
+BENCHMARK_COLOR = "#3E8E7E"
+
+# Which raw benchmark bin column corresponds to each simple driver. The turbine rating bin's own
+# midpoint is already in MW, matching `rated_power_kw`'s MW display units.
+BENCHMARK_DRIVER_COLUMNS: dict[str, str] = {
+    "rotor_diameter": BENCHMARK_RD_COLUMN,
+    "rated_power_kw": BENCHMARK_CAPACITY_COLUMN,
+    "tower_length": BENCHMARK_TOWER_COLUMN,
+}
+
+_BIN_CLOSED_RE = re.compile(r"([\d.]+)\s*-\s*([\d.]+)")
+_BIN_OPEN_HIGH_RE = re.compile(r"([\d.]+)\s*\+")
+_BIN_OPEN_LOW_RE = re.compile(r"<\s*([\d.]+)")
+
+
+def _bin_midpoints(labels) -> dict[str, float]:
+    """Maps each distinct RACM range label (e.g. "B.) 101-111 Meters") to its numeric midpoint.
+
+    Open-ended bins ("A.) <101 Meters", "I.) 9.0+ MW") are extrapolated using the median width of
+    the closed bins in the same set, since no true bound is given for them.
+    """
+    widths = []
+    closed = {}
+    for label in labels:
+        m = _BIN_CLOSED_RE.search(label)
+        if m:
+            lo, hi = float(m.group(1)), float(m.group(2))
+            closed[label] = (lo + hi) / 2
+            widths.append(hi - lo)
+    typical_width = float(np.median(widths)) if widths else 10.0
+    result = dict(closed)
+    for label in labels:
+        if label in result:
+            continue
+        m = _BIN_OPEN_HIGH_RE.search(label)
+        if m:
+            result[label] = float(m.group(1)) + typical_width / 2
+            continue
+        m = _BIN_OPEN_LOW_RE.search(label)
+        if m:
+            result[label] = float(m.group(1)) - typical_width / 2
+            continue
+        nums = re.findall(r"[\d.]+", label)
+        result[label] = float(nums[0]) if nums else float("nan")
+    return result
+
+
+def load_benchmark_data(
+    csv_path: str | Path | None, time_period: str | None = "2026Y"
+) -> pd.DataFrame | None:
+    """Loads an industry cost benchmark CSV for the overlay described above.
+
+    Args:
+        csv_path (str | Path | None): Path to the CSV, or None to disable the overlay.
+        time_period (str | None, optional): Keep only rows matching this "time_period" value
+            (quarterly-refreshed forecasts for different periods live in the same file); None
+            keeps every period present. Defaults to "2026Y".
+
+    Returns:
+        pd.DataFrame | None: The loaded data, or None if `csv_path` is None.
+    """
+    if csv_path is None:
+        return None
+    df = pd.read_csv(csv_path)
+    df.columns = [c.strip() for c in df.columns]
+    if time_period is not None and BENCHMARK_PERIOD_COLUMN in df.columns:
+        df = df[df[BENCHMARK_PERIOD_COLUMN] == time_period]
+    return df
+
+
+def _benchmark_points(
+    benchmark_df: pd.DataFrame | None, wm_categories: list[str], driver: Driver
+) -> tuple[np.ndarray, np.ndarray] | None:
+    """(x_display, cost_$k) arrays of every raw benchmark row for `wm_categories`.
+
+    x is the midpoint of the bin matching `driver`; y is `value_$/MW` converted to an absolute
+    cost using each row's own turbine-rating-bin midpoint. With more than one category (e.g.
+    summing every "Turbine Purchase" sub-category to compare against CSM's Turbine (Total), since
+    WoodMac has no single row for that), costs are summed within each (turbine rating, rotor
+    diameter, hub height) bin combination — a combination is only included if every category in
+    `wm_categories` has a row for it, so a partial sum is never silently shown as if it were the
+    whole group.
+
+    Returns None if none of `wm_categories` are in the data, `driver` isn't one of the three raw
+    binned columns (a composite or rotor-torque driver, say — the benchmark data has no way to
+    express those), or (multi-category only) no bin combination has every category present.
+    """
+    if benchmark_df is None or not isinstance(driver, str):
+        return None
+    driver_col = BENCHMARK_DRIVER_COLUMNS.get(driver)
+    if driver_col is None:
+        return None
+    rows = benchmark_df[benchmark_df[BENCHMARK_ITEM_COLUMN].isin(wm_categories)]
+    if rows.empty:
+        return None
+
+    driver_mid = _bin_midpoints(rows[driver_col].unique())
+    capacity_mid = _bin_midpoints(rows[BENCHMARK_CAPACITY_COLUMN].unique())
+    rows = rows.copy()
+    rows["_cost_usd"] = rows[BENCHMARK_VALUE_COLUMN] * rows[BENCHMARK_CAPACITY_COLUMN].map(capacity_mid)
+
+    if len(wm_categories) == 1:
+        cost_by_bin = rows.set_index([BENCHMARK_CAPACITY_COLUMN, BENCHMARK_RD_COLUMN, BENCHMARK_TOWER_COLUMN])[
+            "_cost_usd"
+        ]
+    else:
+        group_cols = [BENCHMARK_CAPACITY_COLUMN, BENCHMARK_RD_COLUMN, BENCHMARK_TOWER_COLUMN]
+        present = rows.groupby(group_cols, observed=True)[BENCHMARK_ITEM_COLUMN].nunique()
+        complete_bins = present[present == len(wm_categories)].index
+        if len(complete_bins) == 0:
+            return None
+        cost_by_bin = rows.groupby(group_cols, observed=True)["_cost_usd"].sum().loc[complete_bins]
+
+    cost_by_bin = cost_by_bin.reset_index()
+    x = cost_by_bin[driver_col].map(driver_mid).to_numpy(dtype=float)
+    y = cost_by_bin["_cost_usd"].to_numpy(dtype=float)
+    return x, y * COST_SCALE
 
 
 def _fmt_num(x: float) -> str:
@@ -319,6 +600,9 @@ FORMULA_DEFAULT: dict[str, Callable[[type], str]] = {
         f"{_fmt_coef(_coeff(cls, 'transformer_mass_intercept'))}"
     ),
     "Tower": lambda cls: f"m = {_fmt_num(_coeff(cls, 'tower_mass_coeff'))}·H^{_fmt_num(_coeff(cls, 'tower_mass_exp'))}",
+    "Converter": lambda cls: "m = 0 (not modeled)",
+    "Controls": lambda cls: "m = 0 (not modeled)",
+    "Electrical Connection": lambda cls: "m = 0 (not modeled)",
 }
 
 # Overrides for components whose 2020 `calculate_*_mass` structurally differs from the base.
@@ -447,7 +731,7 @@ DEFAULT_TURBINE_SPECS = {
 MODEL_COLORS = {"2015": "#4C72B0", "2020": "#DD5A48", "Custom": "#E8A33D"}
 CONFIG_MARKERS = ["*", "^", "s", "D", "P", "X", "o"]
 
-# Optional empirical-measurements overlay (e.g. csm/lbw_csm_2026_data.csv): a CSV with one row
+# Optional empirical-measurements overlay (e.g. csm/us_lbw_csm_2026_data.csv): a CSV with one row
 # per measured turbine component, columns "Component", "MW", "RD (m)", "hh (m)", "mass (kg)",
 # and optionally "cost ($)" and "outlier?" ("Yes" rows are dropped). Passing a path via the
 # `empirical_csv` argument on :py:func:`generate_comparison`/:py:func:`generate_all_figures`
@@ -464,6 +748,9 @@ EMPIRICAL_COMPONENT_LABELS: dict[str, str] = {
     "blade": "Blade",
     "hub": "Hub",
     "spinner": "Spinner",
+    "main bearing": "Main Bearing",
+    "low speed shaft": "Low Speed Shaft",
+    "bedplate": "Bedplate",
     "gearbox": "Gearbox",
     "generator": "Generator",
     "transformer": "Transformer",
@@ -571,21 +858,30 @@ def _empirical_mass_points(
 
 
 def _empirical_cost_points(
-    empirical_df: pd.DataFrame | None, component: ComponentSpec
+    empirical_df: pd.DataFrame | None,
+    component: ComponentSpec,
+    driver: Driver,
+    base_kwargs: dict,
 ) -> tuple[np.ndarray, np.ndarray] | None:
-    """(mass_tonnes, cost_$k) arrays of `component` rows with both a measured mass and cost, or
-    None if unavailable.
+    """(x_display, cost_$k) arrays of `component` rows with both a `driver` value (computed or
+    derived — see :py:func:`_derive_empirical_entry`) and a measured cost, or None if unavailable.
     """
     rows = _empirical_rows(empirical_df, component)
     if rows is None or EMPIRICAL_COST_COLUMN not in rows.columns:
         return None
-    valid = rows[[EMPIRICAL_MASS_COLUMN, EMPIRICAL_COST_COLUMN]].dropna()
-    if valid.empty:
+    xs, ys = [], []
+    for _, row in rows.iterrows():
+        cost = row.get(EMPIRICAL_COST_COLUMN)
+        if pd.isna(cost):
+            continue
+        x = _driver_display_value(driver, _derive_empirical_entry(row, base_kwargs))
+        if x is None:
+            continue
+        xs.append(x)
+        ys.append(float(cost) * COST_SCALE)
+    if not xs:
         return None
-    return (
-        valid[EMPIRICAL_MASS_COLUMN].to_numpy(dtype=float) * MASS_SCALE,
-        valid[EMPIRICAL_COST_COLUMN].to_numpy(dtype=float) * COST_SCALE,
-    )
+    return np.array(xs), np.array(ys)
 
 
 def to_model_kwargs(spec: dict) -> dict:
@@ -647,6 +943,38 @@ def _resolve_driver(component: ComponentSpec, model_cls: type) -> Driver | None:
     if model_cls in overrides:
         return overrides[model_cls]
     return component.default_driver
+
+
+def _cost_driver_matches(component: ComponentSpec, model_cls: type, cost_driver: str) -> bool:
+    """True if `model_cls`'s real mass-panel driver for `component` is exactly `cost_driver`.
+
+    The cost panel always plots against one coarse, single-parameter driver per component (see
+    :py:data:`COST_PANEL_DRIVER`), but a given model's actual cost formula might genuinely depend
+    on something else entirely — a different single parameter (e.g. the 2015 brake depends on
+    rotor torque, not turbine rating), or a composite of two (e.g. the 2015 low speed shaft
+    depends on blade mass *and* rating). In either case, sweeping just `cost_driver` while holding
+    the real driver fixed at an arbitrary reference value produces a line that's an artifact of
+    that reference, not a faithful "cost as a function of `cost_driver`" — so the caller should
+    skip drawing it (markers, computed from each configuration's real full inputs, stay valid
+    either way).
+    """
+    return _resolve_driver(component, model_cls) == cost_driver
+
+
+def _cost_line_valid(component: ComponentSpec, model_cls: type, cost_driver: str) -> bool:
+    """Like :py:func:`_cost_driver_matches`, but for a "total" component (Hub System, Rotor/
+    Nacelle/Turbine (Total)) checks whether *every one* of its real leaf subcomponents (see
+    :py:data:`AGGREGATE_LEAF_COMPONENTS`) agrees on `cost_driver` for `model_cls` — not just
+    whether the aggregate's own assigned default driver happens to equal `cost_driver`, which is
+    trivially true by construction and wouldn't catch a mismatch buried in what it actually sums
+    (e.g. Nacelle (Total) mixes rotor-diameter-, rotor-torque-, and rating-driven subcomponents
+    for every current model, so its cost is never genuinely a function of turbine rating alone).
+    """
+    leaf_labels = AGGREGATE_LEAF_COMPONENTS.get(component.label)
+    if leaf_labels is None:
+        return _cost_driver_matches(component, model_cls, cost_driver)
+    leaves = [c for c in ALL_COMPONENTS if c.label in leaf_labels]
+    return all(_cost_driver_matches(leaf, model_cls, cost_driver) for leaf in leaves)
 
 
 def _driver_key(driver: Driver) -> str:
@@ -783,6 +1111,38 @@ def _driver_range(
     return max(lo - span * pad, 1e-6), hi + span * pad
 
 
+def _safe_upstream_kwargs(model_cls: type, base_kwargs: dict, *target_attrs: str) -> dict:
+    """Reference-point values for every computed mass/cost attribute `model_cls` computes that
+    `target_attrs` doesn't actually depend on (per the model's own `parameter_graph`).
+
+    `calculate_subsystem_mass`/`calculate_subsystem_cost` compute every component's mass/cost as
+    a side effect, in one fixed sequence, aborting on the first subsystem whose formula goes
+    invalid (e.g. a negative mass at an extreme swept value). For a component computed *late* in
+    that sequence, an earlier and completely unrelated failure means it never gets a chance to
+    run at all — even though its own formula would have been perfectly fine. Pre-supplying every
+    *unrelated* attribute's value from a reference run at `base_kwargs` (an average of real
+    configurations, never an extreme edge case, so known to succeed) makes those upstream
+    calculations short-circuit instead of re-running and failing, letting the sweep reach
+    `target_attrs` regardless of where they fall in the sequence. Attributes `target_attrs`
+    themselves transitively depend on are excluded, so they're still freshly (and correctly)
+    recomputed at each swept point.
+    """
+    try:
+        reference = model_cls(**base_kwargs)
+        reference.run()
+    except ValueError:
+        return {}
+    keep = set(target_attrs)
+    for attr in target_attrs:
+        if attr in reference.parameter_graph:
+            keep |= nx.descendants(reference.parameter_graph, attr)
+    return {
+        name: value
+        for name, value in reference.get_results().items()
+        if name not in keep and value is not None
+    }
+
+
 def _sweep_single(
     component: ComponentSpec,
     driver: Driver,
@@ -793,14 +1153,12 @@ def _sweep_single(
 ) -> dict[str, np.ndarray]:
     """Sweeps `model_cls` across `raw_range` of `driver`'s underlying raw attribute.
 
-    All non-driver model inputs are held fixed at `base_kwargs`. `model.run()` computes every
-    component's mass as a side effect, not just `component`'s, in a fixed sequence — so a raw
-    value can make some *other*, later-computed component's mass formula go invalid (e.g.
-    negative) even where `component` itself, computed earlier in that sequence, would have been
-    fine. Rather than discarding the whole point, whatever `component` already managed to
-    compute before that happened is salvaged from the partially-run model; only a point where
-    `component` itself couldn't be computed is left as NaN (which matplotlib simply skips,
-    leaving a gap rather than truncating the curve early).
+    All non-driver model inputs are held fixed at `base_kwargs`, except for a set of "safe"
+    upstream values (see :py:func:`_safe_upstream_kwargs`) that stop an unrelated subsystem's
+    formula from going invalid partway through `model.run()`'s fixed calculation sequence and
+    aborting it before `component` itself gets computed. Whatever `component` still couldn't
+    compute at a given point (its own formula genuinely invalid there) is left as NaN, which
+    matplotlib simply skips, leaving a gap rather than truncating the curve early.
 
     Returns:
         dict[str, np.ndarray]: "driver_display", "mass", "cost", "mass_sorted", and "cost_sorted"
@@ -812,8 +1170,11 @@ def _sweep_single(
     masses = np.full(n_points, np.nan)
     costs = np.full(n_points, np.nan)
     display = np.full(n_points, np.nan)
+    safe_kwargs = _safe_upstream_kwargs(
+        model_cls, base_kwargs, component.mass_attr, component.cost_attr
+    )
     for i, raw_value in enumerate(raw_grid):
-        kwargs = dict(base_kwargs)
+        kwargs = {**base_kwargs, **safe_kwargs}
         kwargs[override_attr] = _cast_driver_value(override_attr, raw_value)
         try:
             model = model_cls(**kwargs)
@@ -887,18 +1248,20 @@ def _raw_range_for_display(
         return max(display_bounds[0] / scale, 1.0), max(display_bounds[1] / scale, 1.0)
 
     override_attr = _override_attr(driver)
+    safe_kwargs = _safe_upstream_kwargs(
+        model_cls, base_kwargs, component.mass_attr, component.cost_attr
+    )
 
     def display_at(raw_value: float) -> float:
         """The composite driver's display value at `raw_value`. `model.run()` computes every
         component's mass as a side effect, in a fixed sequence, so it can raise on some *other*,
-        later-computed component going invalid — but the quantities `driver.display_from_entry`
-        actually needs (raw kwargs, or a component computed earlier in that sequence) are often
-        already set on the model by that point, so a run() failure is salvaged the same way
-        :py:func:`_sweep_single` does rather than immediately giving up. Returns NaN only if the
-        needed quantities genuinely aren't available, which the search below treats as "outside
-        the domain" and backs off from rather than crashing.
+        later-computed component going invalid — `safe_kwargs` (see
+        :py:func:`_safe_upstream_kwargs`) heads off most of that, and any failure that slips
+        through is salvaged the same way :py:func:`_sweep_single` does rather than immediately
+        giving up. Returns NaN only if the needed quantities genuinely aren't available, which the
+        search below treats as "outside the domain" and backs off from rather than crashing.
         """
-        kwargs = dict(base_kwargs)
+        kwargs = {**base_kwargs, **safe_kwargs}
         kwargs[override_attr] = _cast_driver_value(override_attr, raw_value)
         try:
             model = model_cls(**kwargs)
@@ -1003,25 +1366,26 @@ def _draw_mass_panel(
 
 
 def _draw_cost_panel(
-    ax, component: ComponentSpec, curves_by_key: dict, config_cache: dict,
+    ax, component: ComponentSpec, driver: Driver, curves: dict, config_cache: dict,
     models: dict[str, type], configs: dict[str, dict], marker_map: dict, color_map: dict,
 ) -> None:
-    if component.label not in NO_LINE_COMPONENTS:
-        for curves in curves_by_key.values():
-            for model_name, data in curves.items():
-                ax.plot(
-                    data["mass_sorted"] * MASS_SCALE, data["cost_sorted"] * COST_SCALE,
-                    color=color_map[model_name], lw=2.5,
-                )
+    # Unlike the mass panels, "total" components (NO_LINE_COMPONENTS) still get a real cost line
+    # here: this panel's cost is always a direct sweep of one real attrs field (e.g.
+    # `nacelle_cost`) against one canonical driver, not an approximation reused across mismatched
+    # per-model mass drivers, so there's no reason to suppress it.
+    for model_name, data in curves.items():
+        ax.plot(data["driver_display"], data["cost"] * COST_SCALE, color=color_map[model_name], lw=2.5)
     for model_name in models:
         for config_name in configs:
             entry = config_cache[model_name].get(config_name)
             if entry is None:
                 continue
+            x = _driver_display_value(driver, entry)
+            if x is None:
+                continue
             ax.scatter(
-                entry[component.mass_attr] * MASS_SCALE, entry[component.cost_attr] * COST_SCALE,
-                marker=marker_map[config_name], color=color_map[model_name],
-                s=110, edgecolor="black", linewidth=0.6, zorder=5,
+                x, entry[component.cost_attr] * COST_SCALE, marker=marker_map[config_name],
+                color=color_map[model_name], s=110, edgecolor="black", linewidth=0.6, zorder=5,
             )
 
 
@@ -1052,23 +1416,24 @@ def plot_component(
     height: float = 5.8,
     n_points: int = 60,
     empirical_df: pd.DataFrame | None = None,
+    benchmark_df: pd.DataFrame | None = None,
 ):
-    """Plots `component` mass vs. each driving parameter next to cost vs. mass.
+    """Plots `component` mass vs. each driving parameter next to cost vs. its own relevant
+    parameter (rotor diameter for the blade/rotor family, hub height for the tower, turbine
+    rating for everything else — see :py:data:`COST_PANEL_DRIVER`).
 
     One mass panel is drawn per distinct driver among `models` for this component (adapting to
-    however many different drivers they actually use), followed by a single shared mass-vs-cost
-    panel. Every model is its own colored line and every named configuration is marked with a
-    consistent marker shape on every panel. Axis limits are set from each panel's natural (padded)
-    sweep range; every mass-panel curve — including a flat reference line for any model whose mass
-    is a constant for this component — is then redrawn stretched across those frozen limits, and
-    every cost-panel line is drawn as its own average cost/mass ratio spanning the full frozen
-    cost-panel width (exact for ordinary components; an visibly-dashed approximation for "total"
-    components, whose cost/mass ratio isn't perfectly constant), so every line reaches the edges
-    of its panel regardless of how differently two models' mass ranges happen to fall. Each
-    panel's title shows the literal formula (with live coefficient values) for every model drawn
-    there, including a defining line for any intermediate quantity (blade mass, bedplate mass,
-    rotor torque) the formula is written in terms of; "total" components show what they sum
-    instead, and the nacelle/turbine totals skip lines entirely (see module docstring).
+    however many different drivers they actually use), followed by a single cost panel. Every
+    model is its own colored line and every named configuration is marked with a consistent
+    marker shape on every panel. Axis limits are set from each panel's natural (padded) sweep
+    range, then every curve — including a flat reference line for any model whose mass is a
+    constant for this component — is redrawn stretched across those frozen limits, so every line
+    reaches the edges of its panel. Each mass panel's title shows the literal formula (with live
+    coefficient values) for every model drawn there, including a defining line for any
+    intermediate quantity (blade mass, bedplate mass, rotor torque) the formula is written in
+    terms of; the cost panel's title keeps showing "cost = k·mass" (still useful even though the
+    panel's own x-axis isn't mass). "Total" components show what they sum instead of a formula,
+    and the nacelle/turbine totals additionally skip lines entirely (see module docstring).
 
     Returns:
         matplotlib.figure.Figure: The multi-panel figure.
@@ -1080,6 +1445,7 @@ def plot_component(
     axes = list(np.atleast_1d(axes))
     mass_axes = axes[:n_left]
     ax_cost = axes[-1]
+    cost_driver = COST_PANEL_DRIVER[component.label]
 
     config_names = list(configs)
     marker_map = {
@@ -1091,12 +1457,12 @@ def plot_component(
     is_aggregate = component.label in AGGREGATE_COMPONENTS
     show_lines = component.label not in NO_LINE_COMPONENTS
 
-    # ---- pass 1: natural (padded) ranges, draw curves + markers + empirical points, then
-    # capture axis limits. The empirical overlay is drawn here (not after limits are frozen) so
-    # every empirical point participates in autoscale and stays visible inside the plot, even one
-    # that falls outside the model curves' own natural sweep range. Applies regardless of
-    # `show_lines`, since a no-line total (nacelle, turbine, ...) can still be directly measured
-    # in the data even though it has no single driving parameter to sweep.
+    # ---- pass 1: natural (padded) ranges, draw curves + markers + empirical/benchmark points,
+    # then capture axis limits. The overlays are drawn here (not after limits are frozen) so every
+    # overlaid point participates in autoscale and stays visible inside the plot, even one that
+    # falls outside the model curves' own natural sweep range. Applies regardless of `show_lines`,
+    # since a no-line total (nacelle, turbine, ...) can still be directly measured in the data even
+    # though it has no single driving parameter to sweep.
     natural_curves: dict[str, dict] = {}
     owners_by_key: dict[str, dict[str, type]] = {}
     natural_raw_ranges: dict[str, tuple[float, float]] = {}
@@ -1114,11 +1480,32 @@ def plot_component(
             ax.scatter(*points, color="0.55", s=16, alpha=0.35, linewidths=0, zorder=8)
             has_empirical = True
 
-    _draw_cost_panel(ax_cost, component, natural_curves, config_cache, models, configs, marker_map, color_map)
-    cost_points = _empirical_cost_points(empirical_df, component)
+    cost_line_models = {
+        name: cls for name, cls in models.items() if _cost_line_valid(component, cls, cost_driver)
+    }
+    cost_raw_range = _driver_range(config_cache, cost_driver)
+    cost_natural_curves = _sweep_curve(
+        component, cost_driver, cost_line_models, base_kwargs, cost_raw_range, n_points
+    )
+    _draw_cost_panel(
+        ax_cost, component, cost_driver, cost_natural_curves, config_cache, models, configs,
+        marker_map, color_map,
+    )
+    cost_points = _empirical_cost_points(empirical_df, component, cost_driver, base_kwargs)
     if cost_points is not None:
         ax_cost.scatter(*cost_points, color="0.55", s=16, alpha=0.35, linewidths=0, zorder=8)
         has_empirical = True
+    benchmark_overlay = BENCHMARK_OVERLAY.get(component.label)
+    has_benchmark = False
+    if benchmark_overlay is not None:
+        wm_categories, mult_key = benchmark_overlay
+        bench_points = _benchmark_points(benchmark_df, wm_categories, cost_driver)
+        if bench_points is not None:
+            bench_x, bench_y = bench_points
+            if mult_key is not None:
+                bench_y = bench_y / base_kwargs[mult_key]
+            ax_cost.scatter(bench_x, bench_y, color=BENCHMARK_COLOR, s=14, alpha=0.4, linewidths=0, zorder=9)
+            has_benchmark = True
 
     captured = {}
     for ax in axes:
@@ -1141,6 +1528,10 @@ def plot_component(
             ax.set_ylim(*shared_ylim)
 
     # ---- pass 2: redraw every curve stretched across the frozen (captured) limits ----
+    # Mass panels stay gated by `show_lines`: for a "total" component, its subcomponents don't
+    # share one driving parameter, so a single swept mass curve would misrepresent it. The cost
+    # panel isn't gated the same way — it always sweeps one real attrs field (e.g. `nacelle_cost`)
+    # against one canonical driver, which is well-defined regardless of component.
     if show_lines:
         for ax, driver in zip(mass_axes, panel_drivers):
             xlim, _ylim = captured[ax]
@@ -1160,14 +1551,16 @@ def plot_component(
                         color=color_map[model_name], lw=2.5, ls="--",
                     )
 
-        cost_xlim, _cost_ylim = captured[ax_cost]
-        mass_line = np.array(cost_xlim)  # already in tonnes: pass 1 plotted mass * MASS_SCALE
-        for model_name in model_names:
-            slope = _average_slope(model_name, config_cache, component)
-            if slope is None:
-                continue
-            style = "--" if is_aggregate else "-"
-            ax_cost.plot(mass_line, mass_line * slope, color=color_map[model_name], lw=2.5, ls=style)
+    cost_xlim, _cost_ylim = captured[ax_cost]
+    for model_name, model_cls in cost_line_models.items():
+        raw_lo, raw_hi = _raw_range_for_display(
+            component, cost_driver, model_cls, base_kwargs, cost_xlim, cost_raw_range
+        )
+        raw_range = (min(raw_lo, raw_hi), max(raw_lo, raw_hi))
+        data = _sweep_single(component, cost_driver, model_cls, base_kwargs, raw_range, n_points)
+        ax_cost.plot(
+            data["driver_display"], data["cost"] * COST_SCALE, color=color_map[model_name], lw=2.5,
+        )
 
     for ax in axes:
         ax.set_xlim(*captured[ax][0])
@@ -1192,7 +1585,8 @@ def plot_component(
             ]
             max_title_lines = max(max_title_lines, _set_stacked_title(ax, [(n, t) for n, t in lines if t]))
 
-    ax_cost.set_xlabel("Mass (t)")
+    cost_label, cost_units = _driver_label_units(cost_driver)
+    ax_cost.set_xlabel(f"{cost_label} ({cost_units})" if cost_units else cost_label)
     ax_cost.set_ylabel("Cost ($k)")
     ax_cost.xaxis.set_major_locator(MaxNLocator(nbins=6))
     ax_cost.xaxis.set_major_formatter(FuncFormatter(_fmt_tick))
@@ -1200,6 +1594,9 @@ def plot_component(
     plt.setp(ax_cost.get_xticklabels(), rotation=20, ha="right")
     ax_cost.grid(alpha=0.3)
     if not is_aggregate:
+        # Kept as "cost = k·mass" (not cost vs. this panel's own x-axis) since it's the actual
+        # formula CSMBase computes cost from, and remains a useful reference regardless of what
+        # the panel is plotted against.
         cost_lines = []
         for model_name in model_names:
             slope = _average_slope(model_name, config_cache, component)
@@ -1227,11 +1624,21 @@ def plot_component(
         if has_empirical
         else []
     )
+    benchmark_handle = (
+        [
+            Line2D(
+                [0], [0], marker="o", color="none", markerfacecolor=BENCHMARK_COLOR,
+                markeredgecolor="none", alpha=0.7, markersize=7, label="2026 Benchmark",
+            )
+        ]
+        if has_benchmark
+        else []
+    )
     # Cap columns at the models+configs count (known to fit on one row within any panel width
-    # this module uses) and let "Empirical data" wrap onto its own row rather than widening the
-    # row past the figure's edge.
+    # this module uses) and let the overlay entries wrap onto their own row rather than widening
+    # the row past the figure's edge.
     fig.legend(
-        handles=model_handles + config_handles + empirical_handle,
+        handles=model_handles + config_handles + empirical_handle + benchmark_handle,
         loc="lower center",
         ncol=len(model_handles) + len(config_handles),
         bbox_to_anchor=(0.5, 0.01),
@@ -1239,7 +1646,7 @@ def plot_component(
         fontsize=9,
     )
 
-    fig.tight_layout(rect=(0, 0.13 if has_empirical else 0.09, 1, 0.90))
+    fig.tight_layout(rect=(0, 0.13 if (has_empirical or has_benchmark) else 0.09, 1, 0.90))
 
     if is_aggregate:
         wrapped = textwrap.fill(f"= {AGGREGATE_COMPONENTS[component.label]}", width=18 * n_panels)
@@ -1262,8 +1669,9 @@ def generate_all_figures(
     configs: dict[str, dict] | None = None,
     components: list[ComponentSpec] | None = None,
     empirical_csv: str | Path | None = None,
+    benchmark_csv: str | Path | None = None,
 ) -> dict[str, Path]:
-    """Generates and saves one mass-vs-cost figure per component.
+    """Generates and saves one mass-and-cost figure per component.
 
     Args:
         output_dir (str | Path): Directory the figures are saved into (created if missing).
@@ -1273,17 +1681,23 @@ def generate_all_figures(
             turbine spec (see :py:func:`to_model_kwargs`). Defaults to
             :py:data:`DEFAULT_TURBINE_SPECS`.
         components (list[ComponentSpec] | None, optional): Components to plot. Defaults to
-            :py:data:`PLOT_COMPONENTS` (all components with a non-trivial mass relationship).
+            :py:data:`ALL_COMPONENTS` (every component, including the always-zero-mass ones —
+            Converter, Controls, Electrical Connection — since their cost is still meaningful;
+            pass :py:data:`PLOT_COMPONENTS` instead to skip those three).
         empirical_csv (str | Path | None, optional): Path to an empirical measurements CSV to
             overlay as faint points behind the model curves (see :py:func:`load_empirical_data`
             for the expected columns). Defaults to None (no overlay).
+        benchmark_csv (str | Path | None, optional): Path to a 2026 industry cost benchmark CSV
+            to overlay on the cost panel of any component with a direct mapping (see
+            :py:func:`load_benchmark_data`, :py:data:`BENCHMARK_OVERLAY`). Defaults to
+            None (no overlay).
 
     Returns:
         dict[str, Path]: Mapping of component label to the saved PNG path.
     """
     models = models or DEFAULT_MODELS
     configs = configs or DEFAULT_TURBINE_SPECS
-    components = components or PLOT_COMPONENTS
+    components = components or ALL_COMPONENTS
 
     output_dir = Path(output_dir).resolve()
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -1291,16 +1705,269 @@ def generate_all_figures(
     base_kwargs = _base_config(configs)
     config_cache = _evaluate_all_configs(models, configs)
     empirical_df = load_empirical_data(empirical_csv)
+    benchmark_df = load_benchmark_data(benchmark_csv)
 
     figure_paths = {}
     for component in components:
         fig = plot_component(
-            component, models, config_cache, base_kwargs, configs, empirical_df=empirical_df
+            component, models, config_cache, base_kwargs, configs,
+            empirical_df=empirical_df, benchmark_df=benchmark_df,
         )
         path = output_dir / f"{_slugify(component.label)}.png"
         fig.savefig(path, dpi=175)
         plt.close(fig)
         figure_paths[component.label] = path
+    return figure_paths
+
+
+def _combined_cost_multiplier(component_label: str, multipliers: dict[str, str], values: dict) -> float:
+    mult_key = multipliers.get(component_label)
+    return values[mult_key] if mult_key else 1.0
+
+
+def _sweep_combined_cost(
+    csm_components: list[ComponentSpec],
+    multipliers: dict[str, str],
+    model_cls: type,
+    base_kwargs: dict,
+    driver: str,
+    raw_range: tuple[float, float],
+    n_points: int = 60,
+) -> dict[str, np.ndarray]:
+    """Sweeps `driver` for `model_cls`, summing the cost of `csm_components` (each optionally
+    scaled by a `base_kwargs` quantity via `multipliers`, e.g. num_bearings) at every point.
+
+    Uses `_safe_upstream_kwargs` (see :py:func:`_sweep_single`) to stop an unrelated subsystem's
+    formula from going invalid partway through `model.run()`'s fixed sequence and blocking a
+    later-computed member of `csm_components`; whichever of their costs still couldn't be
+    computed at a given point are simply left out of that point's sum, and a point is only left
+    NaN if none of them were reached at all.
+    """
+    raw_grid = np.linspace(*raw_range, n_points)
+    _label, _units, scale = DRIVER_INFO.get(driver, (driver, "", 1.0))
+    display = raw_grid * scale
+    costs = np.full(n_points, np.nan)
+    target_attrs = [attr for c in csm_components for attr in (c.mass_attr, c.cost_attr)]
+    safe_kwargs = _safe_upstream_kwargs(model_cls, base_kwargs, *target_attrs)
+    for i, raw_value in enumerate(raw_grid):
+        kwargs = {**base_kwargs, **safe_kwargs}
+        kwargs[driver] = _cast_driver_value(driver, raw_value)
+        model = model_cls(**kwargs)
+        try:
+            model.run()
+        except ValueError:
+            pass
+        total = 0.0
+        any_found = False
+        for component in csm_components:
+            cost = getattr(model, component.cost_attr, None)
+            if cost is None:
+                continue
+            any_found = True
+            total += cost * _combined_cost_multiplier(component.label, multipliers, kwargs)
+        if any_found:
+            costs[i] = total
+    return {"driver_display": display, "cost": costs}
+
+
+def _combined_cost_from_entry(
+    entry: dict, csm_components: list[ComponentSpec], multipliers: dict[str, str]
+) -> float | None:
+    """Sums `csm_components`' costs (each optionally scaled per `multipliers`) from a config-cache
+    entry (merged kwargs + :py:meth:`CSMBase.get_results`), or None if any component's cost is
+    missing from `entry`.
+    """
+    costs = [entry.get(c.cost_attr) for c in csm_components]
+    if any(c is None for c in costs):
+        return None
+    return sum(
+        cost * _combined_cost_multiplier(component.label, multipliers, entry)
+        for component, cost in zip(csm_components, costs)
+    )
+
+
+def plot_wm_comparison(
+    wm_category: str,
+    models: dict[str, type],
+    config_cache: dict[str, dict[str, dict | None]],
+    base_kwargs: dict,
+    configs: dict[str, dict],
+    benchmark_df: pd.DataFrame | None,
+    panel_width: float = 9.5,
+    height: float = 5.8,
+    n_points: int = 60,
+):
+    """Compares CSM's combined cost for `wm_category` — the sum of its mapped CSM components, per
+    :py:data:`WM_CATEGORY_MAPPING` — against the 2026 industry benchmark for that category, on a
+    single cost-vs-driving-parameter panel. Follows the same natural-range-then-extend-to-frozen-
+    limits approach as :py:func:`plot_component`'s panels.
+
+    Returns:
+        matplotlib.figure.Figure
+    """
+    mapping = WM_CATEGORY_MAPPING[wm_category]
+    csm_components = [c for c in ALL_COMPONENTS if c.label in mapping.csm_components]
+    driver = mapping.driver
+
+    fig, ax = plt.subplots(figsize=(panel_width, height))
+    config_names = list(configs)
+    marker_map = {
+        name: CONFIG_MARKERS[i % len(CONFIG_MARKERS)] for i, name in enumerate(config_names)
+    }
+    model_names = list(models)
+    color_map = {name: _model_color(name, i) for i, name in enumerate(model_names)}
+
+    # Only draw a line for a model if *every* mapped CSM component genuinely uses `driver` as its
+    # own real (mass-panel) driver for that model — otherwise the combined-sum line would be an
+    # artifact of holding some component's actual driver fixed at an arbitrary reference value
+    # rather than a faithful "cost as a function of `driver`" (see `_cost_driver_matches`).
+    # Markers, computed from each configuration's real full inputs, stay valid regardless.
+    line_models = {
+        name: cls for name, cls in models.items()
+        if all(_cost_driver_matches(c, cls, driver) for c in csm_components)
+    }
+    raw_range = _driver_range(config_cache, driver)
+    natural_curves = {
+        name: _sweep_combined_cost(
+            csm_components, mapping.multipliers, cls, base_kwargs, driver, raw_range, n_points
+        )
+        for name, cls in line_models.items()
+    }
+    for model_name, data in natural_curves.items():
+        ax.plot(data["driver_display"], data["cost"] * COST_SCALE, color=color_map[model_name], lw=2.5)
+    for model_name in models:
+        for config_name in configs:
+            entry = config_cache[model_name].get(config_name)
+            if entry is None:
+                continue
+            x = _driver_display_value(driver, entry)
+            cost = _combined_cost_from_entry(entry, csm_components, mapping.multipliers)
+            if x is None or cost is None:
+                continue
+            ax.scatter(
+                x, cost * COST_SCALE, marker=marker_map[config_name], color=color_map[model_name],
+                s=110, edgecolor="black", linewidth=0.6, zorder=5,
+            )
+    bench_points = _benchmark_points(benchmark_df, [wm_category], driver)
+    has_benchmark = bench_points is not None
+    if has_benchmark:
+        ax.scatter(*bench_points, color=BENCHMARK_COLOR, s=14, alpha=0.4, linewidths=0, zorder=9)
+
+    xlim, ylim = ax.get_xlim(), ax.get_ylim()
+    for line in list(ax.get_lines()):
+        line.remove()
+    ax.set_xlim(*xlim)
+    ax.set_ylim(*ylim)
+
+    # `_raw_range_for_display` only needs a ComponentSpec for its (unused, on this plain-string
+    # driver) composite-driver branch, so any of `csm_components` works as a placeholder.
+    placeholder_component = csm_components[0]
+    for model_name, model_cls in line_models.items():
+        raw_lo, raw_hi = _raw_range_for_display(
+            placeholder_component, driver, model_cls, base_kwargs, xlim, raw_range
+        )
+        extended_range = (min(raw_lo, raw_hi), max(raw_lo, raw_hi))
+        data = _sweep_combined_cost(
+            csm_components, mapping.multipliers, model_cls, base_kwargs, driver, extended_range, n_points
+        )
+        ax.plot(data["driver_display"], data["cost"] * COST_SCALE, color=color_map[model_name], lw=2.5)
+
+    ax.set_xlim(*xlim)
+    ax.set_ylim(*ylim)
+
+    label, units = _driver_label_units(driver)
+    ax.set_xlabel(f"{label} ({units})" if units else label)
+    ax.set_ylabel("Cost ($k)")
+    ax.xaxis.set_major_locator(MaxNLocator(nbins=6))
+    ax.xaxis.set_major_formatter(FuncFormatter(_fmt_tick))
+    ax.yaxis.set_major_formatter(FuncFormatter(_fmt_tick))
+    plt.setp(ax.get_xticklabels(), rotation=20, ha="right")
+    ax.grid(alpha=0.3)
+
+    model_handles = [
+        Line2D([0], [0], color=color_map[name], lw=2.5, label=name) for name in model_names
+    ]
+    config_handles = [
+        Line2D(
+            [0], [0], marker=marker_map[name], color="none", markerfacecolor="white",
+            markeredgecolor="black", markersize=9, label=name,
+        )
+        for name in config_names
+    ]
+    benchmark_handle = (
+        [
+            Line2D(
+                [0], [0], marker="o", color="none", markerfacecolor=BENCHMARK_COLOR,
+                markeredgecolor="none", alpha=0.7, markersize=7, label="2026 Benchmark",
+            )
+        ]
+        if has_benchmark
+        else []
+    )
+    fig.legend(
+        handles=model_handles + config_handles + benchmark_handle,
+        loc="lower center",
+        ncol=len(model_handles) + len(config_handles),
+        bbox_to_anchor=(0.5, 0.01),
+        frameon=False,
+        fontsize=9,
+    )
+
+    fig.tight_layout(rect=(0, 0.13 if has_benchmark else 0.09, 1, 0.90))
+
+    wrapped = textwrap.fill(f"= {' + '.join(mapping.csm_components)}", width=70)
+    n_lines = wrapped.count("\n") + 1
+    fig.suptitle(f"{wm_category} (Industry Benchmark)", fontsize=15, fontweight="bold", y=0.99)
+    fig.text(0.5, 0.955, wrapped, ha="center", va="top", fontsize=9, style="italic")
+    fig.subplots_adjust(top=0.90 - 0.045 * n_lines)
+
+    return fig
+
+
+def generate_wm_comparison_figures(
+    output_dir: str | Path,
+    models: dict[str, type] | None = None,
+    configs: dict[str, dict] | None = None,
+    benchmark_csv: str | Path | None = None,
+    wm_categories: list[str] | None = None,
+) -> dict[str, Path]:
+    """Generates and saves one combined CSM-vs-industry-benchmark figure per multi-component WM
+    category (see :py:data:`COMBINED_WM_CATEGORIES`) — the categories from
+    :py:data:`WM_CATEGORY_MAPPING` that sum more than one CSM component, or apply a multiplier,
+    and so can't be shown as a direct overlay on a single existing component figure.
+
+    Args:
+        output_dir (str | Path): Directory the figures are saved into (created if missing).
+        models (dict[str, type] | None, optional): Mapping of model name to a ``CSMBase``
+            subclass to compare. Defaults to :py:data:`DEFAULT_MODELS`.
+        configs (dict[str, dict] | None, optional): Mapping of configuration name to a raw
+            turbine spec. Defaults to :py:data:`DEFAULT_TURBINE_SPECS`.
+        benchmark_csv (str | Path | None, optional): Path to a 2026 industry cost benchmark CSV
+            (see :py:func:`load_benchmark_data`). Defaults to None (no overlay, CSM-only lines).
+        wm_categories (list[str] | None, optional): Which categories to generate. Defaults to
+            :py:data:`COMBINED_WM_CATEGORIES` (all of them).
+
+    Returns:
+        dict[str, Path]: Mapping of WM category name to the saved PNG path.
+    """
+    models = models or DEFAULT_MODELS
+    configs = configs or DEFAULT_TURBINE_SPECS
+    wm_categories = wm_categories or COMBINED_WM_CATEGORIES
+
+    output_dir = Path(output_dir).resolve()
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    base_kwargs = _base_config(configs)
+    config_cache = _evaluate_all_configs(models, configs)
+    benchmark_df = load_benchmark_data(benchmark_csv)
+
+    figure_paths = {}
+    for wm_category in wm_categories:
+        fig = plot_wm_comparison(wm_category, models, config_cache, base_kwargs, configs, benchmark_df)
+        path = output_dir / f"wm_{_slugify(wm_category)}.png"
+        fig.savefig(path, dpi=175)
+        plt.close(fig)
+        figure_paths[wm_category] = path
     return figure_paths
 
 
@@ -1455,8 +2122,10 @@ def generate_comparison(
     models: dict[str, type] | None = None,
     configs: dict[str, dict] | None = None,
     empirical_csv: str | Path | None = None,
+    benchmark_csv: str | Path | None = None,
 ) -> dict[str, Path]:
-    """Runs the full pipeline: per-component figures, a summary report, and a slide deck.
+    """Runs the full pipeline: per-component figures, combined WM-category comparison figures, a
+    summary report, and a slide deck.
 
     Args:
         output_dir (str | Path, optional): Directory the figures, report image, and deck are
@@ -1468,6 +2137,9 @@ def generate_comparison(
         empirical_csv (str | Path | None, optional): Path to an empirical measurements CSV to
             overlay behind the figures' model curves (see :py:func:`load_empirical_data`).
             Defaults to None (no overlay); the summary report table is unaffected either way.
+        benchmark_csv (str | Path | None, optional): Path to a 2026 industry cost benchmark CSV
+            to overlay on cost panels and to compare against in the combined WM-category figures
+            (see :py:func:`load_benchmark_data`). Defaults to None (CSM-only lines/no overlay).
 
     Returns:
         dict[str, Path]: Paths to the figures directory, summary report image, and presentation.
@@ -1475,14 +2147,18 @@ def generate_comparison(
     output_dir = Path(output_dir).resolve()
     figures_dir = output_dir / "figures"
     figure_paths = generate_all_figures(
-        figures_dir, models=models, configs=configs, empirical_csv=empirical_csv
+        figures_dir, models=models, configs=configs,
+        empirical_csv=empirical_csv, benchmark_csv=benchmark_csv,
+    )
+    wm_figure_paths = generate_wm_comparison_figures(
+        figures_dir, models=models, configs=configs, benchmark_csv=benchmark_csv,
     )
 
     report_df = build_report_dataframe(models=models, configs=configs)
     report_image_path = render_report_image(report_df, output_dir / "summary_report.png")
 
     pptx_path = build_presentation(
-        output_dir / "csm_comparison.pptx", figure_paths, report_image_path
+        output_dir / "csm_comparison.pptx", {**figure_paths, **wm_figure_paths}, report_image_path
     )
     return {
         "figures_dir": figures_dir,
@@ -1492,7 +2168,10 @@ def generate_comparison(
 
 
 if __name__ == "__main__":
-    # Set empirical_csv=None to fall back to the plain model-vs-model comparison.
-    paths = generate_comparison(empirical_csv="csm/us_lbw_csm_2026_data.csv")
+    # Set empirical_csv/benchmark_csv to None to fall back to the plain model-vs-model comparison.
+    paths = generate_comparison(
+        empirical_csv="csm/us_lbw_csm_2026_data.csv",
+        benchmark_csv="csm/WM_wind_capex_benchmark_data_geared.csv",
+    )
     for key, path in paths.items():
         print(f"{key}: {path}")
