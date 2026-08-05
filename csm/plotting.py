@@ -54,6 +54,7 @@ costs (with any needed multiplier, e.g. blades x num_blades) against the benchma
 
 import math
 import re
+import sys
 import textwrap
 from pathlib import Path
 from typing import NamedTuple
@@ -72,6 +73,7 @@ from matplotlib.ticker import FuncFormatter, MaxNLocator
 
 from csm.models.nlr2015 import Land2015NLR
 from csm.models.nlr2020 import Land2020NLR
+from csm.models.nlr2026 import Land2026NLR
 
 
 class CompositeDriver(NamedTuple):
@@ -382,6 +384,17 @@ BENCHMARK_TOWER_COLUMN = "tower_height"
 BENCHMARK_PERIOD_COLUMN = "time_period"
 BENCHMARK_COLOR = "#3E8E7E"
 
+# Shared styling for the empirical-measurement and industry-benchmark overlay scatter points:
+# a thin black edge and a zorder well above every model line (~2), config marker (5), and each
+# other, so both overlays always read as sitting on top of the rest of the plot regardless of
+# panel or draw order — empirical data is real-world ground truth, and benchmark data is the
+# external reference the fitted lines are calibrated against, so neither should ever be hidden
+# behind a curve or marker.
+OVERLAY_EDGE_COLOR = "black"
+OVERLAY_EDGE_LINEWIDTH = 0.4
+EMPIRICAL_ZORDER = 20
+BENCHMARK_ZORDER = 21
+
 # Which raw benchmark bin column corresponds to each simple driver. The turbine rating bin's own
 # midpoint is already in MW, matching `rated_power_kw`'s MW display units.
 BENCHMARK_DRIVER_COLUMNS: dict[str, str] = {
@@ -517,9 +530,27 @@ def _coeff(model_cls: type, name: str) -> float:
 
 
 def _resolve_mass_formula(component_label: str, model_cls: type) -> str:
+    """Renders `component_label`'s mass formula text for `model_cls`.
+
+    Checks for an exact match in :py:data:`FORMULA_OVERRIDES` first. Then, same reasoning as
+    :py:func:`_resolve_driver`: if `model_cls` is a generated model with a
+    :py:func:`_generated_shape_overrides` marker for `component_label`, that marker decides —
+    authoritative regardless of Python inheritance. Otherwise falls back to matching on
+    `model_cls`'s base classes, so a hand-written model that subclasses e.g. `Land2020NLR`
+    without overriding this component's `calculate_*` method inherits its formula *shape* too, so
+    the displayed formula text should match, not silently fall back to the base (2015-style)
+    template just because it's a different class object.
+    """
     overrides = FORMULA_OVERRIDES.get(component_label, {})
     if model_cls in overrides:
         return overrides[model_cls](model_cls)
+    marker = _generated_shape_overrides(model_cls).get(component_label)
+    if marker is not None:
+        uses_2020_shape = marker == "2020"
+    else:
+        uses_2020_shape = any(issubclass(model_cls, base_cls) for base_cls in overrides)
+    if uses_2020_shape and Land2020NLR in overrides:
+        return overrides[Land2020NLR](model_cls)
     template = FORMULA_DEFAULT.get(component_label)
     return template(model_cls) if template is not None else ""
 
@@ -671,6 +702,7 @@ FORMULA_OVERRIDES: dict[str, dict[type, Callable[[type], str]]] = {
 DEFAULT_MODELS = {
     "2015": Land2015NLR,
     "2020": Land2020NLR,
+    "2026": Land2026NLR,
 }
 
 # Example turbine configurations to mark on every curve. `turbine_class` and `blade_has_carbon`
@@ -932,16 +964,50 @@ def _base_config(configs: dict[str, dict]) -> dict:
     return base
 
 
+def _generated_shape_overrides(model_cls: type) -> dict[str, str]:
+    """The `SHAPE_OVERRIDES` marker `csm/build_custom_model.py` writes into a generated model's
+    module (component label -> which named shape, `"2020"` or `"2015"`, that component's
+    `calculate_*` method actually implements there), or `{}` for a hand-written model
+    (`nlr2015.py`/`nlr2020.py`), which carries no such marker and doesn't need one.
+
+    This is the only reliable way to tell which formula a *generated* model's method implements
+    for a specific component. Neither field presence nor Python inheritance work in general:
+    an attrs subclass keeps every parent field even when a method override stops using some of
+    them (so checking "does it have `tower_mass_intercept`" can't tell a `Land2020NLR` subclass
+    whose Tower was overridden to `Land2015NLR`'s shape apart from one that wasn't), and
+    `issubclass` is equally unreliable in the other direction (a generated class overriding one
+    component to match a *different* model's shape doesn't retroactively become a Python
+    subclass of that model). The marker sidesteps both: it's written by the same code that
+    decided the shape, so it's always authoritative for models that have it.
+    """
+    module = sys.modules.get(model_cls.__module__)
+    return getattr(module, "SHAPE_OVERRIDES", {}) if module else {}
+
+
 def _resolve_driver(component: ComponentSpec, model_cls: type) -> Driver | None:
     """Returns the driver `model_cls` actually uses for `component`.
 
-    Falls back to `component.default_driver` for any model class without an explicit entry in
-    :py:data:`COMPONENT_DRIVER_OVERRIDES`, which is correct for any model that inherits the base
-    formula (and therefore the base driver) for this component.
+    Checks for an exact match in :py:data:`COMPONENT_DRIVER_OVERRIDES` first. Then, if
+    `model_cls` is a generated model with a :py:func:`_generated_shape_overrides` marker for
+    `component.label`, that marker decides — authoritative regardless of Python inheritance (see
+    its docstring). Otherwise falls back to matching on `model_cls`'s base classes, so a
+    hand-written model that subclasses e.g. `Land2020NLR` without overriding this component's
+    `calculate_*` method (a coefficients-only refit, say) is correctly treated as inheriting its
+    driver too, rather than silently falling back to `component.default_driver` just because it's
+    a different class object. Falls back to `component.default_driver` only when nothing matches,
+    which is correct for any model that inherits the base formula (and therefore the base driver)
+    for this component.
     """
     overrides = COMPONENT_DRIVER_OVERRIDES.get(component.label, {})
     if model_cls in overrides:
         return overrides[model_cls]
+    marker = _generated_shape_overrides(model_cls).get(component.label)
+    if marker is not None:
+        uses_2020_shape = marker == "2020"
+    else:
+        uses_2020_shape = any(issubclass(model_cls, base_cls) for base_cls in overrides)
+    if uses_2020_shape and Land2020NLR in overrides:
+        return overrides[Land2020NLR]
     return component.default_driver
 
 
@@ -1115,31 +1181,41 @@ def _safe_upstream_kwargs(model_cls: type, base_kwargs: dict, *target_attrs: str
     """Reference-point values for every computed mass/cost attribute `model_cls` computes that
     `target_attrs` doesn't actually depend on (per the model's own `parameter_graph`).
 
-    `calculate_subsystem_mass`/`calculate_subsystem_cost` compute every component's mass/cost as
-    a side effect, in one fixed sequence, aborting on the first subsystem whose formula goes
-    invalid (e.g. a negative mass at an extreme swept value). For a component computed *late* in
-    that sequence, an earlier and completely unrelated failure means it never gets a chance to
-    run at all — even though its own formula would have been perfectly fine. Pre-supplying every
+    `run()` computes every subsystem's mass, *then* every subsystem's cost, each in one fixed
+    sequence, aborting the whole phase on the first subsystem whose formula goes invalid (e.g. a
+    negative mass at an extreme swept value, or — for a model whose coefficients came from a fit
+    over too little data — even at an ordinary value). For a component computed *late* in either
+    sequence, an earlier and completely unrelated failure means it never gets a chance to run at
+    all — even though its own formula would have been perfectly fine, and even though the entire
+    *cost* phase never starts if anything in the *mass* phase fails first. Pre-supplying every
     *unrelated* attribute's value from a reference run at `base_kwargs` (an average of real
-    configurations, never an extreme edge case, so known to succeed) makes those upstream
+    configurations, essentially never an extreme edge case, though see below) makes those upstream
     calculations short-circuit instead of re-running and failing, letting the sweep reach
-    `target_attrs` regardless of where they fall in the sequence. Attributes `target_attrs`
+    `target_attrs` regardless of where they fall in either sequence. Attributes `target_attrs`
     themselves transitively depend on are excluded, so they're still freshly (and correctly)
     recomputed at each swept point.
+
+    Even the reference run itself can fail partway through (a poorly-generalizing fit can be
+    invalid at literally every realistic value, not just extreme ones) — in that case whatever it
+    did manage to compute is still used, and every *unrelated* attribute it never reached is
+    plugged with a small positive placeholder rather than left missing. `target_attrs` never
+    depend on those (they were excluded from `keep` for exactly this purpose), so the placeholder
+    is never actually read by anything the caller computes from — it exists purely so the fixed
+    calculate-in-sequence methods don't raise on their way past it to whatever comes next.
     """
+    reference = model_cls(**base_kwargs)
     try:
-        reference = model_cls(**base_kwargs)
         reference.run()
     except ValueError:
-        return {}
+        pass
     keep = set(target_attrs)
     for attr in target_attrs:
         if attr in reference.parameter_graph:
             keep |= nx.descendants(reference.parameter_graph, attr)
     return {
-        name: value
+        name: (value if value is not None else 1e-6)
         for name, value in reference.get_results().items()
-        if name not in keep and value is not None
+        if name not in keep
     }
 
 
@@ -1365,6 +1441,26 @@ def _draw_mass_panel(
             )
 
 
+def _place_legend(fig, handles: list, max_cols_per_row: int = 7) -> int:
+    """Places `handles` as a figure-level legend, wrapped onto as few rows as fit within
+    `max_cols_per_row` columns each, rather than forcing every handle onto a single hard-coded-
+    width row — which silently overflowed (entries truncated or spilling past the figure edge)
+    once enough models/configs/overlays were present, e.g. after a third model was added.
+
+    Returns:
+        int: The number of rows the legend used, so the caller can reserve proportional bottom
+            margin for it in ``fig.tight_layout(rect=...)``.
+    """
+    n_total = len(handles)
+    n_rows = max(1, math.ceil(n_total / max_cols_per_row))
+    ncol = math.ceil(n_total / n_rows)
+    fig.legend(
+        handles=handles, loc="lower center", ncol=ncol, bbox_to_anchor=(0.5, 0.01),
+        frameon=False, fontsize=9,
+    )
+    return n_rows
+
+
 def _draw_cost_panel(
     ax, component: ComponentSpec, driver: Driver, curves: dict, config_cache: dict,
     models: dict[str, type], configs: dict[str, dict], marker_map: dict, color_map: dict,
@@ -1477,7 +1573,10 @@ def plot_component(
         _draw_mass_panel(ax, component, driver, curves, config_cache, models, configs, marker_map, color_map)
         points = _empirical_mass_points(empirical_df, component, driver, base_kwargs)
         if points is not None:
-            ax.scatter(*points, color="0.55", s=16, alpha=0.35, linewidths=0, zorder=8)
+            ax.scatter(
+                *points, color="0.55", s=16, alpha=0.35, edgecolor=OVERLAY_EDGE_COLOR,
+                linewidth=OVERLAY_EDGE_LINEWIDTH, zorder=EMPIRICAL_ZORDER,
+            )
             has_empirical = True
 
     cost_line_models = {
@@ -1493,7 +1592,10 @@ def plot_component(
     )
     cost_points = _empirical_cost_points(empirical_df, component, cost_driver, base_kwargs)
     if cost_points is not None:
-        ax_cost.scatter(*cost_points, color="0.55", s=16, alpha=0.35, linewidths=0, zorder=8)
+        ax_cost.scatter(
+            *cost_points, color="0.55", s=16, alpha=0.35, edgecolor=OVERLAY_EDGE_COLOR,
+            linewidth=OVERLAY_EDGE_LINEWIDTH, zorder=EMPIRICAL_ZORDER,
+        )
         has_empirical = True
     benchmark_overlay = BENCHMARK_OVERLAY.get(component.label)
     has_benchmark = False
@@ -1504,7 +1606,10 @@ def plot_component(
             bench_x, bench_y = bench_points
             if mult_key is not None:
                 bench_y = bench_y / base_kwargs[mult_key]
-            ax_cost.scatter(bench_x, bench_y, color=BENCHMARK_COLOR, s=14, alpha=0.4, linewidths=0, zorder=9)
+            ax_cost.scatter(
+                bench_x, bench_y, color=BENCHMARK_COLOR, s=14, alpha=0.4, edgecolor=OVERLAY_EDGE_COLOR,
+                linewidth=OVERLAY_EDGE_LINEWIDTH, zorder=BENCHMARK_ZORDER,
+            )
             has_benchmark = True
 
     captured = {}
@@ -1634,19 +1739,11 @@ def plot_component(
         if has_benchmark
         else []
     )
-    # Cap columns at the models+configs count (known to fit on one row within any panel width
-    # this module uses) and let the overlay entries wrap onto their own row rather than widening
-    # the row past the figure's edge.
-    fig.legend(
-        handles=model_handles + config_handles + empirical_handle + benchmark_handle,
-        loc="lower center",
-        ncol=len(model_handles) + len(config_handles),
-        bbox_to_anchor=(0.5, 0.01),
-        frameon=False,
-        fontsize=9,
+    n_legend_rows = _place_legend(
+        fig, model_handles + config_handles + empirical_handle + benchmark_handle
     )
 
-    fig.tight_layout(rect=(0, 0.13 if (has_empirical or has_benchmark) else 0.09, 1, 0.90))
+    fig.tight_layout(rect=(0, 0.045 + 0.045 * n_legend_rows, 1, 0.90))
 
     if is_aggregate:
         wrapped = textwrap.fill(f"= {AGGREGATE_COMPONENTS[component.label]}", width=18 * n_panels)
@@ -1851,7 +1948,10 @@ def plot_wm_comparison(
     bench_points = _benchmark_points(benchmark_df, [wm_category], driver)
     has_benchmark = bench_points is not None
     if has_benchmark:
-        ax.scatter(*bench_points, color=BENCHMARK_COLOR, s=14, alpha=0.4, linewidths=0, zorder=9)
+        ax.scatter(
+            *bench_points, color=BENCHMARK_COLOR, s=14, alpha=0.4, edgecolor=OVERLAY_EDGE_COLOR,
+            linewidth=OVERLAY_EDGE_LINEWIDTH, zorder=BENCHMARK_ZORDER,
+        )
 
     xlim, ylim = ax.get_xlim(), ax.get_ylim()
     for line in list(ax.get_lines()):
@@ -1904,16 +2004,9 @@ def plot_wm_comparison(
         if has_benchmark
         else []
     )
-    fig.legend(
-        handles=model_handles + config_handles + benchmark_handle,
-        loc="lower center",
-        ncol=len(model_handles) + len(config_handles),
-        bbox_to_anchor=(0.5, 0.01),
-        frameon=False,
-        fontsize=9,
-    )
+    n_legend_rows = _place_legend(fig, model_handles + config_handles + benchmark_handle)
 
-    fig.tight_layout(rect=(0, 0.13 if has_benchmark else 0.09, 1, 0.90))
+    fig.tight_layout(rect=(0, 0.045 + 0.045 * n_legend_rows, 1, 0.90))
 
     wrapped = textwrap.fill(f"= {' + '.join(mapping.csm_components)}", width=70)
     n_lines = wrapped.count("\n") + 1
