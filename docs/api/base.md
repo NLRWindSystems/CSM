@@ -36,8 +36,8 @@
         platform_mainframe_mass_coeff, platform_mainframe_mass_cost_coeff, platform_mainframe_mass,
         platform_mainframe_cost, transformer_mass_coeff, transformer_mass_intercept,
         transformer_mass_cost_coeff, transformer_mass, transformer_cost, controls_mass,
-        controls_rated_power_cost_coeff, controls_cost, electrical_connection_mass,
-        electrical_connection_rated_power_cost_coeff, electrical_connection_cost, converter_mass,
+        controls_cost_coeff, controls_cost, electrical_connection_mass,
+        electrical_connection_cost_coeff, electrical_connection_cost, converter_mass,
         converter_mass_cost_coeff, converter_cost, tower_mass_coeff, tower_length, tower_mass_exp,
         tower_mass_cost_coeff, tower_mass, tower_cost, nacelle_mass, nacelle_cost, hub_system_mass,
         hub_system_cost, rotor_mass, rotor_cost, turbine_mass, turbine_cost, turbine_cost_kw,
@@ -46,7 +46,7 @@
         fields, fields_dict, _has_values, _validate_inputs, _prepare_calculation,
         reset_values, update, parameterize, run, get_dependent_attributes,
         _get_attr_map,
-        get_results, get_mass_results, get_cost_results, irs_mpc_breakdown, total_domestic_content,
+        get_all_results, get_mass_results, get_cost_results, irs_mpc_breakdown, total_domestic_content,
         calculate_subsystem_mass, calculate_subsystem_cost, calculate_system_mass,
         calculate_system_cost,
         calculate_blade_mass, calculate_blade_cost, calculate_hub_mass, calculate_hub_cost,
@@ -82,7 +82,7 @@
 ## Getting Results
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase.get_results
+.. automethod:: csm.models.base_model.CSMBase.get_all_results
 ```
 
 ```{eval-rst}
