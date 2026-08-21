@@ -1,13 +1,10 @@
 from attrs import define, fields
 
-from csm.models.utils import create_field
-from csm.models.base_model import CSMBase
-
-
-base = fields(CSMBase)
-
-
 from csm.models import Land2020NLR
+from csm.models.utils import create_field
+
+
+base = fields(Land2020NLR)
 
 
 @define
@@ -26,6 +23,16 @@ class Land2021NLR(Land2020NLR):
     blade_mass_coeff = base.blade_mass_coeff.reuse(default=8.3612)
     blade_mass_coeff2 = base.blade_mass_coeff.reuse(default=-620.03)
     blade_mass_intercept = create_field(float, "unitless", "input", default=17847)
+
+    hub_mass_coeff = base.hub_mass_coeff.reuse(default=3.5793)
+    hub_mass_exp = create_field(float, "unitless", "input", default=-25451.58)
+
+    pitch_blade_mass_coeff = base.pitch_blade_mass_coeff.reuse(default=0)
+    pitch_system_mass_coeff = base.pitch_system_mass_coeff.reuse(default=0)
+    pitch_blade_mass_intercept = base.pitch_blade_mass_intercept.reuse(default=0)
+
+    gearbox_torque_density = base.gearbox_torque_density.reuse(default=132.5)
+    gearbox_torque_exp = base.gearbox_torque_exp.reuse(default=0)
 
     def __attrs_post_init__(self):
         """Updates the parameter mapping for new mass and cost relationships."""
@@ -78,6 +85,10 @@ class Land2021NLR(Land2020NLR):
         Raises:
             ValueError: Raised if the required parameters have not been provided or calculated.
         """
+        exists = self._prepare_calculation("blade_mass")
+        if exists:
+            return
+
         self.blade_mass = (
             self.blade_mass_coeff * self.rotor_radius**2
             + self.blade_mass_coeff2 * self.rotor_radius
@@ -87,28 +98,71 @@ class Land2021NLR(Land2020NLR):
     def calculate_hub_mass(self):
         # m = k*P^b
         # k	8104.7	b	1.1377
-        ...
+        """Calculates and sets :py:attr:`hub_mass` if it was not provided by the user.
 
-    def calculate_pitch_system_mass(self):
-        # included in pitch system, don't individually calculate
-        ...
+        .. math:: k * power ^ b
+
+        where:
+
+        - :math:`k =` :py:attr:`hub_mass_coeff`
+        - :math:`power =` :py:attr:`rated_power_kw`
+        - :math:`b =` :py:attr:`hub_mass_exp`
+
+        Args:
+            hub_mass_coeff (float): :math:`k` in the mass equation above (:math:`kg/kW`).
+            rated_power_kw (float): Turbine nameplate capacity (rated power) (:math:`kW`).
+            hub_mass_exp (bool): :math:`b` in the mass equation above.
+
+        Raises:
+            ValueError: Raised if the required parameters have not been provided or calculated.
+        """
+        exists = self._prepare_calculation("hub_mass")
+        if exists:
+            return
+
+        self.hub_mass = self.hub_mass_coeff * self.rated_power_kw**self.hub_mass_exp
 
     def calculate_gearbox_mass(self):
-        # m = T/k	T = rotor torque, Nm
-        # k	132.5
-        ...
+        """Calculates and sets :py:attr:`gearbox_mass` for the gearbox if it was not provided
+        by the user.
+
+        .. math:: torque * 1000 / k
+
+        where:
+
+        - :math:`torque =` :py:attr:`rotor_torque`
+        - :math:`k =` :py:attr:`gearbox_torque_density`
+
+        Args:
+            rotor_torque (float): Turbine rotor torque at rated power (:math:`kNm`).
+            gearbox_torque_density (float): :math:`k` in the mass equation above (:math:`N*m/kg`).
+
+        Raises:
+            ValueError: Raised if the required parameters have not been provided or calculated.
+        """
+        exists = self._prepare_calculation("gearbox_mass")
+        if exists:
+            return
+
+        self.gearbox_mass = self.rotor_torque * 1000 / self.gearbox_torque_density
 
     def calculate_yaw_system_mass(self):
         # m = 1.6*k*RD^b
         # k	7.0E-04	b	3.1571
-        ...
+        exists = self._prepare_calculation("yaw_system_mass")
+        if exists:
+            return
 
     def calculate_hydraulic_cooling_mass(self):
         # k	221
-        ...
+        exists = self._prepare_calculation("hydraulic_cooling_mass")
+        if exists:
+            return
 
     def calculate_tower_mass(self):
         # m = a*(hh*A)^2 + b*hh*A + c
         # hh = hub height, m A = swept area, m2
         # a	0.000000043	b	0.064588	c	48275
-        ...
+        exists = self._prepare_calculation("tower_mass")
+        if exists:
+            return
