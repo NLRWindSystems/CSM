@@ -9,11 +9,6 @@ base = fields(Land2020NLR)
 
 @define
 class Land2021NLR(Land2020NLR):
-    # untouched
-    # nacelle cover: k	1915	b	1910
-    # platform mainframe: k	0.005
-    # crane mass: no change
-
     blade_mass_coeff = base.blade_mass_coeff.reuse(default=8.3612)
     blade_mass_coeff2 = base.blade_mass_coeff.reuse(default=-620.03)
     blade_mass_intercept = create_field(float, "unitless", "input", default=17847)
@@ -28,6 +23,12 @@ class Land2021NLR(Land2020NLR):
     gearbox_torque_exp = base.gearbox_torque_exp.reuse(default=0)
     generator_mass_coeff = base.generator_mass_coeff.reuse(default=1.6731)
     generator_mass_intercept = base.generator_mass_intercept.reuse(default=3932.7)
+    nacelle_cover_mass_coeff = base.nacelle_cover_mass_coeff.reuse(default=1.915)
+    nacelle_cover_mass_intercept = base.nacelle_cover_mass_intercept.reuse(default=1910)
+    tower_mass_coeff: float = base.tower_mass_coeff.reuse(default=0.000000043)
+    tower_mass_coeff2: float = create_field(float, "unitless", "input", default=0.064588)
+    tower_mass_intercept: float = create_field(float, "unitless", "input", default=48275)
+    tower_mass_exp: float = base.tower_mass_exp.reuse(default=0)
 
     def __attrs_post_init__(self):
         """Updates the parameter mapping for new mass and cost relationships."""
@@ -37,20 +38,13 @@ class Land2021NLR(Land2020NLR):
             "blade_mass_coeff2",
             "blade_mass_intercept",
         )
-        self.parameter_map["pitch_system_mass"] = "pitch_system_mass"
+        self.parameter_map["pitch_system_mass"] = ("pitch_system_mass",)
         self.parameter_map["hub_mass"] = (
             "rated_power_kw",
             "hub_mass_coeff",
             "hub_mass_exp",
         )
         self.parameter_map["gearbox_mass"] = ("rotor_torque", "gearbox_mass_coeff")
-        self.parameter_map["yaw_system_mass"] = (
-            "rotor_diameter",
-            "yaw_system_mass_coeff",
-            "yaw_system_mass_coeff2",
-            "yaw_system_mass_exp",
-        )
-        self.parameter_map["hydraulic_cooling_mass"] = ("hydraulic_cooling_mass",)
         self.parameter_map["tower_mass"] = (
             "rotor_diameter",
             "tower_length",
@@ -141,16 +135,38 @@ class Land2021NLR(Land2020NLR):
 
         self.gearbox_mass = self.rotor_torque * 1000 / self.gearbox_torque_density
 
-    def calculate_hydraulic_cooling_mass(self):
-        # k	221
-        exists = self._prepare_calculation("hydraulic_cooling_mass")
-        if exists:
-            return
-
     def calculate_tower_mass(self):
-        # m = a*(hh*A)^2 + b*hh*A + c
-        # hh = hub height, m A = swept area, m2
-        # a	0.000000043	b	0.064588	c	48275
+        """Calculates and sets :py:attr:`tower_mass` if it was not provided by the user.
+
+        .. math:: k1 * (A * H_{hub})^2 + k2 * A * H_{hub} + b
+
+        where:
+
+        - :math:`k1 =` :py:attr:`tower_mass_coeff`
+        - :math:`A =` :py:attr:`swept_area`
+        - :math:`H_{hub} =` :py:attr:`tower_length`
+        - :math:`k2 =` :py:attr:`tower_mass_coeff2`
+        - :math:`b =` :py:attr:`tower_mass_intercept`
+
+        Args:
+            tower_mass_coeff (float): :math:`k` in the mass equation above.
+            tower_mass_coeff2 (float): :math:`k` in the mass equation above.
+            rotor_diameter (float): Diameter of the rotor swept area; used to calculate
+                :py:attr:`swept_area`.
+            tower_length (float): For onshore turbines, this is the hub height (total length above
+                ground). For offshore turbines, this is length from transition piece to hub height
+                (:math:`m`).
+            tower_mass_intercept (bool): :math:`b` in the mass equation above (:math:`kg`).
+
+        Raises:
+            ValueError: Raised if the required parameters have not been provided or calculated.
+        """
         exists = self._prepare_calculation("tower_mass")
         if exists:
             return
+
+        self.tower_mass = (
+            self.tower_mass_coeff * (self.tower_length * self.swept_area) ** 2
+            + self.tower_mass_coeff2 * self.tower_length * self.swept_area
+            + self.tower_mass_intercept
+        )
