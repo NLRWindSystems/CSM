@@ -13,6 +13,36 @@ class Land2021NLR(Land2020NLR):
     # platform mainframe: k	0.005
     # crane mass: no change
 
+    def __attrs_post_init__(self):
+        """Updates the parameter mapping for new mass and cost relationships."""
+        self.parameter_map["blade_mass"] = (
+            "rotor_diameter",
+            "blade_mass_coeff1",
+            "blade_mass_coeff2",
+            "blade_mass_intercept",
+        )
+        self.parameter_map["pitch_system_mass"] = "pitch_system_mass"
+        self.parameter_map["hub_mass"] = (
+            "rated_power_kw",
+            "hub_mass_coeff",
+            "hub_mass_exp",
+        )
+        self.parameter_map["gearbox_mass"] = ("rotor_torque", "gearbox_mass_coeff")
+        self.parameter_map["yaw_system_mass"] = (
+            "rotor_diameter",
+            "yaw_system_mass_coeff",
+            "yaw_system_mass_coeff2",
+            "yaw_system_mass_exp",
+        )
+        self.parameter_map["hydraulic_cooling_mass"] = ("hydraulic_cooling_mass",)
+        self.parameter_map["tower_mass"] = (
+            "rotor_diameter",
+            "tower_length",
+            "tower_mass_coeff",
+            "tower_mass_coeff2",
+            "tower_mass_intercept",
+        )
+
     def calculate_blade_mass(self):
         # m = a*(RD/2)^2 + b*(RD/2) + c
         # a	8.3612	b	-620.03	c	17847
@@ -45,9 +75,4 @@ class Land2021NLR(Land2020NLR):
         # m = a*(hh*A)^2 + b*hh*A + c
         # hh = hub height, m A = swept area, m2
         # a	0.000000043	b	0.064588	c	48275
-        ...
-
-    def calculate__mass(self):
-        # f
-        # m
         ...
