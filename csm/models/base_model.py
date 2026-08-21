@@ -1022,6 +1022,11 @@ class CSMBase:
         df.columns = df.columns.droplevel(0)  # remove the "result" name for aesthetics
         return df
 
+    @property
+    def rotor_radius(self) -> float:
+        """Calculates the rotor radius as :py:attr:`rotor_diameter` / 2."""
+        return self.rotor_diameter / 2
+
     def calculate_blade_mass(self):
         """Calculates and sets :py:attr:`blade_mass` if it was not provided by the user.
 
