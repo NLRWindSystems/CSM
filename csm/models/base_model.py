@@ -1027,6 +1027,11 @@ class CSMBase:
         """Calculates the rotor radius as :py:attr:`rotor_diameter` / 2."""
         return self.rotor_diameter / 2
 
+    @property
+    def swept_area(self) -> float:
+        r"""Calculates the rotor swept area as :math:`\pi * rotor\_radius ^ 2`."""
+        return np.pi * self.rotor_radius**2
+
     def calculate_blade_mass(self):
         """Calculates and sets :py:attr:`blade_mass` if it was not provided by the user.
 
