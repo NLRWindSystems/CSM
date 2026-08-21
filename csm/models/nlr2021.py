@@ -10,12 +10,6 @@ base = fields(Land2020NLR)
 @define
 class Land2021NLR(Land2020NLR):
     # untouched
-    # spinner: k	2.3255	b	204.65
-    # low speed shaft: a	2.1906	b	-311.15	c	13108
-    # bearing: k	1.0E-04	b	3.5
-    # brake: k	198.51	b	1.893
-    # generator: k	1673.1	b	3932.7
-    # bedplate: k	737.88	b	-68066
     # nacelle cover: k	1915	b	1910
     # platform mainframe: k	0.005
     # crane mass: no change
@@ -23,16 +17,17 @@ class Land2021NLR(Land2020NLR):
     blade_mass_coeff = base.blade_mass_coeff.reuse(default=8.3612)
     blade_mass_coeff2 = base.blade_mass_coeff.reuse(default=-620.03)
     blade_mass_intercept = create_field(float, "unitless", "input", default=17847)
-
     hub_mass_coeff = base.hub_mass_coeff.reuse(default=3.5793)
     hub_mass_exp = create_field(float, "unitless", "input", default=-25451.58)
-
     pitch_blade_mass_coeff = base.pitch_blade_mass_coeff.reuse(default=0)
     pitch_system_mass_coeff = base.pitch_system_mass_coeff.reuse(default=0)
     pitch_blade_mass_intercept = base.pitch_blade_mass_intercept.reuse(default=0)
-
+    pitch_system_mass = base.pitch_system_mass.reuse(default=0)
+    pitch_system_cost = base.pitch_system_cost.reuse(default=0)
     gearbox_torque_density = base.gearbox_torque_density.reuse(default=132.5)
     gearbox_torque_exp = base.gearbox_torque_exp.reuse(default=0)
+    generator_mass_coeff = base.generator_mass_coeff.reuse(default=1.6731)
+    generator_mass_intercept = base.generator_mass_intercept.reuse(default=3932.7)
 
     def __attrs_post_init__(self):
         """Updates the parameter mapping for new mass and cost relationships."""
@@ -145,13 +140,6 @@ class Land2021NLR(Land2020NLR):
             return
 
         self.gearbox_mass = self.rotor_torque * 1000 / self.gearbox_torque_density
-
-    def calculate_yaw_system_mass(self):
-        # m = 1.6*k*RD^b
-        # k	7.0E-04	b	3.1571
-        exists = self._prepare_calculation("yaw_system_mass")
-        if exists:
-            return
 
     def calculate_hydraulic_cooling_mass(self):
         # k	221
