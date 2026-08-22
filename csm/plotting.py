@@ -52,12 +52,12 @@ single component's own figure; those instead get their own combined comparison f
 costs (with any needed multiplier, e.g. blades x num_blades) against the benchmark.
 """
 
-import math
 import re
 import sys
+import math
 import textwrap
-from pathlib import Path
 from typing import NamedTuple
+from pathlib import Path
 from collections.abc import Callable
 
 import numpy as np
@@ -65,11 +65,11 @@ import pandas as pd
 import networkx as nx
 import matplotlib.pyplot as plt
 from PIL import Image
-from attrs import fields as attrs_fields
 from pptx import Presentation
-from pptx.util import Inches, Pt
+from attrs import fields as attrs_fields
+from pptx.util import Pt, Inches
 from matplotlib.lines import Line2D
-from matplotlib.ticker import FuncFormatter, MaxNLocator
+from matplotlib.ticker import MaxNLocator, FuncFormatter
 
 from csm.models.nlr2015 import Land2015NLR
 from csm.models.nlr2020 import Land2020NLR
@@ -212,15 +212,43 @@ AGGREGATE_LEAF_COMPONENTS: dict[str, list[str]] = {
     "Hub System": ["Hub", "Pitch System", "Spinner"],
     "Rotor (Total)": ["Blade", "Hub", "Pitch System", "Spinner"],
     "Nacelle (Total)": [
-        "Low Speed Shaft", "Main Bearing", "Gearbox", "Brake", "High Speed Shaft", "Generator",
-        "Bedplate", "Yaw System", "Hydraulic Cooling", "Nacelle Cover", "Platform & Mainframe",
-        "Transformer", "Converter", "Controls", "Electrical Connection",
+        "Low Speed Shaft",
+        "Main Bearing",
+        "Gearbox",
+        "Brake",
+        "High Speed Shaft",
+        "Generator",
+        "Bedplate",
+        "Yaw System",
+        "Hydraulic Cooling",
+        "Nacelle Cover",
+        "Platform & Mainframe",
+        "Transformer",
+        "Converter",
+        "Controls",
+        "Electrical Connection",
     ],
     "Turbine (Total)": [
-        "Blade", "Hub", "Pitch System", "Spinner", "Low Speed Shaft", "Main Bearing", "Gearbox",
-        "Brake", "High Speed Shaft", "Generator", "Bedplate", "Yaw System", "Hydraulic Cooling",
-        "Nacelle Cover", "Platform & Mainframe", "Transformer", "Converter", "Controls",
-        "Electrical Connection", "Tower",
+        "Blade",
+        "Hub",
+        "Pitch System",
+        "Spinner",
+        "Low Speed Shaft",
+        "Main Bearing",
+        "Gearbox",
+        "Brake",
+        "High Speed Shaft",
+        "Generator",
+        "Bedplate",
+        "Yaw System",
+        "Hydraulic Cooling",
+        "Nacelle Cover",
+        "Platform & Mainframe",
+        "Transformer",
+        "Converter",
+        "Controls",
+        "Electrical Connection",
+        "Tower",
     ],
 }
 
@@ -310,14 +338,20 @@ class WMMapping(NamedTuple):
 WM_CATEGORY_MAPPING: dict[str, WMMapping] = {
     "Balance of Nacelle": WMMapping(
         (
-            "Nacelle Cover", "Electrical Connection", "Hydraulic Cooling", "Brake",
-            "Transformer", "Controls",
+            "Nacelle Cover",
+            "Electrical Connection",
+            "Hydraulic Cooling",
+            "Brake",
+            "Transformer",
+            "Controls",
         ),
-        {}, "rated_power_kw",
+        {},
+        "rated_power_kw",
     ),
     "Bearings and Shaft": WMMapping(
         ("Main Bearing", "Low Speed Shaft", "High Speed Shaft"),
-        {"Main Bearing": "num_bearings"}, "rated_power_kw",
+        {"Main Bearing": "num_bearings"},
+        "rated_power_kw",
     ),
     "Blades": WMMapping(("Blade",), {"Blade": "num_blades"}, "rotor_diameter"),
     "Converter": WMMapping(("Converter",), {}, "rated_power_kw"),
@@ -350,15 +384,26 @@ BENCHMARK_OVERLAY: dict[str, tuple[list[str], str | None]] = {
     "Rotor (Total)": (["Blades", "Hub and Pitch"], None),
     "Nacelle (Total)": (
         [
-            "Balance of Nacelle", "Bearings and Shaft", "Converter", "Gearbox", "Generator",
+            "Balance of Nacelle",
+            "Bearings and Shaft",
+            "Converter",
+            "Gearbox",
+            "Generator",
             "Structure",
         ],
         None,
     ),
     "Turbine (Total)": (
         [
-            "Balance of Nacelle", "Bearings and Shaft", "Blades", "Converter", "Gearbox",
-            "Generator", "Hub and Pitch", "Structure", "Tower",
+            "Balance of Nacelle",
+            "Bearings and Shaft",
+            "Blades",
+            "Converter",
+            "Gearbox",
+            "Generator",
+            "Hub and Pitch",
+            "Structure",
+            "Tower",
         ],
         None,
     ),
@@ -492,12 +537,14 @@ def _benchmark_points(
     driver_mid = _bin_midpoints(rows[driver_col].unique())
     capacity_mid = _bin_midpoints(rows[BENCHMARK_CAPACITY_COLUMN].unique())
     rows = rows.copy()
-    rows["_cost_usd"] = rows[BENCHMARK_VALUE_COLUMN] * rows[BENCHMARK_CAPACITY_COLUMN].map(capacity_mid)
+    rows["_cost_usd"] = rows[BENCHMARK_VALUE_COLUMN] * rows[BENCHMARK_CAPACITY_COLUMN].map(
+        capacity_mid
+    )
 
     if len(wm_categories) == 1:
-        cost_by_bin = rows.set_index([BENCHMARK_CAPACITY_COLUMN, BENCHMARK_RD_COLUMN, BENCHMARK_TOWER_COLUMN])[
-            "_cost_usd"
-        ]
+        cost_by_bin = rows.set_index(
+            [BENCHMARK_CAPACITY_COLUMN, BENCHMARK_RD_COLUMN, BENCHMARK_TOWER_COLUMN]
+        )["_cost_usd"]
     else:
         group_cols = [BENCHMARK_CAPACITY_COLUMN, BENCHMARK_RD_COLUMN, BENCHMARK_TOWER_COLUMN]
         present = rows.groupby(group_cols, observed=True)[BENCHMARK_ITEM_COLUMN].nunique()
@@ -556,12 +603,12 @@ def _resolve_mass_formula(component_label: str, model_cls: type) -> str:
 
 
 def _blade_mass_definition(model_cls: type) -> str:
-    """"m_blade = ..." line, reusing the Blade component's own formula for `model_cls`."""
+    """ "m_blade = ..." line, reusing the Blade component's own formula for `model_cls`."""
     return _resolve_mass_formula("Blade", model_cls).replace("m = ", "m_blade = ", 1)
 
 
 def _bedplate_mass_definition(model_cls: type) -> str:
-    """"m_bedplate = ..." line, reusing the Bedplate component's own formula for `model_cls`."""
+    """ "m_bedplate = ..." line, reusing the Bedplate component's own formula for `model_cls`."""
     return _resolve_mass_formula("Bedplate", model_cls).replace("m = ", "m_bedplate = ", 1)
 
 
@@ -630,7 +677,9 @@ FORMULA_DEFAULT: dict[str, Callable[[type], str]] = {
         f"m = {_fmt_num(_coeff(cls, 'transformer_mass_coeff'))}·P "
         f"{_fmt_coef(_coeff(cls, 'transformer_mass_intercept'))}"
     ),
-    "Tower": lambda cls: f"m = {_fmt_num(_coeff(cls, 'tower_mass_coeff'))}·H^{_fmt_num(_coeff(cls, 'tower_mass_exp'))}",
+    "Tower": lambda cls: (
+        f"m = {_fmt_num(_coeff(cls, 'tower_mass_coeff'))}·H^{_fmt_num(_coeff(cls, 'tower_mass_exp'))}"
+    ),
     "Converter": lambda cls: "m = 0 (not modeled)",
     "Controls": lambda cls: "m = 0 (not modeled)",
     "Electrical Connection": lambda cls: "m = 0 (not modeled)",
@@ -1421,12 +1470,24 @@ def _slugify(label: str) -> str:
 
 
 def _draw_mass_panel(
-    ax, component: ComponentSpec, driver: Driver, curves: dict, config_cache: dict,
-    models: dict[str, type], configs: dict[str, dict], marker_map: dict, color_map: dict,
+    ax,
+    component: ComponentSpec,
+    driver: Driver,
+    curves: dict,
+    config_cache: dict,
+    models: dict[str, type],
+    configs: dict[str, dict],
+    marker_map: dict,
+    color_map: dict,
 ) -> None:
     if component.label not in NO_LINE_COMPONENTS:
         for model_name, data in curves.items():
-            ax.plot(data["driver_display"], data["mass"] * MASS_SCALE, color=color_map[model_name], lw=2.5)
+            ax.plot(
+                data["driver_display"],
+                data["mass"] * MASS_SCALE,
+                color=color_map[model_name],
+                lw=2.5,
+            )
     for model_name in models:
         for config_name in configs:
             entry = config_cache[model_name].get(config_name)
@@ -1436,8 +1497,14 @@ def _draw_mass_panel(
             if x is None:
                 continue
             ax.scatter(
-                x, entry[component.mass_attr] * MASS_SCALE, marker=marker_map[config_name],
-                color=color_map[model_name], s=110, edgecolor="black", linewidth=0.6, zorder=5,
+                x,
+                entry[component.mass_attr] * MASS_SCALE,
+                marker=marker_map[config_name],
+                color=color_map[model_name],
+                s=110,
+                edgecolor="black",
+                linewidth=0.6,
+                zorder=5,
             )
 
 
@@ -1455,22 +1522,35 @@ def _place_legend(fig, handles: list, max_cols_per_row: int = 7) -> int:
     n_rows = max(1, math.ceil(n_total / max_cols_per_row))
     ncol = math.ceil(n_total / n_rows)
     fig.legend(
-        handles=handles, loc="lower center", ncol=ncol, bbox_to_anchor=(0.5, 0.01),
-        frameon=False, fontsize=9,
+        handles=handles,
+        loc="lower center",
+        ncol=ncol,
+        bbox_to_anchor=(0.5, 0.01),
+        frameon=False,
+        fontsize=9,
     )
     return n_rows
 
 
 def _draw_cost_panel(
-    ax, component: ComponentSpec, driver: Driver, curves: dict, config_cache: dict,
-    models: dict[str, type], configs: dict[str, dict], marker_map: dict, color_map: dict,
+    ax,
+    component: ComponentSpec,
+    driver: Driver,
+    curves: dict,
+    config_cache: dict,
+    models: dict[str, type],
+    configs: dict[str, dict],
+    marker_map: dict,
+    color_map: dict,
 ) -> None:
     # Unlike the mass panels, "total" components (NO_LINE_COMPONENTS) still get a real cost line
     # here: this panel's cost is always a direct sweep of one real attrs field (e.g.
     # `nacelle_cost`) against one canonical driver, not an approximation reused across mismatched
     # per-model mass drivers, so there's no reason to suppress it.
     for model_name, data in curves.items():
-        ax.plot(data["driver_display"], data["cost"] * COST_SCALE, color=color_map[model_name], lw=2.5)
+        ax.plot(
+            data["driver_display"], data["cost"] * COST_SCALE, color=color_map[model_name], lw=2.5
+        )
     for model_name in models:
         for config_name in configs:
             entry = config_cache[model_name].get(config_name)
@@ -1480,8 +1560,14 @@ def _draw_cost_panel(
             if x is None:
                 continue
             ax.scatter(
-                x, entry[component.cost_attr] * COST_SCALE, marker=marker_map[config_name],
-                color=color_map[model_name], s=110, edgecolor="black", linewidth=0.6, zorder=5,
+                x,
+                entry[component.cost_attr] * COST_SCALE,
+                marker=marker_map[config_name],
+                color=color_map[model_name],
+                s=110,
+                edgecolor="black",
+                linewidth=0.6,
+                zorder=5,
             )
 
 
@@ -1570,12 +1656,19 @@ def plot_component(
         natural_raw_ranges[_driver_key(driver)] = raw_range
         curves = _sweep_curve(component, driver, owners, base_kwargs, raw_range, n_points)
         natural_curves[_driver_key(driver)] = curves
-        _draw_mass_panel(ax, component, driver, curves, config_cache, models, configs, marker_map, color_map)
+        _draw_mass_panel(
+            ax, component, driver, curves, config_cache, models, configs, marker_map, color_map
+        )
         points = _empirical_mass_points(empirical_df, component, driver, base_kwargs)
         if points is not None:
             ax.scatter(
-                *points, color="0.55", s=16, alpha=0.35, edgecolor=OVERLAY_EDGE_COLOR,
-                linewidth=OVERLAY_EDGE_LINEWIDTH, zorder=EMPIRICAL_ZORDER,
+                *points,
+                color="0.55",
+                s=16,
+                alpha=0.35,
+                edgecolor=OVERLAY_EDGE_COLOR,
+                linewidth=OVERLAY_EDGE_LINEWIDTH,
+                zorder=EMPIRICAL_ZORDER,
             )
             has_empirical = True
 
@@ -1587,14 +1680,26 @@ def plot_component(
         component, cost_driver, cost_line_models, base_kwargs, cost_raw_range, n_points
     )
     _draw_cost_panel(
-        ax_cost, component, cost_driver, cost_natural_curves, config_cache, models, configs,
-        marker_map, color_map,
+        ax_cost,
+        component,
+        cost_driver,
+        cost_natural_curves,
+        config_cache,
+        models,
+        configs,
+        marker_map,
+        color_map,
     )
     cost_points = _empirical_cost_points(empirical_df, component, cost_driver, base_kwargs)
     if cost_points is not None:
         ax_cost.scatter(
-            *cost_points, color="0.55", s=16, alpha=0.35, edgecolor=OVERLAY_EDGE_COLOR,
-            linewidth=OVERLAY_EDGE_LINEWIDTH, zorder=EMPIRICAL_ZORDER,
+            *cost_points,
+            color="0.55",
+            s=16,
+            alpha=0.35,
+            edgecolor=OVERLAY_EDGE_COLOR,
+            linewidth=OVERLAY_EDGE_LINEWIDTH,
+            zorder=EMPIRICAL_ZORDER,
         )
         has_empirical = True
     benchmark_overlay = BENCHMARK_OVERLAY.get(component.label)
@@ -1607,8 +1712,14 @@ def plot_component(
             if mult_key is not None:
                 bench_y = bench_y / base_kwargs[mult_key]
             ax_cost.scatter(
-                bench_x, bench_y, color=BENCHMARK_COLOR, s=14, alpha=0.4, edgecolor=OVERLAY_EDGE_COLOR,
-                linewidth=OVERLAY_EDGE_LINEWIDTH, zorder=BENCHMARK_ZORDER,
+                bench_x,
+                bench_y,
+                color=BENCHMARK_COLOR,
+                s=14,
+                alpha=0.4,
+                edgecolor=OVERLAY_EDGE_COLOR,
+                linewidth=OVERLAY_EDGE_LINEWIDTH,
+                zorder=BENCHMARK_ZORDER,
             )
             has_benchmark = True
 
@@ -1643,17 +1754,30 @@ def plot_component(
             owners = owners_by_key[_driver_key(driver)]
             for model_name, model_cls in owners.items():
                 raw_lo, raw_hi = _raw_range_for_display(
-                    component, driver, model_cls, base_kwargs, xlim, natural_raw_ranges[_driver_key(driver)]
+                    component,
+                    driver,
+                    model_cls,
+                    base_kwargs,
+                    xlim,
+                    natural_raw_ranges[_driver_key(driver)],
                 )
                 raw_range = (min(raw_lo, raw_hi), max(raw_lo, raw_hi))
                 data = _sweep_single(component, driver, model_cls, base_kwargs, raw_range, n_points)
-                ax.plot(data["driver_display"], data["mass"] * MASS_SCALE, color=color_map[model_name], lw=2.5)
+                ax.plot(
+                    data["driver_display"],
+                    data["mass"] * MASS_SCALE,
+                    color=color_map[model_name],
+                    lw=2.5,
+                )
             for model_name in constant_models:
                 const_mass = _constant_value(model_name, config_cache, component.mass_attr)
                 if const_mass is not None:
                     ax.plot(
-                        xlim, [const_mass * MASS_SCALE, const_mass * MASS_SCALE],
-                        color=color_map[model_name], lw=2.5, ls="--",
+                        xlim,
+                        [const_mass * MASS_SCALE, const_mass * MASS_SCALE],
+                        color=color_map[model_name],
+                        lw=2.5,
+                        ls="--",
                     )
 
     cost_xlim, _cost_ylim = captured[ax_cost]
@@ -1664,7 +1788,10 @@ def plot_component(
         raw_range = (min(raw_lo, raw_hi), max(raw_lo, raw_hi))
         data = _sweep_single(component, cost_driver, model_cls, base_kwargs, raw_range, n_points)
         ax_cost.plot(
-            data["driver_display"], data["cost"] * COST_SCALE, color=color_map[model_name], lw=2.5,
+            data["driver_display"],
+            data["cost"] * COST_SCALE,
+            color=color_map[model_name],
+            lw=2.5,
         )
 
     for ax in axes:
@@ -1688,7 +1815,9 @@ def plot_component(
                 (name, _resolve_mass_formula(component.label, cls))
                 for name, cls in title_models.items()
             ]
-            max_title_lines = max(max_title_lines, _set_stacked_title(ax, [(n, t) for n, t in lines if t]))
+            max_title_lines = max(
+                max_title_lines, _set_stacked_title(ax, [(n, t) for n, t in lines if t])
+            )
 
     cost_label, cost_units = _driver_label_units(cost_driver)
     ax_cost.set_xlabel(f"{cost_label} ({cost_units})" if cost_units else cost_label)
@@ -1714,16 +1843,29 @@ def plot_component(
     ]
     config_handles = [
         Line2D(
-            [0], [0], marker=marker_map[name], color="none", markerfacecolor="white",
-            markeredgecolor="black", markersize=9, label=name,
+            [0],
+            [0],
+            marker=marker_map[name],
+            color="none",
+            markerfacecolor="white",
+            markeredgecolor="black",
+            markersize=9,
+            label=name,
         )
         for name in config_names
     ]
     empirical_handle = (
         [
             Line2D(
-                [0], [0], marker="o", color="none", markerfacecolor="0.55",
-                markeredgecolor="none", alpha=0.6, markersize=7, label="Empirical data",
+                [0],
+                [0],
+                marker="o",
+                color="none",
+                markerfacecolor="0.55",
+                markeredgecolor="none",
+                alpha=0.6,
+                markersize=7,
+                label="Empirical data",
             )
         ]
         if has_empirical
@@ -1732,8 +1874,15 @@ def plot_component(
     benchmark_handle = (
         [
             Line2D(
-                [0], [0], marker="o", color="none", markerfacecolor=BENCHMARK_COLOR,
-                markeredgecolor="none", alpha=0.7, markersize=7, label="2026 Benchmark",
+                [0],
+                [0],
+                marker="o",
+                color="none",
+                markerfacecolor=BENCHMARK_COLOR,
+                markeredgecolor="none",
+                alpha=0.7,
+                markersize=7,
+                label="2026 Benchmark",
             )
         ]
         if has_benchmark
@@ -1807,8 +1956,13 @@ def generate_all_figures(
     figure_paths = {}
     for component in components:
         fig = plot_component(
-            component, models, config_cache, base_kwargs, configs,
-            empirical_df=empirical_df, benchmark_df=benchmark_df,
+            component,
+            models,
+            config_cache,
+            base_kwargs,
+            configs,
+            empirical_df=empirical_df,
+            benchmark_df=benchmark_df,
         )
         path = output_dir / f"{_slugify(component.label)}.png"
         fig.savefig(path, dpi=175)
@@ -1817,7 +1971,9 @@ def generate_all_figures(
     return figure_paths
 
 
-def _combined_cost_multiplier(component_label: str, multipliers: dict[str, str], values: dict) -> float:
+def _combined_cost_multiplier(
+    component_label: str, multipliers: dict[str, str], values: dict
+) -> float:
     mult_key = multipliers.get(component_label)
     return values[mult_key] if mult_key else 1.0
 
@@ -1920,7 +2076,8 @@ def plot_wm_comparison(
     # rather than a faithful "cost as a function of `driver`" (see `_cost_driver_matches`).
     # Markers, computed from each configuration's real full inputs, stay valid regardless.
     line_models = {
-        name: cls for name, cls in models.items()
+        name: cls
+        for name, cls in models.items()
         if all(_cost_driver_matches(c, cls, driver) for c in csm_components)
     }
     raw_range = _driver_range(config_cache, driver)
@@ -1931,7 +2088,9 @@ def plot_wm_comparison(
         for name, cls in line_models.items()
     }
     for model_name, data in natural_curves.items():
-        ax.plot(data["driver_display"], data["cost"] * COST_SCALE, color=color_map[model_name], lw=2.5)
+        ax.plot(
+            data["driver_display"], data["cost"] * COST_SCALE, color=color_map[model_name], lw=2.5
+        )
     for model_name in models:
         for config_name in configs:
             entry = config_cache[model_name].get(config_name)
@@ -1942,15 +2101,26 @@ def plot_wm_comparison(
             if x is None or cost is None:
                 continue
             ax.scatter(
-                x, cost * COST_SCALE, marker=marker_map[config_name], color=color_map[model_name],
-                s=110, edgecolor="black", linewidth=0.6, zorder=5,
+                x,
+                cost * COST_SCALE,
+                marker=marker_map[config_name],
+                color=color_map[model_name],
+                s=110,
+                edgecolor="black",
+                linewidth=0.6,
+                zorder=5,
             )
     bench_points = _benchmark_points(benchmark_df, [wm_category], driver)
     has_benchmark = bench_points is not None
     if has_benchmark:
         ax.scatter(
-            *bench_points, color=BENCHMARK_COLOR, s=14, alpha=0.4, edgecolor=OVERLAY_EDGE_COLOR,
-            linewidth=OVERLAY_EDGE_LINEWIDTH, zorder=BENCHMARK_ZORDER,
+            *bench_points,
+            color=BENCHMARK_COLOR,
+            s=14,
+            alpha=0.4,
+            edgecolor=OVERLAY_EDGE_COLOR,
+            linewidth=OVERLAY_EDGE_LINEWIDTH,
+            zorder=BENCHMARK_ZORDER,
         )
 
     xlim, ylim = ax.get_xlim(), ax.get_ylim()
@@ -1968,9 +2138,17 @@ def plot_wm_comparison(
         )
         extended_range = (min(raw_lo, raw_hi), max(raw_lo, raw_hi))
         data = _sweep_combined_cost(
-            csm_components, mapping.multipliers, model_cls, base_kwargs, driver, extended_range, n_points
+            csm_components,
+            mapping.multipliers,
+            model_cls,
+            base_kwargs,
+            driver,
+            extended_range,
+            n_points,
         )
-        ax.plot(data["driver_display"], data["cost"] * COST_SCALE, color=color_map[model_name], lw=2.5)
+        ax.plot(
+            data["driver_display"], data["cost"] * COST_SCALE, color=color_map[model_name], lw=2.5
+        )
 
     ax.set_xlim(*xlim)
     ax.set_ylim(*ylim)
@@ -1989,16 +2167,29 @@ def plot_wm_comparison(
     ]
     config_handles = [
         Line2D(
-            [0], [0], marker=marker_map[name], color="none", markerfacecolor="white",
-            markeredgecolor="black", markersize=9, label=name,
+            [0],
+            [0],
+            marker=marker_map[name],
+            color="none",
+            markerfacecolor="white",
+            markeredgecolor="black",
+            markersize=9,
+            label=name,
         )
         for name in config_names
     ]
     benchmark_handle = (
         [
             Line2D(
-                [0], [0], marker="o", color="none", markerfacecolor=BENCHMARK_COLOR,
-                markeredgecolor="none", alpha=0.7, markersize=7, label="2026 Benchmark",
+                [0],
+                [0],
+                marker="o",
+                color="none",
+                markerfacecolor=BENCHMARK_COLOR,
+                markeredgecolor="none",
+                alpha=0.7,
+                markersize=7,
+                label="2026 Benchmark",
             )
         ]
         if has_benchmark
@@ -2056,7 +2247,9 @@ def generate_wm_comparison_figures(
 
     figure_paths = {}
     for wm_category in wm_categories:
-        fig = plot_wm_comparison(wm_category, models, config_cache, base_kwargs, configs, benchmark_df)
+        fig = plot_wm_comparison(
+            wm_category, models, config_cache, base_kwargs, configs, benchmark_df
+        )
         path = output_dir / f"wm_{_slugify(wm_category)}.png"
         fig.savefig(path, dpi=175)
         plt.close(fig)
@@ -2240,11 +2433,17 @@ def generate_comparison(
     output_dir = Path(output_dir).resolve()
     figures_dir = output_dir / "figures"
     figure_paths = generate_all_figures(
-        figures_dir, models=models, configs=configs,
-        empirical_csv=empirical_csv, benchmark_csv=benchmark_csv,
+        figures_dir,
+        models=models,
+        configs=configs,
+        empirical_csv=empirical_csv,
+        benchmark_csv=benchmark_csv,
     )
     wm_figure_paths = generate_wm_comparison_figures(
-        figures_dir, models=models, configs=configs, benchmark_csv=benchmark_csv,
+        figures_dir,
+        models=models,
+        configs=configs,
+        benchmark_csv=benchmark_csv,
     )
 
     report_df = build_report_dataframe(models=models, configs=configs)
