@@ -7,47 +7,48 @@ Only components the input CSV(s) actually cover get new coefficients; everything
 inherits the base model's own value. See :py:func:`build_custom_model` for the main entry point.
 """
 
-import importlib
-import math
 import re
 import sys
-from dataclasses import dataclass
+import math
+import importlib
+from typing import NamedTuple
 from pathlib import Path
-from typing import Callable, NamedTuple
+from dataclasses import dataclass
+from collections.abc import Callable
 
 import numpy as np
 import pandas as pd
 from attrs import fields as attrs_fields
 from scipy.optimize import curve_fit
 
-from csm.models.nlr2015 import Land2015NLR
-from csm.models.nlr2020 import Land2020NLR
 from csm.plotting import (
     ALL_COMPONENTS,
-    BENCHMARK_CAPACITY_COLUMN,
-    BENCHMARK_ITEM_COLUMN,
     BENCHMARK_OVERLAY,
     BENCHMARK_RD_COLUMN,
-    BENCHMARK_TOWER_COLUMN,
-    BENCHMARK_VALUE_COLUMN,
+    WM_CATEGORY_MAPPING,
+    BENCHMARK_ITEM_COLUMN,
     DEFAULT_TURBINE_SPECS,
     EMPIRICAL_COST_COLUMN,
     EMPIRICAL_MASS_COLUMN,
+    BENCHMARK_TOWER_COLUMN,
+    BENCHMARK_VALUE_COLUMN,
+    BENCHMARK_CAPACITY_COLUMN,
     TOWER_SWEPT_VOLUME_DRIVER,
-    WM_CATEGORY_MAPPING,
-    ComponentSpec,
     WMMapping,
+    ComponentSpec,
     _base_config,
-    _bin_midpoints,
-    _combined_cost_multiplier,
-    _derive_empirical_entry,
     _driver_range,
+    _bin_midpoints,
     _empirical_rows,
+    load_benchmark_data as _load_benchmark_data,
+    load_empirical_data as _load_empirical_data,
     _evaluate_all_configs,
     _safe_upstream_kwargs,
+    _derive_empirical_entry,
+    _combined_cost_multiplier,
 )
-from csm.plotting import load_benchmark_data as _load_benchmark_data
-from csm.plotting import load_empirical_data as _load_empirical_data
+from csm.models.nlr2015 import Land2015NLR
+from csm.models.nlr2020 import Land2020NLR
 
 
 class MassFitSpec(NamedTuple):
@@ -198,8 +199,15 @@ NEEDS_BLADE_MASS: frozenset[str] = frozenset({"Hub", "Low Speed Shaft"})
 
 # Blade must be fit before Hub/Low Speed Shaft; everything else is independent of fit order.
 MASS_FIT_ORDER: list[str] = [
-    "Blade", "Hub", "Gearbox", "Generator", "Tower",
-    "Bedplate", "Main Bearing", "Low Speed Shaft", "Transformer",
+    "Blade",
+    "Hub",
+    "Gearbox",
+    "Generator",
+    "Tower",
+    "Bedplate",
+    "Main Bearing",
+    "Low Speed Shaft",
+    "Transformer",
 ]
 
 # A single empirical mass point can't constrain a new scaling relationship on its own — the one
@@ -339,7 +347,11 @@ def _native_spec_for(label: str, model_cls: type) -> MassFitSpec:
     *2015* side wrongly conclude a `Land2020NLR`-based model natively provides the 2015 shape too.
     """
     spec_2020 = MASS_FIT_SPECS_2020[label]
-    return spec_2020 if all(_has_field(model_cls, p) for p in spec_2020.params) else MASS_FIT_SPECS_2015[label]
+    return (
+        spec_2020
+        if all(_has_field(model_cls, p) for p in spec_2020.params)
+        else MASS_FIT_SPECS_2015[label]
+    )
 
 
 def _resolve_mass_fit_specs(
@@ -357,7 +369,9 @@ def _resolve_mass_fit_specs(
     }
 
 
-def _shape_default_source(label: str, spec: MassFitSpec, shape_overrides: dict[str, type] | None) -> type:
+def _shape_default_source(
+    label: str, spec: MassFitSpec, shape_overrides: dict[str, type] | None
+) -> type:
     """The model class whose own coefficient values are the right p0/default for `spec` — the
     `shape_overrides` entry for `label` if there is one (e.g. `Land2015NLR` for a Tower forced to
     its shape), otherwise whichever of `Land2020NLR`/`Land2015NLR` actually matches `spec`'s shape
@@ -390,6 +404,7 @@ def _needed_structural_overrides(
             )
         needed.append(MASS_SHAPE_OVERRIDES[key])
     return needed
+
 
 # Cost coefficient field name for every leaf component that appears in WM_CATEGORY_MAPPING (i.e.
 # every component a benchmark category can inform), so the group-cost fit in _fit_cost_group can
@@ -435,12 +450,17 @@ def _cost_coeff_field_for(label: str, base_model_cls: type) -> str:
       *either* base model, so `_has_field` alone would never find it.
     """
     field = COST_COEFF_FIELD[label]
-    known_override_fields = {name for o in (*MASS_SHAPE_OVERRIDES.values(), CONVERTER_COST_OVERRIDE) for name, _ in o.new_fields}
+    known_override_fields = {
+        name
+        for o in (*MASS_SHAPE_OVERRIDES.values(), CONVERTER_COST_OVERRIDE)
+        for name, _ in o.new_fields
+    }
     if _has_field(base_model_cls, field) or field in known_override_fields:
         return field
     if label == "Gearbox":
         return "gearbox_torque_cost"
     raise AttributeError(f"{base_model_cls.__name__} has no cost field for '{label}'")
+
 
 # "Total" components with no coefficients of their own to fit (their mass is a straight sum in
 # the base model) — their CSV rows are instead used to validate the bottom-up result.
@@ -560,7 +580,9 @@ def _fit_mass_component(
         if label in NEEDS_BLADE_MASS and "rotor_diameter" in entry:
             blade_spec = mass_fit_specs["Blade"]
             blade_source = shape_default_sources["Blade"]
-            blade_p = blade_params or {p: _default_coeff(blade_source, p) for p in blade_spec.params}
+            blade_p = blade_params or {
+                p: _default_coeff(blade_source, p) for p in blade_spec.params
+            }
             blade_mass_val = blade_spec.formula(
                 entry["rotor_diameter"], *[blade_p[p] for p in blade_spec.params]
             )
@@ -578,7 +600,11 @@ def _fit_mass_component(
         return FitResult(label, "mass", defaults, None, 0, "inherited (no data)")
     if n_points < MIN_MASS_FIT_POINTS:
         return FitResult(
-            label, "mass", defaults, None, n_points,
+            label,
+            "mass",
+            defaults,
+            None,
+            n_points,
             f"sample size too low (n={n_points}) to fit a new scaling relationship, "
             f"inherited {defaults_source.__name__}'s curve unchanged",
         )
@@ -612,7 +638,11 @@ def _fit_mass_component(
     predicted_check = spec.formula(plausibility_grid, *(fitted[p] for p in spec.params))
     if not (np.all(np.isfinite(predicted_check)) and np.all(predicted_check >= 0)):
         return FitResult(
-            label, "mass", defaults, None, n_points,
+            label,
+            "mass",
+            defaults,
+            None,
+            n_points,
             "fit rejected (negative/invalid mass across realistic turbine range), inherited",
         )
 
@@ -651,7 +681,10 @@ def _benchmark_bin_points(benchmark_df: pd.DataFrame, category: str) -> pd.DataF
 
 
 def _build_class(
-    class_name: str, overrides: dict[str, float], docstring: str, base_model_cls: type,
+    class_name: str,
+    overrides: dict[str, float],
+    docstring: str,
+    base_model_cls: type,
     mass_fit_specs: dict[str, MassFitSpec],
 ) -> type:
     """Renders and `exec`s a `base_model_cls` subclass with `overrides` applied — the same source
@@ -661,11 +694,13 @@ def _build_class(
     """
     source = _render_model_source(class_name, overrides, docstring, base_model_cls, mass_fit_specs)
     namespace: dict = {}
-    exec(compile(source, f"<{class_name}>", "exec"), namespace)  # noqa: S102
+    exec(compile(source, f"<{class_name}>", "exec"), namespace)
     return namespace[class_name]
 
 
-def _restrict_to_realistic_range(points: pd.DataFrame, size_window: dict[str, tuple[float, float]]) -> pd.DataFrame:
+def _restrict_to_realistic_range(
+    points: pd.DataFrame, size_window: dict[str, tuple[float, float]]
+) -> pd.DataFrame:
     """Keeps only benchmark bins within the padded range `csm.plotting` itself sweeps for the
     comparison's actual reference turbines (see `_driver_range`) — a cost fit unrestricted to this
     spans the benchmark's full 1–10MW/<101–171+m extent, most of which nothing in this comparison
@@ -734,12 +769,18 @@ def _fit_empirical_cost(
     coeff = float(np.sum(costs_arr * regressors_arr) / np.sum(regressors_arr**2))
     n_points = len(regressors)
     r2 = _r_squared(costs_arr, coeff * regressors_arr) if n_points > 1 else None
-    status = f"fit (empirical data, n={n_points})" if n_points > 1 else "fit (empirical data, 1 point — exact)"
+    status = (
+        f"fit (empirical data, n={n_points})"
+        if n_points > 1
+        else "fit (empirical data, 1 point — exact)"
+    )
     return FitResult(label, "cost", {field_name: coeff}, r2, n_points, status)
 
 
 def _fit_converter_cost(
-    benchmark_df: pd.DataFrame | None, base_kwargs: dict, size_window: dict[str, tuple[float, float]]
+    benchmark_df: pd.DataFrame | None,
+    base_kwargs: dict,
+    size_window: dict[str, tuple[float, float]],
 ) -> FitResult:
     """Fits Converter's cost as an affine function of turbine rating (`coeff * rating +
     intercept`) — unlike every other current cost formula's proportional-through-origin shape —
@@ -767,7 +808,11 @@ def _fit_converter_cost(
     coeff = max(float(coeff), 0.0)  # cost shouldn't decrease with turbine size
     r2 = _r_squared(y, coeff * x + float(intercept))
     return FitResult(
-        "Converter", "cost", {field_coeff: coeff, field_intercept: float(intercept)}, r2, len(x),
+        "Converter",
+        "cost",
+        {field_coeff: coeff, field_intercept: float(intercept)},
+        r2,
+        len(x),
         "fit (Converter, affine against turbine rating)",
     )
 
@@ -809,21 +854,35 @@ def _fit_cost_group(
     """
     leaves = [c for c in ALL_COMPONENTS if c.label in mapping.csm_components]
     field_names = {c.label: _cost_coeff_field_for(c.label, base_model_cls) for c in leaves}
-    defaults = {label: _default_coeff(base_model_cls, field) for label, field in field_names.items()}
+    defaults = {
+        label: _default_coeff(base_model_cls, field) for label, field in field_names.items()
+    }
 
-    fixed = {leaf.label: empirical_fits[leaf.label] for leaf in leaves if leaf.label in empirical_fits}
+    fixed = {
+        leaf.label: empirical_fits[leaf.label] for leaf in leaves if leaf.label in empirical_fits
+    }
     scalable = [leaf for leaf in leaves if leaf.label not in fixed]
     results = [
         FitResult(
-            r.label, "cost", r.params, r.r_squared, r.n_points,
-            r.status if len(leaves) == 1 else f"{r.status}, held fixed while calibrating {category}",
+            r.label,
+            "cost",
+            r.params,
+            r.r_squared,
+            r.n_points,
+            r.status
+            if len(leaves) == 1
+            else f"{r.status}, held fixed while calibrating {category}",
         )
         for r in fixed.values()
     ]
 
     fallback = [
         FitResult(
-            leaf.label, "cost", {field_names[leaf.label]: defaults[leaf.label]}, None, 0,
+            leaf.label,
+            "cost",
+            {field_names[leaf.label]: defaults[leaf.label]},
+            None,
+            0,
             "inherited (no benchmark data)",
         )
         for leaf in scalable
@@ -872,13 +931,16 @@ def _fit_cost_group(
             # mass) without needing to special-case either.
             default = defaults[leaf.label]
             cost_at_default = getattr(model, leaf.cost_attr, None)
-            value = (cost_at_default / default) if (cost_at_default is not None and default) else 0.0
+            value = (
+                (cost_at_default / default) if (cost_at_default is not None and default) else 0.0
+            )
             return value * _combined_cost_multiplier(leaf.label, mapping.multipliers, kwargs)
 
         fixed_contribution.append(
             sum(
                 fixed[leaf.label].params[field_names[leaf.label]] * regressor(leaf)
-                for leaf in leaves if leaf.label in fixed
+                for leaf in leaves
+                if leaf.label in fixed
             )
         )
         scalable_baseline.append(sum(defaults[leaf.label] * regressor(leaf) for leaf in scalable))
@@ -898,7 +960,11 @@ def _fit_cost_group(
         # components) — nothing to scale against.
         return results + [
             FitResult(
-                leaf.label, "cost", {field_names[leaf.label]: defaults[leaf.label]}, None, n_points,
+                leaf.label,
+                "cost",
+                {field_names[leaf.label]: defaults[leaf.label]},
+                None,
+                n_points,
                 "inherited (mass always ~0 for this component, nothing to fit)",
             )
             for leaf in scalable
@@ -917,18 +983,31 @@ def _fit_cost_group(
     # narrow window, which is worth flagging rather than leaving implicit in the number alone.
     note = category if len(leaves) == 1 else f"group: {category}"
     if r2 < 0.0:
-        note += " — low R² within the realistic-size window (check cost_aggregate_check for centering)"
+        note += (
+            " — low R² within the realistic-size window (check cost_aggregate_check for centering)"
+        )
 
     for leaf in scalable:
         field = field_names[leaf.label]
         results.append(
-            FitResult(leaf.label, "cost", {field: scale * defaults[leaf.label]}, r2, n_points, f"fit ({note})")
+            FitResult(
+                leaf.label,
+                "cost",
+                {field: scale * defaults[leaf.label]},
+                r2,
+                n_points,
+                f"fit ({note})",
+            )
         )
     return results
 
 
 def _fit_aggregate_check(
-    label: str, mass_attr: str, empirical_df: pd.DataFrame | None, base_kwargs: dict, model_cls: type
+    label: str,
+    mass_attr: str,
+    empirical_df: pd.DataFrame | None,
+    base_kwargs: dict,
+    model_cls: type,
 ) -> FitResult:
     """Validates (does not fit) `mass_attr` — a sum with no coefficients of its own — against
     `label`'s empirical rows, by running the fully-assembled `model_cls` at each row's real inputs
@@ -987,7 +1066,10 @@ COST_AGGREGATE_CHECKS: dict[str, list[str]] = {
 
 # The two roll-ups have a single model attribute that already sums everything underneath them —
 # reading it directly is simpler and more consistent than re-summing leaf costs by hand.
-_ROLLUP_COST_ATTR: dict[str, str] = {"Nacelle (Total)": "nacelle_cost", "Turbine (Total)": "turbine_cost"}
+_ROLLUP_COST_ATTR: dict[str, str] = {
+    "Nacelle (Total)": "nacelle_cost",
+    "Turbine (Total)": "turbine_cost",
+}
 
 
 def _fit_cost_aggregate_check(
@@ -1039,7 +1121,9 @@ def _fit_cost_aggregate_check(
         )
 
     if predicted is None:
-        return FitResult(label, "cost_aggregate_check", {}, None, n_total, "model couldn't compute this total")
+        return FitResult(
+            label, "cost_aggregate_check", {}, None, n_total, "model couldn't compute this total"
+        )
     ratio = predicted / target if target else float("nan")
     status = f"model ${predicted:,.0f} vs. benchmark mid-range ${target:,.0f} (ratio={ratio:.2f})"
     return FitResult(label, "cost_aggregate_check", {}, None, n_total, status)
@@ -1077,14 +1161,16 @@ def _render_model_source(
     # reuse from at all (that's exactly why it's structural).
     override_lines = [
         f"    {name} = base.{name}.reuse(default={float(value)!r})"
-        for name, value in overrides.items() if name not in structural_fields
+        for name, value in overrides.items()
+        if name not in structural_fields
     ]
     overrides_body = "\n".join(override_lines) if override_lines else "    pass"
 
     new_field_lines = "".join(
         f'    {field_name} = create_field(float, "unitless", "input", '
         f"default={float(overrides.get(field_name, default))!r})\n"
-        for o in structural for field_name, default in o.new_fields
+        for o in structural
+        for field_name, default in o.new_fields
     )
     method_blocks = "\n".join(o.method_body for o in structural)
 
@@ -1130,11 +1216,18 @@ def _render_model_source(
     if shape_markers:
         header.append(f"SHAPE_OVERRIDES = {shape_markers!r}")
         header += [""]
-    header += ["", f"base = fields({base_name})", "", "", "@define", f"class {class_name}({base_name}):"]
+    header += [
+        "",
+        f"base = fields({base_name})",
+        "",
+        "",
+        "@define",
+        f"class {class_name}({base_name}):",
+    ]
     header.append(
-        "    \"\"\"Coefficients fit from empirical data; formula shapes are inherited from"
+        '    """Coefficients fit from empirical data; formula shapes are inherited from'
         f" `{base_name}` unless noted. See the accompanying fit report for what was fit vs."
-        " inherited, and from how many data points.\"\"\""
+        ' inherited, and from how many data points."""'
     )
     header.append("")
 
@@ -1155,7 +1248,9 @@ def render_fit_report(report: list[FitResult], model_name: str | None) -> str:
     for r in report:
         r2_str = f"{r.r_squared:.4f}" if r.r_squared is not None else "—"
         params_str = ", ".join(f"{k}={v:.6g}" for k, v in r.params.items())
-        lines.append(f"{r.label:<22}{r.kind:<17}{r.status:<48}{r2_str:>8}{r.n_points:>6}  {params_str}")
+        lines.append(
+            f"{r.label:<22}{r.kind:<17}{r.status:<48}{r2_str:>8}{r.n_points:>6}  {params_str}"
+        )
     return "\n".join(lines)
 
 
@@ -1218,7 +1313,8 @@ def build_custom_model(
     }
     mass_fit_specs = _resolve_mass_fit_specs(base_model_cls, shape_overrides)
     shape_default_sources = {
-        label: _shape_default_source(label, spec, shape_overrides) for label, spec in mass_fit_specs.items()
+        label: _shape_default_source(label, spec, shape_overrides)
+        for label, spec in mass_fit_specs.items()
     }
 
     report: list[FitResult] = []
@@ -1226,8 +1322,13 @@ def build_custom_model(
     for label in MASS_FIT_ORDER:
         spec = mass_fit_specs[label]
         result = _fit_mass_component(
-            label, mass_fit_specs, shape_default_sources, empirical_df, base_kwargs,
-            mass_params.get("Blade"), _plausibility_grid(spec, reference_cache),
+            label,
+            mass_fit_specs,
+            shape_default_sources,
+            empirical_df,
+            base_kwargs,
+            mass_params.get("Blade"),
+            _plausibility_grid(spec, reference_cache),
         )
         mass_params[label] = result.params
         report.append(result)
@@ -1248,9 +1349,11 @@ def build_custom_model(
     # (not just the ones with their own CSV mass data) gets a real, model-consistent predicted
     # mass to regress cost against.
     mass_fitted_cls = _build_class(
-        "_MassFittedIntermediate", mass_overrides,
+        "_MassFittedIntermediate",
+        mass_overrides,
         "Intermediate: mass-only overrides, used internally while fitting cost coefficients.",
-        base_model_cls, mass_fit_specs,
+        base_model_cls,
+        mass_fit_specs,
     )
 
     # Empirical cost data (currently just Main Bearing, 1 point) takes priority over the
@@ -1263,7 +1366,9 @@ def build_custom_model(
         if label == "Converter":
             continue
         field_name = _cost_coeff_field_for(label, base_model_cls)
-        result = _fit_empirical_cost(label, field_name, empirical_df, mass_fitted_cls, base_kwargs, base_model_cls)
+        result = _fit_empirical_cost(
+            label, field_name, empirical_df, mass_fitted_cls, base_kwargs, base_model_cls
+        )
         if result is not None:
             empirical_cost_fits[label] = result
 
@@ -1278,8 +1383,14 @@ def build_custom_model(
         if not leaf_labels:
             continue
         results = _fit_cost_group(
-            category, mapping, mass_fitted_cls, benchmark_df, base_kwargs, base_model_cls,
-            size_window, empirical_cost_fits,
+            category,
+            mapping,
+            mass_fitted_cls,
+            benchmark_df,
+            base_kwargs,
+            base_model_cls,
+            size_window,
+            empirical_cost_fits,
         )
         for result in results:
             report.append(result)
@@ -1291,7 +1402,9 @@ def build_custom_model(
     if converter_result.status.startswith("fit"):
         cost_overrides.update(converter_result.params)
 
-    field_to_label = {_cost_coeff_field_for(label, base_model_cls): label for label in COST_COEFF_FIELD}
+    field_to_label = {
+        _cost_coeff_field_for(label, base_model_cls): label for label in COST_COEFF_FIELD
+    }
     for field_name, value in cost_coefficients.items():
         label = field_to_label.get(field_name, field_name)
         report.append(FitResult(label, "cost", {field_name: value}, None, 0, "user-supplied"))
@@ -1304,7 +1417,9 @@ def build_custom_model(
         docstring += f" and {Path(benchmark_csv).name}"
     docstring += f". Mass formula shapes default to {base_model_cls.__name__}"
     if shape_overrides:
-        overrides_text = ", ".join(f"{label}={cls.__name__}" for label, cls in shape_overrides.items())
+        overrides_text = ", ".join(
+            f"{label}={cls.__name__}" for label, cls in shape_overrides.items()
+        )
         docstring += f", except: {overrides_text}"
     docstring += "."
     source = _render_model_source(class_name, overrides, docstring, base_model_cls, mass_fit_specs)
@@ -1322,17 +1437,23 @@ def build_custom_model(
         model_cls = getattr(module, class_name)
     else:
         namespace: dict = {}
-        exec(compile(source, f"<{class_name}>", "exec"), namespace)  # noqa: S102
+        exec(compile(source, f"<{class_name}>", "exec"), namespace)
         model_cls = namespace[class_name]
 
     for label, mass_attr in AGGREGATE_CHECKS.items():
         report.append(_fit_aggregate_check(label, mass_attr, empirical_df, base_kwargs, model_cls))
     for label, categories in COST_AGGREGATE_CHECKS.items():
-        report.append(_fit_cost_aggregate_check(label, categories, model_cls, benchmark_df, base_kwargs, size_window))
+        report.append(
+            _fit_cost_aggregate_check(
+                label, categories, model_cls, benchmark_df, base_kwargs, size_window
+            )
+        )
 
     output_dir = Path(output_dir) / (model_name or "custom")
     output_dir.mkdir(parents=True, exist_ok=True)
-    (output_dir / "fit_report.md").write_text(render_fit_report(report, model_name), encoding="utf-8")
+    (output_dir / "fit_report.md").write_text(
+        render_fit_report(report, model_name), encoding="utf-8"
+    )
 
     return CustomModelResult(model_cls, class_name, module_path, report)
 
