@@ -21,17 +21,26 @@ def plot_mass_cost_comparison(
     fig_kwargs: dict | None = None,
     scatter_kwargs: dict | None = None,
     plot_kwargs: dict | None = None,
+    axis_label_kwargs: dict | None = None,
     model_cmap: dict[str, str] | None = None,
-    xlim: tuple[float, float] | None = None,
-    ylim: tuple[float, float] | None = None,
+    mass_xlim: tuple[float, float] | None = None,
+    mass_ylim: tuple[float, float] | None = None,
+    cost_xlim: tuple[float, float] | None = None,
+    cost_ylim: tuple[float, float] | None = None,
     *,
     return_fig_ax: bool = False,
 ) -> None | tuple[plt.Figure, tuple[plt.Axes, plt.Axes]]:
     """Removes the missing docstring error."""
-    fig_kwargs = {"dpi": 200} if fig_kwargs is None else fig_kwargs
-    scatter_kwargs = {} if fig_kwargs is None else scatter_kwargs
-    plot_kwargs = {} if fig_kwargs is None else plot_kwargs
+    # Plot settings handling
+    fig_settings = {"dpi": 200, "figsize": (9, 4)}
+    if fig_kwargs is not None:
+        fig_settings.update(fig_kwargs)
 
+    # scatter_settings = {} or scatter_kwargs
+    plot_settings = {} or plot_kwargs
+    axis_label_settings = {} or axis_label_kwargs
+
+    # Create models and results
     metrics = [f"{component}_mass", f"{component}_cost"]
     models = {name: get_model(name) for name in base_kwargs}
     parameter = next(iter(parameterization))
@@ -44,6 +53,7 @@ def plot_mass_cost_comparison(
         for name, model in models.items()
     }
 
+    # Handle mass and cost units
     match mass_units.lower():
         case "kg":
             label_units = "kg"
@@ -70,29 +80,39 @@ def plot_mass_cost_comparison(
     mass_label = f"{component.title()} Mass ({label_units})"
     cost_label = f"{component.title()} Cost ({label_cost})"
 
-    fig = plt.figure(dpi=200, figsize=(9, 4))
+    # Plotting setup
+    fig = plt.figure(**fig_settings)
     ax1, ax2 = fig.subplots(1, 2)
 
-    ax1.set_xlabel(parameter_label)
-    ax1.set_ylabel(mass_label)
-    ax2.set_xlabel(mass_label)
-    ax2.set_ylabel(cost_label)
+    ax1.set_xlabel(parameter_label, **axis_label_settings)
+    ax1.set_ylabel(mass_label, **axis_label_settings)
+    ax2.set_xlabel(mass_label, **axis_label_settings)
+    ax2.set_ylabel(cost_label, **axis_label_settings)
+
+    ax1.set_xlim(mass_xlim)
+    ax1.set_ylim(mass_ylim)
+    ax2.set_xlim(cost_xlim)
+    ax2.set_ylim(cost_ylim)
+
     for ax in (ax1, ax2):
         ax.xaxis.set_major_formatter(StrMethodFormatter("{x:,.0f}"))
         ax.yaxis.set_major_formatter(StrMethodFormatter("{x:,.0f}"))
         ax.grid()
         ax.set_axisbelow(True)
 
+    # Model line plots
     for name, _results in results.items():
         parameter_values = _results.columns
         mass = _results.loc[f"{component}_mass"] * mass_scale
         cost = _results.loc[f"{component}_cost"] * cost_scale
 
-        ax1.plot(parameter_values, mass, label=name)
-        ax2.plot(mass, cost)
+        ax1.plot(parameter_values, mass, label=name, **plot_settings)
+        ax2.plot(mass, cost, **plot_settings)
 
+    # Reference turbine scatter plots
     # TODO: reference turbine scatter plots
 
+    # Post-plot figure handling
     ax1.legend()
 
     fig.tight_layout()
