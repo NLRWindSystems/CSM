@@ -973,6 +973,8 @@ class CSMBase:
             pd.DataFrame: DataFrame with a ``pandas.MultiIndex`` column set of all parameterized
                 values and with an index of the results names.
         """
+        if isinstance(results, str):
+            results = [results]
         expanded = generate_parameterization(parameterized_kwargs)
         names = [*expanded]
 
@@ -988,8 +990,6 @@ class CSMBase:
             if results is None:
                 single_results = model.get_all_results()
             else:
-                if isinstance(results, str):
-                    results = [results]
                 single_results = {el: getattr(model, el) for el in results}
             all_results.append(
                 pd.DataFrame.from_dict(single_results, orient="index")
@@ -1044,6 +1044,8 @@ class CSMBase:
             pd.DataFrame: DataFrame with a ``pandas.MultiIndex`` column set of all parameterized
                 values and with an index of the results names.
         """
+        if isinstance(results, str):
+            results = [results]
         expanded = generate_parameterization(parameterized_kwargs)
         names = [*expanded]
 
@@ -1054,13 +1056,11 @@ class CSMBase:
         model = cls.from_dict(base_kwargs, partial=True)
         for kwargs in additional_kwargs:
             model.update(kwargs)
-            model.run()
+            [getattr(model, f"calculate_{result}")() for result in results]
 
             if results is None:
                 single_results = model.get_all_results()
             else:
-                if isinstance(results, str):
-                    results = [results]
                 single_results = {el: getattr(model, el) for el in results}
             all_results.append(
                 pd.DataFrame.from_dict(single_results, orient="index")
