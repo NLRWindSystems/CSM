@@ -1,7 +1,7 @@
 from attrs import define, fields
 
-from csm.models import Land2020NLR
 from csm.models.utils import create_field
+from csm.models.nlr2020 import Land2020NLR
 
 
 base = fields(Land2020NLR)
@@ -10,10 +10,10 @@ base = fields(Land2020NLR)
 @define
 class Land2021NLR(Land2020NLR):
     blade_mass_coeff = base.blade_mass_coeff.reuse(default=8.3612)
-    blade_mass_coeff2 = base.blade_mass_coeff.reuse(default=-620.03)
-    blade_mass_intercept = create_field(float, "unitless", "input", default=17847)
+    blade_mass_coeff2: float = create_field(float, "unitless", "input", default=-620.03)
+    blade_mass_intercept: float = create_field(float, "unitless", "input", default=17847)
     hub_mass_coeff = base.hub_mass_coeff.reuse(default=3.5793)
-    hub_mass_exp = create_field(float, "unitless", "input", default=-25451.58)
+    hub_mass_exp: float = create_field(float, "unitless", "input", default=-25451.58)
     pitch_blade_mass_coeff = base.pitch_blade_mass_coeff.reuse(default=0)
     pitch_system_mass_coeff = base.pitch_system_mass_coeff.reuse(default=0)
     pitch_blade_mass_intercept = base.pitch_blade_mass_intercept.reuse(default=0)
@@ -25,10 +25,10 @@ class Land2021NLR(Land2020NLR):
     generator_mass_intercept = base.generator_mass_intercept.reuse(default=3932.7)
     nacelle_cover_mass_coeff = base.nacelle_cover_mass_coeff.reuse(default=1.915)
     nacelle_cover_mass_intercept = base.nacelle_cover_mass_intercept.reuse(default=1910)
-    tower_mass_coeff: float = base.tower_mass_coeff.reuse(default=0.000000043)
+    tower_mass_coeff = base.tower_mass_coeff.reuse(default=0.000000043)
     tower_mass_coeff2: float = create_field(float, "unitless", "input", default=0.064588)
     tower_mass_intercept: float = create_field(float, "unitless", "input", default=48275)
-    tower_mass_exp: float = base.tower_mass_exp.reuse(default=0)
+    tower_mass_exp = base.tower_mass_exp.reuse(default=0)
 
     def __attrs_post_init__(self):
         """Updates the parameter mapping for new mass and cost relationships."""
@@ -52,6 +52,7 @@ class Land2021NLR(Land2020NLR):
             "tower_mass_coeff2",
             "tower_mass_intercept",
         )
+        super().__attrs_post_init__()
 
     def calculate_blade_mass(self):
         """Calculates and sets :py:attr:`blade_mass` if it was not provided by the user.
