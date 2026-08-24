@@ -36,9 +36,9 @@ def plot_mass_cost_comparison(
     if fig_kwargs is not None:
         fig_settings.update(fig_kwargs)
 
-    # scatter_settings = {} or scatter_kwargs
-    plot_settings = {} or plot_kwargs
-    axis_label_settings = {} or axis_label_kwargs
+    # scatter_settings = {} if scatter_kwargs is None else scatter_kwargs
+    plot_settings = {} if plot_kwargs is None else plot_kwargs
+    axis_label_settings = {} if axis_label_kwargs is None else axis_label_kwargs
 
     # Create models and results
     metrics = [f"{component}_mass", f"{component}_cost"]
