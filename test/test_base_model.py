@@ -551,6 +551,21 @@ def test_validate_inputs(subtests):
         model.blade_has_carbon = True
         assert model._validate_inputs(blade_mass_inputs) is None
 
+    model = CSMBase.from_dict(csm_2015_inputs)
+    with subtests.test("dependent output is calculated"):
+        # Confirm that blade mass is unavailable, but calculated during validation
+        missing = ["blade_mass"]
+        dependents = model.get_dependent_attributes("pitch_system_mass")
+        no_vals = [
+            name
+            for name, has_val in zip(dependents, model._has_values(*dependents), strict=True)
+            if not has_val
+        ]
+        assert missing == no_vals
+
+        model._validate_inputs(model.parameter_map["pitch_system_mass"])
+        assert model._has_values("blade_mass")
+
 
 @pytest.mark.unit
 def test_prepare_calculation(subtests):
