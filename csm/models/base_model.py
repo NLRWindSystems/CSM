@@ -842,7 +842,7 @@ class CSMBase:
         """
         return {el.name: el for el in self.__attrs_attrs__}
 
-    @cached_property
+    @property
     def output_names(self) -> tuple[str]:
         """Names of all attributes that are outputs of the model (those with their "io" metadata as
         either "output" or "both").
