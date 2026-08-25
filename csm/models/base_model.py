@@ -933,7 +933,7 @@ class CSMBase:
         Returns:
             set[str]: Set of model attribute names that rely on the value of :py:attr:`name`.
         """
-        return nx.ancestors(self.parameter_graph, name)
+        return nx.descendants(self.parameter_graph, name)
 
     def update(self, data: dict[str, Any]):
         """Update the value of one or multiple model parameters.
