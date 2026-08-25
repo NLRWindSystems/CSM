@@ -1100,6 +1100,25 @@ class CSMBase:
         r"""Calculates the rotor swept area as :math:`\pi * rotor\_radius ^ 2`."""
         return np.pi * self.rotor_radius**2
 
+    def calculate(self, *args: str):
+        """Generic method for calculating individual parameters that have an available method in
+        the form of ``calculate_parameter`` such as ``calculate_blade_mass``.
+
+        Args:
+            args (str): The name(s) of parameters to calculate. Each parameter provided
+                must match the format of ``calculate_parameter`` such as ``calculate_blade_mass``.
+                Parameters will be converted to lower case with spaces replaced by underscores,
+                i.e., "Blade Mass" converts to "blade_mass".
+
+        Raises:
+            ValueError: Raised if no calculation is found for the parameter.
+        """
+        for parameter in args:
+            calculation = f"calculate_{parameter.lower().replace(' ', '_')}"
+            if (fn := getattr(self, calculation)) is None:
+                raise ValueError(f"No calculation available for '{parameter}'.")
+            fn()
+
     def calculate_blade_mass(self):
         """Calculates and sets :py:attr:`blade_mass` if it was not provided by the user.
 
