@@ -194,6 +194,8 @@ def test_defaults_only(subtests):
         assert len_results == len(results)
         assert not set(mass_results).intersection(cost_results)
 
+    model = CSMBase()
+    results = model.get_all_results()
     with subtests.test("Check default attribute values for results"):
         _fields = fields(CSMBase)
         for name, val in results.items():
