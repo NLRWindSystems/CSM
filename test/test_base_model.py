@@ -444,6 +444,59 @@ def test_fields_dict():
 
 
 @pytest.mark.unit
+def test_get_attr_map():
+    """Tests :py:meth:`CSMBase._get_attr_map`."""
+    metadata_by_name = {
+        f.name: {"io": f.metadata.get("io"), "units": f.metadata.get("units"), "default": f.default}
+        for f in fields(CSMBase)
+        if "io" in f.metadata
+    }
+
+    # Full specification for units and default value
+    separate_attr_map = {"inputs": {}, "outputs": {}, "both": {}}
+    combined_attr_map = {"inputs": {}, "outputs": {}}
+    for name, meta in metadata_by_name.items():
+        io_type = meta.pop("io")
+        match io_type:
+            case "input":
+                separate_attr_map["inputs"][name] = meta
+                combined_attr_map["inputs"][name] = meta
+            case "output":
+                separate_attr_map["outputs"][name] = meta
+                combined_attr_map["outputs"][name] = meta
+            case "both":
+                separate_attr_map["both"][name] = meta
+                combined_attr_map["inputs"][name] = meta
+                combined_attr_map["outputs"][name] = meta
+
+    assert separate_attr_map == CSMBase._get_attr_map(both_as_separate=True, include_units=True)
+    assert combined_attr_map == CSMBase._get_attr_map(both_as_separate=False, include_units=True)
+
+    # Drop units
+    separate_attr_map = {
+        _io: {name: meta["default"] for name, meta in vals.items()}
+        for _io, vals in separate_attr_map.items()
+    }
+    assert separate_attr_map == CSMBase._get_attr_map(both_as_separate=True, include_units=False)
+
+    combined_attr_map = {
+        _io: {name: meta["default"] for name, meta in vals.items()}
+        for _io, vals in combined_attr_map.items()
+    }
+    assert combined_attr_map == CSMBase._get_attr_map(both_as_separate=False, include_units=False)
+
+
+@pytest.mark.unit
+def test_output_names():
+    """Tests :py:meth:`CSMBase.output_names`."""
+    output_attrs = tuple(
+        f.name for f in fields(CSMBase) if f.metadata.get("io") in ("output", "both")
+    )
+    model = CSMBase.from_dict(csm_2015_inputs)
+    assert output_attrs == model.output_names
+
+
+@pytest.mark.unit
 def test_has_values(subtests):
     """Test :py:meth:`CSMBase._has_values`."""
     model = CSMBase.from_dict(csm_2015_inputs)
