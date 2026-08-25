@@ -1074,7 +1074,7 @@ class CSMBase:
         model = cls.from_dict(base_kwargs, partial=True)
         for kwargs in additional_kwargs:
             model.update(kwargs)
-            [getattr(model, f"calculate_{result}")() for result in results]
+            model.calculate(*results)
 
             if results is None:
                 single_results = model.get_all_results()
