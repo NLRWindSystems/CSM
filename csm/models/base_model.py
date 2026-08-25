@@ -870,7 +870,8 @@ class CSMBase:
 
     def _validate_inputs(self, parameters: tuple[str, ...]) -> None:
         """Validates if the required parameters to calculate an attribute's value have been
-        populated by a subclass or provided by the user.
+        populated by a subclass or provided by the user. For model outputs don't have provided or
+        calculated values, the ``calculate_xx`` method will be run.
 
         Args:
             parameters (list[str]): List of class attributes to check for valid inputs.
@@ -884,7 +885,13 @@ class CSMBase:
             missing = [
                 name for exists, name in zip(has_values, parameters, strict=True) if not exists
             ]
-            raise ValueError(f"Inputs for the following variables required: {', '.join(missing)}")
+            for name in missing:
+                if name in self.output_names:
+                    getattr(self, f"calculate_{name}")()
+                    missing.pop(missing.index(name))
+            if missing:
+                msg = f"Inputs for the following variables required: {', '.join(missing)}"
+                raise ValueError(msg)
 
     def _prepare_calculation(self, method: str) -> bool:
         """Checks the existence of the attribute(s) a method will set, and returns True
