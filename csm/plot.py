@@ -22,7 +22,7 @@ def plot_mass_cost_comparison(
     scatter_kwargs: dict | None = None,
     plot_kwargs: dict | None = None,
     axis_label_kwargs: dict | None = None,
-    model_cmap: dict[str, str] | None = None,
+    model_plot_settings: dict[str, str] | None = None,
     mass_xlim: tuple[float, float] | None = None,
     mass_ylim: tuple[float, float] | None = None,
     cost_xlim: tuple[float, float] | None = None,
@@ -106,9 +106,9 @@ def plot_mass_cost_comparison(
         mass = _results.loc[f"{component}_mass"] * mass_scale
         cost = _results.loc[f"{component}_cost"] * cost_scale
 
-        color = model_cmap.get(name)
-        ax1.plot(parameter_values, mass, label=name, c=color, **plot_settings)
-        ax2.plot(mass, cost, **plot_settings, c=color)
+        formatting = model_plot_settings.get(name, {})
+        ax1.plot(parameter_values, mass, label=name, **formatting, **plot_settings)
+        ax2.plot(mass, cost, **plot_settings, **formatting, **plot_settings)
 
     # Reference turbine scatter plots
     # TODO: reference turbine scatter plots
