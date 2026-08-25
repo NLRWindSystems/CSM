@@ -552,7 +552,7 @@ def test_validate_inputs(subtests):
         assert model._validate_inputs(blade_mass_inputs) is None
 
     model = CSMBase.from_dict(csm_2015_inputs)
-    with subtests.test("dependent output is calculated"):
+    with subtests.test("dependent output is calculated for single level missing"):
         # Confirm that blade mass is unavailable, but calculated during validation
         missing = ["blade_mass"]
         dependents = model.get_dependent_attributes("pitch_system_mass")
@@ -565,6 +565,21 @@ def test_validate_inputs(subtests):
 
         model._validate_inputs(model.parameter_map["pitch_system_mass"])
         assert model._has_values("blade_mass")
+
+    model = CSMBase.from_dict(csm_2015_inputs)
+    with subtests.test("dependent output is calculated for multi-level missing"):
+        # Confirm that blade mass is unavailable, but calculated during validation
+        missing = ["blade_mass", "pitch_system_mass"]
+        dependents = model.get_dependent_attributes("pitch_system_cost")
+        no_vals = [
+            name
+            for name, has_val in zip(dependents, model._has_values(*dependents), strict=True)
+            if not has_val
+        ]
+        assert missing == no_vals
+
+        model._validate_inputs(model.parameter_map["pitch_system_cost"])
+        assert all(model._has_values(*missing))
 
 
 @pytest.mark.unit
