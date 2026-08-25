@@ -106,8 +106,9 @@ def plot_mass_cost_comparison(
         mass = _results.loc[f"{component}_mass"] * mass_scale
         cost = _results.loc[f"{component}_cost"] * cost_scale
 
-        ax1.plot(parameter_values, mass, label=name, **plot_settings)
-        ax2.plot(mass, cost, **plot_settings)
+        color = model_cmap.get(name)
+        ax1.plot(parameter_values, mass, label=name, c=color, **plot_settings)
+        ax2.plot(mass, cost, **plot_settings, c=color)
 
     # Reference turbine scatter plots
     # TODO: reference turbine scatter plots
