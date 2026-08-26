@@ -555,7 +555,7 @@ def test_validate_inputs(subtests):
     with subtests.test("dependent output is calculated for single level missing"):
         # Confirm that blade mass is unavailable, but calculated during validation
         missing = ["blade_mass"]
-        dependents = model.get_dependent_attributes("pitch_system_mass")
+        dependents = model.get_descendant_attributes("pitch_system_mass")
         no_vals = [
             name
             for name, has_val in zip(dependents, model._has_values(*dependents), strict=True)
@@ -570,7 +570,7 @@ def test_validate_inputs(subtests):
     with subtests.test("dependent output is calculated for multi-level missing"):
         # Confirm that blade mass is unavailable, but calculated during validation
         missing = ["blade_mass", "pitch_system_mass"]
-        dependents = model.get_dependent_attributes("pitch_system_cost")
+        dependents = model.get_descendant_attributes("pitch_system_cost")
         no_vals = [
             name
             for name, has_val in zip(dependents, model._has_values(*dependents), strict=True)

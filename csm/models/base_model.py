@@ -933,6 +933,18 @@ class CSMBase:
         Returns:
             set[str]: Set of model attribute names that rely on the value of :py:attr:`name`.
         """
+        return nx.ancestors(self.parameter_graph, name)
+
+    def get_descendant_attribute(self, name: str) -> set[str]:
+        """Returns a set of model attributes :py:attr:`name` requires.
+
+        Args:
+            name (str): The name of a model attribute that a user inputs or can be
+                calculated.
+
+        Returns:
+            set[str]: Set of model attribute names that :py:attr:`name` relies on.
+        """
         return nx.descendants(self.parameter_graph, name)
 
     def update(self, data: dict[str, Any]):
