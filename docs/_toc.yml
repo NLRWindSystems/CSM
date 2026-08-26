@@ -16,8 +16,8 @@ parts:
   - file: user_guide/new_models
 - caption: API Reference
   chapters:
-  - file: api/base
-  - file: api/utils
-  - file: api/wisdem
+  - file: api/models/base
   - file: api/models/land_2015
   - file: api/models/land_2020
+  - file: api/utils
+  - file: api/wisdem
