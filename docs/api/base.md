@@ -41,14 +41,17 @@
         converter_mass_cost_coeff, converter_cost, tower_mass_coeff, tower_length, tower_mass_exp,
         tower_mass_cost_coeff, tower_mass, tower_cost, nacelle_mass, nacelle_cost, hub_system_mass,
         hub_system_cost, rotor_mass, rotor_cost, turbine_mass, turbine_cost, turbine_cost_kw,
-        parameter_map, parameter_graph, turbine_production_cost, tower_flange_material_cost,
+        transport_cost, turbine_production_cost, tower_flange_material_cost,
         tower_flange_production_cost,
+        parameter_map, parameter_graph, get_results,
+        _all_result_names, _mass_result_names, _cost_result_names, output_names,
         fields, fields_dict, _has_values, _validate_inputs, _prepare_calculation,
-        reset_values, update, parameterize, run, get_dependent_attributes,
-        _get_attr_map,
+        parameterize, parameterize_subset, run, get_dependent_attributes,
+        get_descendant_attributes, _get_attr_map,
         get_all_results, get_mass_results, get_cost_results, irs_mpc_breakdown, total_domestic_content,
+        rotor_radius, swept_area,
         calculate_subsystem_mass, calculate_subsystem_cost, calculate_system_mass,
-        calculate_system_cost,
+        calculate_system_cost, calculate,
         calculate_blade_mass, calculate_blade_cost, calculate_hub_mass, calculate_hub_cost,
         calculate_pitch_system_mass, calculate_pitch_system_cost, calculate_spinner_mass,
         calculate_spinner_cost, calculate_low_speed_shaft_mass, calculate_low_speed_shaft_cost,
@@ -72,6 +75,10 @@
 ## Running the model
 
 ```{eval-rst}
+.. automethod:: csm.models.base_model.CSMBase.calculate
+```
+
+```{eval-rst}
 .. automethod:: csm.models.base_model.CSMBase.run
 ```
 
@@ -79,7 +86,15 @@
 .. automethod:: csm.models.base_model.CSMBase.parameterize
 ```
 
+```{eval-rst}
+.. automethod:: csm.models.base_model.CSMBase.parameterize_subset
+```
+
 ## Getting Results
+
+```{eval-rst}
+.. automethod:: csm.models.base_model.CSMBase.get_results
+```
 
 ```{eval-rst}
 .. automethod:: csm.models.base_model.CSMBase.get_all_results
@@ -106,11 +121,27 @@
 ### Dependent Variable Tracking
 
 ```{eval-rst}
+.. autoproperty:: csm.models.base_model.CSMBase.rotor_radius
+```
+
+```{eval-rst}
+.. autoproperty:: csm.models.base_model.CSMBase.swept_area
+```
+
+```{eval-rst}
 .. automethod:: csm.models.base_model.CSMBase._get_attr_map
 ```
 
 ```{eval-rst}
+.. autoproperty:: csm.models.base_model.CSMBase.output_names
+```
+
+```{eval-rst}
 .. automethod:: csm.models.base_model.CSMBase.get_dependent_attributes
+```
+
+```{eval-rst}
+.. automethod:: csm.models.base_model.CSMBase.get_descendant_attributes
 ```
 
 ### Data Checking
@@ -130,11 +161,11 @@
 ### Subclassing
 
 ```{eval-rst}
-.. autoproperty:: csm.models.base_model.CSMBase.fields
+.. autoattribute:: csm.models.base_model.CSMBase.fields
 ```
 
 ```{eval-rst}
-.. autoproperty:: csm.models.base_model.CSMBase.fields_dict
+.. autoattribute:: csm.models.base_model.CSMBase.fields_dict
 ```
 
 ## Subsystem Calculations
