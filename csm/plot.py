@@ -22,6 +22,7 @@ def plot_mass_cost_comparison(
     cost_basis: str = "millions",
     save_name: str | Path | None = None,
     fig_kwargs: dict | None = None,
+    legend_kwargs: dict | None = None,
     reference_scatter_kwargs: dict | None = None,
     background_scatter_kwargs: dict | None = None,
     plot_kwargs: dict | None = None,
@@ -40,6 +41,10 @@ def plot_mass_cost_comparison(
     fig_settings = {"dpi": 200, "figsize": (9, 4)}
     if fig_kwargs is not None:
         fig_settings.update(fig_kwargs)
+
+    legend_settings = {}
+    if legend_kwargs is not None:
+        legend_settings.update(legend_kwargs)
 
     reference_scatter_settings = {}
     if reference_scatter_kwargs is not None:
@@ -123,17 +128,6 @@ def plot_mass_cost_comparison(
         ax.grid()
         ax.set_axisbelow(True)
 
-    # Background scatter points
-    if background_data is not None:
-        scatter_data = background_data.loc[:, [parameter, *metrics]]
-        parameter_values = scatter_data[parameter].to_numpy()
-        mass = scatter_data[metrics[0]].to_numpy() * mass_scale
-        cost = scatter_data[metrics[1]].to_numpy() * cost_scale
-        ax1.scatter(
-            parameter_values, mass, **background_scatter_settings, label="Individual Turbines"
-        )
-        ax2.scatter(mass, cost, **background_scatter_settings)
-
     # Model line plots
     for name, _results in results.items():
         parameter_values = _results.columns
@@ -143,6 +137,17 @@ def plot_mass_cost_comparison(
         formatting = plot_settings | model_plot_settings.get(name, {})
         ax1.plot(parameter_values, mass, label=name, **formatting)
         ax2.plot(mass, cost, **plot_settings, **formatting)
+
+    # Background scatter points
+    if background_data is not None:
+        scatter_data = background_data.loc[:, [parameter, *metrics]]
+        parameter_values = scatter_data[parameter].to_numpy()
+        mass = scatter_data[metrics[0]].to_numpy() * mass_scale
+        cost = scatter_data[metrics[1]].to_numpy() * cost_scale
+        ax1.scatter(
+            parameter_values, mass, **({"label": "Empirical Data"} | background_scatter_settings)
+        )
+        ax2.scatter(mass, cost, **background_scatter_settings)
 
     # Reference turbine scatter plots
     # TODO: reference turbine scatter plots
@@ -169,7 +174,7 @@ def plot_mass_cost_comparison(
     # TODO: background data scatter for industry data points
 
     # Post-plot figure handling
-    ax1.legend()
+    fig.legend(**legend_settings)
 
     fig.tight_layout()
     if save_name is not None:
