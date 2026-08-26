@@ -848,12 +848,9 @@ class CSMBase:
     def output_names(self) -> tuple[str]:
         """Names of all attributes that are outputs of the model (those with their "io" metadata as
         either "output" or "both").
-
-        Returns:
-            tuple[str]: Tuple of all attributes that are an output of the model.
         """
         output_map = self._get_attr_map(both_as_separate=False, include_units=False)["outputs"]
-        return tuple(output_map)
+        return tuple(output_map.keys())
 
     def _has_values(self, *args: str) -> Generator[bool]:
         """Checks if the user provided values for a given :py:attr:`arg` (True), or if they are

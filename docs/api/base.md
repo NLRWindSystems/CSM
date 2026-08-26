@@ -11,7 +11,7 @@
 ## Base Parameterization
 
 ```{eval-rst}
-.. autoclass:: csm.models.base_model.CSMBase
+.. autoclass:: csm.models.CSMBase
     :members: from_dict, update, reset_values
     :undoc-members:
     :exclude-members: turbine_class, rated_power_kw, rotor_diameter, efficiency_max, num_bearings,
@@ -75,97 +75,97 @@
 ## Running the model
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase.calculate
+.. automethod:: csm.models.CSMBase.calculate
 ```
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase.run
+.. automethod:: csm.models.CSMBase.run
 ```
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase.parameterize
+.. automethod:: csm.models.CSMBase.parameterize
 ```
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase.parameterize_subset
+.. automethod:: csm.models.CSMBase.parameterize_subset
 ```
 
 ## Getting Results
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase.get_results
+.. automethod:: csm.models.CSMBase.get_results
 ```
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase.get_all_results
+.. automethod:: csm.models.CSMBase.get_all_results
 ```
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase.get_mass_results
+.. automethod:: csm.models.CSMBase.get_mass_results
 ```
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase.get_cost_results
+.. automethod:: csm.models.CSMBase.get_cost_results
 ```
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase.irs_mpc_breakdown
+.. automethod:: csm.models.CSMBase.irs_mpc_breakdown
 ```
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase.total_domestic_content
+.. automethod:: csm.models.CSMBase.total_domestic_content
 ```
 
 ## Model Helpers
 
+```{eval-rst}
+.. autoproperty:: csm.models.CSMBase.rotor_radius
+```
+
+```{eval-rst}
+.. autoproperty:: csm.models.CSMBase.swept_area
+```
+
 ### Dependent Variable Tracking
 
 ```{eval-rst}
-.. autoproperty:: csm.models.base_model.CSMBase.rotor_radius
+.. automethod:: csm.models.CSMBase._get_attr_map
 ```
 
 ```{eval-rst}
-.. autoproperty:: csm.models.base_model.CSMBase.swept_area
+.. autoattribute:: csm.models.CSMBase.output_names
 ```
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase._get_attr_map
+.. automethod:: csm.models.CSMBase.get_dependent_attributes
 ```
 
 ```{eval-rst}
-.. autoproperty:: csm.models.base_model.CSMBase.output_names
-```
-
-```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase.get_dependent_attributes
-```
-
-```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase.get_descendant_attributes
+.. automethod:: csm.models.CSMBase.get_descendant_attributes
 ```
 
 ### Data Checking
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase._has_values
+.. automethod:: csm.models.CSMBase._has_values
 ```
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase._validate_inputs
+.. automethod:: csm.models.CSMBase._validate_inputs
 ```
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase._prepare_calculation
+.. automethod:: csm.models.CSMBase._prepare_calculation
 ```
 
 ### Subclassing
 
 ```{eval-rst}
-.. autoattribute:: csm.models.base_model.CSMBase.fields
+.. autoattribute:: csm.models.CSMBase.fields
 ```
 
 ```{eval-rst}
-.. autoattribute:: csm.models.base_model.CSMBase.fields_dict
+.. autoattribute:: csm.models.CSMBase.fields_dict
 ```
 
 ## Subsystem Calculations
@@ -173,221 +173,221 @@
 ### Rotor
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase.calculate_blade_mass
+.. automethod:: csm.models.CSMBase.calculate_blade_mass
 ```
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase.calculate_blade_cost
+.. automethod:: csm.models.CSMBase.calculate_blade_cost
 ```
 
 #### Hub System
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase.calculate_hub_mass
+.. automethod:: csm.models.CSMBase.calculate_hub_mass
 ```
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase.calculate_hub_cost
+.. automethod:: csm.models.CSMBase.calculate_hub_cost
 ```
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase.calculate_pitch_system_mass
+.. automethod:: csm.models.CSMBase.calculate_pitch_system_mass
 ```
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase.calculate_pitch_system_cost
+.. automethod:: csm.models.CSMBase.calculate_pitch_system_cost
 ```
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase.calculate_spinner_mass
+.. automethod:: csm.models.CSMBase.calculate_spinner_mass
 ```
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase.calculate_spinner_cost
+.. automethod:: csm.models.CSMBase.calculate_spinner_cost
 ```
 
 ### Nacelle
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase.calculate_low_speed_shaft_mass
+.. automethod:: csm.models.CSMBase.calculate_low_speed_shaft_mass
 ```
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase.calculate_low_speed_shaft_cost
+.. automethod:: csm.models.CSMBase.calculate_low_speed_shaft_cost
 ```
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase.calculate_bearing_mass
+.. automethod:: csm.models.CSMBase.calculate_bearing_mass
 ```
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase.calculate_bearing_cost
+.. automethod:: csm.models.CSMBase.calculate_bearing_cost
 ```
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase.calculate_rotor_torque
+.. automethod:: csm.models.CSMBase.calculate_rotor_torque
 ```
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase.calculate_gearbox_mass
+.. automethod:: csm.models.CSMBase.calculate_gearbox_mass
 ```
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase.calculate_gearbox_cost
+.. automethod:: csm.models.CSMBase.calculate_gearbox_cost
 ```
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase.calculate_brake_mass
+.. automethod:: csm.models.CSMBase.calculate_brake_mass
 ```
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase.calculate_brake_cost
+.. automethod:: csm.models.CSMBase.calculate_brake_cost
 ```
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase.calculate_high_speed_shaft_mass
+.. automethod:: csm.models.CSMBase.calculate_high_speed_shaft_mass
 ```
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase.calculate_high_speed_shaft_cost
+.. automethod:: csm.models.CSMBase.calculate_high_speed_shaft_cost
 ```
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase.calculate_generator_mass
+.. automethod:: csm.models.CSMBase.calculate_generator_mass
 ```
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase.calculate_generator_cost
+.. automethod:: csm.models.CSMBase.calculate_generator_cost
 ```
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase.calculate_bedplate_mass
+.. automethod:: csm.models.CSMBase.calculate_bedplate_mass
 ```
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase.calculate_bedplate_cost
+.. automethod:: csm.models.CSMBase.calculate_bedplate_cost
 ```
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase.calculate_yaw_system_mass
+.. automethod:: csm.models.CSMBase.calculate_yaw_system_mass
 ```
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase.calculate_yaw_system_cost
+.. automethod:: csm.models.CSMBase.calculate_yaw_system_cost
 ```
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase.calculate_hydraulic_cooling_mass
+.. automethod:: csm.models.CSMBase.calculate_hydraulic_cooling_mass
 ```
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase.calculate_hydraulic_cooling_cost
+.. automethod:: csm.models.CSMBase.calculate_hydraulic_cooling_cost
 ```
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase.calculate_nacelle_cover_mass
+.. automethod:: csm.models.CSMBase.calculate_nacelle_cover_mass
 ```
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase.calculate_nacelle_cover_cost
+.. automethod:: csm.models.CSMBase.calculate_nacelle_cover_cost
 ```
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase.calculate_platform_mainframe_mass
+.. automethod:: csm.models.CSMBase.calculate_platform_mainframe_mass
 ```
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase.calculate_platform_mainframe_cost
+.. automethod:: csm.models.CSMBase.calculate_platform_mainframe_cost
 ```
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase.calculate_transformer_mass
+.. automethod:: csm.models.CSMBase.calculate_transformer_mass
 ```
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase.calculate_transformer_cost
+.. automethod:: csm.models.CSMBase.calculate_transformer_cost
 ```
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase.calculate_controls_mass
+.. automethod:: csm.models.CSMBase.calculate_controls_mass
 ```
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase.calculate_controls_cost
+.. automethod:: csm.models.CSMBase.calculate_controls_cost
 ```
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase.calculate_electrical_connection_mass
+.. automethod:: csm.models.CSMBase.calculate_electrical_connection_mass
 ```
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase.calculate_electrical_connection_cost
+.. automethod:: csm.models.CSMBase.calculate_electrical_connection_cost
 ```
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase.calculate_converter_mass
+.. automethod:: csm.models.CSMBase.calculate_converter_mass
 ```
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase.calculate_converter_cost
+.. automethod:: csm.models.CSMBase.calculate_converter_cost
 ```
 
 ### Tower
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase.calculate_tower_mass
+.. automethod:: csm.models.CSMBase.calculate_tower_mass
 ```
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase.calculate_tower_cost
+.. automethod:: csm.models.CSMBase.calculate_tower_cost
 ```
 
 ## Subsystem Aggregations
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase.calculate_subsystem_mass
+.. automethod:: csm.models.CSMBase.calculate_subsystem_mass
 ```
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase.calculate_subsystem_cost
+.. automethod:: csm.models.CSMBase.calculate_subsystem_cost
 ```
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase.calculate_system_mass
+.. automethod:: csm.models.CSMBase.calculate_system_mass
 ```
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase.calculate_system_cost
+.. automethod:: csm.models.CSMBase.calculate_system_cost
 ```
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase.calculate_nacelle_mass
+.. automethod:: csm.models.CSMBase.calculate_nacelle_mass
 ```
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase.calculate_nacelle_cost
+.. automethod:: csm.models.CSMBase.calculate_nacelle_cost
 ```
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase.calculate_hub_system_mass
+.. automethod:: csm.models.CSMBase.calculate_hub_system_mass
 ```
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase.calculate_hub_system_cost
+.. automethod:: csm.models.CSMBase.calculate_hub_system_cost
 ```
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase.calculate_rotor_mass
+.. automethod:: csm.models.CSMBase.calculate_rotor_mass
 ```
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase.calculate_rotor_cost
+.. automethod:: csm.models.CSMBase.calculate_rotor_cost
 ```
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase.calculate_turbine_mass
+.. automethod:: csm.models.CSMBase.calculate_turbine_mass
 ```
 
 ```{eval-rst}
-.. automethod:: csm.models.base_model.CSMBase.calculate_turbine_cost
+.. automethod:: csm.models.CSMBase.calculate_turbine_cost
 ```
