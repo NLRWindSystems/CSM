@@ -1015,7 +1015,11 @@ class CSMBase:
         model = cls.from_dict(base_kwargs, partial=True)
         for kwargs in additional_kwargs:
             model.update(kwargs)
-            model.run()
+            try:
+                model.run()
+            except Exception as e:
+                msg = f"Error calculating results for {cls.__name__} with parameters: {kwargs}"
+                raise ValueError(msg) from e
 
             if results is None:
                 single_results = model.get_all_results()
@@ -1086,7 +1090,11 @@ class CSMBase:
         model = cls.from_dict(base_kwargs, partial=True)
         for kwargs in additional_kwargs:
             model.update(kwargs)
-            model.calculate(*results)
+            try:
+                model.calculate(*results)
+            except Exception as e:
+                msg = f"Error calculating results for {cls.__name__} with parameters: {kwargs}"
+                raise ValueError(msg) from e
 
             if results is None:
                 single_results = model.get_all_results()
