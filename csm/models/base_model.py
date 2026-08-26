@@ -393,8 +393,10 @@ class CSMBase:
             :math:`pitch\_system\_cost = pitch\_system\_mass * pitch\_system\_mass\_cost\_coeff`
         spinner_mass (float): Spinner mass (:math:`kg`). See :py:meth:`calculate_spinner_mass`
             for more details.
+
             .. math::
                 spinner\_mass = spinner\_mass\_coeff * {rotor\_diameter} + spinner\_mass\_intercept
+
         spinner_cost (float): Spinner cost (:math:`USD`). See :py:meth:`calculate_spinner_cost`
             for more details.
             :math:`spinner\_cost = {spinner\_mass} * {spinner\_mass\_cost\_coeff}`
@@ -451,8 +453,8 @@ class CSMBase:
         nacelle_cover_mass (float): nacelle_cover mass (:math:`kg`). See
             :py:meth:`calculate_nacelle_cover_mass` for more details.
 
-            ..math::
-                nacelle\_cover|_mass = nacelle_cover_mass_coeff * rated\_power\_kw
+            .. math::
+                nacelle\_cover\_mass = nacelle\_cover\_mass\_coeff * rated\_power\_kw
                 + nacelle\_cover\_mass\_intercept
 
         nacelle_cover_cost (float): nacelle_cover mass (:math:`USD`). See
@@ -935,7 +937,7 @@ class CSMBase:
         """
         return nx.ancestors(self.parameter_graph, name)
 
-    def get_descendant_attribute(self, name: str) -> set[str]:
+    def get_descendant_attributes(self, name: str) -> set[str]:
         """Returns a set of model attributes :py:attr:`name` requires.
 
         Args:
