@@ -17,6 +17,8 @@ Main interface of the model for end users creating and running a model, and gett
 | [`get_cost_results`](#csm.models.CSMBase.get_cost_results)() | Retrieve a dictionary of calculated cost attributes. |
 | [`irs_mpc_breakdown`](#csm.models.CSMBase.irs_mpc_breakdown)(turbine_production_cost, tower_flange_material_cost, tower_flange_production_cost) | Calculate the base cost breakdown of the US IRS manufactured product component tables. |
 | [`total_domestic_content`](#csm.models.CSMBase.total_domestic_content)(turbine_production_cost, tower_flange_material_cost, tower_flange_production_cost, domestic) | Calculates the total, valid domestic content production percentage |
+| [`update`](#csm.models.CSMBase.update)(data) | Update model values based on a data dictionary and reset any calculated values dependent on the attributes. |
+| [`reset_values`](#csm.models.CSMBase.reset_values)(args) | Reset attribute(s) back to their model default. |
 
 ## Subsystems
 
