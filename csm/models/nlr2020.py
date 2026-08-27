@@ -128,9 +128,50 @@ class Land2020NLR(CSMBase):
     methods, please see the :py:class:`csm.models.base_model.CSMBase` documentation. All listed
     attributes below describe the models defaults and any relevant contextual information.
 
-    Below the args will solely be the inputs that do not have a default value chose for the 2020
-    analysis year, and the parameters section will list the default values and any contextual
-    information when available.
+    Unused parameters from the base model:
+
+    - :py:attr:`turbine_class`
+    - :py:attr:`blade_has_carbon`
+    - :py:attr:`bearing_housing_fraction`
+    - :py:attr:`pitch_bearing_mass_coeff`
+    - :py:attr:`pitch_bearing_mass_intercept`
+    - :py:attr:`lss_mass_exp`
+    - :py:attr:`lss_mass_coeff`
+    - :py:attr:`gearbox_torque_cost`
+    - :py:attr:`hss_mass_coeff`
+    - :py:attr:`hss_mass_cost_coeff`
+    - :py:attr:`high_speed_shaft_mass`
+    - :py:attr:`high_speed_shaft_cost`
+    - :py:attr:`bedplate_mass_exp`
+    - :py:attr:`hvac_mass_coeff`
+    - :py:attr:`tower_mass_exp`
+
+    Not updated from the 2015 model:
+
+    - :py:attr:`pitch_bearing_mass_coeff`
+    - :py:attr:`pitch_bearing_mass_intercept`
+    - :py:attr:`bearing_housing_fraction`
+    - :py:attr:`mass_sys_offset`
+    - :py:attr:`pitch_system_mass_cost_coeff`
+
+    Updated scaling relationships:
+
+    - :py:attr:`blade_mass`
+    - :py:attr:`pitch_system_mass`
+    - :py:attr:`low_speed_shaft_mass`
+    - :py:attr:`gearbox_mass`
+    - :py:attr:`gearbox_cost`
+    - :py:attr:`bedplate_mass`
+    - :py:attr:`hydraulic_cooling_mass`
+    - :py:attr:`platform_mainframe_mass`
+    - :py:attr:`platform_mainframe_cost`
+    - :py:attr:`crane_mass`
+    - :py:attr:`crane_cost`
+    - :py:attr:`tower_mass`
+    - :py:attr:`transport_cost`
+    - :py:attr:`nacelle_mass`
+    - :py:attr:`nacelle_cost`
+
 
     Args:
         num_blades (int): Number of turbine blades
@@ -145,8 +186,8 @@ class Land2020NLR(CSMBase):
             (:math:`m`).
 
     Parameters:
-        turbine_class (int): Unused in the 2020 model. Defaults to 1.
-        blade_mass_coeff (float): Defaults to 9.2157.
+        blade_mass_coeff (float): :math:`k` in the blade mass equation from
+            :py:meth:`calculate_blade_mass`. Defaults to 9.2157.
         blade_mass_exp (float): Defaults to 1.7679.
         blade_mass_cost_coeff (float): Defaults to 15.9432.
         blade_mass (float):
@@ -262,9 +303,6 @@ class Land2020NLR(CSMBase):
     hub_mass_coeff = base.hub_mass_coeff.reuse(default=3.5793)
     hub_mass_intercept = base.hub_mass_intercept.reuse(default=-25451.58)
     hub_mass_cost_coeff = base.hub_mass_cost_coeff.reuse(default=4.2588)
-    bearing_housing_fraction = base.bearing_housing_fraction.reuse(default=0)
-    pitch_bearing_mass_coeff = base.pitch_bearing_mass_coeff.reuse(default=0)
-    pitch_bearing_mass_intercept = base.pitch_bearing_mass_intercept.reuse(default=0)
     pitch_blade_mass_coeff = create_field(float, "unitless", "input", default=0.1295)
     pitch_system_mass_coeff = create_field(float, "unitless", "input", default=1.328)
     pitch_blade_mass_intercept = create_field(float, "unitless", "input", default=491.31)
@@ -282,19 +320,13 @@ class Land2020NLR(CSMBase):
     bearing_mass_cost_coeff = base.bearing_mass_cost_coeff.reuse(default=4.914)
     gearbox_torque_density = base.gearbox_torque_density.reuse(default=156.46)
     gearbox_torque_exp = create_field(float, "unitless", "input", default=0.6566)
-    gearbox_torque_cost = base.gearbox_torque_cost.reuse(default=0)
     gearbox_mass_cost_coeff = create_field(float, "USD/kg", "input", default=14.0868)
     brake_mass_coeff = base.brake_mass_coeff.reuse(default=0.19851)
     brake_mass_intercept = create_field(float, units="unitless", io_type="input", default=1.893)
     brake_mass_cost_coeff = base.brake_mass_cost_coeff.reuse(default=7.4256)
-    hss_mass_coeff = base.hss_mass_coeff.reuse(default=0)
-    hss_mass_cost_coeff = base.hss_mass_cost_coeff.reuse(default=0)
-    high_speed_shaft_mass = base.high_speed_shaft_mass.reuse(default=0)
-    high_speed_shaft_cost = base.high_speed_shaft_cost.reuse(default=0)
     generator_mass_coeff = base.generator_mass_coeff.reuse(default=1.754)
     generator_mass_intercept = base.generator_mass_intercept.reuse(default=3503.6)
     generator_mass_cost_coeff = base.generator_mass_cost_coeff.reuse(default=13.5408)
-    bedplate_mass_exp = base.bedplate_mass_exp.reuse(default=0)
     bedplate_mass_coeff = create_field(float, "unitless", "input", default=737.88)
     bedplate_mass_intercept = create_field(float, "unitless", "input", default=-68066)
     bedplate_mass_cost_coeff = base.bedplate_mass_cost_coeff.reuse(default=3.1668)
@@ -302,7 +334,6 @@ class Land2020NLR(CSMBase):
     yaw_system_mass_coeff = base.yaw_system_mass_coeff.reuse(default=0.0007)
     yaw_system_mass_exp = base.yaw_system_mass_exp.reuse(default=3.1571)
     yaw_system_mass_cost_coeff = base.yaw_system_mass_cost_coeff.reuse(default=9.0636)
-    hvac_mass_coeff = base.hvac_mass_coeff.reuse(default=0)
     hvac_mass_cost_coeff = base.hvac_mass_cost_coeff.reuse(default=135.408)
     hydraulic_cooling_mass = base.hydraulic_cooling_mass.reuse(default=221)
     nacelle_cover_mass_coeff = base.nacelle_cover_mass_coeff.reuse(default=1.2817)
@@ -335,10 +366,22 @@ class Land2020NLR(CSMBase):
     transport_tower_cost_coeff = create_field(float, "USD", "input", default=34083)
     tower_section_mass_max = create_field(float, "USD", "input", default=80000)
     transport_misc_parts_cost_coeff = create_field(float, "USD", "input", default=0.025)
+
+    # Unused attributes
     blade_has_carbon = base.blade_has_carbon.reuse(default=False)
-    tower_mass_exp = base.tower_mass_exp.reuse(default=0)
+    bearing_housing_fraction = base.bearing_housing_fraction.reuse(default=0)
+    pitch_bearing_mass_coeff = base.pitch_bearing_mass_coeff.reuse(default=0)
+    pitch_bearing_mass_intercept = base.pitch_bearing_mass_intercept.reuse(default=0)
     lss_mass_exp = base.lss_mass_exp.reuse(default=0)
     lss_mass_coeff = base.lss_mass_coeff.reuse(default=0)
+    gearbox_torque_cost = base.gearbox_torque_cost.reuse(default=0)
+    hss_mass_coeff = base.hss_mass_coeff.reuse(default=0)
+    hss_mass_cost_coeff = base.hss_mass_cost_coeff.reuse(default=0)
+    high_speed_shaft_mass = base.high_speed_shaft_mass.reuse(default=0)
+    high_speed_shaft_cost = base.high_speed_shaft_cost.reuse(default=0)
+    bedplate_mass_exp = base.bedplate_mass_exp.reuse(default=0)
+    hvac_mass_coeff = base.hvac_mass_coeff.reuse(default=0)
+    tower_mass_exp = base.tower_mass_exp.reuse(default=0)
 
     _all_result_names = base._all_result_names.reuse(default=ALL_RESULT_NAMES)
     _mass_result_name = base._mass_result_names.reuse(default=MASS_RESULT_NAMES)
