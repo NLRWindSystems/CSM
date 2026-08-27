@@ -576,7 +576,7 @@ def test_validate_inputs(subtests):
             for name, has_val in zip(dependents, model._has_values(*dependents), strict=True)
             if not has_val
         ]
-        assert missing == no_vals
+        assert sorted(missing) == sorted(no_vals)
 
         model._validate_inputs(model.parameter_map["pitch_system_cost"])
         assert all(model._has_values(*missing))
