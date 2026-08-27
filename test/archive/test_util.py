@@ -1,10 +1,11 @@
-from pathlib import Path
 import types
+from pathlib import Path
+
 import pytest
 
 from csm import util
 
-from test.conftest import MODEL_DIRECTORY, MODEL_FILENAME
+from test.conftest import MODEL_FILENAME, MODEL_DIRECTORY
 
 
 def test_import_module():

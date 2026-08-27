@@ -1,5 +1,7 @@
 import pytest
+
 from csm import run
+
 from test.conftest import PATH_CONFIG
 
 
@@ -80,9 +82,7 @@ def test_generate_input_parameter_scenarios_no_model():
 def test_generate_input_parameter_scenarios_none_model():
     with pytest.raises(KeyError):
         tuple(
-            run.generate_input_parameter_scenarios(
-                {"parameters": {"a": 1, "b": 2, "model": None}}
-            )
+            run.generate_input_parameter_scenarios({"parameters": {"a": 1, "b": 2, "model": None}})
         )
 
 
