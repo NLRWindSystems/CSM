@@ -12,11 +12,16 @@ the `attrs` dataclass. This will be useful for simple reuse of existing variable
 ```python
 from attrs import define, fields
 
-from csm.models.base_model import CSMBase
+from csm.models import CSMBase
 from csm.models.utils import create_field
 
 base = fields(CSMBase)
 ```
+
+Note that we could also subclass the `Land2015NLR` if we wished to maintain the defaults and
+relationships made available there. However, the 2020 model changes nearly all the values and many
+relationships, so it is not desirable in this case. Though the 2021 model does subclass the 2020
+model as there are comparatively few changes between the two.
 
 ### Class creation
 
@@ -37,10 +42,10 @@ attribute's existing type data, metadata, and conversn and validation routines.
 In this example, we are setting default values for `turbine_class` and `blade_has_carbon`. Though
 these attributes will be unused by `CustomModel`, a value is required for certain helper
 methods for the class in addition to encoding the expected information for posterity (including 0).
-However, for `blade_has_carbon`, we also set the `init=False` to prohibit users from
-setting this value without raising an error. For this case, it's not necessary as it won't be used,
-so is purely for demonstration. We must also create a new attribute `blade_mass_exp`. Note that
-`units="unitless"` and `io_type="input"` are the defaults.
+However, for `blade_has_carbon` and `turbine_class`, we also set the `init=False` to prohibit users
+from setting this value without raising an error. For this case, it's not necessary as it won't be
+used, so is purely for demonstration. We must also create a new attribute `blade_mass_exp`. Note
+that `units="unitless"` and `io_type="input"` are the defaults.
 
 Both attributes `units` and `io_type` are essential for WISDEM integration. As such, `units` should
 align with
@@ -53,7 +58,7 @@ documentation.
 ```python
 @define
 class CustomModel(CSMBase):
-    turbine_class = base.turbine_class.reuse(default=1)
+    turbine_class = base.turbine_class.reuse(default=1, init=False)
     blade_has_carbon = base.blade_has_carbon.reuse(default=True, init=False)
     blade_mass_exp = create_field(obj=float, units="unitless", io_type="input", default=9.2157)
 ```
@@ -126,36 +131,36 @@ or last, then the following can be done. Simply change the ordering of
         super().calculate_subsystem_mass()
 ```
 
-
-
 ### The full implementation
 
 Below is the full implementation of the `CustomModel` that redefines the `blade_mass` scaling
 relationship.
 
 ```python
-
 from attrs import define, fields
 
-from csm.models.base_model import CSMBase
-from csm import Land2015NLR
+from csm.models import CSMBase, Land2015NLR
 from csm.models.utils import create_field
 
 
-base = fields(CSMBase)
+base = fields(Land2015NLR)
 
 
 @define
 class CustomModel(CSMBase):
-    turbine_class = base.turbine_class.reuse(default=1)
+    turbine_class = base.turbine_class.reuse(default=1, init=False)
     blade_has_carbon = base.blade_has_carbon.reuse(default=True, init=False)
     blade_mass_coeff = base.blade_mass_coeff.reuse(default=9.2157)
-    blade_mass_exp = create_field(obj=float, units="unitless", io_type="input", default=1.7679)
+    blade_mass_exp = create_field(
+        obj=float, units="unitless", io_type="input", default=1.7679
+    )
 
     def __attrs_post_init__(self):
-        # NOTE: we are changing the blade mass calculation's requirements, and need to
-        # update the parameter relationships
-        self.parameter_map["blade_mass"] = ("rotor_diameter", "blade_mass_coeff", "blade_mass_exp")
+        # NOTE: we are changing the blade mass calculation's requirements, and
+        # need to update the parameter relationships
+        self.parameter_map["blade_mass"] = (
+            "rotor_diameter", "blade_mass_coeff", "blade_mass_exp"
+        )
         super().__attrs_post_init__()
 
     def calculate_blade_mass(self):
@@ -163,5 +168,7 @@ class CustomModel(CSMBase):
         if exists:
             return
 
-        self.blade_mass = self.blade_mass_coeff * (self.rotor_diameter / 2) ** self.blade_mass_exp
+        self.blade_mass = (
+            self.blade_mass_coeff * (self.rotor_diameter / 2) ** self.blade_mass_exp
+        )
 ```
