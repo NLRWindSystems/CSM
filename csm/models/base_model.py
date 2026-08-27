@@ -2571,6 +2571,31 @@ class CSMBase:
         self.calculate_system_cost()
 
     @classmethod
+    def get_required_inputs(
+        cls, *, include_units: bool = False
+    ) -> list[str] | list[tuple[str, str]]:
+        """Get a list of the inputs required for a user to provide for a user to run
+        :py:meth:`run`.
+
+        Args:
+            include_units (bool, optional): Include the attribute's units, if True, othewsie only
+                their names. Defaults to False.
+
+        Returns:
+            list[str] | list[tuple[str, str]]: List of attribute names a user is required to provide
+                to fully define a model, or list of tuples containing the attribute name and their
+                units.
+        """
+        attr_map = cls._get_attr_map(both_as_separate=True, include_units=include_units)
+        if include_units:
+            return [
+                (el, val["units"])
+                for el, val in attr_map["inputs"].items()
+                if val["default"] is None
+            ]
+        return [el for el, default in attr_map["inputs"].items() if default is None]
+
+    @classmethod
     def _get_attr_map(
         cls, *, both_as_separate: bool = False, include_units: bool = False
     ) -> dict[str, Any]:

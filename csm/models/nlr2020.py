@@ -188,11 +188,13 @@ class Land2020NLR(CSMBase):
     Parameters:
         blade_mass_coeff (float): :math:`k` in the blade mass equation from
             :py:meth:`calculate_blade_mass`. Defaults to 9.2157.
-        blade_mass_exp (float): Defaults to 1.7679.
+        blade_mass_exp (float):  :math:`b` in the blade mass equation from
+            :py:meth:`calculate_blade_mass`. Defaults to 1.7679.
         blade_mass_cost_coeff (float): Defaults to 15.9432.
-        blade_mass (float):
-            ..math::
-                blade\_mass = blade\_mass\_coeff * (\frac{rotor\_diameter}{2}) ^ {blade\_mass\_exp}
+        blade_mass (float): Blade mass (:math:`kg`). If not provided, calculated in
+            :py:meth:`calculate_blade_mass`.
+        blade_cost (float): Blade cost (:math:`USD`). If not provided, calculated in
+            :py:meth:`calculate_blade_cost`.
         hub_mass_coeff (float): Defaults to 3.5793.
         hub_mass_intercept (float): Defaults to -25451.58.
         hub_mass_cost_coeff (float): Defaults to 4.2588.
