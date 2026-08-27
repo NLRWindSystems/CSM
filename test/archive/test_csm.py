@@ -1,8 +1,10 @@
-from csm import CSM
-import pytest
 import pandas as pd
-from test.model import test_model
+import pytest
 from pandas.testing import assert_frame_equal
+
+from csm import CSM
+
+from test.model import test_model
 
 
 DIR_MODEL_TEST = "./test/model"
@@ -158,7 +160,7 @@ def test_calculate_parameter_scalar_input_dataframe_output(csm_dataframe):
     expected = pd.DataFrame(data={"a": [1, 1, 1], "b": [2, 2, 2]}).rename_axis(
         "test_index_name",
     )
-    actual = csm_dataframe.calculate("df_output", **{"a": 1, "b": 2})
+    actual = csm_dataframe.calculate("df_output", a=1, b=2)
     assert_frame_equal(actual, expected)
 
 
@@ -179,7 +181,7 @@ def test_calculate_parameter_nonexistent_scalar_input(csm_simple):
 
 def test_calculate_parameter_missing_input(csm_simple):
     with pytest.raises(KeyError):
-        csm_simple.calculate("d", **{"a": 1})
+        csm_simple.calculate("d", a=1)
 
 
 def test_dataframe_missing_type_hint():
