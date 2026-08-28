@@ -8,7 +8,7 @@ parts:
   chapters:
   - file: intro/install
   - file: intro/contributing
-  - file: intro/new_model
+  - file: intro/demo
 - caption: Model Background
   chapters:
   - file: user_guide/theory
@@ -20,4 +20,5 @@ parts:
   - file: api/models/land_2015
   - file: api/models/land_2020
   - file: api/utils
-  - file: api/wisdem
+  - file: api/tools/plot
+  # - file: api/wisdem

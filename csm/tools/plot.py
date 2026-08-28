@@ -44,7 +44,7 @@ def plot_mass_cost_comparison(
     Args:
         base_kwargs (dict[str, dict]): Base configuration for each of the models in the form of
             model names as keys and configuration dictionary as values. See
-            :py:function:`csm.get_model` for more details on model naming possibilities. The keys
+            :py:func:`csm.get_model` for more details on model naming possibilities. The keys
             will be used for the figure legend.
         parameterization (dict[str, list]): The parameterization input to
             :py:meth:`CSMBase.parameterize_subset`. Note that only the first parameter will be used
@@ -61,6 +61,7 @@ def plot_mass_cost_comparison(
             - "range": subsequent values must be start, stop, num where stop is inclusive,
                 e.g., {"efficiency_max": ("range", 0.8, 1.0, 5)} will run 5 iterations of the
                 model varying ``efficiency_max`` with values 0.8, 0.85, 0.9, 0.95, and 1.0.
+
         component (str): The name of the turbine component to calculate its respective mass and
             cost. For available options, see :py:meth:`CSMBase.output_names`
         parameter_label (str): Axis label for the parameter values, e.g., "Blade Mass (kg)".
@@ -231,7 +232,6 @@ def plot_mass_cost_comparison(
         ax2.scatter(mass, cost, **background_scatter_settings)
 
     # Reference turbine scatter plots
-    # TODO: reference turbine scatter plots
     if reference_turbines is None:
         reference_turbines = {}
     for turbine, config in reference_turbines.items():
@@ -251,8 +251,6 @@ def plot_mass_cost_comparison(
         formatting = reference_scatter_settings | turbine_scatter_settings.get(turbine, {})
         ax1.scatter(parameter_values, mass, label=turbine, **formatting)
         ax2.scatter(mass, cost, **formatting)
-
-    # TODO: background data scatter for industry data points
 
     # Post-plot figure handling
     fig.legend(**legend_settings)
