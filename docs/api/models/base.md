@@ -44,11 +44,13 @@
         transport_cost, turbine_production_cost, tower_flange_material_cost,
         tower_flange_production_cost,
         parameter_map, parameter_graph, get_results,
-        _all_result_names, _mass_result_names, _cost_result_names, output_names,
+        _all_result_names, _mass_result_names, _cost_result_names, _transport_result_names,
+        output_names,
         fields, fields_dict, _has_values, _validate_inputs, _prepare_calculation,
         parameterize, parameterize_subset, run, get_dependent_attributes,
         get_descendant_attributes, _get_attr_map,
-        get_all_results, get_mass_results, get_cost_results, irs_mpc_breakdown, total_domestic_content,
+        get_all_results, get_mass_results, get_cost_results, get_transport_results,
+        irs_mpc_breakdown, total_domestic_content,
         rotor_radius, swept_area,
         calculate_subsystem_mass, calculate_subsystem_cost, calculate_system_mass,
         calculate_system_cost, calculate,
@@ -69,7 +71,11 @@
         calculate_tower_cost, calculate_nacelle_mass, calculate_nacelle_cost,
         calculate_hub_system_mass, calculate_hub_system_cost, calculate_rotor_mass,
         calculate_rotor_cost, calculate_turbine_mass, calculate_turbine_cost,
-        calculate_turbine_cost
+        calculate_turbine_cost,
+        calculate_blade_transport_cost, calculate_hub_transport_cost,
+        calculate_power_electronics_transport_cost, calculate_tower_transport_cost,
+        calculate_drivetrain_transport_cost, calculate_parts_transport_cost,
+        calculate_transport_cost,
 ```
 
 ## Running the model
@@ -110,6 +116,10 @@
 
 ```{eval-rst}
 .. automethod:: csm.models.CSMBase.get_cost_results
+```
+
+```{eval-rst}
+.. automethod:: csm.models.CSMBase.get_transport_results
 ```
 
 ```{eval-rst}
@@ -172,7 +182,7 @@
 .. autoattribute:: csm.models.CSMBase.fields_dict
 ```
 
-## Subsystem Calculations
+## Cost and Mass Calculations
 
 ### Rotor
 
@@ -346,7 +356,7 @@
 .. automethod:: csm.models.CSMBase.calculate_tower_cost
 ```
 
-## Subsystem Aggregations
+### Subsystem Aggregations
 
 ```{eval-rst}
 .. automethod:: csm.models.CSMBase.calculate_subsystem_mass
@@ -394,4 +404,34 @@
 
 ```{eval-rst}
 .. automethod:: csm.models.CSMBase.calculate_turbine_cost
+```
+
+### Transportation Costs
+
+```{eval-rst}
+.. automethod:: csm.models.CSMBase.calculate_blade_transport_cost
+```
+
+```{eval-rst}
+.. automethod:: csm.models.CSMBase.calculate_hub_transport_cost
+```
+
+```{eval-rst}
+.. automethod:: csm.models.CSMBase.calculate_power_electronics_transport_cost
+```
+
+```{eval-rst}
+.. automethod:: csm.models.CSMBase.calculate_tower_transport_cost
+```
+
+```{eval-rst}
+.. automethod:: csm.models.CSMBase.calculate_drivetrain_transport_cost
+```
+
+```{eval-rst}
+.. automethod:: csm.models.CSMBase.calculate_parts_transport_cost
+```
+
+```{eval-rst}
+.. automethod:: csm.models.CSMBase.calculate_transport_cost
 ```

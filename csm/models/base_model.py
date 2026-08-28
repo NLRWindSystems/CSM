@@ -147,6 +147,20 @@ parameter_map = {
     "rotor_cost": ("num_blades", "blade_cost", "hub_system_cost"),
     "turbine_mass": ("nacelle_mass", "rotor_mass", "tower_mass"),
     "turbine_cost": ("nacelle_cost", "rotor_cost", "tower_cost"),
+    "blade_transport_cost": (),
+    "hub_transport_cost": (),
+    "power_electronics_transport_cost": (),
+    "drivetrain_transport_cost": (),
+    "tower_transport_cost": (),
+    "parts_transport_cost": (),
+    "transport_cost": (
+        "blade_transport_cost",
+        "hub_transport_cost",
+        "power_electronics_transport_cost",
+        "drivetrain_transport_cost",
+        "tower_transport_cost",
+        "parts_transport_cost",
+    ),
 }
 
 ALL_RESULT_NAMES = (
@@ -201,6 +215,12 @@ ALL_RESULT_NAMES = (
     "turbine_mass",
     "turbine_cost",
     "turbine_cost_kw",
+    "blade_transport_cost",
+    "hub_transport_cost",
+    "power_electronics_transport_cost",
+    "drivetrain_transport_cost",
+    "tower_transport_cost",
+    "parts_transport_cost",
 )
 
 MASS_RESULT_NAMES = (
@@ -256,6 +276,20 @@ COST_RESULT_NAMES = (
     "rotor_cost",
     "turbine_cost",
     "turbine_cost_kw",
+    "blade_transport_cost",
+    "hub_transport_cost",
+    "power_electronics_transport_cost",
+    "drivetrain_transport_cost",
+    "tower_transport_cost",
+    "parts_transport_cost",
+)
+TRANSPORT_RESULT_NAMES = (
+    "blade_transport_cost",
+    "hub_transport_cost",
+    "power_electronics_transport_cost",
+    "drivetrain_transport_cost",
+    "tower_transport_cost",
+    "parts_transport_cost",
 )
 
 
@@ -511,6 +545,21 @@ class CSMBase:
             :py:meth:`calculate_turbine_cost` for more details.
         turbine_cost (float): Total turbine cost, normalized by
             :py:attr:`rated_power_kw` (:math:`USD/kW`).
+        blade_transport_cost (float): Total blade transportation cost (:math:`USD`). See
+            :py:meth:`calculate_blade_transport_cost` for more details.
+        hub_transport_cost (float): Total hub transportation cost (:math:`USD`). See
+            :py:meth:`calculate_hub_transport_cost` for more details.
+        power_electronics_transport_cost (float): Total power_electronics transportation cost
+            (:math:`USD`). See :py:meth:`calculate_power_electronics_transport_cost` for more
+            details.
+        drivetrain_transport_cost (float): Total drivetrain transportation cost (:math:`USD`). See
+            :py:meth:`calculate_drivetrain_transport_cost` for more details.
+        tower_transport_cost (float): Total tower transportation cost (:math:`USD`). See
+            :py:meth:`calculate_tower_transport_cost` for more details.
+        parts_transport_cost (float): Total transportation cost of miscellaneous parts
+            (:math:`USD`). See :py:meth:`calculate_parts_transport_cost` for more details.
+        transport_cost (float): Total transportation cost (:math:`USD`). See
+            :py:meth:`calculate_transport_cost` for more details.
     """
 
     # turbine general
@@ -751,9 +800,6 @@ class CSMBase:
     )
     rotor_mass: float = create_field(float, "kg", "both", additional_validators=[validators.ge(0)])
     rotor_cost: float = create_field(float, "USD", "both", additional_validators=[validators.ge(0)])
-    transport_cost: float = create_field(
-        float, "USD", "both", additional_validators=[validators.ge(0)]
-    )
     turbine_mass: float = create_field(
         float, "kg", "output", additional_validators=[validators.ge(0)]
     )
@@ -764,12 +810,36 @@ class CSMBase:
         float, "USD/kW", "output", additional_validators=[validators.ge(0)]
     )
 
+    # transportation
+    blade_transport_cost: float = create_field(
+        float, "USD", "both", additional_validators=[validators.ge(0)]
+    )
+    hub_transport_cost: float = create_field(
+        float, "USD", "both", additional_validators=[validators.ge(0)]
+    )
+    power_electronics_transport_cost: float = create_field(
+        float, "USD", "both", additional_validators=[validators.ge(0)]
+    )
+    drivetrain_transport_cost: float = create_field(
+        float, "USD", "both", additional_validators=[validators.ge(0)]
+    )
+    tower_transport_cost: float = create_field(
+        float, "USD", "both", additional_validators=[validators.ge(0)]
+    )
+    parts_transport_cost: float = create_field(
+        float, "USD", "both", additional_validators=[validators.ge(0)]
+    )
+    transport_cost: float = create_field(
+        float, "USD", "both", additional_validators=[validators.ge(0)]
+    )
+
     # all else
     parameter_map: dict[str, tuple[str]] = field(init=False)
     parameter_graph: nx.DiGraph = field(init=False)
     _all_result_names: dict = field(init=False, default=ALL_RESULT_NAMES)
     _mass_result_names: dict = field(init=False, default=MASS_RESULT_NAMES)
     _cost_result_names: dict = field(init=False, default=COST_RESULT_NAMES)
+    _transport_result_names: dict = field(init=False, default=TRANSPORT_RESULT_NAMES)
 
     # NOTE: temporary while prototyping
     turbine_production_cost: float = field(default=1000.0)
@@ -892,9 +962,12 @@ class CSMBase:
             missing = [
                 name for exists, name in zip(has_values, parameters, strict=True) if not exists
             ]
+            missing = sorted(missing)
             for name in missing:
                 if name in self.output_names:
-                    getattr(self, f"calculate_{name}")()
+                    if (calculation := getattr(self, f"calculate_{name}", None)) is None:
+                        continue
+                    calculation()
             if missing:
                 final_value_check = tuple(self._has_values(*missing))
                 if not all(final_value_check):
@@ -2489,7 +2562,7 @@ class CSMBase:
 
     def calculate_turbine_cost(self):
         """Calculates and sets :py:attr:`turbine_cost` (:math:`USD`) and :py:attr:`turbine_cost_kw`
-        (:math:USD/kW) if neither was provided by the user.
+        (:math:USD/kW) if neither was provided by the user, excluding any transportation costs.
 
         Sum of the :py:attr:`rotor_cost` (:py:attr:`calculate_rotor_cost`),
         :py:attr:`hub_system_cost` (:py:attr:`calculate_hub_system_cost`),
@@ -2514,6 +2587,91 @@ class CSMBase:
             self.turbine_cost = self.nacelle_cost + self.rotor_cost + self.tower_cost
         if not cost_kw_exists:
             self.turbine_cost_kw = self.turbine_cost / self.rated_power_kw
+
+    def calculate_blade_transport_cost(self):
+        """Calculates and sets the :py:attr:`blade_transport_cost` if it was not
+        provided by the user.
+
+        Currently sets the value to 0 as there is no base relationship.
+        """
+        cost_exists = self._prepare_calculation("blade_transport_cost")
+        if cost_exists:
+            return
+        self.blade_transport_cost = 0
+
+    def calculate_hub_transport_cost(self):
+        """Calculates and sets the :py:attr:`hub_transport_cost` if it was not provided by the user.
+
+        Currently sets the value to 0 as there is no base relationship.
+        """
+        cost_exists = self._prepare_calculation("hub_transport_cost")
+        if cost_exists:
+            return
+        self.hub_transport_cost = 0
+
+    def calculate_power_electronics_transport_cost(self):
+        """Calculates and sets the :py:attr:`power_electronics_transport_cost` if it was not
+        provided by the user.
+
+        Currently sets the value to 0 as there is no base relationship.
+        """
+        cost_exists = self._prepare_calculation("power_electronics_transport_cost")
+        if cost_exists:
+            return
+        self.power_electronics_transport_cost = 0
+
+    def calculate_drivetrain_transport_cost(self):
+        """Calculates and sets the :py:attr:`drivetrain_transport_cost` if it was not provided by
+        the user.
+
+        Currently sets the value to 0 as there is no base relationship.
+        """
+        cost_exists = self._prepare_calculation("drivetrain_transport_cost")
+        if cost_exists:
+            return
+        self.drivetrain_transport_cost = 0
+
+    def calculate_tower_transport_cost(self):
+        """Calculates and sets the :py:attr:`tower_transport_cost` if it was not provided by the
+        user.
+
+        Currently sets the value to 0 as there is no base relationship.
+        """
+        cost_exists = self._prepare_calculation("tower_transport_cost")
+        if cost_exists:
+            return
+        self.tower_transport_cost = 0
+
+    def calculate_parts_transport_cost(self):
+        """Calculates and sets the :py:attr:`parts_transport_cost` if it was not provided by the
+        user.
+
+        Currently sets the value to 0 as there is no base relationship.
+        """
+        cost_exists = self._prepare_calculation("parts_transport_cost")
+        if cost_exists:
+            return
+        self.parts_transport_cost = 0
+
+    def calculate_transport_cost(self):
+        """Calculates and sets the :py:attr:`transport_cost` if it was not provided by the user.
+
+        Currently sets the value to 0 as there is no base relationship.
+        """
+        cost_exists = self._prepare_calculation("transport_cost")
+        if cost_exists:
+            return
+
+        self.transport_cost = sum(
+            (
+                self.blade_transport_cost,
+                self.hub_transport_cost,
+                self.power_electronics_transport_cost,
+                self.drivetrain_transport_cost,
+                self.tower_transport_cost,
+                self.parts_transport_cost,
+            )
+        )
 
     def calculate_subsystem_mass(self):
         """Runs all the mass calculations for the non-aggregated turbine subsytems."""
@@ -2582,6 +2740,7 @@ class CSMBase:
         self.calculate_system_mass()
         self.calculate_subsystem_cost()
         self.calculate_system_cost()
+        self.calculate_transport_cost()
 
     @classmethod
     def get_required_inputs(
@@ -2682,6 +2841,10 @@ class CSMBase:
     def get_cost_results(self) -> dict[str, float]:
         """Gathers all the cost-specific outputs into a dictionary of attribute: value."""
         return {name: getattr(self, name) for name in self._cost_result_names}
+
+    def get_transport_results(self) -> dict[str, float]:
+        """Gathers all the cost-specific outputs into a dictionary of attribute: value."""
+        return {name: getattr(self, name) for name in self._transport_result_names}
 
     def get_component_breakdown(self) -> pd.DataFrame:
         """Create a Pandas DataFrame of all component mass and cost data."""
