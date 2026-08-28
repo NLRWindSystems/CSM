@@ -18,7 +18,12 @@ import pandas as pd
 import networkx as nx
 from attrs import Attribute, field, define, fields, validators
 
-from csm.models.utils import create_field, generate_parameterization
+from csm.models.utils import (
+    create_field,
+    get_dependent_attributes,
+    generate_parameterization,
+    get_descendant_attributes,
+)
 
 
 parameter_map = {
@@ -758,7 +763,7 @@ class CSMBase:
 
     # all else
     parameter_map: dict[str, tuple[str]] = field(init=False)
-    parameter_graph: nx.Digraph = field(init=False)
+    parameter_graph: nx.DiGraph = field(init=False)
     _all_result_names: dict = field(init=False, default=ALL_RESULT_NAMES)
     _mass_result_names: dict = field(init=False, default=MASS_RESULT_NAMES)
     _cost_result_names: dict = field(init=False, default=COST_RESULT_NAMES)
@@ -887,10 +892,16 @@ class CSMBase:
             for name in missing:
                 if name in self.output_names:
                     getattr(self, f"calculate_{name}")()
-                    missing.pop(missing.index(name))
             if missing:
-                msg = f"Inputs for the following variables required: {', '.join(missing)}"
-                raise ValueError(msg)
+                final_value_check = tuple(self._has_values(*missing))
+                if not all(final_value_check):
+                    final_missing = [
+                        name
+                        for exists, name in zip(final_value_check, missing, strict=True)
+                        if not exists
+                    ]
+                    msg = f"Inputs for the following variables required: {', '.join(final_missing)}"
+                    raise ValueError(msg)
 
     def _prepare_calculation(self, method: str) -> bool:
         """Checks the existence of the attribute(s) a method will set, and returns True
@@ -907,7 +918,7 @@ class CSMBase:
         if next(self._has_values(method)):
             return True
 
-        parameters = self.parameter_map[method]
+        parameters = self.get_descendant_attributes(method)
         self._validate_inputs(parameters=parameters)
         return False
 
@@ -932,7 +943,7 @@ class CSMBase:
         Returns:
             set[str]: Set of model attribute names that rely on the value of :py:attr:`name`.
         """
-        return nx.ancestors(self.parameter_graph, name)
+        return get_dependent_attributes(self.parameter_graph, name)
 
     def get_descendant_attributes(self, name: str) -> set[str]:
         """Returns a set of model attributes :py:attr:`name` requires.
@@ -944,7 +955,7 @@ class CSMBase:
         Returns:
             set[str]: Set of model attribute names that :py:attr:`name` relies on.
         """
-        return nx.descendants(self.parameter_graph, name)
+        return get_descendant_attributes(self.parameter_graph, name)
 
     def update(self, data: dict[str, Any]):
         """Update the value of one or multiple model parameters.
@@ -2669,6 +2680,20 @@ class CSMBase:
     def get_cost_results(self) -> dict[str, float]:
         """Gathers all the cost-specific outputs into a dictionary of attribute: value."""
         return {name: getattr(self, name) for name in self._cost_result_names}
+
+    def get_component_breakdown(self) -> pd.DataFrame:
+        """Create a Pandas DataFrame of all component mass and cost data."""
+        mass = pd.DataFrame.from_dict(self.get_mass_results(), orient="index").rename(
+            columns={0: "Mass (kg)"}
+        )
+        cost = pd.DataFrame.from_dict(self.get_cost_results(), orient="index").rename(
+            columns={0: "Cost (USD)"}
+        )
+        mass.index = mass.index.str.replace("_mass", "")
+        cost.index = cost.index.str.replace("_cost", "")
+        results = mass.join(cost, how="outer")
+        results.index.name = "Component"
+        return results
 
     def irs_mpc_breakdown(  # noqa: D417
         self,

@@ -12,7 +12,7 @@
 
 ```{eval-rst}
 .. autoclass:: csm.models.CSMBase
-    :members: from_dict, update, reset_values
+    :members: get_required_inputs, from_dict, update, reset_values
     :undoc-members:
     :exclude-members: turbine_class, rated_power_kw, rotor_diameter, efficiency_max, num_bearings,
         num_blades, blade_has_carbon, blade_mass_coeff, blade_mass_cost_coeff, blade_mass,
@@ -91,6 +91,10 @@
 ```
 
 ## Getting Results
+
+```{eval-rst}
+.. automethod:: csm.models.CSMBase.get_component_breakdown
+```
 
 ```{eval-rst}
 .. automethod:: csm.models.CSMBase.get_results

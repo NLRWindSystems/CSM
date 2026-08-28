@@ -1,9 +1,10 @@
 """Provides all the ``attrs``-based utilities for the CSM base model and its subclasses."""
 
 from typing import Any
-from functools import partial
+from functools import cache, partial
 
 import numpy as np
+import networkx as nx
 from attrs import Attribute, field, converters, validators
 from attr._make import attrib
 
@@ -206,3 +207,33 @@ def generate_parameterization(parameterized_kwargs: dict) -> dict[str, list]:
             raise ValueError(f"Parameterized inputs for '{name}' must have at least 2 values.")
         expanded[name] = _inputs
     return expanded
+
+
+@cache
+def get_dependent_attributes(parameter_graph: nx.DiGraph, name: str) -> set[str]:
+    """Returns a set of model attributes that depend on the value of :py:attr:`name`.
+
+    Args:
+        parameter_graph (nx.DiGraph): The ``CSMBase.parameter_graph``.
+        name (str): The name of a model attribute that a user inputs or can be
+            calculated.
+
+    Returns:
+        set[str]: Set of model attribute names that rely on the value of :py:attr:`name`.
+    """
+    return nx.ancestors(parameter_graph, name)
+
+
+@cache
+def get_descendant_attributes(parameter_graph: nx.DiGraph, name: str) -> set[str]:
+    """Returns a set of model attributes :py:attr:`name` requires.
+
+    Args:
+        parameter_graph (nx.DiGraph): The ``CSMBase.parameter_graph``.
+        name (str): The name of a model attribute that a user inputs or can be
+            calculated.
+
+    Returns:
+        set[str]: Set of model attribute names that :py:attr:`name` relies on.
+    """
+    return nx.descendants(parameter_graph, name)
