@@ -1144,6 +1144,8 @@ class CSMBase:
             ValueError: Raised if no calculation is found for the parameter.
         """
         for parameter in args:
+            if parameter == "turbine_cost_kw":
+                parameter = "turbine_cost"
             calculation = f"calculate_{parameter.lower().replace(' ', '_')}"
             if (fn := getattr(self, calculation)) is None:
                 raise ValueError(f"No calculation available for '{parameter}'.")
