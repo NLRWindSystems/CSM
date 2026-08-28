@@ -132,23 +132,16 @@ def test_defaults_only(subtests):
     with pytest.raises(ValueError, match=undefined_params_msg):
         model.calculate_transformer_cost()
 
-    # NOTE: no default relationship
-    # with pytest.raises(ValueError, match=undefined_params_msg):
-    #     model.calculate_converter_mass()
+    # None of these require an input as they set themselves to 0 for posterity
+    model.calculate_converter_mass()
+    model.calculate_controls_mass()
+    model.calculate_electrical_connection_mass()
 
     with pytest.raises(ValueError, match=undefined_params_msg):
         model.calculate_converter_cost()
 
-    # NOTE: no default relationship
-    # with pytest.raises(ValueError, match=undefined_params_msg):
-    #     model.calculate_controls_mass()
-
     with pytest.raises(ValueError, match=undefined_params_msg):
         model.calculate_controls_cost()
-
-    # NOTE: no default relationship
-    # with pytest.raises(ValueError, match=undefined_params_msg):
-    #     model.calculate_electrical_connection_mass()
 
     with pytest.raises(ValueError, match=undefined_params_msg):
         model.calculate_electrical_connection_cost()
@@ -185,6 +178,14 @@ def test_defaults_only(subtests):
 
     with pytest.raises(ValueError, match=undefined_params_msg):
         model.run()
+
+    # transportation costs set themselves to 0, so will not fail
+    model.calculate_blade_transport_cost()
+    model.calculate_hub_transport_cost()
+    model.calculate_power_electronics_transport_cost()
+    model.calculate_drivetrain_transport_cost()
+    model.calculate_tower_transport_cost()
+    model.calculate_parts_transport_cost()
 
     results = model.get_all_results()
     mass_results = model.get_mass_results()
@@ -509,8 +510,6 @@ def test_has_values(subtests):
         k for k, v in model.fields_dict.items() if v.metadata.get("io") in ("both", "output")
     ]
 
-    # remove placeholder for transport cost
-    calculated.pop(calculated.index("transport_cost"))
     with subtests.test("Check calculated values unregistered"):
         assert not all(model._has_values(*calculated))
 
@@ -538,8 +537,8 @@ def test_validate_inputs(subtests):
     model = CSMBase(**csm_2015_defaults)
     blade_mass_inputs = model.parameter_map["blade_mass"]
     with subtests.test("2015 defaults only can't validate"):
-        # order taken from parameter_map for consistency
-        missing = ("rotor_diameter", "turbine_class", "blade_has_carbon")
+        # missing is sorted for consistency with error checking and readability
+        missing = ("blade_has_carbon", "rotor_diameter", "turbine_class")
 
         msg = f"Inputs for the following variables required: {', '.join(missing)}"
         with pytest.raises(ValueError, match=msg):
@@ -589,7 +588,7 @@ def test_prepare_calculation(subtests):
     model = CSMBase(**csm_2015_defaults)
     with subtests.test("2015 defaults only can't validate"):
         # order taken from parameter_map for consistency
-        missing = ("rotor_diameter", "turbine_class", "blade_has_carbon")
+        missing = ("blade_has_carbon", "rotor_diameter", "turbine_class")
 
         msg = f"Inputs for the following variables required: {', '.join(missing)}"
         with pytest.raises(ValueError, match=msg):
