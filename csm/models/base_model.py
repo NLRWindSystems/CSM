@@ -1106,10 +1106,7 @@ class CSMBase:
                 msg = f"Error calculating results for {cls.__name__} with parameters: {kwargs}"
                 raise ValueError(msg) from e
 
-            if results is None:
-                single_results = model.get_all_results()
-            else:
-                single_results = {el: getattr(model, el) for el in results}
+            single_results = {el: getattr(model, el) for el in results}
             all_results.append(
                 pd.DataFrame.from_dict(single_results, orient="index")
                 .assign(**kwargs)
