@@ -1,32 +1,10 @@
-# Calculating and Getting Results
+## Subsystem Calculations
 
-## Primary API
-
-Main interface of the model for end users creating and running a model, and getting results.
-
-| Method | Description |
-| ---------- | ----------- |
-| [`from_dict`](#csm.models.CSMBase.from_dict)(data, partial) | Create a complete or incomplete model from a configuration data dictionary. |
-| [`calculate`](#csm.models.CSMBase.calculate)(args) | Calculate individual or a series of outputs. |
-| [`run`](#csm.models.CSMBase.run)() | Calculate all outputs. |
-| [`parameterize`](#csm.models.CSMBase.parameterize)(base_kwargs, parameterized_kwargs, results) | Parameter sweep. |
-| [`parameterize_subset`](#csm.models.CSMBase.parameterize_subset)(base_kwargs, parameterized_kwargs, results) |  Parameter sweep with only partial calculation of results for incomplete model definitions. |
-| [`get_results`](#csm.models.CSMBase.get_results)(args) | Retrieve a dictionary of calculated attributes. |
-| [`get_all_results`](#csm.models.CSMBase.get_all_results)() | Retrieve a dictionary of all calculated attributes. |
-| [`get_mass_results`](#csm.models.CSMBase.get_mass_results)() | Retrieve a dictionary of calculated mass attributes. |
-| [`get_cost_results`](#csm.models.CSMBase.get_cost_results)() | Retrieve a dictionary of calculated cost attributes. |
-| [`irs_mpc_breakdown`](#csm.models.CSMBase.irs_mpc_breakdown)(turbine_production_cost, tower_flange_material_cost, tower_flange_production_cost) | Calculate the base cost breakdown of the US IRS manufactured product component tables. |
-| [`total_domestic_content`](#csm.models.CSMBase.total_domestic_content)(turbine_production_cost, tower_flange_material_cost, tower_flange_production_cost, domestic) | Calculates the total, valid domestic content production percentage |
-| [`update`](#csm.models.CSMBase.update)(data) | Update model values based on a data dictionary and reset any calculated values dependent on the attributes. |
-| [`reset_values`](#csm.models.CSMBase.reset_values)(args) | Reset attribute(s) back to their model default. |
-
-## Subsystems
-
-The folllowing is a breakdown of all the individual subsystem calculations available.  All subsystem
+The following is a breakdown of all the individual subsystem calculations available.  All subsystem
 values use:math:`kg` for mass and :math:`USD` for cost. Any other values will have units listed.
 
 | System | Method | Description |
-| ------ | ---------- | ----------- |
+| ------ | ------ | ----------- |
 | Rotor | [`calculate_blade_mass`](#csm.models.CSMBase.calculate_blade_mass)() | Calculate mass of a single blade. |
 | Rotor | [`calculate_blade_cost`](#csm.models.CSMBase.calculate_blade_cost)() | Calculate cost of a single blade. |
 | Hub System | [`calculate_hub_mass`](#csm.models.CSMBase.calculate_hub_mass)() | Calculate mass of the hub. |
@@ -68,11 +46,17 @@ values use:math:`kg` for mass and :math:`USD` for cost. Any other values will ha
 | Nacelle | [`calculate_converter_cost`](#csm.models.CSMBase.calculate_converter_cost)() | Calculate cost of the electrical converter system. |
 | Tower | [`calculate_tower_mass`](#csm.models.CSMBase.calculate_tower_mass)() | Calculate mass of the tower. |
 | Tower | [`calculate_tower_cost`](#csm.models.CSMBase.calculate_tower_cost)() | Calculate cost of the tower. |
+| Transport | [`calculate_blade_transport_cost`](#csm.models.CSMBase.calculate_blade_transport_cost)() | Calculate the total blade transport cost. |
+| Transport | [`calculate_hub_transport_cost`](#csm.models.CSMBase.calculate_hub_transport_cost)() | Calculate the hub transport cost. |
+| Transport | [`calculate_power_electronics_transport_cost`](#csm.models.CSMBase.calculate_power_electronics_transport_cost)() | Calculate the power electronics transport cost. |
+| Transport | [`calculate_drivetrain_transport_cost`](#csm.models.CSMBase.calculate_drivetrain_transport_cost)() | Calculate the drivetrain transport cost. |
+| Transport | [`calculate_tower_transport_cost`](#csm.models.CSMBase.calculate_tower_transport_cost)() | Calculate the tower transport cost. |
+| Transport | [`calculate_transport_cost`](#csm.models.CSMBase.calculate_transport_cost)() | Calculate the total transport cost. |
 
 ## Subsystem Aggregations (Systems)
 
 | Method | Description |
-| ---------- | ----------- |
+| ------ | ----------- |
 | [`calculate_subsystem_mass`](#csm.models.CSMBase.calculate_subsystem_mass)() | Calculate mass of all subsystems listed above. |
 | [`calculate_subsystem_cost`](#csm.models.CSMBase.calculate_subsystem_cost)() | Calculate cost of all subsystems
 listed above. |
@@ -84,22 +68,3 @@ listed above. |
 | [`calculate_rotor_cost`](#csm.models.CSMBase.calculate_rotor_cost)() | Calculate cost of the rotor. |
 | [`calculate_turbine_mass`](#csm.models.CSMBase.calculate_turbine_mass)() | Calculate mass of the turbine. |
 | [`calculate_turbine_cost`](#csm.models.CSMBase.calculate_turbine_cost)() | Calculate cost of the turbine. |
-
-# Model Helpers
-
-The following properties and methods are made available for either convenience or performing underlying checks on the
-data.
-
-| Attributes/Methods | Description |
-| ------------------ | ----------- |
-| [`rotor_radius`](#csm.models.CSMBase.rotor_radius) | Half of the rotor diameter. |
-| [`swept_area`](#csm.models.CSMBase.swept_area) | Rotor swept area. |
-| [`output_names`](#csm.models.CSMBase.output_names) | The names of all attributes available as outputs. |
-| [`get_dependent_attributes`](#csm.models.CSMBase.get_dependent_attributes)(name) | Names of all attributes dependent on `name`. |
-| [`get_descendant_attributes`](#csm.models.CSMBase.get_descendant_attributes)(name) | Names of all attributes `name` depends on. |
-| [`_get_attr_map`](#csm.models.CSMBase._get_attr_map)(both_as_separate, include_units) | Mapping of all the inputs and outputs of the model. |
-| [`fields`](#csm.models.CSMBase.fields) | Tuple of `attrs.Attribute`s. |
-| [`fields_dict`](#csm.models.CSMBase.fields_dict) | Dictionary of `attrs.Attribute`s. |
-| [`_has_values`](#csm.models.CSMBase._has_values)(args) | Checks for the existence of a non-None value. |
-| [`_validate_inputs`](#csm.models.CSMBase._validate_inputs)(parameters) | Validates the required attributes for a component's calculation and runs any uncalculated dependent calculations. |
-| [`_prepare_calculation`](#csm.models.CSMBase._prepare_calculation) | Verifies the attribute isn't already calculated and validates its dependencies. |

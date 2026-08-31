@@ -16,11 +16,15 @@ parts:
   - file: user_guide/new_models
 - caption: API Reference
   chapters:
-  - file: api/models/base
-  - file: api/models/land_2015
-  - file: api/models/land_2020
-  - file: api/models/land_2021
-  - file: api/models/land_2026
-  - file: api/utils
-  - file: api/tools/plot
+  - file: api/models/index
+    sections:
+    - file: api/models/base
+    - file: api/models/land_2015
+    - file: api/models/land_2020
+    - file: api/models/land_2021
+    - file: api/models/land_2026
+    - file: api/utils
+  - file: api/tools/index
+    sections:
+    - file: api/tools/plot
   # - file: api/wisdem
