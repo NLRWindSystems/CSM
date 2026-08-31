@@ -43,6 +43,8 @@
         hub_system_cost, rotor_mass, rotor_cost, turbine_mass, turbine_cost, turbine_cost_kw,
         transport_cost, turbine_production_cost, tower_flange_material_cost,
         tower_flange_production_cost,
+        blade_transport_cost, hub_transport_cost, power_electronics_transport_cost,
+        drivetrain_transport_cost, tower_transport_cost, parts_transport_cost,
         parameter_map, parameter_graph, get_results,
         _all_result_names, _mass_result_names, _cost_result_names, _transport_result_names,
         output_names,
