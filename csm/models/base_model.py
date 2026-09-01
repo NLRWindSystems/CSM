@@ -298,23 +298,32 @@ class CSMBase:
     r"""Base cost and scaling model that defines universally required inputs and calculations.
 
     Args:
-        num_blades (int, optional): Number of turbine blades. Defaults to 3.
-        rated_power_kw (float): Turbine rated power (:math:`kW`).
         rotor_diameter (float): Diameter of the swept area of the turbine blades (:math:`m`).
+        rated_power_kw (float): Turbine rated power (:math:`kW`).
+        efficiency_max (float): Maximum possible drivetrain efficiency.
+        max_tip_speed (float): Maximum allowable blade tip speed (:math:`m/s`).
         turbine_class (int): Turbine classification; use 1 for IEC Wind-Class I, 2 fo
             IEC Wind-Class II or III.
+        num_blades (int, optional): Number of turbine blades. Defaults to 3.
         num_bearings (int): Number of main bearings.
         blade_mass_coeff (float): :math:`k` in the blade mass equation from
             :py:meth:`calculate_blade_mass`.
         blade_has_carbon (bool): Use True if the blade has carbon, False if not.
         blade_mass_cost_coeff (float): Blade cost per kilogram (:math:`USD/kg`).
-        blade_mass (float): Blade mass (:math:`kg`).
+        blade_mass (float): Blade mass (:math:`kg`). See :py:meth:`calculate_blade_mass`
+            for details.
+        blade_cost (float): Blade cost (:math:`USD`). See :py:meth:`calculate_blade_cost`
+            for details.
         hub_mass_coeff (float): :math:`k` in the hub mass equation from
             :py:meth:`calculate_hub_mass`.
         hub_mass_intercept (bool): :math:`b` in the hub mass equation from
             :py:meth:`calculate_hub_mass`.
         hub_mass_cost_coeff (float): Hub cost per kilogram (:math:`USD/kg`) from
             :py:meth:`calculate_hub_cost`.
+        hub_mass (float): Hub mass (:math:`kg`). See :py:meth:`calculate_hub_mass`
+            for more details.
+        hub_cost (float): Hub cost (:math:`USD`). See :py:meth:`calculate_hub_cost`
+            for more details.
         pitch_bearing_mass_coeff (float): :math:`k` in the pitch bearing mass equation from
             :py:meth:`calculate_pitch_system_mass`.
         pitch_bearing_mass_intercept (float): :math:`b1` in the pitch bearing mass equation from
@@ -326,12 +335,20 @@ class CSMBase:
             :py:meth:`calculate_pitch_system_mass`.
         pitch_system_mass_cost_coeff (float): Pitch system cost per kilogram (:math:`USD/kg`) from
             :py:meth:`calculate_pitch_system_cost`.
+        pitch_system_mass (float): Pitch system mass (:math:`kg`). See
+            :py:meth:`calculate_pitch_system_mass` for more details.
+        pitch_system_cost (float): Pitch system cost (:math:`USD`). See
+            :py:meth:`calculate_pitch_system_cost` for more details.
         spinner_mass_coeff (float): :math:`k` in the mass equation above from
             :py:meth:`calculate_spinner_mass`.
         spinner_mass_intercept (bool): :math:`b` in the mass equation above from
             :py:meth:`calculate_spinner_mass`.
         spinner_mass_cost_coeff (float): Spinner cost per kilogram (:math:`USD/kg`) from
             :py:meth:`calculate_spinner_cost`.
+        spinner_mass (float): Spinner mass (:math:`kg`). See :py:meth:`calculate_spinner_mass`
+            for more details.
+        spinner_cost (float): Spinner cost (:math:`USD`). See :py:meth:`calculate_spinner_cost`
+            for more details.
         lss_mass_coeff (float): :math:`k` in the low speed shaft mass equation from
             :py:meth:`calculate_low_speed_shaft_mass`.
         lss_mass_exp (float): :math:`b1` in the low speed shaft mass equation from
@@ -339,33 +356,62 @@ class CSMBase:
         lss_mass_intercept (float): :math:`b2` in the low speed shaft mass equation from
             :py:meth:`calculate_low_speed_shaft_mass`.
         lss_mass_cost_coeff (float): Low speed shaft cost per kilogram (:math:`USD/kg`).
+        low_speed_shaft_mass (float): Low speed shaft mass (:math:`kg`). See
+            :py:meth:`calculate_low_speed_shaft_mass` for more details.
+        low_speed_shaft_cost (float): Low speed shaft cost (:math:`USD`). See
+            :py:meth:`calculate_low_speed_shaft_cost` for more details.
         bearing_mass_coeff (float): :math:`k` in the bearing mass equation from
             :py:meth:`calculate_bearing_mass`.
         bearing_mass_exp (bool): :math:`b` in the bearing mass equation from
             :py:meth:`calculate_bearing_mass`.
         bearing_mass_cost_coeff (float): Main bearing cost per kilogram (:math:`USD/kg`).
-        efficiency_max (float): Maximum possible drivetrain efficiency.
-        max_tip_speed (float): Maximum allowable blade tip speed (:math:`m/s`).
+        bearing_mass (float): Main bearing mass (:math:`kg`). See :py:meth:`calculate_bearing_mass`
+            for more details.
+        bearing_cost (float): Main bearing cost (:math:`USD`). See :py:meth:`calculate_bearing_cost`
+            for more details.
+        rated_rpm (float): Rated RPM of the turbine based on the :py:attr:`max_tip_speed`
+            and :py:attr:`rotor_diameter`. See :py:meth:`calculate_rotor_torque` for more details.
+        rotor_torque (float): Maximum torque produced under normal operations of the turbine
+            (kNm). See :py:meth:`calculate_rotor_torque` for more details.
         gearbox_torque_density (float): Gearbox torque per kilogram of mass from
             :py:meth:`calculate_gearbox_mass` and :py:meth:`calculate_gearbox_cost`
             (:math:`N*m/kg`).
         gearbox_torque_cost (float): Gearbox cost per unit of torque (:math:`USD/kN/m`) from
             :py:meth:`calculate_gearbox_cost`.
+        gearbox_mass (float): Gearbox mass (:math:`kg`). See :py:meth:`calculate_gearbox_mass`
+            for more details.
+        gearbox_cost (float): Gearbox cost (:math:`USD`). See :py:meth:`calculate_gearbox_cost`
+            for more details.
         brake_mass_coeff (bool): :math:`k` in the brake mass equation from
             :py:meth:`calculate_brake_mass`.
         brake_mass_cost_coeff (float): Brake cost per kilogram (:math:`USD/kg`).
-        rated_power_kw (float): Turbine nameplate capacity (rated power) (:math:`kW`).
+        brake_mass (float): Brake mass (:math:`kg`). See :py:meth:`calculate_brake_mass` for more
+            details.
+        brake_cost (float): Brake cost (:math:`USD`). See :py:meth:`calculate_brake_cost` for more
+            details.
         hss_mass_coeff (float): Mass scaling coefficient, :math:`k` in the mass equation.
         hss_mass_cost_coeff (float): High speed shaft cost, per kilogram of mass, :math:`k` in the
             equation above (:math:`USD/kg`).
+        high_speed_shaft_mass (float): High speed shaft mass (:math:`kg`).
+            See :py:meth:`calculate_high_speed_shaft_mass` for more details.
+        high_speed_shaft_cost (float): High speed shaft cost (:math:`USD`).
+            See :py:meth:`calculate_high_speed_shaft_cost` for more details.
         generator_mass_coeff (float): :math:`k` in the generator mass equation above (:math:`kg/kW`)
             from :py:meth:`calculate_generator_mass`.
         generator_mass_intercept (bool): :math:`b` in the generator mass equation above (:math:`kg`)
             from :py:meth:`calculate_generator_mass`.
         generator_mass_cost_coeff (float): generator cost per kilogram (:math:`USD/kg`).
+        generator_mass (float): Generator mass (:math:`kg`). See :py:meth:`calculate_generator_mass`
+            for more details.
+        generator_cost (float): Generator cost (:math:`USD`). See
+            :py:meth:`calculate_generator_cost` for more details.
         bedplate_mass_exp (bool): :math:`b` in the mass equation from
             :py:meth:`calculate_bedplate_mass`.
         bedplate_mass_cost_coeff (float): bedplate cost per kilogram (:math:`USD/kg`).
+        bedplate_mass (float): Bedplate mass (:math:`kg`). See :py:meth:`calculate_bedplate_mass`
+            for more details.
+        bedplate_cost (float): Bedplate cost (:math:`USD`). See :py:meth:`calculate_bedplate_cost`
+            for more details.
         yaw_system_non_bearing_mass_coeff (float): :math:`k1` in the mass equation from
             :py:meth:`calculate_yaw_system_mass` to account for non-bearing mass.
         yaw_system_mass_coeff (float): :math:`k2` in the mass equation from
@@ -373,14 +419,26 @@ class CSMBase:
         yaw_system_mass_exp (bool): :math:`b` in the mass equation from
             :py:meth:`calculate_yaw_system_mass`..
         yaw_system_mass_cost_coeff (float): Yaw system cost per kilogram (:math:`USD/kg`).
+        yaw_system_mass (float): Yaw system mass (:math:`kg`). See
+            :py:meth:`calculate_yaw_system_mass` for more details.
+        yaw_system_cost (float): Yaw system cost (:math:`USD`). See
+            :py:meth:`calculate_yaw_system_cost` for more details.
         hvac_mass_coeff (float): Mass scaling coefficient. See
             :py:meth:`calculate_hydraulic_cooling_mass` for more details.
         hvac_mass_cost_coeff (float): Hydraulic cooling cost, per kilogram of mass.
+        hydraulic_cooling_mass (float): Hydraulic cooling mass (:math:`kg`). See
+            :py:meth:`calculate_hydraulic_cooling_mass` for more details.
+        hydraulic_cooling_cost (float): Hydraulic cooling cost (:math:`USD`). See
+            :py:meth:`calculate_hydraulic_cooling_cost` for more details.
         nacelle_cover_mass_coeff (float): :math:`k` in the mass equation from
             :py:meth:`calculate_nacelle_cover_mass`.
         nacelle_cover_mass_intercept (bool): :math:`b` in the mass equation from
             :py:meth:`calculate_nacelle_cover_mass`.
         nacelle_cover_mass_cost_coeff (float): Nacelle cover cost per kilogram (:math:`USD/kg`).
+        nacelle_cover_mass (float): nacelle_cover mass (:math:`kg`). See
+            :py:meth:`calculate_nacelle_cover_mass` for more details.
+        nacelle_cover_cost (float): nacelle_cover mass (:math:`USD`). See
+            :py:meth:`calculate_nacelle_cover_cost` for more details.
         platform_mainframe_mass_coeff (float): :math:`k` from
             :py:meth:`calculate_platform_mainframe_mass`.
         has_crane (bool): If True, apply :py:attr:`crane_mass` to
@@ -392,15 +450,37 @@ class CSMBase:
             mass equation above.
         platform_mainframe_mass_cost_coeff (float): Platform mainframe cost per kilogram
             (:math:`USD/kg`).
+        platform_mainframe_mass (float): Platform mainframe mass (:math:`kg`).
+            See :py:meth:`calculate_platform_mainframe_mass` for more details.
+        platform_mainframe_cost (float): Platform mainframe cost (:math:`USD`).
+            See :py:meth:`calculate_platform_mainframe_cost` for more details.
         transformer_mass_coeff (float): :math:`k` in the mass equation from
             :py:meth:`calculate_transformer_mass`.
         transformer_mass_intercept (bool): :math:`b` in the mass equation from
             :py:meth:`calculate_transformer_mass`.
         transformer_mass_cost_coeff (float): Transformer cost per kilogram (:math:`USD/kg`).
+        transformer_mass (float): Transformer cover mass (:math:`kg`). See
+            :py:meth:`calculate_transformer_mass` for more details.
+        transformer_cost (float): Transformer cover cost (:math:`USD`). See
+            :py:meth:`calculate_transformer_cost` for more details.
         controls_cost_coeff (float): Controls cost per kilowatt of capacity
             (:math:`USD/kW`).
+        controls_mass (float): Controls mass (:math:`kg`). See
+            :py:meth:`calculate_controls_mass` for more details.
+        controls_cost (float): Controls cost (:math:`USD`). See
+            :py:meth:`calculate_controls_cost` for more details.
         electrical_connection_cost_coeff (float): Electrical connection cost per
             kilowatt (:math:`USD/kW`).
+        electrical_connection_mass (float): Electrical connection mass (:math:`kg`). See
+            :py:meth:`calculate_electrical_connection_mass` for more details.
+        electrical_connection_cost (float): Electrical connection cost (:math:`USD`). See
+            :py:meth:`calculate_electrical_connection_cost` for more details.
+        converter_mass_cost_coeff (float): Power converter cost per kilogram (:math:`USD/kg`). See
+            :py:meth:`calculate_converter_cost` for more details.
+        converter_mass (float): Power converter mass (:math:`kg`). See
+            :py:meth:`calculate_converter_mass` for more details.
+        converter_cost (float): Power converter cost (:math:`USD`). See
+            :py:meth:`calculate_converter_cost` for more details.
         tower_mass_coeff (float): :math:`k` in the mass from :py:meth:`calculate_tower_mass`
             (:math:`kg/m`).
         tower_length (float): For onshore turbines, this is the hub height (total length above
@@ -409,120 +489,6 @@ class CSMBase:
         tower_mass_exp (bool): :math:`b` in the mass equation from
             :py:meth:`calculate_tower_mass`.
         tower_mass_cost_coeff (float): Tower cover cost per kilogram (:math:`USD/kg`).
-        blade_mass (float): Blade mass (:math:`kg`). See :py:meth:`calculate_blade_mass`
-            for details.
-            :math:`blade\_mass = blade\_mass\_coeff * {rotor\_diameter}^b`.
-        blade_cost (float): Blade cost (:math:`USD`). See :py:meth:`calculate_blade_cost`
-            for details.
-            :math:`blade\_cost = blade\_mass\_cost\_coeff * blade\_mass`
-        hub_mass (float): Hub mass (:math:`kg`). See :py:meth:`calculate_hub_mass`
-            for more details.
-            :math:`hub\_mass = hub\_mass\_coeff * blade\_mass + hub\_mass\_intercept`
-        hub_cost (float): Hub cost (:math:`USD`). See :py:meth:`calculate_hub_cost`
-            for more details.
-            :math:`hub\_cost = hub\_mass\_cost\_coeff * hub\_mass`
-        pitch_system_mass (float): Pitch system mass (:math:`kg`). See
-            :py:meth:`calculate_pitch_system_mass` for more details.
-
-            .. math::
-                bearing\_mass = {pitch\_bearing\_mass\_coeff}*{blade\_mass}*{num\_blades}
-                + {pitch\_bearing\_mass\_intercept} \\
-                {pitch\_system\_mass} = (1+{bearing\_housing\_fraction})*{bearing\_mass}
-                + {mass\_sys\_offset}
-
-        pitch_system_cost (float): Pitch system cost (:math:`USD`). See
-            :py:meth:`calculate_pitch_system_cost` for more details.
-            :math:`pitch\_system\_cost = pitch\_system\_mass * pitch\_system\_mass\_cost\_coeff`
-        spinner_mass (float): Spinner mass (:math:`kg`). See :py:meth:`calculate_spinner_mass`
-            for more details.
-
-            .. math::
-                spinner\_mass = spinner\_mass\_coeff * {rotor\_diameter} + spinner\_mass\_intercept
-
-        spinner_cost (float): Spinner cost (:math:`USD`). See :py:meth:`calculate_spinner_cost`
-            for more details.
-            :math:`spinner\_cost = {spinner\_mass} * {spinner\_mass\_cost\_coeff}`
-        low_speed_shaft_mass (float): Low speed shaft mass (:math:`kg`). See
-            :py:meth:`calculate_low_speed_shaft_mass` for more details.
-        low_speed_shaft_cost (float): Low speed shaft cost (:math:`USD`). See
-            :py:meth:`calculate_low_speed_shaft_cost` for more details.
-        bearing_mass (float): Main bearing mass (:math:`kg`). See :py:meth:`calculate_bearing_mass`
-            for more details.
-            :math:`bearing\_mass = bearing\_mass\_coeff * rotor\_diameter ^ {bearing\_mass\_exp}`
-        bearing_cost (float): Main bearing cost (:math:`USD`). See :py:meth:`calculate_bearing_cost`
-            for more details.
-            :math:`bearing\_cost = {bearing\_mass} * {bearing\_mass\_cost\_coeff}`
-        rated_rpm (float): Rated RPM of the turbine based on the :py:attr:`max_tip_speed`
-            and :py:attr:`rotor_diameter`. See :py:meth:`calculate_rotor_torque` for more details.
-        rotor_torque (float): Maximum torque produced under normal operations of the turbine
-            (kNm). See :py:meth:`calculate_rotor_torque` for more details.
-        gearbox_mass (float): Gearbox mass (:math:`kg`). See :py:meth:`calculate_gearbox_mass`
-            for more details.
-        gearbox_cost (float): Gearbox cost (:math:`USD`). See :py:meth:`calculate_gearbox_cost`
-            for more details.
-        brake_mass (float): Brake mass (:math:`kg`). See :py:meth:`calculate_brake_mass` for more
-            details.
-        brake_cost (float): Brake cost (:math:`USD`). See :py:meth:`calculate_brake_cost` for more
-            details.
-        high_speed_shaft_mass (float): High speed shaft mass (:math:`kg`).
-            See :py:meth:`calculate_high_speed_shaft_mass` for more details.
-        high_speed_shaft_cost (float): High speed shaft cost (:math:`USD`).
-            See :py:meth:`calculate_high_speed_shaft_cost` for more details.
-        generator_mass (float): Generator mass (:math:`kg`). See :py:meth:`calculate_generator_mass`
-            for more details.
-        generator_cost (float): Generator cost (:math:`USD`). See
-            :py:meth:`calculate_generator_cost` for more details.
-        bedplate_mass (float): Bedplate mass (:math:`kg`). See :py:meth:`calculate_bedplate_mass`
-            for more details.
-            :math:`bedplate\_mass = rotor\_diameter ^ bedplate\_mass\_exp`
-        bedplate_cost (float): Bedplate cost (:math:`USD`). See :py:meth:`calculate_bedplate_cost`
-            for more details.
-            :math:`bedplate\_cost = bedplate\_mass ^ bedplate\_mass\_cost\_coeff`
-        yaw_system_mass (float): Yaw system mass (:math:`kg`). See
-            :py:meth:`calculate_yaw_system_mass` for more details.
-
-            .. math::
-                yaw\_system\_mass = yaw\_system\_non\_bearing\_mass\_coeff
-                * (yaw\_system\_mass\_coeff * rotor\_diameter ^ yaw\_system\_mass\_exp)
-
-        yaw_system_cost (float): Yaw system cost (:math:`USD`). See
-            :py:meth:`calculate_yaw_system_cost` for more details.
-            :math:`yaw\_system\_cost = yaw\_system\_mass\_cost\_coeff * yaw\_system\_mass`
-        hydraulic_cooling_mass (float): Hydraulic cooling mass (:math:`kg`). See
-            :py:meth:`calculate_hydraulic_cooling_mass` for more details.
-        hydraulic_cooling_cost (float): Hydraulic cooling cost (:math:`USD`). See
-            :py:meth:`calculate_hydraulic_cooling_cost` for more details.
-        nacelle_cover_mass (float): nacelle_cover mass (:math:`kg`). See
-            :py:meth:`calculate_nacelle_cover_mass` for more details.
-
-            .. math::
-                nacelle\_cover\_mass = nacelle\_cover\_mass\_coeff * rated\_power\_kw
-                + nacelle\_cover\_mass\_intercept
-
-        nacelle_cover_cost (float): nacelle_cover mass (:math:`USD`). See
-            :py:meth:`calculate_nacelle_cover_cost` for more details.
-        platform_mainframe_mass (float): Platform mainframe mass (:math:`kg`).
-            See :py:meth:`calculate_platform_mainframe_mass` for more details.
-        platform_mainframe_cost (float): Platform mainframe cost (:math:`USD`).
-            See :py:meth:`calculate_platform_mainframe_cost` for more details.
-        transformer_mass (float): Transformer cover mass (:math:`kg`). See
-            :py:meth:`calculate_transformer_mass` for more details.
-        transformer_cost (float): Transformer cover cost (:math:`USD`). See
-            :py:meth:`calculate_transformer_cost` for more details.
-        controls_mass (float): Controls mass (:math:`kg`). See
-            :py:meth:`calculate_controls_mass` for more details.
-        controls_cost (float): Controls cost (:math:`USD`). See
-            :py:meth:`calculate_controls_cost` for more details.
-        electrical_connection_mass (float): Electrical connection mass (:math:`kg`). See
-            :py:meth:`calculate_electrical_connection_mass` for more details.
-        electrical_connection_cost (float): Electrical connection cost (:math:`USD`). See
-            :py:meth:`calculate_electrical_connection_cost` for more details.
-        converter_mass (float): Power converter mass (:math:`kg`). See
-            :py:meth:`calculate_converter_mass` for more details.
-        converter_mass_cost_coeff (float): Power converter cost per kilogram (:math:`USD/kg`). See
-            :py:meth:`calculate_converter_cost` for more details.
-        converter_cost (float): Power converter cost (:math:`USD`). See
-            :py:meth:`calculate_converter_cost` for more details.
         tower_mass (float): Tower mass (:math:`kg`). See
             :py:meth:`calculate_tower_mass` for more details.
         tower_cost (float): Tower cost (:math:`USD`). See
