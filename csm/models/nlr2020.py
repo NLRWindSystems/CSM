@@ -124,9 +124,8 @@ COST_RESULT_NAMES = (
 
 @define
 class Land2020NLR(CSMBase):
-    r"""NLR 2020 empirically-based model. For complete details on all arguments, attributes, and
-    methods, please see the :py:class:`csm.models.base_model.CSMBase` documentation. All listed
-    attributes below describe the models defaults and any relevant contextual information.
+    r"""NLR 2020 empirically-based model based on updated data and feedback since the
+    original and 2015 models.
 
     Unused parameters from the base model:
 
@@ -389,7 +388,6 @@ class Land2020NLR(CSMBase):
     _mass_result_name = base._mass_result_names.reuse(default=MASS_RESULT_NAMES)
     _cost_result_names = base._cost_result_names.reuse(default=COST_RESULT_NAMES)
 
-    # TODO: pitch system docstrings (top and calculate)
     # TODO: transport cost tests
 
     def __attrs_post_init__(self):
