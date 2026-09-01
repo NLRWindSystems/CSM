@@ -385,6 +385,7 @@ class Land2020NLR(CSMBase):
     _cost_result_names = base._cost_result_names.reuse(default=COST_RESULT_NAMES)
 
     # TODO: transport cost tests
+    # TODO: breakout transport cost methods to match updated base
 
     def __attrs_post_init__(self):
         """Updates the parameter mapping for new mass and cost relationships."""
