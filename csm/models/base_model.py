@@ -2146,12 +2146,12 @@ class CSMBase:
     def calculate_controls_cost(self):
         r"""Calculates and sets :py:attr:`controls_cost` if it was not provided by the user.
 
-        .. math:: k * rated\_power
+        .. math:: k * power
 
         where:
 
         - :math:`k =` :py:attr:`controls_cost_coeff` (:math:`USD/kW`)
-        - :math:`m =` :py:attr:`rated_power` (:math:`kW`).
+        - :math:`power =` :py:attr:`rated_power` (:math:`kW`).
 
         Args:
             controls_cost_coeff (float): Controls cost per kW of capacity
@@ -2218,12 +2218,12 @@ class CSMBase:
         r"""Calculates and sets :py:attr:`electrical_connection_cost` if it was not provided by the
         user.
 
-        .. math:: k * rated\_power
+        .. math:: k * power
 
         where:
 
         - :math:`k =` :py:attr:`electrical_connection_cost_coeff` (:math:`USD/kW`)
-        - :math:`m =` :py:attr:`rated_power` (:math:`kW`).
+        - :math:`power =` :py:attr:`rated_power` (:math:`kW`).
 
         Args:
             electrical_connection_cost_coeff (float): Electrical connection cost per
