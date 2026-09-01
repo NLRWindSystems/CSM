@@ -147,10 +147,6 @@ class Land2020NLR(CSMBase):
 
     Not updated from the 2015 model:
 
-    - :py:attr:`pitch_bearing_mass_coeff`
-    - :py:attr:`pitch_bearing_mass_intercept`
-    - :py:attr:`bearing_housing_fraction`
-    - :py:attr:`mass_sys_offset`
     - :py:attr:`pitch_system_mass_cost_coeff`
 
     Updated scaling relationships:
