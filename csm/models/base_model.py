@@ -1194,6 +1194,11 @@ class CSMBase:
         return df
 
     @property
+    def rated_power_mw(self) -> float:
+        """Converts :py:attr:`rated_power_kw` to MW."""
+        return self.rated_power_kw / 1000.0
+
+    @property
     def rotor_radius(self) -> float:
         """Calculates the rotor radius as :py:attr:`rotor_diameter` / 2."""
         return self.rotor_diameter / 2
@@ -1487,8 +1492,7 @@ class CSMBase:
             return
 
         self.low_speed_shaft_mass = (
-            self.lss_mass_coeff
-            * (self.blade_mass * self.rated_power_kw * 1e-3) ** self.lss_mass_exp
+            self.lss_mass_coeff * (self.blade_mass * self.rated_power_mw) ** self.lss_mass_exp
             + self.lss_mass_intercept
         )
 

@@ -42,8 +42,8 @@ values use:math:`kg` for mass and :math:`USD` for cost. Any other values will ha
 | Nacelle | [`calculate_controls_cost`](#csm.models.CSMBase.calculate_controls_cost)() | Calculate cost of the controls system. |
 | Nacelle | [`calculate_electrical_connection_mass`](#csm.models.CSMBase.calculate_electrical_connection_mass)() | Calculate mass of the electrical connections. |
 | Nacelle | [`calculate_electrical_connection_cost`](#csm.models.CSMBase.calculate_electrical_connection_cost)() | Calculate cost of the electrical connections. |
-| Nacelle | [`calculate_converter_mass`](#csm.models.CSMBase.calculate_converter_mass)() | Calculate mass of the electrical converter system. |
-| Nacelle | [`calculate_converter_cost`](#csm.models.CSMBase.calculate_converter_cost)() | Calculate cost of the electrical converter system. |
+| Nacelle | [`calculate_converter_mass`](#csm.models.CSMBase.calculate_converter_mass)() | Calculate mass of the power converter system. |
+| Nacelle | [`calculate_converter_cost`](#csm.models.CSMBase.calculate_converter_cost)() | Calculate cost of the power converter system. |
 | Tower | [`calculate_tower_mass`](#csm.models.CSMBase.calculate_tower_mass)() | Calculate mass of the tower. |
 | Tower | [`calculate_tower_cost`](#csm.models.CSMBase.calculate_tower_cost)() | Calculate cost of the tower. |
 | Transport | [`calculate_blade_transport_cost`](#csm.models.CSMBase.calculate_blade_transport_cost)() | Calculate the total blade transport cost. |

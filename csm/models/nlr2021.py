@@ -9,7 +9,7 @@ base = fields(Land2020NLR)
 
 @define
 class Land2021NLR(Land2020NLR):
-    r"""NLR 2020 empirically-based model used for development of the IRS Safe Harbor tables.
+    r"""NLR 2021 empirically-based model used for development of the IRS Safe Harbor tables.
 
     Unused parameters from the base model:
 
@@ -202,6 +202,7 @@ class Land2021NLR(Land2020NLR):
     converter_mass_cost_coeff = base.converter_mass_cost_coeff.reuse(default=0)
 
     # TODO: fix docstrings from 2020 copypasta with 2020 issues and parameterizations
+    # TODO: update tower flange assumption in base model to 6% of tower
 
     def __attrs_post_init__(self):
         """Updates the parameter mapping for new mass and cost relationships."""
@@ -267,12 +268,12 @@ class Land2021NLR(Land2020NLR):
         where:
 
         - :math:`k =` :py:attr:`hub_mass_coeff`
-        - :math:`power =` :py:attr:`rated_power_kw`
+        - :math:`power =` :py:attr:`rated_power_mw`
         - :math:`b =` :py:attr:`hub_mass_exp`
 
         Args:
             hub_mass_coeff (float): :math:`k` in the mass equation above (:math:`kg/kW`).
-            rated_power_kw (float): Turbine nameplate capacity (rated power) (:math:`kW`).
+            rated_power_mw (float): Turbine nameplate capacity (rated power) (:math:`MW`).
             hub_mass_exp (bool): :math:`b` in the mass equation above.
 
         Raises:
@@ -282,7 +283,7 @@ class Land2021NLR(Land2020NLR):
         if exists:
             return
 
-        self.hub_mass = self.hub_mass_coeff * self.rated_power_kw**self.hub_mass_exp
+        self.hub_mass = self.hub_mass_coeff * self.rated_power_mw**self.hub_mass_exp
 
     def calculate_gearbox_mass(self):
         """Calculates and sets :py:attr:`gearbox_mass` for the gearbox if it was not provided

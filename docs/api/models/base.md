@@ -53,7 +53,7 @@
         get_descendant_attributes, _get_attr_map,
         get_all_results, get_mass_results, get_cost_results, get_transport_results,
         irs_mpc_breakdown, total_domestic_content,
-        rotor_radius, swept_area,
+        rated_power_mw, rotor_radius, swept_area,
         calculate_subsystem_mass, calculate_subsystem_cost, calculate_system_mass,
         calculate_system_cost, calculate,
         calculate_blade_mass, calculate_blade_cost, calculate_hub_mass, calculate_hub_cost,
@@ -133,6 +133,10 @@
 ```
 
 ## Model Helpers
+
+```{eval-rst}
+.. autoproperty:: csm.models.CSMBase.rated_power_mw
+```
 
 ```{eval-rst}
 .. autoproperty:: csm.models.CSMBase.rotor_radius

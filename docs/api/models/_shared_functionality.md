@@ -27,6 +27,7 @@ data.
 
 | Attributes/Methods | Description |
 | ------------------ | ----------- |
+| [`rated_power_mw`](#csm.models.CSMBase.rated_power) | Turbine nameplate capacity, in :math:`MW`. |
 | [`rotor_radius`](#csm.models.CSMBase.rotor_radius) | Half of the rotor diameter. |
 | [`swept_area`](#csm.models.CSMBase.swept_area) | Rotor swept area. |
 | [`output_names`](#csm.models.CSMBase.output_names) | The names of all attributes available as outputs. |
