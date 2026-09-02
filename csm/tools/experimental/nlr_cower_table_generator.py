@@ -101,6 +101,36 @@ DEFAULT_TURBINE_SPECS: dict[str, dict] = {
         "rotor_efficiency_max": 0.9,
         "BOS_cost": 0.0,
     },
+    "2011 COWER (1.5MW)": {
+        "turbine_rating_MW": 1.5,
+        "rotor_diameter": 82.5,
+        "hub_height": 80.0,
+        "tip_speed_max": 80.0,
+        "num_bearings": 1,
+        "num_blades": 3,
+        "rotor_efficiency_max": 0.9,
+        "BOS_cost": 0.0,
+    },
+    "2015 COWER (2.0MW)": {
+        "turbine_rating_MW": 2.0,
+        "rotor_diameter": 102.0,
+        "hub_height": 82.1,
+        "tip_speed_max": 80.0,
+        "num_bearings": 1,
+        "num_blades": 3,
+        "rotor_efficiency_max": 0.9,
+        "BOS_cost": 0.0,
+    },
+    "2020 COWER (2.8MW)": {
+        "turbine_rating_MW": 2.8,
+        "rotor_diameter": 125.0,
+        "hub_height": 90.0,
+        "tip_speed_max": 80.0,
+        "num_bearings": 1,
+        "num_blades": 3,
+        "rotor_efficiency_max": 0.9,
+        "BOS_cost": 0.0,
+    },
 }
 
 
