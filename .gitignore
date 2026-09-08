@@ -1,5 +1,9 @@
 output
 
+# Source CSVs for the experimental fitting/plotting scripts (empirical + benchmark cost/mass
+# data) — not committed since it's sourced data, not code.
+csm/tools/experimental/data/
+
 *.code-workspace
 
 # Byte-compiled / optimized / DLL files
