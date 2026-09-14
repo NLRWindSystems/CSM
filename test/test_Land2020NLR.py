@@ -120,9 +120,9 @@ def test_Land2020NLR_defaults_only(subtests):
 
     with subtests.test("Transport parameters"):
         assert nlr2020.transport_power_electronics_cost_coeff == 9
-        assert nlr2020.transport_drivetrain_cost_coeff1 == 9000
+        assert nlr2020.transport_drivetrain_cost_coeff == 9000
         assert nlr2020.transport_drivetrain_cost_coeff2 == 45000
-        assert nlr2020.transport_blade_cost_coeff1 == 0.543
+        assert nlr2020.transport_blade_cost_coeff == 0.543
         assert nlr2020.transport_blade_cost_coeff2 == -7.4903
         assert nlr2020.transport_blade_cost_coeff3 == -2847.5
         assert nlr2020.transport_blade_cost_intercept == 103627

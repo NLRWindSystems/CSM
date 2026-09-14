@@ -312,10 +312,10 @@ class Land2020NLR(CSMBase):
             :py:meth:`calculate_tower_cost` for more details.
         tower_cost (float): Tower cost (:math:`USD`). See
             :py:meth:`calculate_tower_cost` for more details.
-        transport_drivetrain_cost_coeff1
+        transport_drivetrain_cost_coeff
         transport_power_electronics_cost_coeff
         transport_drivetrain_cost_coeff2
-        transport_blade_cost_coeff1
+        transport_blade_cost_coeff
         transport_blade_cost_coeff2
         transport_blade_cost_coeff3
         transport_blade_cost_intercept
@@ -399,10 +399,10 @@ class Land2020NLR(CSMBase):
     tower_mass_coeff = base.tower_mass_coeff.reuse(default=0.152)
     tower_mass_intercept = create_field(float, "unitless", "input", default=-14281.0)
     tower_mass_cost_coeff = base.tower_mass_cost_coeff.reuse(default=3.1668)
-    transport_drivetrain_cost_coeff1 = create_field(float, "USD", "input", default=9000)
+    transport_drivetrain_cost_coeff = create_field(float, "USD", "input", default=9000)
     transport_power_electronics_cost_coeff = create_field(float, "USD", "input", default=9)
     transport_drivetrain_cost_coeff2 = create_field(float, "USD", "input", default=45000)
-    transport_blade_cost_coeff1 = create_field(float, "USD", "input", default=0.543)
+    transport_blade_cost_coeff = create_field(float, "USD", "input", default=0.543)
     transport_blade_cost_coeff2 = create_field(float, "USD", "input", default=-7.4903)
     transport_blade_cost_coeff3 = create_field(float, "USD", "input", default=-2847.5)
     transport_blade_cost_intercept = create_field(float, "USD", "input", default=103627)
@@ -481,9 +481,9 @@ class Land2020NLR(CSMBase):
         )
         self.parameter_map["transport_cost"] = (
             "transport_power_electronics_cost_coeff",
-            "transport_drivetrain_cost_coeff1",
+            "transport_drivetrain_cost_coeff",
             "transport_drivetrain_cost_coeff2",
-            "transport_blade_cost_coeff1",
+            "transport_blade_cost_coeff",
             "transport_blade_cost_coeff2",
             "transport_blade_cost_coeff3",
             "transport_blade_cost_intercept",
@@ -525,6 +525,39 @@ class Land2020NLR(CSMBase):
             "platform_mainframe_cost",
             "transformer_cost",
             "crane_cost",
+        )
+        self.parameter_map["blade_transport_cost"] = (
+            "rotor_diameter",
+            "num_blades",
+            "transport_blade_cost_coeff",
+            "transport_blade_cost_coeff2",
+            "transport_blade_cost_coeff3",
+            "transport_blade_cost_intercept",
+        )
+        self.parameter_map["hub_transport_cost"] = (
+            "hub_mass",
+            "transport_hub_cost_intercept",
+        )
+        self.parameter_map["power_electronics_transport_cost"] = (
+            "rated_power_kw",
+            "transport_power_electronics_cost_coeff",
+        )
+        self.parameter_map["drivetrain_transport_cost"] = (
+            "nacelle_mass",
+            "transport_drivetrain_cost_coeff",
+            "transport_drivetrain_cost_coeff2",
+        )
+        self.parameter_map["num_tower_sections"] = (
+            "tower_mass",
+            "tower_section_mass_max",
+        )
+        self.parameter_map["tower_cost"] = (
+            "num_tower_sections",
+            "transport_tower_cost_coeff",
+        )
+        self.parameter_map["parts_transport_cost"] = (
+            "transport_misc_parts_cost_coeff",
+            "turbine_mass",
         )
         super().__attrs_post_init__()
 
@@ -1022,6 +1055,183 @@ class Land2020NLR(CSMBase):
             )
         )
 
+    def calculate_blade_transport_cost(self):
+        """Calculates and sets the :py:attr:`blade_transport_cost` for the total cost of
+        transporting all turbine blades if it was not provided by the user.
+
+        .. math::
+            n_{blades} * (k1 * radius^3 + k2 * radius^2 + k3 * radius + b)
+
+        where:
+
+        - :math:`n_{blades} =` :py:attr:`num_blades`
+        - :math:`radius =` :py:attr:`rotor_diameter` / 2
+        - :math:`k1 =` :py:attr:`transport_blade_cost_coeff`
+        - :math:`k2 =` :py:attr:`transport_blade_cost_coeff2`
+        - :math:`k3 =` :py:attr:`transport_blade_cost_coeff3`
+        - :math:`b =` :py:attr:`transport_blade_cost_intercept`
+
+        Args:
+            num_blades (float): Number of turbine blades on the rotor.
+            rotor_diameter (float): Used to calculate :py:attr:`rotor_radius`.
+            transport_blade_cost_coeff (float): :math:`k1` in the cost equation.
+            transport_blade_cost_coeff2 (float): :math:`k2` in the cost equation.
+            transport_blade_cost_coeff3 (float): :math:`k3` in the cost equation.
+            transport_blade_cost_intercept (float): :math:`b` in the cost equation.
+
+        Raises:
+            ValueError: Raised if any of the required parameters have not been provided.
+        """
+        cost_exists = self._prepare_calculation("blade_transport_cost")
+        if cost_exists:
+            return
+
+        self.blade_transport_cost = self.num_blades * (
+            self.transport_blade_cost_coeff * self.rotor_radius**3
+            + self.transport_blade_cost_coeff2 * self.rotor_radius**2
+            + self.transport_blade_cost_coeff3 * self.rotor_radius
+            + self.transport_blade_cost_intercept
+        )
+
+    def calculate_hub_transport_cost(self):
+        """Calculates and sets the :py:attr:`hub_transport_cost` if it was not provided by the user.
+
+        .. math::
+            m_{hub} + b
+
+        where:
+
+        - :math:`m_{hub} =` :py:attr:`hub_mass`
+        - :math:`b =` :py:attr:`transport_hub_cost_intercept`
+
+        Args:
+            hub_mass (float): Mass of the rotor hub (:math:`kg`). See :py:meth:`calculate_hub_mass`.
+            transport_hub_cost_intercept (float): :math:`b` in the cost equation.
+
+        Raises:
+            ValueError: Raised if any of the required parameters have not been provided.
+        """
+        cost_exists = self._prepare_calculation("hub_transport_cost")
+        if cost_exists:
+            return
+        self.hub_transport_cost = self.hub_mass + self.transport_hub_cost_intercept
+
+    def calculate_power_electronics_transport_cost(self):
+        """Calculates and sets the :py:attr:`power_electronics_transport_cost` if it was not
+        provided by the user.
+
+        .. math::
+            max[power_{MW} - 3, 0] * k
+
+        where:
+
+        - :math:`power_{MW} =` :py:attr:`rated_power_mw`
+        - :math:`k =` :py:attr:`transport_power_electronics_cost_coeff`
+
+        Args:
+            rated_power_kw (float): Turbine nameplate capacity (rated power) (:math:`kW`).
+            transport_power_electronics_cost_coeff (float): :math:`k` in the cost equation.
+
+        Raises:
+            ValueError: Raised if any of the required parameters have not been provided.
+        """
+        cost_exists = self._prepare_calculation("power_electronics_transport_cost")
+        if cost_exists:
+            return
+        self.power_electronics_transport_cost = (
+            max(self.rated_power_mw - 3, 0.0) * self.transport_power_electronics_cost_coeff
+        )
+
+    def calculate_drivetrain_transport_cost(self):
+        r"""Calculates and sets the :py:attr:`drivetrain_transport_cost` if it was not provided by
+        the user.
+
+        .. math::
+            \lceil m_{nacelle} / k1 \rceil * k2
+
+        where:
+
+        - :math:`m_{nacelle} =` :py:attr:`nacelle_mass`
+        - :math:`k1 =` :py:attr:`transport_drivetrain_cost_coeff`
+        - :math:`k2 =` :py:attr:`transport_drivetrain_cost_coeff2`
+
+        Args:
+            nacelle_mass (float): Mass of the nacelle (:math:`kg`). See
+                :py:meth:`calculate_nacelle_mass`.
+            transport_drivetrain_cost_coeff (float): :math:`k1` in the cost equation.
+            transport_drivetrain_cost_coeff2 (float): :math:`k2` in the cost equation.
+
+        Raises:
+            ValueError: Raised if any of the required parameters have not been provided.
+        """
+        cost_exists = self._prepare_calculation("drivetrain_transport_cost")
+        if cost_exists:
+            return
+        self.drivetrain_transport_cost = float(
+            np.ceil(self.nacelle_mass / self.transport_drivetrain_cost_coeff)
+            * self.transport_drivetrain_cost_coeff2
+        )
+
+    def calculate_tower_transport_cost(self):
+        r"""Calculates and sets the :py:attr:`num_tower_sections` and
+        :py:attr:`tower_transport_cost` if they were not provided by the user.
+
+        .. math::
+            n_{tower sections} = \lceil m_{tower} / k1 \rceil
+
+            cost = n_{tower sections} * k2
+
+        where:
+
+        - :math:`m_{tower} =` :py:attr:`tower_mass`
+        - :math:`k1 =` :py:attr:`tower_section_mass_max`
+        - :math:`k2 =` :py:attr:`transport_tower_cost_coeff`
+
+        Args:
+            tower_mass (float): Mass of the tower (:math:`kg`). See
+                :py:meth:`calculate_tower_mass`.
+            tower_section_mass_max (float): Maximum mass of a single tower section, :math:`k1` in
+                the cost equation.
+            transport_tower_cost_coeff (float): Transportation cost of a single tower section,
+                :math:`k2` in the cost equation.
+
+        Raises:
+            ValueError: Raised if any of the required parameters have not been provided.
+        """
+        sections_exists = self._prepare_calculation("num_tower_sections")
+        cost_exists = self._prepare_calculation("tower_cost")
+        if sections_exists and cost_exists:
+            return
+
+        self.num_tower_sections = int(np.ceil(self.tower_mass / self.tower_section_mass_max))
+        self.tower_cost = self.num_tower_sections * self.transport_tower_cost_coeff
+
+    def calculate_parts_transport_cost(self):
+        """Calculates and sets the :py:attr:`parts_transport_cost` if it was not provided by the
+        user.
+
+        .. math::
+            m_{turbine} * k
+
+        where:
+
+        - :math:`m_{turbine} =` :py:attr:`turbine_mass`
+        - :math:`k =` :py:attr:`transport_misc_parts_cost_coeff`
+
+        Args:
+            turbine_mass (float): Mass of the turbine (:math:`kg`). See
+                :py:meth:`calculate_turbine_mass`.
+            transport_misc_parts_cost_coeff (float): Cost ratio of miscellaneous parts to total the
+                turbine mass (:math:`USD/kg`), :math:`k` in the cost equation.
+
+        Raises:
+            ValueError: Raised if any of the required parameters have not been provided.
+        """
+        cost_exists = self._prepare_calculation("parts_transport_cost")
+        if cost_exists:
+            return
+        self.parts_transport_cost = self.transport_misc_parts_cost_coeff * self.turbine_mass
+
     def calculate_transport_cost(self):
         r"""Calculates and sets :py:attr:`platform_mainframe_cost` if it was not provided by the
         user.
@@ -1046,36 +1256,13 @@ class Land2020NLR(CSMBase):
         if exists:
             return
 
-        drivetrain_cost = (
-            np.ceil(self.nacelle_mass / self.transport_drivetrain_cost_coeff1)
-            * self.transport_drivetrain_cost_coeff2
-        )
-        power_electronics_cost = float(
-            np.maximum(self.rated_power_kw - 30000, 0.0)
-            * self.transport_power_electronics_cost_coeff
-        )
-
-        rotor_radius = self.rotor_diameter / 2.0
-        blade_cost = self.num_blades * (
-            self.transport_blade_cost_coeff1 * rotor_radius**3
-            + self.transport_blade_cost_coeff2 * rotor_radius**2
-            + self.transport_blade_cost_coeff3 * rotor_radius
-            + self.transport_blade_cost_intercept
-        )
-        hub_cost = self.hub_mass + self.transport_hub_cost_intercept
-
-        num_tower_sections = int(np.ceil(self.tower_mass / self.tower_section_mass_max))
-        tower_cost = num_tower_sections * self.transport_tower_cost_coeff
-
-        misc_parts_cost = self.transport_misc_parts_cost_coeff * self.turbine_mass
-
         self.transport_cost = (
-            power_electronics_cost
-            + drivetrain_cost
-            + blade_cost
-            + hub_cost
-            + tower_cost
-            + misc_parts_cost
+            self.blade_transport_cost
+            + self.hub_transport_cost
+            + self.power_electronics_transport_cost
+            + self.drivetrain_transport_cost
+            + self.tower_cost
+            + self.parts_transport_cost
         )
 
     def calculate_subsystem_mass(self):
