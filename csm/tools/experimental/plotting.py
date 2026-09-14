@@ -56,6 +56,7 @@ import re
 import sys
 import math
 import textwrap
+import contextlib
 from typing import NamedTuple
 from pathlib import Path
 from collections.abc import Callable
@@ -73,7 +74,18 @@ from matplotlib.ticker import MaxNLocator, FuncFormatter
 
 from csm.models.nlr2015 import Land2015NLR
 from csm.models.nlr2020 import Land2020NLR
-from csm.models.nlr2026 import Land2026NLR
+from csm.models.nlr2021 import Land2021NLR
+
+
+# nlr2026.py doesn't exist until csm/tools/experimental/build_custom_model.py's __main__ has
+# actually been run once (it writes that file, fitting fresh coefficients from
+# data/us_lbw_csm_2026_data.csv) — and build_custom_model.py itself imports from this module, so
+# a hard top-level import here would be circular on a first run. Import it optionally instead:
+# "2026" only shows up in DEFAULT_MODELS once the file exists.
+try:
+    from csm.models.nlr2026 import Land2026NLR
+except ImportError:
+    Land2026NLR = None
 
 
 class CompositeDriver(NamedTuple):
@@ -100,7 +112,7 @@ Driver = str | CompositeDriver
 
 LSS_LOAD_DRIVER = CompositeDriver(
     key="lss_load",
-    label="Blade Mass × Turbine Rating",
+    label="Blade Mass × Turbine Rating",  # noqa: RUF001 — display text, not an identifier
     units="t·MW",
     vary_attr="rotor_diameter",
     display_from_entry=lambda entry: entry["blade_mass"] * entry["rated_power_kw"] * 1e-6,
@@ -108,7 +120,7 @@ LSS_LOAD_DRIVER = CompositeDriver(
 
 TOWER_SWEPT_VOLUME_DRIVER = CompositeDriver(
     key="tower_swept_volume",
-    label="Hub Height × Swept Area",
+    label="Hub Height × Swept Area",  # noqa: RUF001 — display text, not an identifier
     units="m³",
     vary_attr="tower_length",
     display_from_entry=(
@@ -194,9 +206,9 @@ PLOT_COMPONENTS = [c for c in ALL_COMPONENTS if c.has_mass_scaling]
 # What each "total" component actually sums, shown as a subtitle instead of a formula.
 AGGREGATE_COMPONENTS: dict[str, str] = {
     "Hub System": "Hub + Pitch System + Spinner",
-    "Rotor (Total)": "Blades (× num_blades) + Hub System",
+    "Rotor (Total)": "Blades (× num_blades) + Hub System",  # noqa: RUF001 — display text
     "Nacelle (Total)": (
-        "Low Speed Shaft + Main Bearing (× num_bearings) + Gearbox + Brake + High Speed Shaft + "
+        "Low Speed Shaft + Main Bearing (× num_bearings) + Gearbox + Brake + High Speed Shaft + "  # noqa: RUF001
         "Generator + Bedplate + Yaw System + Hydraulic Cooling + Nacelle Cover + "
         "Platform & Mainframe (incl. Crane) + Transformer + Converter + Controls + "
         "Electrical Connection"
@@ -269,6 +281,13 @@ COMPONENT_DRIVER_OVERRIDES: dict[str, dict[type, Driver | None]] = {
     "High Speed Shaft": {Land2020NLR: None},
     "Hydraulic Cooling": {Land2020NLR: None},
     "Tower": {Land2020NLR: TOWER_SWEPT_VOLUME_DRIVER},
+    # Land2021NLR's calculate_hub_mass is a power law of turbine rating, not blade mass (rotor
+    # diameter) like every other model — a genuinely different driver, not just a refit.
+    "Hub": {Land2021NLR: "rated_power_kw"},
+    # Land2021NLR zeroes every Pitch System coefficient (and reuses the pitch_system_mass/cost
+    # fields themselves at default=0), the same "fixed at zero, no real driver" pattern as
+    # Land2020NLR's High Speed Shaft/Hydraulic Cooling above.
+    "Pitch System": {Land2021NLR: None},
 }
 
 # Display label, units, and a multiplier applied to the raw (model-native) value for plotting.
@@ -427,18 +446,38 @@ BENCHMARK_CAPACITY_COLUMN = "turbine_nameplate_capacity"
 BENCHMARK_RD_COLUMN = "rotor_diameter"
 BENCHMARK_TOWER_COLUMN = "tower_height"
 BENCHMARK_PERIOD_COLUMN = "time_period"
-BENCHMARK_COLOR = "#3E8E7E"
+# Matplotlib's "tab10" categorical palette (the Tableau 10 set) throughout this module — same
+# choice as csm/tools/plot.py's own (unset, so matplotlib's own default cycle, itself tab10)
+# defaults — for consistent colorblind-accessible, print-in-grayscale-distinguishable colors
+# rather than arbitrary hex picks. tab10[9] "#17BECF" (cyan); see MODEL_COLORS below for the
+# rest of the assignment and why tab10[3] (red) is deliberately skipped everywhere in this file.
+BENCHMARK_COLOR = "#17BECF"
 
 # Shared styling for the empirical-measurement and industry-benchmark overlay scatter points:
-# a thin black edge and a zorder well above every model line (~2), config marker (5), and each
-# other, so both overlays always read as sitting on top of the rest of the plot regardless of
-# panel or draw order — empirical data is real-world ground truth, and benchmark data is the
-# external reference the fitted lines are calibrated against, so neither should ever be hidden
-# behind a curve or marker.
+# a thin black edge and a zorder well above every model line (~2), config marker (see
+# CONFIG_MARKER_ZORDER), and each other, so both overlays always read as sitting on top of the
+# rest of the plot regardless of panel or draw order — empirical data is real-world ground truth,
+# and benchmark data is the external reference the fitted lines are calibrated against, so
+# neither should ever be hidden behind a curve or marker. Empirical points are drawn fully opaque
+# (unlike the benchmark's own overlay) since they're the smaller, sparser of the two and easiest
+# to lose against a busy plot at anything less than full visibility.
 OVERLAY_EDGE_COLOR = "black"
 OVERLAY_EDGE_LINEWIDTH = 0.4
 EMPIRICAL_ZORDER = 20
 BENCHMARK_ZORDER = 21
+EMPIRICAL_ALPHA = 1.0
+
+# General figure styling, applied consistently across plot_component and plot_wm_comparison:
+# thinner model lines and smaller, less visually heavy config markers than earlier drafts (both
+# still filled with the owning model's own color, edged in black, per CONFIG_MARKER_ZORDER kept
+# well below EMPIRICAL_ZORDER/BENCHMARK_ZORDER so overlays always stay on top), and a visible grid
+# on both axes.
+MODEL_LINE_WIDTH = 1.5
+CONFIG_MARKER_SIZE = 50
+CONFIG_MARKER_LEGEND_SIZE = 6
+CONFIG_MARKER_EDGE_LINEWIDTH = 0.6
+CONFIG_MARKER_ZORDER = 5
+GRID_ALPHA = 0.4
 
 # Which raw benchmark bin column corresponds to each simple driver. The turbine rating bin's own
 # midpoint is already in MW, matching `rated_power_kw`'s MW display units.
@@ -603,12 +642,12 @@ def _resolve_mass_formula(component_label: str, model_cls: type) -> str:
 
 
 def _blade_mass_definition(model_cls: type) -> str:
-    """ "m_blade = ..." line, reusing the Blade component's own formula for `model_cls`."""
+    """`m_blade = ...` line, reusing the Blade component's own formula for `model_cls`."""
     return _resolve_mass_formula("Blade", model_cls).replace("m = ", "m_blade = ", 1)
 
 
 def _bedplate_mass_definition(model_cls: type) -> str:
-    """ "m_bedplate = ..." line, reusing the Bedplate component's own formula for `model_cls`."""
+    """`m_bedplate = ...` line, reusing the Bedplate component's own formula for `model_cls`."""
     return _resolve_mass_formula("Bedplate", model_cls).replace("m = ", "m_bedplate = ", 1)
 
 
@@ -623,7 +662,7 @@ TORQUE_DEFINITION = "τ = 0.5·P·D / (η·v_tip)"
 # height), and P (turbine rating).
 FORMULA_DEFAULT: dict[str, Callable[[type], str]] = {
     "Blade": lambda cls: (
-        f"m = {_fmt_num(_coeff(cls, 'blade_mass_coeff'))}·(D/2)^b  (b: 2.44–2.54 by class/carbon)"
+        f"m = {_fmt_num(_coeff(cls, 'blade_mass_coeff'))}·(D/2)^b  (b: 2.44–2.54 by class/carbon)"  # noqa: RUF001 — display text, not an identifier
     ),
     "Hub": lambda cls: (
         f"m = {_fmt_num(_coeff(cls, 'hub_mass_coeff'))}·m_blade "
@@ -645,7 +684,8 @@ FORMULA_DEFAULT: dict[str, Callable[[type], str]] = {
         f"{_blade_mass_definition(cls)}"
     ),
     "Main Bearing": lambda cls: (
-        f"m = {_fmt_num(_coeff(cls, 'bearing_mass_coeff'))}·D^{_fmt_num(_coeff(cls, 'bearing_mass_exp'))}"
+        f"m = {_fmt_num(_coeff(cls, 'bearing_mass_coeff'))}·"
+        f"D^{_fmt_num(_coeff(cls, 'bearing_mass_exp'))}"
     ),
     "Gearbox": lambda cls: (
         f"m = 1000·τ / {_fmt_num(_coeff(cls, 'gearbox_torque_density'))}\n{TORQUE_DEFINITION}"
@@ -678,7 +718,8 @@ FORMULA_DEFAULT: dict[str, Callable[[type], str]] = {
         f"{_fmt_coef(_coeff(cls, 'transformer_mass_intercept'))}"
     ),
     "Tower": lambda cls: (
-        f"m = {_fmt_num(_coeff(cls, 'tower_mass_coeff'))}·H^{_fmt_num(_coeff(cls, 'tower_mass_exp'))}"
+        f"m = {_fmt_num(_coeff(cls, 'tower_mass_coeff'))}·"
+        f"H^{_fmt_num(_coeff(cls, 'tower_mass_exp'))}"
     ),
     "Converter": lambda cls: "m = 0 (not modeled)",
     "Controls": lambda cls: "m = 0 (not modeled)",
@@ -692,6 +733,13 @@ FORMULA_OVERRIDES: dict[str, dict[type, Callable[[type], str]]] = {
             f"m = {_fmt_num(_coeff(cls, 'blade_mass_coeff'))}·"
             f"(D/2)^{_fmt_num(_coeff(cls, 'blade_mass_exp'))}"
         ),
+        # Land2021NLR's calculate_blade_mass is quadratic in rotor radius, plus an intercept —
+        # its own shape, not a 2015/2020 refit.
+        Land2021NLR: lambda cls: (
+            f"m = {_fmt_num(_coeff(cls, 'blade_mass_coeff'))}·(D/2)² "
+            f"{_fmt_coef(_coeff(cls, 'blade_mass_coeff2'))}·(D/2) "
+            f"{_fmt_coef(_coeff(cls, 'blade_mass_intercept'))}"
+        ),
     },
     "Pitch System": {
         Land2020NLR: lambda cls: (
@@ -700,6 +748,9 @@ FORMULA_OVERRIDES: dict[str, dict[type, Callable[[type], str]]] = {
             f"{_fmt_coef(_coeff(cls, 'pitch_blade_mass_intercept'))}) "
             f"{_fmt_coef(_coeff(cls, 'mass_sys_offset'))}\n{_blade_mass_definition(cls)}"
         ),
+        # Land2021NLR zeroes every Pitch System coefficient and fixes the mass/cost fields
+        # themselves at 0 — same "not modeled" treatment as Land2020NLR's High Speed Shaft below.
+        Land2021NLR: lambda cls: "m = 0 (not modeled)",
     },
     "Low Speed Shaft": {
         Land2020NLR: lambda cls: (
@@ -712,6 +763,12 @@ FORMULA_OVERRIDES: dict[str, dict[type, Callable[[type], str]]] = {
         Land2020NLR: lambda cls: (
             f"m = {_fmt_num(_coeff(cls, 'gearbox_torque_density'))}·"
             f"τ^{_fmt_num(_coeff(cls, 'gearbox_torque_exp'))}\n{TORQUE_DEFINITION}"
+        ),
+        # Land2021NLR's calculate_gearbox_mass reverts to the base (2015-style) τ·1000/density
+        # shape instead of inheriting Land2020NLR's density·τ^exp — without this entry, the
+        # issubclass fallback below would mislabel it with 2020's formula text.
+        Land2021NLR: lambda cls: (
+            f"m = 1000·τ / {_fmt_num(_coeff(cls, 'gearbox_torque_density'))}\n{TORQUE_DEFINITION}"
         ),
     },
     "Brake": {
@@ -745,13 +802,31 @@ FORMULA_OVERRIDES: dict[str, dict[type, Callable[[type], str]]] = {
             f"m = {_fmt_num(_coeff(cls, 'tower_mass_coeff'))}·H·(π/4)·D² "
             f"{_fmt_coef(_coeff(cls, 'tower_mass_intercept'))}"
         ),
+        # Land2021NLR keeps 2020's H·(π/4)·D² swept-volume driver but makes the mass formula
+        # itself quadratic in that quantity, plus an added linear term — its own shape.
+        Land2021NLR: lambda cls: (
+            f"m = {_fmt_num(_coeff(cls, 'tower_mass_coeff'))}·(H·(π/4)·D²)² "
+            f"{_fmt_coef(_coeff(cls, 'tower_mass_coeff2'))}·H·(π/4)·D² "
+            f"{_fmt_coef(_coeff(cls, 'tower_mass_intercept'))}"
+        ),
+    },
+    # Hub uses Land2021NLR's own driver (turbine rating instead of rotor diameter/blade mass —
+    # see COMPONENT_DRIVER_OVERRIDES), so unlike the entries above it has no base-shape sibling.
+    "Hub": {
+        Land2021NLR: lambda cls: (
+            f"m = {_fmt_num(_coeff(cls, 'hub_mass_coeff'))}·"
+            f"P^{_fmt_num(_coeff(cls, 'hub_mass_exp'))}"
+        ),
     },
 }
 
 DEFAULT_MODELS = {
     "2015": Land2015NLR,
     "2020": Land2020NLR,
-    "2026": Land2026NLR,
+    "2021": Land2021NLR,
+    # Only present once build_custom_model.py has actually generated nlr2026.py — see the import
+    # above.
+    **({"2026": Land2026NLR} if Land2026NLR is not None else {}),
 }
 
 # Example turbine configurations to mark on every curve. `turbine_class` and `blade_has_carbon`
@@ -807,10 +882,53 @@ DEFAULT_TURBINE_SPECS = {
         "rotor_efficiency_max": 0.9,
         "BOS_cost": 0.0,
     },
+    "2011 COWER (1.5MW)": {
+        "turbine_rating_MW": 1.5,
+        "rotor_diameter": 82.5,
+        "hub_height": 80.0,
+        "tip_speed_max": 80.0,
+        "num_bearings": 1,
+        "num_blades": 3,
+        "rotor_efficiency_max": 0.9,
+        "BOS_cost": 0.0,
+    },
+    "2015 COWER (2.0MW)": {
+        "turbine_rating_MW": 2.0,
+        "rotor_diameter": 102.0,
+        "hub_height": 82.1,
+        "tip_speed_max": 80.0,
+        "num_bearings": 1,
+        "num_blades": 3,
+        "rotor_efficiency_max": 0.9,
+        "BOS_cost": 0.0,
+    },
+    "2020 COWER (2.8MW)": {
+        "turbine_rating_MW": 2.8,
+        "rotor_diameter": 125.0,
+        "hub_height": 90.0,
+        "tip_speed_max": 80.0,
+        "num_bearings": 1,
+        "num_blades": 3,
+        "rotor_efficiency_max": 0.9,
+        "BOS_cost": 0.0,
+    },
 }
 
-MODEL_COLORS = {"2015": "#4C72B0", "2020": "#DD5A48", "Custom": "#E8A33D"}
-CONFIG_MARKERS = ["*", "^", "s", "D", "P", "X", "o"]
+MODEL_COLORS = {
+    # tab10 (Tableau 10) colors, pinned explicitly per model rather than left to _model_color's
+    # positional tab10 fallback: with several models now in DEFAULT_MODELS, an index-based
+    # fallback shifts a model's color every time a model is added or removed (already caused
+    # "2026" to silently drift off the green it'd always had once a 4th model was added). tab10[3]
+    # ("#D62728", red) is deliberately skipped for every entry here — it's PANJIVA_COLOR in
+    # csm/plotting-see-panjiva.py, used there for a specific empirical-source overlay, not a
+    # model — so no model color in this file collides with it.
+    "2015": "#1F77B4",  # tab10[0], blue
+    "2020": "#FF7F0E",  # tab10[1], orange
+    "2021": "#9467BD",  # tab10[4], purple
+    "2026": "#2CA02C",  # tab10[2], green
+    "Custom": "#BCBD22",  # tab10[8], olive
+}
+CONFIG_MARKERS = ["*", "^", "s", "D", "P", "X", "o", "v"]
 
 # Optional empirical-measurements overlay (e.g. csm/us_lbw_csm_2026_data.csv): a CSV with one row
 # per measured turbine component, columns "Component", "MW", "RD (m)", "hh (m)", "mass (kg)",
@@ -828,6 +946,11 @@ EMPIRICAL_OUTLIER_COLUMN = "outlier?"
 EMPIRICAL_COMPONENT_LABELS: dict[str, str] = {
     "blade": "Blade",
     "hub": "Hub",
+    # A separate CSV Component string from "hub" — an assembled hub+pitch+spinner measurement
+    # (a "hub system" row) is not interchangeable with a bare hub casting's mass/cost, so it
+    # must route to the "Hub System" component (Hub + Pitch System + Spinner, see
+    # AGGREGATE_COMPONENTS) instead of silently inflating "Hub"'s own empirical overlay/fit data.
+    "hub system": "Hub System",
     "spinner": "Spinner",
     "main bearing": "Main Bearing",
     "low speed shaft": "Low Speed Shaft",
@@ -875,16 +998,17 @@ def load_empirical_data(csv_path: str | Path | None) -> pd.DataFrame | None:
 def _empirical_rows(
     empirical_df: pd.DataFrame | None, component: ComponentSpec
 ) -> pd.DataFrame | None:
-    """Rows of `empirical_df` for `component`, or None if it isn't covered at all."""
+    """Rows of `empirical_df` for `component`, or None if it isn't covered at all. More than one
+    raw CSV component string can map to the same component label, so every matching key is
+    included, not just the first.
+    """
     if empirical_df is None:
         return None
-    csv_label = next(
-        (k for k, v in EMPIRICAL_COMPONENT_LABELS.items() if v == component.label), None
-    )
-    if csv_label is None:
+    csv_labels = [k for k, v in EMPIRICAL_COMPONENT_LABELS.items() if v == component.label]
+    if not csv_labels:
         return None
     names = empirical_df[EMPIRICAL_COMPONENT_COLUMN].astype(str).str.strip().str.lower()
-    rows = empirical_df[names == csv_label]
+    rows = empirical_df[names.isin(csv_labels)]
     return rows if len(rows) else None
 
 
@@ -979,7 +1103,7 @@ def to_model_kwargs(spec: dict) -> dict:
             :py:class:`csm.models.nlr2020.Land2020NLR`.
     """
     return {
-        "rated_power_kw": int(round(spec["turbine_rating_MW"] * 1000)),
+        "rated_power_kw": round(spec["turbine_rating_MW"] * 1000),
         "rotor_diameter": float(spec["rotor_diameter"]),
         "tower_length": float(spec["hub_height"]),
         "max_tip_speed": float(spec["tip_speed_max"]),
@@ -994,7 +1118,7 @@ def to_model_kwargs(spec: dict) -> dict:
 def _cast_driver_value(attr: str, value: float) -> int | float:
     """Casts a swept raw attribute value to the type the model constructor requires."""
     if attr == "rated_power_kw":
-        return int(round(value))
+        return round(value)
     return float(value)
 
 
@@ -1007,7 +1131,7 @@ def _base_config(configs: dict[str, dict]) -> dict:
         if isinstance(values[0], bool):
             base[key] = values[0]
         elif isinstance(values[0], int):
-            base[key] = int(round(sum(values) / len(values)))
+            base[key] = round(sum(values) / len(values))
         else:
             base[key] = sum(values) / len(values)
     return base
@@ -1166,10 +1290,25 @@ def _evaluate_all_configs(
 
     Returns:
         dict[str, dict[str, dict | None]]: Per-model, per-configuration dictionary merging that
-            configuration's raw model kwargs with :py:meth:`CSMBase.get_results`, or None if the
-            model raised while evaluating that configuration. Reused across figure generation and
-            the summary report so every (model, configuration) pair is only computed once.
+            configuration's raw model kwargs with :py:meth:`CSMBase.get_all_results`, or None if
+            the model raised while evaluating that configuration. Reused across figure generation
+            and the summary report so every (model, configuration) pair is only computed once.
+
+            `get_all_results()` only returns each model's own `_all_result_names` — a "core"
+            result set that can (and does, e.g. Land2020NLR dropping High Speed Shaft for
+            crane/transport) differ from one model to the next, even though every
+            :py:data:`ALL_COMPONENTS` mass/cost attribute still exists as a real field on every
+            model. Every component's mass/cost attribute is explicitly pulled in on top of
+            `get_all_results()` so plotting code can always key an entry by
+            `component.mass_attr`/`cost_attr`, regardless of whether that model's own "core"
+            result set happens to track it.
     """
+    component_attrs = {
+        attr
+        for component in ALL_COMPONENTS
+        for attr in (component.mass_attr, component.cost_attr)
+        if attr is not None
+    }
     cache = {}
     for model_name, model_cls in models.items():
         cache[model_name] = {}
@@ -1178,7 +1317,13 @@ def _evaluate_all_configs(
             try:
                 model = model_cls(**kwargs)
                 model.run()
-                cache[model_name][config_name] = {**kwargs, **model.get_results()}
+                results = model.get_all_results()
+                extra = {
+                    attr: getattr(model, attr)
+                    for attr in component_attrs
+                    if attr not in results and hasattr(model, attr)
+                }
+                cache[model_name][config_name] = {**kwargs, **results, **extra}
             except (ValueError, AttributeError, TypeError):
                 cache[model_name][config_name] = None
     return cache
@@ -1253,17 +1398,15 @@ def _safe_upstream_kwargs(model_cls: type, base_kwargs: dict, *target_attrs: str
     calculate-in-sequence methods don't raise on their way past it to whatever comes next.
     """
     reference = model_cls(**base_kwargs)
-    try:
+    with contextlib.suppress(ValueError):
         reference.run()
-    except ValueError:
-        pass
     keep = set(target_attrs)
     for attr in target_attrs:
         if attr in reference.parameter_graph:
             keep |= nx.descendants(reference.parameter_graph, attr)
     return {
         name: (value if value is not None else 1e-6)
-        for name, value in reference.get_results().items()
+        for name, value in reference.get_all_results().items()
         if name not in keep
     }
 
@@ -1305,10 +1448,8 @@ def _sweep_single(
             model = model_cls(**kwargs)
         except ValueError:
             continue
-        try:
+        with contextlib.suppress(ValueError):
             model.run()
-        except ValueError:
-            pass
         mass = getattr(model, component.mass_attr, None)
         if mass is None:
             continue
@@ -1320,10 +1461,8 @@ def _sweep_single(
             _label, _units, scale = DRIVER_INFO.get(driver, (driver, "", 1.0))
             display[i] = raw_value * scale
         else:
-            try:
-                display[i] = driver.display_from_entry({**kwargs, **model.get_results()})
-            except TypeError:
-                pass
+            with contextlib.suppress(TypeError):
+                display[i] = driver.display_from_entry({**kwargs, **model.get_all_results()})
     order = np.argsort(masses)
     return {
         "driver_display": display,
@@ -1392,12 +1531,10 @@ def _raw_range_for_display(
             model = model_cls(**kwargs)
         except ValueError:
             return math.nan
-        try:
+        with contextlib.suppress(ValueError):
             model.run()
-        except ValueError:
-            pass
         try:
-            return driver.display_from_entry({**kwargs, **model.get_results()})
+            return driver.display_from_entry({**kwargs, **model.get_all_results()})
         except TypeError:
             return math.nan
 
@@ -1486,7 +1623,7 @@ def _draw_mass_panel(
                 data["driver_display"],
                 data["mass"] * MASS_SCALE,
                 color=color_map[model_name],
-                lw=2.5,
+                lw=MODEL_LINE_WIDTH,
             )
     for model_name in models:
         for config_name in configs:
@@ -1501,35 +1638,56 @@ def _draw_mass_panel(
                 entry[component.mass_attr] * MASS_SCALE,
                 marker=marker_map[config_name],
                 color=color_map[model_name],
-                s=110,
+                s=CONFIG_MARKER_SIZE,
                 edgecolor="black",
-                linewidth=0.6,
-                zorder=5,
+                linewidth=CONFIG_MARKER_EDGE_LINEWIDTH,
+                zorder=CONFIG_MARKER_ZORDER,
             )
 
 
 def _place_legend(fig, handles: list, max_cols_per_row: int = 7) -> int:
     """Places `handles` as a figure-level legend, wrapped onto as few rows as fit within
-    `max_cols_per_row` columns each, rather than forcing every handle onto a single hard-coded-
-    width row — which silently overflowed (entries truncated or spilling past the figure edge)
-    once enough models/configs/overlays were present, e.g. after a third model was added.
+    `max_cols_per_row` columns each — then, since that column count alone says nothing about
+    whether those columns actually fit a *particular* figure's width (a component with only one
+    driver renders a narrower 2-panel figure than one with two, and label text length varies a
+    lot too — "2020" vs. "2020 COWER (2.8MW)"), actually draws it and measures the real rendered
+    legend width against the figure's own width, shrinking `ncol` and redrawing until it fits (or
+    there's only one column left, for a handle list wide enough that nothing else helps). A
+    purely count-based column cap silently overflowed the figure's edge — clipped on save, not
+    just visually cramped — for some component/config combinations even though others with *more*
+    total handles happened to land on a column count that fit, purely by coincidence of how
+    `math.ceil` rounded for that particular count.
 
     Returns:
         int: The number of rows the legend used, so the caller can reserve proportional bottom
             margin for it in ``fig.tight_layout(rect=...)``.
     """
     n_total = len(handles)
-    n_rows = max(1, math.ceil(n_total / max_cols_per_row))
-    ncol = math.ceil(n_total / n_rows)
-    fig.legend(
-        handles=handles,
-        loc="lower center",
-        ncol=ncol,
-        bbox_to_anchor=(0.5, 0.01),
-        frameon=False,
-        fontsize=9,
-    )
-    return n_rows
+    if n_total == 0:
+        return 0
+    fig.canvas.draw()  # a renderer is required below, and only exists after at least one draw
+    renderer = fig.canvas.get_renderer()
+    fig_width_px = fig.get_size_inches()[0] * fig.dpi
+
+    ncol = min(max_cols_per_row, n_total)
+    legend = None
+    while True:
+        if legend is not None:
+            legend.remove()
+        legend = fig.legend(
+            handles=handles,
+            loc="lower center",
+            ncol=ncol,
+            bbox_to_anchor=(0.5, 0.01),
+            frameon=False,
+            fontsize=9,
+        )
+        fig.canvas.draw()
+        width_px = legend.get_window_extent(renderer).width
+        if width_px <= fig_width_px * 0.98 or ncol <= 1:
+            break
+        ncol -= 1
+    return math.ceil(n_total / ncol)
 
 
 def _draw_cost_panel(
@@ -1549,7 +1707,10 @@ def _draw_cost_panel(
     # per-model mass drivers, so there's no reason to suppress it.
     for model_name, data in curves.items():
         ax.plot(
-            data["driver_display"], data["cost"] * COST_SCALE, color=color_map[model_name], lw=2.5
+            data["driver_display"],
+            data["cost"] * COST_SCALE,
+            color=color_map[model_name],
+            lw=MODEL_LINE_WIDTH,
         )
     for model_name in models:
         for config_name in configs:
@@ -1564,10 +1725,10 @@ def _draw_cost_panel(
                 entry[component.cost_attr] * COST_SCALE,
                 marker=marker_map[config_name],
                 color=color_map[model_name],
-                s=110,
+                s=CONFIG_MARKER_SIZE,
                 edgecolor="black",
-                linewidth=0.6,
-                zorder=5,
+                linewidth=CONFIG_MARKER_EDGE_LINEWIDTH,
+                zorder=CONFIG_MARKER_ZORDER,
             )
 
 
@@ -1649,7 +1810,7 @@ def plot_component(
     owners_by_key: dict[str, dict[str, type]] = {}
     natural_raw_ranges: dict[str, tuple[float, float]] = {}
     has_empirical = False
-    for ax, driver in zip(mass_axes, panel_drivers):
+    for ax, driver in zip(mass_axes, panel_drivers, strict=True):
         owners = _owners_for_driver(component, models, driver)
         owners_by_key[_driver_key(driver)] = owners
         raw_range = _driver_range(config_cache, _override_attr(driver))
@@ -1665,7 +1826,7 @@ def plot_component(
                 *points,
                 color="0.55",
                 s=16,
-                alpha=0.35,
+                alpha=EMPIRICAL_ALPHA,
                 edgecolor=OVERLAY_EDGE_COLOR,
                 linewidth=OVERLAY_EDGE_LINEWIDTH,
                 zorder=EMPIRICAL_ZORDER,
@@ -1696,7 +1857,7 @@ def plot_component(
             *cost_points,
             color="0.55",
             s=16,
-            alpha=0.35,
+            alpha=EMPIRICAL_ALPHA,
             edgecolor=OVERLAY_EDGE_COLOR,
             linewidth=OVERLAY_EDGE_LINEWIDTH,
             zorder=EMPIRICAL_ZORDER,
@@ -1749,7 +1910,7 @@ def plot_component(
     # panel isn't gated the same way — it always sweeps one real attrs field (e.g. `nacelle_cost`)
     # against one canonical driver, which is well-defined regardless of component.
     if show_lines:
-        for ax, driver in zip(mass_axes, panel_drivers):
+        for ax, driver in zip(mass_axes, panel_drivers, strict=True):
             xlim, _ylim = captured[ax]
             owners = owners_by_key[_driver_key(driver)]
             for model_name, model_cls in owners.items():
@@ -1767,7 +1928,7 @@ def plot_component(
                     data["driver_display"],
                     data["mass"] * MASS_SCALE,
                     color=color_map[model_name],
-                    lw=2.5,
+                    lw=MODEL_LINE_WIDTH,
                 )
             for model_name in constant_models:
                 const_mass = _constant_value(model_name, config_cache, component.mass_attr)
@@ -1776,7 +1937,7 @@ def plot_component(
                         xlim,
                         [const_mass * MASS_SCALE, const_mass * MASS_SCALE],
                         color=color_map[model_name],
-                        lw=2.5,
+                        lw=MODEL_LINE_WIDTH,
                         ls="--",
                     )
 
@@ -1791,7 +1952,7 @@ def plot_component(
             data["driver_display"],
             data["cost"] * COST_SCALE,
             color=color_map[model_name],
-            lw=2.5,
+            lw=MODEL_LINE_WIDTH,
         )
 
     for ax in axes:
@@ -1800,7 +1961,7 @@ def plot_component(
 
     # ---- cosmetics: labels, formula titles, legend, suptitle ----
     max_title_lines = 0
-    for ax, driver in zip(mass_axes, panel_drivers):
+    for ax, driver in zip(mass_axes, panel_drivers, strict=True):
         label, units = _driver_label_units(driver)
         ax.set_xlabel(f"{label} ({units})" if units else label)
         ax.set_ylabel("Mass (t)")
@@ -1808,7 +1969,7 @@ def plot_component(
         ax.xaxis.set_major_formatter(FuncFormatter(_fmt_tick))
         ax.yaxis.set_major_formatter(FuncFormatter(_fmt_tick))
         plt.setp(ax.get_xticklabels(), rotation=20, ha="right")
-        ax.grid(alpha=0.3)
+        ax.grid(alpha=GRID_ALPHA)
         if not is_aggregate:
             title_models = {**owners_by_key[_driver_key(driver)], **constant_models}
             lines = [
@@ -1826,7 +1987,7 @@ def plot_component(
     ax_cost.xaxis.set_major_formatter(FuncFormatter(_fmt_tick))
     ax_cost.yaxis.set_major_formatter(FuncFormatter(_fmt_tick))
     plt.setp(ax_cost.get_xticklabels(), rotation=20, ha="right")
-    ax_cost.grid(alpha=0.3)
+    ax_cost.grid(alpha=GRID_ALPHA)
     if not is_aggregate:
         # Kept as "cost = k·mass" (not cost vs. this panel's own x-axis) since it's the actual
         # formula CSMBase computes cost from, and remains a useful reference regardless of what
@@ -1839,7 +2000,8 @@ def plot_component(
         max_title_lines = max(max_title_lines, _set_stacked_title(ax_cost, cost_lines))
 
     model_handles = [
-        Line2D([0], [0], color=color_map[name], lw=2.5, label=name) for name in model_names
+        Line2D([0], [0], color=color_map[name], lw=MODEL_LINE_WIDTH, label=name)
+        for name in model_names
     ]
     config_handles = [
         Line2D(
@@ -1849,7 +2011,7 @@ def plot_component(
             color="none",
             markerfacecolor="white",
             markeredgecolor="black",
-            markersize=9,
+            markersize=CONFIG_MARKER_LEGEND_SIZE,
             label=name,
         )
         for name in config_names
@@ -1863,7 +2025,7 @@ def plot_component(
                 color="none",
                 markerfacecolor="0.55",
                 markeredgecolor="none",
-                alpha=0.6,
+                alpha=EMPIRICAL_ALPHA,
                 markersize=7,
                 label="Empirical data",
             )
@@ -2006,10 +2168,8 @@ def _sweep_combined_cost(
         kwargs = {**base_kwargs, **safe_kwargs}
         kwargs[driver] = _cast_driver_value(driver, raw_value)
         model = model_cls(**kwargs)
-        try:
+        with contextlib.suppress(ValueError):
             model.run()
-        except ValueError:
-            pass
         total = 0.0
         any_found = False
         for component in csm_components:
@@ -2035,7 +2195,7 @@ def _combined_cost_from_entry(
         return None
     return sum(
         cost * _combined_cost_multiplier(component.label, multipliers, entry)
-        for component, cost in zip(csm_components, costs)
+        for component, cost in zip(csm_components, costs, strict=True)
     )
 
 
@@ -2089,7 +2249,10 @@ def plot_wm_comparison(
     }
     for model_name, data in natural_curves.items():
         ax.plot(
-            data["driver_display"], data["cost"] * COST_SCALE, color=color_map[model_name], lw=2.5
+            data["driver_display"],
+            data["cost"] * COST_SCALE,
+            color=color_map[model_name],
+            lw=MODEL_LINE_WIDTH,
         )
     for model_name in models:
         for config_name in configs:
@@ -2105,10 +2268,10 @@ def plot_wm_comparison(
                 cost * COST_SCALE,
                 marker=marker_map[config_name],
                 color=color_map[model_name],
-                s=110,
+                s=CONFIG_MARKER_SIZE,
                 edgecolor="black",
-                linewidth=0.6,
-                zorder=5,
+                linewidth=CONFIG_MARKER_EDGE_LINEWIDTH,
+                zorder=CONFIG_MARKER_ZORDER,
             )
     bench_points = _benchmark_points(benchmark_df, [wm_category], driver)
     has_benchmark = bench_points is not None
@@ -2147,7 +2310,10 @@ def plot_wm_comparison(
             n_points,
         )
         ax.plot(
-            data["driver_display"], data["cost"] * COST_SCALE, color=color_map[model_name], lw=2.5
+            data["driver_display"],
+            data["cost"] * COST_SCALE,
+            color=color_map[model_name],
+            lw=MODEL_LINE_WIDTH,
         )
 
     ax.set_xlim(*xlim)
@@ -2160,10 +2326,11 @@ def plot_wm_comparison(
     ax.xaxis.set_major_formatter(FuncFormatter(_fmt_tick))
     ax.yaxis.set_major_formatter(FuncFormatter(_fmt_tick))
     plt.setp(ax.get_xticklabels(), rotation=20, ha="right")
-    ax.grid(alpha=0.3)
+    ax.grid(alpha=GRID_ALPHA)
 
     model_handles = [
-        Line2D([0], [0], color=color_map[name], lw=2.5, label=name) for name in model_names
+        Line2D([0], [0], color=color_map[name], lw=MODEL_LINE_WIDTH, label=name)
+        for name in model_names
     ]
     config_handles = [
         Line2D(
@@ -2173,7 +2340,7 @@ def plot_wm_comparison(
             color="none",
             markerfacecolor="white",
             markeredgecolor="black",
-            markersize=9,
+            markersize=CONFIG_MARKER_LEGEND_SIZE,
             label=name,
         )
         for name in config_names
@@ -2262,7 +2429,7 @@ def build_report_dataframe(
     configs: dict[str, dict] | None = None,
     components: list[ComponentSpec] | None = None,
 ) -> pd.DataFrame:
-    """Builds a component x (configuration, model) summary table of mass and cost.
+    r"""Builds a component x (configuration, model) summary table of mass and cost.
 
     Cells are left blank (NaN) when a model failed to evaluate a configuration, so a future model
     with partial coverage (e.g. an in-progress custom fit) degrades gracefully instead of breaking
@@ -2270,7 +2437,7 @@ def build_report_dataframe(
 
     Returns:
         pd.DataFrame: Rows are component labels; columns are a
-            ``(configuration, model)`` :py:class:`pandas.MultiIndex`; cells are "<mass>\\n<cost>"
+            ``(configuration, model)`` :py:class:`pandas.MultiIndex`; cells are "<mass>\n<cost>"
             strings.
     """
     models = models or DEFAULT_MODELS
@@ -2317,7 +2484,7 @@ def render_report_image(
         loc="center",
         cellLoc="center",
     )
-    table.auto_set_font_size(False)
+    table.auto_set_font_size(value=False)
     table.set_fontsize(7)
     table.scale(1, 1.8)
     for (row, col), cell in table.get_celld().items():
@@ -2460,10 +2627,13 @@ def generate_comparison(
 
 
 if __name__ == "__main__":
-    # Set empirical_csv/benchmark_csv to None to fall back to the plain model-vs-model comparison.
+    # These data files no longer live in the repo proper (moved to the Teams project folder) —
+    # csm/tools/experimental/data/ is a gitignored local drop spot for your own copies (see its
+    # .gitignore) so they never get committed. Set both to None for a plain model-vs-model
+    # comparison with no overlay.
     paths = generate_comparison(
-        empirical_csv="csm/us_lbw_csm_2026_data.csv",
-        benchmark_csv="csm/WM_wind_capex_benchmark_data_geared.csv",
+        empirical_csv="csm/tools/experimental/data/us_lbw_csm_2026_data.csv",
+        benchmark_csv="csm/tools/experimental/data/WM_wind_capex_benchmark_data_geared.csv",
     )
     for key, path in paths.items():
-        print(f"{key}: {path}")
+        print(f"{key}: {path}")  # noqa: T201 — CLI entry point, not a debug leftover

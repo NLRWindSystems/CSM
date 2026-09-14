@@ -2845,11 +2845,12 @@ class CSMBase:
 
         - Wind turbine
 
-          - Blades: model-calculated :py:attr:`blade_cost`. See :py:meth:`calculate_blade_cost`
-            for complete details.
-          - Rotor Hub: model-calculated :py:attr:`hub_cost`. See :py:meth:`calculate_hub_cost`
-            for complete details.
-          - Nacelle: model-calculated :py:attr:`nacelle_cost`.
+          - Blades: model-calculated :py:attr:`num_blades` * :py:attr:`blade_cost` (all blades,
+            not just one). See :py:meth:`calculate_blade_cost` for complete details.
+          - Rotor Hub: model-calculated :py:attr:`hub_system_cost` (hub, pitch system, and
+            spinner). See :py:meth:`calculate_hub_system_cost` for complete details.
+          - Nacelle: model-calculated :py:attr:`nacelle_cost` minus :py:attr:`converter_cost`
+            (every nacelle component except the power converter, which is its own line below).
             See :py:meth:`calculate_nacelle_cost` for complete details.
           - Power Converter: model-calculated :py:attr:`converter_cost`. See
             :py:meth:`calculate_converter_cost` for complete details.
@@ -2876,9 +2877,9 @@ class CSMBase:
                 (component cost / total cost * 100).
         """
         costs = {
-            "blade": self.blade_cost,
-            "hub": self.hub_cost,
-            "nacelle": self.nacelle_cost,
+            "blade": self.num_blades * self.blade_cost,
+            "hub": self.hub_system_cost,
+            "nacelle": self.nacelle_cost - self.converter_cost,
             "power_converter": self.converter_cost,
             "turbine_production": turbine_production_cost,
             "tower_flange_material": tower_flange_material_cost,
@@ -2895,7 +2896,7 @@ class CSMBase:
         }
         mpc_map = {
             "blade": "Blade",
-            "hub": "Hub",
+            "hub": "Rotor Hub",
             "nacelle": "Nacelle",
             "power_converter": "Power Converter",
             "turbine_production": "Production",

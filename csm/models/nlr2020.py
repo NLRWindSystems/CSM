@@ -827,17 +827,20 @@ class Land2020NLR(CSMBase):
         )
 
     def calculate_crane_mass(self):
-        r"""Calculates and sets :py:attr:`platform_mainframe_mass` if it was not provided by the
-        user.
+        r"""Calculates and sets :py:attr:`crane_mass` if it was not provided by the user.
 
         .. math::
-            m_{platform\_mainframe}
+            m_{platform\_mainframe} & has\_crane \\
+            0 & otherwise
 
         where:
 
         - :math:`m_{platform\_mainframe} =` :py:attr:`platform_mainframe_mass`
+        - :math:`has\_crane =` :py:attr:`has_crane`
 
         Args:
+            has_crane (bool): If True, set :py:attr:`crane_mass` to
+                :py:attr:`platform_mainframe_mass`, otherwise 0.
             platform_mainframe_mass (float): Platform mainframe mass (:math:`kg`). See
                 :py:meth:`calculate_platform_mainframe_mass` for details.
 
@@ -848,21 +851,24 @@ class Land2020NLR(CSMBase):
         if exists:
             return
 
-        self.crane_mass = self.platform_mainframe_mass
+        self.crane_mass = self.platform_mainframe_mass if self.has_crane else 0.0
 
     def calculate_crane_cost(self):
-        r"""Calculates and sets :py:attr:`platform_mainframe_cost` if it was not provided by the
-        user.
+        r"""Calculates and sets :py:attr:`crane_cost` if it was not provided by the user.
 
         .. math::
-            k * m_crane
+            k * m_{crane} & has\_crane \\
+            0 & otherwise
 
         where:
 
         - :math:`k =` :py:attr:`crane_mass_cost_coeff` (:math:`USD/kg`)
-        - :math:`m =` :py:attr:`crane_mass` (:math:`kg`).
+        - :math:`m_{crane} =` :py:attr:`crane_mass` (:math:`kg`).
+        - :math:`has\_crane =` :py:attr:`has_crane`
 
         Args:
+            has_crane (bool): If True, set :py:attr:`crane_cost` to
+                :py:attr:`crane_mass_cost_coeff` * :py:attr:`crane_mass`, otherwise 0.
             crane_mass_cost_coeff (float): Crane cost per kilogram (:math:`USD/kg`).
             crane_mass (float): Crane mass (:math:`kg`).
                 See :py:meth:`calculate_platform_mainframe_mass` for more details.
@@ -874,7 +880,7 @@ class Land2020NLR(CSMBase):
         if exists:
             return
 
-        self.crane_cost = self.crane_mass_cost_coeff * self.crane_mass
+        self.crane_cost = self.crane_mass_cost_coeff * self.crane_mass if self.has_crane else 0.0
 
     def calculate_tower_mass(self):
         r"""Calculates and sets :py:attr:`tower_mass` if it was not provided by the user.
