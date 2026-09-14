@@ -312,28 +312,44 @@ class Land2020NLR(CSMBase):
             :py:meth:`calculate_tower_cost` for more details.
         tower_cost (float): Tower cost (:math:`USD`). See
             :py:meth:`calculate_tower_cost` for more details.
-        transport_drivetrain_cost_coeff
-        transport_power_electronics_cost_coeff
-        transport_drivetrain_cost_coeff2
-        transport_blade_cost_coeff
-        transport_blade_cost_coeff2
-        transport_blade_cost_coeff3
-        transport_blade_cost_intercept
-        transport_hub_cost_intercept
-        transport_tower_cost_coeff
-        tower_section_mass_max
-        transport_misc_parts_cost_coeff
+        transport_blade_cost_coeff (float): See :py:attr:`calculate_blade_transport_cost` for more
+            details. Defaults to 0.543.
+        transport_blade_cost_coeff2 (float): See :py:attr:`calculate_blade_transport_cost` for more
+            details. Defaults to -7.4903.
+        transport_blade_cost_coeff3 (float): See :py:attr:`calculate_blade_transport_cost` for more
+            details. Defaults to -2847.5.
+        transport_blade_cost_intercept (float): See :py:attr:`calculate_blade_transport_cost` for
+            more details. Defaults to 103627 :math:`USD`.
         blade_transport_cost (float): Total blade transportation cost (:math:`USD`). See
             :py:meth:`calculate_blade_transport_cost` for more details.
+        transport_hub_cost_intercept (float): See :py:attr:`calculate_hub_transport_cost` for more
+            details. Defaults to 5000.
         hub_transport_cost (float): Total hub transportation cost (:math:`USD`). See
             :py:meth:`calculate_hub_transport_cost` for more details.
+        transport_power_electronics_cost_coeff (float): See
+            :py:attr:`calculate_power_electronics_transport_cost` for more details. Defaults to
+            9 :math:`USD/kW`.
         power_electronics_transport_cost (float): Total power_electronics transportation cost
             (:math:`USD`). See :py:meth:`calculate_power_electronics_transport_cost` for more
             details.
+        transport_drivetrain_cost_coeff (float): See :py:attr:`calculate_drivetrain_transport_cost`
+            for more details. Defaults to 9000 :math:`kg`.
+        transport_drivetrain_cost_coeff2 (float): See :py:attr:`calculate_drivetrain_transport_cost`
+            for more details. Defaults to 45000 :math:`USD`.
         drivetrain_transport_cost (float): Total drivetrain transportation cost (:math:`USD`). See
             :py:meth:`calculate_drivetrain_transport_cost` for more details.
+        tower_section_mass_max (float): Maximum mass of each tower section. See
+            :py:attr:`calculate_tower_transport_cost` for more details. Defaults to 80000
+            :math:`kg`.
+        num_tower_sections (float): Total number of tower sections. See
+            :py:attr:`calculate_tower_transport_cost` for more details if not providing directly.
+        transport_tower_cost_coeff (float): Transportation cost for a single tower section. See
+            :py:attr:`calculate_tower_transport_cost` for more details. Defaults to 34083
+            :math:`USD`.
         tower_transport_cost (float): Total tower transportation cost (:math:`USD`). See
             :py:meth:`calculate_tower_transport_cost` for more details.
+        transport_misc_parts_cost_coeff (float): See :py:attr:`calculate__transport_cost` for more
+            details. Defaults to 0.025 :math:`USD/kg`.
         parts_transport_cost (float): Total transportation cost of miscellaneous parts
             (:math:`USD`). See :py:meth:`calculate_parts_transport_cost` for more details.
         transport_cost (float): Total transportation cost (:math:`USD`). See
@@ -399,17 +415,17 @@ class Land2020NLR(CSMBase):
     tower_mass_coeff = base.tower_mass_coeff.reuse(default=0.152)
     tower_mass_intercept = create_field(float, "unitless", "input", default=-14281.0)
     tower_mass_cost_coeff = base.tower_mass_cost_coeff.reuse(default=3.1668)
-    transport_drivetrain_cost_coeff = create_field(float, "USD", "input", default=9000)
-    transport_power_electronics_cost_coeff = create_field(float, "USD", "input", default=9)
-    transport_drivetrain_cost_coeff2 = create_field(float, "USD", "input", default=45000)
-    transport_blade_cost_coeff = create_field(float, "USD", "input", default=0.543)
-    transport_blade_cost_coeff2 = create_field(float, "USD", "input", default=-7.4903)
-    transport_blade_cost_coeff3 = create_field(float, "USD", "input", default=-2847.5)
+    transport_blade_cost_coeff = create_field(float, "unitless", "input", default=0.543)
+    transport_blade_cost_coeff2 = create_field(float, "unitless", "input", default=-7.4903)
+    transport_blade_cost_coeff3 = create_field(float, "unitless", "input", default=-2847.5)
     transport_blade_cost_intercept = create_field(float, "USD", "input", default=103627)
     transport_hub_cost_intercept = create_field(float, "USD", "input", default=5000)
+    transport_power_electronics_cost_coeff = create_field(float, "USD/kW", "input", default=9)
+    transport_drivetrain_cost_coeff = create_field(float, "kg", "input", default=9000)
+    transport_drivetrain_cost_coeff2 = create_field(float, "USD", "input", default=45000)
+    tower_section_mass_max = create_field(float, "kg", "input", default=80000)
     transport_tower_cost_coeff = create_field(float, "USD", "input", default=34083)
-    tower_section_mass_max = create_field(float, "USD", "input", default=80000)
-    transport_misc_parts_cost_coeff = create_field(float, "USD", "input", default=0.025)
+    transport_misc_parts_cost_coeff = create_field(float, "USD/kg", "input", default=0.025)
 
     # Unused attributes
     blade_has_carbon = base.blade_has_carbon.reuse(default=False)
@@ -1127,11 +1143,11 @@ class Land2020NLR(CSMBase):
         provided by the user.
 
         .. math::
-            max[power_{MW} - 3, 0] * k
+            max[power - 3, 0] * k
 
         where:
 
-        - :math:`power_{MW} =` :py:attr:`rated_power_mw`
+        - :math:`power =` :py:attr:`rated_power_kw`
         - :math:`k =` :py:attr:`transport_power_electronics_cost_coeff`
 
         Args:
@@ -1145,7 +1161,7 @@ class Land2020NLR(CSMBase):
         if cost_exists:
             return
         self.power_electronics_transport_cost = (
-            max(self.rated_power_mw - 3, 0.0) * self.transport_power_electronics_cost_coeff
+            max(self.rated_power_kw - 3000, 0.0) * self.transport_power_electronics_cost_coeff
         )
 
     def calculate_drivetrain_transport_cost(self):
