@@ -75,9 +75,9 @@
         calculate_rotor_cost, calculate_turbine_mass, calculate_turbine_cost,
         calculate_turbine_cost,
         calculate_blade_transport_cost, calculate_hub_transport_cost,
-        calculate_power_electronics_transport_cost, calculate_tower_transport_cost,
-        calculate_drivetrain_transport_cost, calculate_parts_transport_cost,
-        calculate_transport_cost,
+        calculate_power_electronics_transport_cost, calculate_num_tower_sections,
+        calculate_tower_transport_cost, calculate_drivetrain_transport_cost,
+        calculate_parts_transport_cost, calculate_transport_cost,
 ```
 
 ## Running the model
@@ -424,6 +424,10 @@
 
 ```{eval-rst}
 .. automethod:: csm.models.CSMBase.calculate_power_electronics_transport_cost
+```
+
+```{eval-rst}
+.. automethod:: csm.models.CSMBase.calculate_num_tower_sections
 ```
 
 ```{eval-rst}

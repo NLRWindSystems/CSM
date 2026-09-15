@@ -50,6 +50,7 @@ values use:math:`kg` for mass and :math:`USD` for cost. Any other values will ha
 | Transport | [`calculate_hub_transport_cost`](#csm.models.CSMBase.calculate_hub_transport_cost)() | Calculate the hub transport cost. |
 | Transport | [`calculate_power_electronics_transport_cost`](#csm.models.CSMBase.calculate_power_electronics_transport_cost)() | Calculate the power electronics transport cost. |
 | Transport | [`calculate_drivetrain_transport_cost`](#csm.models.CSMBase.calculate_drivetrain_transport_cost)() | Calculate the drivetrain transport cost. |
+| Transport | [`calculate_num_tower_sections`](#csm.models.CSMBase.calculate_num_tower_sections)() | Calculate the number of tower sections. |
 | Transport | [`calculate_tower_transport_cost`](#csm.models.CSMBase.calculate_tower_transport_cost)() | Calculate the tower transport cost. |
 | Transport | [`calculate_transport_cost`](#csm.models.CSMBase.calculate_transport_cost)() | Calculate the total transport cost. |
 
@@ -68,3 +69,5 @@ listed above. |
 | [`calculate_rotor_cost`](#csm.models.CSMBase.calculate_rotor_cost)() | Calculate cost of the rotor. |
 | [`calculate_turbine_mass`](#csm.models.CSMBase.calculate_turbine_mass)() | Calculate mass of the turbine. |
 | [`calculate_turbine_cost`](#csm.models.CSMBase.calculate_turbine_cost)() | Calculate cost of the turbine. |
+| [`calculate_subsystem_transportation_cost`](#csm.models.CSMBase.calculate_subsystem_transportation_cost)() | Calculate cost of all the independently transported components listed above. |
+| [`calculate_transportation_cost`](#csm.models.CSMBase.calculate_transportation_cost)() | Calculate cost of transporting the turbine's components to the site. |
