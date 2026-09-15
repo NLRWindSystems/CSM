@@ -119,14 +119,14 @@ def test_Land2020NLR_defaults_only(subtests):
         assert nlr2020.tower_mass_cost_coeff == 3.1668
 
     with subtests.test("Transport parameters"):
-        assert nlr2020.transport_power_electronics_cost_coeff == 9
-        assert nlr2020.transport_drivetrain_cost_coeff == 9000
-        assert nlr2020.transport_drivetrain_cost_coeff2 == 45000
         assert nlr2020.transport_blade_cost_coeff == 0.543
         assert nlr2020.transport_blade_cost_coeff2 == -7.4903
         assert nlr2020.transport_blade_cost_coeff3 == -2847.5
         assert nlr2020.transport_blade_cost_intercept == 103627
         assert nlr2020.transport_hub_cost_intercept == 5000
+        assert nlr2020.transport_power_electronics_cost_coeff == 9
+        assert nlr2020.transport_drivetrain_cost_coeff == 90000
+        assert nlr2020.transport_drivetrain_cost_coeff2 == 45000
         assert nlr2020.transport_tower_cost_coeff == 34083
         assert nlr2020.tower_section_mass_max == 80000
         assert nlr2020.transport_misc_parts_cost_coeff == 0.025
@@ -243,10 +243,6 @@ def test_Land2020NLR_with_inputs(subtests):
         assert model.yaw_system_cost == approx(95979.52710771014)
     with subtests.test("Hydraulic cooling cost"):
         assert model.hydraulic_cooling_cost == approx(29925.167999999998)
-    # with subtests.test("Hub cost"):
-    # assert model.controls_cost == approx(105750.0)
-    # assert model.converter_cost == approx(0.0)
-    # assert model.elec_cost == approx(209250.0)
     with subtests.test("Nacelle Cover cost"):
         assert model.nacelle_cover_cost == approx(52127.669412)
     with subtests.test("Platform mainframe cost"):
@@ -263,17 +259,20 @@ def test_Land2020NLR_with_inputs(subtests):
         assert model.electrical_connection_cost == approx(283341.24)
     with subtests.test("Nacelle cost"):
         assert model.nacelle_cost == approx(2211577.918173882)
-        # with subtests.test("Hub cost"):
-        # assert model.nacelle_mass_tcc == approx(151455.88331558352 )
-    with subtests.test("Tower parts cost"):
-        # assert model.tower_parts_cost == approx(528775.7936738)
+    with subtests.test("Tower cost"):
         assert model.tower_cost == approx(1443023.2243424067)
     with subtests.test("Hub system cost"):
-        # assert model.hub_system_mass_tcc == approx(55850.44282136)
         assert model.hub_system_cost == approx(531648.8703321306)
     with subtests.test("Rotor cost"):
         assert model.rotor_cost == approx(1574532.2408835592)
     with subtests.test("Turbine cost"):
-        # assert model.turbine_mass_tcc == approx(445414.81133358914)
         assert model.turbine_cost == approx(5229133.3833998479)
         assert model.turbine_cost_kw == approx(843.4086102257819)
+    with subtests.test("Transport cost"):
+        assert model.blade_transport_cost == approx(112939.54570000005)
+        assert model.hub_transport_cost == approx(57591.98398997124)
+        assert model.power_electronics_transport_cost == approx(28800.0)
+        assert model.drivetrain_transport_cost == approx(90000.0)
+        assert model.tower_cost == approx(204498.0)
+        assert model.parts_transport_cost == approx(19085.543225738213)
+        assert model.transport_cost == approx(738794.1643157096)

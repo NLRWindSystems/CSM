@@ -151,6 +151,7 @@ parameter_map = {
     "hub_transport_cost": (),
     "power_electronics_transport_cost": (),
     "drivetrain_transport_cost": (),
+    "num_tower_sections": (),
     "tower_transport_cost": (),
     "parts_transport_cost": (),
     "transport_cost": (
@@ -282,6 +283,7 @@ COST_RESULT_NAMES = (
     "drivetrain_transport_cost",
     "tower_transport_cost",
     "parts_transport_cost",
+    "transport_cost",
 )
 TRANSPORT_RESULT_NAMES = (
     "blade_transport_cost",
@@ -290,6 +292,7 @@ TRANSPORT_RESULT_NAMES = (
     "drivetrain_transport_cost",
     "tower_transport_cost",
     "parts_transport_cost",
+    "transport_cost",
 )
 
 
@@ -788,6 +791,9 @@ class CSMBase:
     )
     drivetrain_transport_cost: float = create_field(
         float, "USD", "both", additional_validators=[validators.ge(0)]
+    )
+    num_tower_sections: float = create_field(
+        int, "unitless", "both", additional_validators=[validators.gt(0)]
     )
     tower_transport_cost: float = create_field(
         float, "USD", "both", additional_validators=[validators.ge(0)]

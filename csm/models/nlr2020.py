@@ -421,7 +421,7 @@ class Land2020NLR(CSMBase):
     transport_blade_cost_intercept = create_field(float, "USD", "input", default=103627)
     transport_hub_cost_intercept = create_field(float, "USD", "input", default=5000)
     transport_power_electronics_cost_coeff = create_field(float, "USD/kW", "input", default=9)
-    transport_drivetrain_cost_coeff = create_field(float, "kg", "input", default=9000)
+    transport_drivetrain_cost_coeff = create_field(float, "kg", "input", default=90000)
     transport_drivetrain_cost_coeff2 = create_field(float, "USD", "input", default=45000)
     tower_section_mass_max = create_field(float, "kg", "input", default=80000)
     transport_tower_cost_coeff = create_field(float, "USD", "input", default=34083)
@@ -567,13 +567,21 @@ class Land2020NLR(CSMBase):
             "tower_mass",
             "tower_section_mass_max",
         )
-        self.parameter_map["tower_cost"] = (
+        self.parameter_map["tower_transport_cost"] = (
             "num_tower_sections",
             "transport_tower_cost_coeff",
         )
         self.parameter_map["parts_transport_cost"] = (
             "transport_misc_parts_cost_coeff",
             "turbine_mass",
+        )
+        self.parameter_map["transport_cost"] = (
+            "blade_transport_cost",
+            "hub_transport_cost",
+            "power_electronics_transport_cost",
+            "drivetrain_transport_cost",
+            "tower_transport_cost",
+            "parts_transport_cost",
         )
         super().__attrs_post_init__()
 
@@ -1221,12 +1229,14 @@ class Land2020NLR(CSMBase):
             ValueError: Raised if any of the required parameters have not been provided.
         """
         sections_exists = self._prepare_calculation("num_tower_sections")
-        cost_exists = self._prepare_calculation("tower_cost")
+        cost_exists = self._prepare_calculation("tower_transport_cost")
         if sections_exists and cost_exists:
             return
 
-        self.num_tower_sections = int(np.ceil(self.tower_mass / self.tower_section_mass_max))
-        self.tower_cost = self.num_tower_sections * self.transport_tower_cost_coeff
+        if not sections_exists:
+            self.num_tower_sections = int(np.ceil(self.tower_mass / self.tower_section_mass_max))
+        if not cost_exists:
+            self.tower_transport_cost = self.num_tower_sections * self.transport_tower_cost_coeff
 
     def calculate_parts_transport_cost(self):
         """Calculates and sets the :py:attr:`parts_transport_cost` if it was not provided by the
@@ -1283,7 +1293,7 @@ class Land2020NLR(CSMBase):
             + self.hub_transport_cost
             + self.power_electronics_transport_cost
             + self.drivetrain_transport_cost
-            + self.tower_cost
+            + self.tower_transport_cost
             + self.parts_transport_cost
         )
 
