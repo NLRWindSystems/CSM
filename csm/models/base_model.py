@@ -151,7 +151,7 @@ parameter_map = {
     "hub_transport_cost": (),
     "power_electronics_transport_cost": (),
     "drivetrain_transport_cost": (),
-    "num_tower_sections": (),
+    "num_tower_sections": ("tower_mass", "tower_section_mass_max"),
     "tower_transport_cost": (),
     "parts_transport_cost": (),
     "transport_cost": (
@@ -159,6 +159,7 @@ parameter_map = {
         "hub_transport_cost",
         "power_electronics_transport_cost",
         "drivetrain_transport_cost",
+        "num_tower_sections",
         "tower_transport_cost",
         "parts_transport_cost",
     ),
@@ -220,6 +221,7 @@ ALL_RESULT_NAMES = (
     "hub_transport_cost",
     "power_electronics_transport_cost",
     "drivetrain_transport_cost",
+    "num_tower_sections",
     "tower_transport_cost",
     "parts_transport_cost",
 )
@@ -523,6 +525,9 @@ class CSMBase:
             details.
         drivetrain_transport_cost (float): Total drivetrain transportation cost (:math:`USD`). See
             :py:meth:`calculate_drivetrain_transport_cost` for more details.
+        tower_section_mass_max (float): Maximum mass of each tower section. See
+            :py:attr:`calculate_num_tower_sections` for more details. Defaults to 80000
+            :math:`kg`.
         tower_transport_cost (float): Total tower transportation cost (:math:`USD`). See
             :py:meth:`calculate_tower_transport_cost` for more details.
         parts_transport_cost (float): Total transportation cost of miscellaneous parts
@@ -792,6 +797,7 @@ class CSMBase:
     drivetrain_transport_cost: float = create_field(
         float, "USD", "both", additional_validators=[validators.ge(0)]
     )
+    tower_section_mass_max = create_field(float, "kg", "input", default=80000)
     num_tower_sections: float = create_field(
         int, "unitless", "both", additional_validators=[validators.gt(0)]
     )
@@ -2607,6 +2613,32 @@ class CSMBase:
             return
         self.drivetrain_transport_cost = 0
 
+    def calculate_num_tower_sections(self):
+        r"""Calculates and sets the :py:attr:`num_tower_sections` if not provided by the user.
+
+        .. math::
+            \lceil m_{tower} / k \rceil
+
+        where:
+
+        - :math:`m_{tower} =` :py:attr:`tower_mass`
+        - :math:`k =` :py:attr:`tower_section_mass_max`
+
+        Args:
+            tower_mass (float): Mass of the tower (:math:`kg`). See
+                :py:meth:`calculate_tower_mass`.
+            tower_section_mass_max (float): Maximum mass of a single tower section, :math:`k` in
+                the cost equation.
+
+        Raises:
+            ValueError: Raised if any of the required parameters have not been provided.
+        """
+        sections_exists = self._prepare_calculation("num_tower_sections")
+        if sections_exists:
+            return
+
+        self.num_tower_sections = int(np.ceil(self.tower_mass / self.tower_section_mass_max))
+
     def calculate_tower_transport_cost(self):
         """Calculates and sets the :py:attr:`tower_transport_cost` if it was not provided by the
         user.
@@ -2696,6 +2728,16 @@ class CSMBase:
         self.calculate_electrical_connection_cost()
         self.calculate_tower_cost()
 
+    def calculate_subsystem_transport_cost(self):
+        """Runs all the transport cost calculations for the separately transported components."""
+        self.calculate_blade_transport_cost()
+        self.calculate_hub_transport_cost()
+        self.calculate_power_electronics_transport_cost()
+        self.calculate_drivetrain_transport_cost()
+        self.calculate_num_tower_sections()
+        self.calculate_tower_transport_cost()
+        self.calculate_parts_transport_cost()
+
     def calculate_system_mass(self):
         """Calculates the mass for all aggregate turbine systems."""
         self.calculate_nacelle_mass()
@@ -2716,6 +2758,7 @@ class CSMBase:
         self.calculate_system_mass()
         self.calculate_subsystem_cost()
         self.calculate_system_cost()
+        self.calculate_subsystem_transport_cost()
         self.calculate_transport_cost()
 
     @classmethod

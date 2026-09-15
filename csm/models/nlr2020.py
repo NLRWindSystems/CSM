@@ -339,7 +339,7 @@ class Land2020NLR(CSMBase):
         drivetrain_transport_cost (float): Total drivetrain transportation cost (:math:`USD`). See
             :py:meth:`calculate_drivetrain_transport_cost` for more details.
         tower_section_mass_max (float): Maximum mass of each tower section. See
-            :py:attr:`calculate_tower_transport_cost` for more details. Defaults to 80000
+            :py:attr:`calculate_num_tower_sections` for more details. Defaults to 80000
             :math:`kg`.
         num_tower_sections (float): Total number of tower sections. See
             :py:attr:`calculate_tower_transport_cost` for more details if not providing directly.
@@ -416,14 +416,13 @@ class Land2020NLR(CSMBase):
     tower_mass_intercept = create_field(float, "unitless", "input", default=-14281.0)
     tower_mass_cost_coeff = base.tower_mass_cost_coeff.reuse(default=3.1668)
     transport_blade_cost_coeff = create_field(float, "unitless", "input", default=0.543)
-    transport_blade_cost_coeff2 = create_field(float, "unitless", "input", default=-7.4903)
+    transport_blade_cost_coeff2 = create_field(float, "unitless", "input", default=-7.4093)
     transport_blade_cost_coeff3 = create_field(float, "unitless", "input", default=-2847.5)
     transport_blade_cost_intercept = create_field(float, "USD", "input", default=103627)
     transport_hub_cost_intercept = create_field(float, "USD", "input", default=5000)
     transport_power_electronics_cost_coeff = create_field(float, "USD/kW", "input", default=9)
     transport_drivetrain_cost_coeff = create_field(float, "kg", "input", default=90000)
     transport_drivetrain_cost_coeff2 = create_field(float, "USD", "input", default=45000)
-    tower_section_mass_max = create_field(float, "kg", "input", default=80000)
     transport_tower_cost_coeff = create_field(float, "USD", "input", default=34083)
     transport_misc_parts_cost_coeff = create_field(float, "USD/kg", "input", default=0.025)
 
@@ -495,19 +494,6 @@ class Land2020NLR(CSMBase):
             "rotor_diameter",
             "tower_mass_intercept",
         )
-        self.parameter_map["transport_cost"] = (
-            "transport_power_electronics_cost_coeff",
-            "transport_drivetrain_cost_coeff",
-            "transport_drivetrain_cost_coeff2",
-            "transport_blade_cost_coeff",
-            "transport_blade_cost_coeff2",
-            "transport_blade_cost_coeff3",
-            "transport_blade_cost_intercept",
-            "transport_hub_cost_intercept",
-            "transport_tower_cost_coeff",
-            "tower_section_mass_max",
-            "transport_misc_parts_cost_coeff",
-        )
         # Removes unmodeled high speed shaft and adds crane
         self.parameter_map["nacelle_mass"] = (
             "low_speed_shaft_mass",
@@ -544,7 +530,6 @@ class Land2020NLR(CSMBase):
         )
         self.parameter_map["blade_transport_cost"] = (
             "rotor_diameter",
-            "num_blades",
             "transport_blade_cost_coeff",
             "transport_blade_cost_coeff2",
             "transport_blade_cost_coeff3",
@@ -562,10 +547,6 @@ class Land2020NLR(CSMBase):
             "nacelle_mass",
             "transport_drivetrain_cost_coeff",
             "transport_drivetrain_cost_coeff2",
-        )
-        self.parameter_map["num_tower_sections"] = (
-            "tower_mass",
-            "tower_section_mass_max",
         )
         self.parameter_map["tower_transport_cost"] = (
             "num_tower_sections",

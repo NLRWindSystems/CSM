@@ -120,7 +120,7 @@ def test_Land2020NLR_defaults_only(subtests):
 
     with subtests.test("Transport parameters"):
         assert nlr2020.transport_blade_cost_coeff == 0.543
-        assert nlr2020.transport_blade_cost_coeff2 == -7.4903
+        assert nlr2020.transport_blade_cost_coeff2 == -7.4093
         assert nlr2020.transport_blade_cost_coeff3 == -2847.5
         assert nlr2020.transport_blade_cost_intercept == 103627
         assert nlr2020.transport_hub_cost_intercept == 5000
@@ -135,7 +135,8 @@ def test_Land2020NLR_defaults_only(subtests):
     mass_results = nlr2020.get_mass_results()
     cost_results = nlr2020.get_cost_results()
     with subtests.test("Ensure mass and cost results add to the joint results"):
-        assert len(mass_results) + len(cost_results) + 2 == len(results)  # torque + rated rpm
+        non_mass_cost = 2  # rated_rpm, num_tower_sections
+        assert len(mass_results) + len(cost_results) + non_mass_cost == len(results)
         assert not set(mass_results).intersection(cost_results)
 
     with subtests.test("Check default attribute values for results"):
@@ -269,10 +270,10 @@ def test_Land2020NLR_with_inputs(subtests):
         assert model.turbine_cost == approx(5229133.3833998479)
         assert model.turbine_cost_kw == approx(843.4086102257819)
     with subtests.test("Transport cost"):
-        assert model.blade_transport_cost == approx(112939.54570000005)
+        assert model.blade_transport_cost == approx(3 * 112939.54570000005)
         assert model.hub_transport_cost == approx(57591.98398997124)
         assert model.power_electronics_transport_cost == approx(28800.0)
         assert model.drivetrain_transport_cost == approx(90000.0)
-        assert model.tower_cost == approx(204498.0)
+        assert model.tower_transport_cost == approx(204498.0)
         assert model.parts_transport_cost == approx(19085.543225738213)
         assert model.transport_cost == approx(738794.1643157096)

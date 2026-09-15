@@ -75,7 +75,8 @@ def test_Land2015NLR_defaults_only(subtests):
     mass_results = nlr2015.get_mass_results()
     cost_results = nlr2015.get_cost_results()
     with subtests.test("Ensure mass and cost results add to the joint results"):
-        assert len(mass_results) + len(cost_results) + 2 == len(results)  # torque + rated rpm
+        non_mass_cost = 2  # rated_rpm, num_tower_sections
+        assert len(mass_results) + len(cost_results) + non_mass_cost == len(results)
         assert not set(mass_results).intersection(cost_results)
 
     with subtests.test("Check default attribute values for results"):
