@@ -1,7 +1,7 @@
 from csm.models import CSMBase, Land2015NLR, Land2020NLR, Land2021NLR, available_models
 
 
-__version__ = "0.1"
+__version__ = "0.0.1"
 
 
 def get_model(name: str | int) -> type[CSMBase]:

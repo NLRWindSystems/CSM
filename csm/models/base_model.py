@@ -2885,8 +2885,8 @@ class CSMBase:
     def irs_mpc_breakdown(  # noqa: D417
         self,
         turbine_production_cost: float,
-        tower_flange_material_cost: float,
         tower_flange_production_cost: float,
+        tower_flange_material_cost: float | None = None,
         *,
         with_category: bool = False,
     ) -> pd.DataFrame:
@@ -2917,17 +2917,20 @@ class CSMBase:
         Args:
             turbine_production_cost (float): Costs associated with production (i.e., not materials)
                 of the wind turbine.
-            tower_flange_material_cost (float): The materials cost for the tower flange.
             tower_flange_production_cost (float): The production cost for the tower flange.
+            tower_flange_material_cost (float): The materials cost for the tower flange. If None,
+                the 6% of :py:attr:`tower_cost` will be applied. Defaults to None.
             with_category (bool, optional: If True, return the DataFrame with the ``category``
                 column intact, otherwise drop the column to produce an IRS-ready output. Defaults
                 to False.
 
-        Returns:-
+        Returns:
             pd.DataFrame: Data Frame with indices for the APCs and MPCs, and columns for the
                 mapping category (if :py:attr:`with_category`), "cost" (total USD), and "Value"
                 (component cost / total cost * 100).
         """
+        if tower_flange_material_cost is None:
+            tower_flange_material_cost = 0.06 * self.tower_flange_material_cost
         costs = {
             "blade": self.num_blades * self.blade_cost,
             "hub": self.hub_system_cost,

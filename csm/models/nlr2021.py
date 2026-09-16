@@ -202,8 +202,6 @@ class Land2021NLR(Land2020NLR):
     converter_mass_cost_coeff = base.converter_mass_cost_coeff.reuse(default=0)
 
     # TODO: fix docstrings from 2020 copypasta with 2020 issues and parameterizations
-    # TODO: update tower flange assumption in base model to 6% of tower
-
     def __attrs_post_init__(self):
         """Updates the parameter mapping for new mass and cost relationships."""
         self.parameter_map["blade_mass"] = (
