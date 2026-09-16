@@ -1,14 +1,19 @@
 (theory)=
 # Theory
 
-The theory for the models in this software are based directly on the work described in references {cite}`Fingersh2006,Sunderland1993,Malcolm2002,Maples2010`. This section provides an overview of these simple mass and cost models for the major turbine components.
+Please note this page is sourced, and lightly edited from the original model documentation within
+the WISDEM repository. As such, these scaling relationships are the basis of the `CSMBase` and
+`NLR2015Land` models. For any later models with differing scaling relationships, in-depth
+documentation is forthcoming.
 
-The NREL Cost and Scaling Model {cite}`Fingersh2006` provides a simple cost and sizing tool to
+The theory for the models in this software are based directly on the work described in references {cite:p}`Fingersh2006,Sunderland1993,Malcolm2002,Maples2010`. This section provides an overview of these simple mass and cost models for the major turbine components.
+
+The NREL Cost and Scaling Model {cite:p}`Fingersh2006` provides a simple cost and sizing tool to
 estimate wind turbine component masses and costs based on a small number of input parameters such
 as rotor diameter, hub height and rated power. The model was developed over several results
 following the Wind Partnerships for Advanced Component Technology (WindPACT) work that occurred
 between roughly 2002 to 2005. The original form of the cost model was based on an earlier model
-from 1993 out of the University of Sunderland (the Sunderland Model) {cite}`Sunderland1993`. The
+from 1993 out of the University of Sunderland (the Sunderland Model) {cite:p}`Sunderland1993`. The
 Sunderland Model created a set of wind turbine models to estimate the mass and cost of all major
 wind turbine components including: blade, hub system [hub, pitch system, and nose cone], nacelle
 [low speed shaft, main bearings, gearbox, high speed shaft/mechanical brake, generator, variable
@@ -22,11 +27,11 @@ then made on a per weight basis using a multiplier again based on field data or 
 To arrive at the NREL Cost and Scaling Model, the WindPACT studies began in many cases with the
 Sunderland model and updated the results with new coefficients or, in some cases, with entirely
 new cost equations based on curve fits of key design parameters (rotor diameter, etc) to the
-results of detailed design studies {cite}`Malcolm2002`. In addition, the WindPACT work established
+results of detailed design studies {cite:p}`Malcolm2002`. In addition, the WindPACT work established
 estimates of costs associated with balance of station and operations and maintenance for a
 fictitious wind plant in North Dakota which led to an overall cost of energy model for a wind plant.
 The key cost of energy equation for a wind plant is given in the NREL Cost and Scaling Model
-{cite}`Fingersh2006` as:
+{cite:p}`Fingersh2006` as:
 
 ```{math}
 COE = (FCR*(BOS+TCC))/AEP + (LLC + LRC + (1-tr)*OM)/AEP
@@ -64,7 +69,7 @@ costs.
 The goal of the development of the second model, `Turbine_CostsSE`, then is to provide a set of
 mass-based component cost calculations. A mass-cost model is developed for each of the major
 turbine components. These use the data underlying the NREL Cost and Scaling Model to estimate
-relationships that can then be scaled based on economic multipliers as done in {cite}`Fingersh2006`.
+relationships that can then be scaled based on economic multipliers as done in {cite:p}`Fingersh2006`.
 Details of the models are described next.
 
 TODO
@@ -533,6 +538,6 @@ c_{turbine} &= (1+kt_{turbine}+kp_{turbine}) (1+ko_{turbine}+ka_{turbine}) (c_{r
 
 For variable names access to override the default values see the :ref:`csmsource`.
 
-```{bibliography} ../../references.bib
+```{bibliography} ../references.bib
 :filter: docname in docnames
 ```
