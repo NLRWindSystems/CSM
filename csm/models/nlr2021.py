@@ -1,3 +1,5 @@
+"""Provides the ``Land2021NLR`` model."""
+
 from attrs import define, fields
 
 from csm.models.utils import create_field
@@ -63,10 +65,12 @@ class Land2021NLR(Land2020NLR):
             (:math:`m`).
 
     Parameters:
-        blade_mass_coeff (float): :math:`k` in the blade mass equation from
-            :py:meth:`calculate_blade_mass`. Defaults to 9.2157.
-        blade_mass_exp (float):  :math:`b` in the blade mass equation from
-            :py:meth:`calculate_blade_mass`. Defaults to 1.7679.
+        blade_mass_coeff (float): :math:`k_1` in the blade mass equation from
+            :py:meth:`calculate_blade_mass`. Defaults to 8.3612.
+        blade_mass_coeff2 (float): :math:`k_2` in the blade mass equation from
+            :py:meth:`calculate_blade_mass`. Defaults to -620.03.
+        blade_mass_intercept (float):  :math:`b` in the blade mass equation from
+            :py:meth:`calculate_blade_mass`. Defaults to 17847.
         blade_mass_cost_coeff (float): Defaults to 15.9432.
         blade_mass (float): Blade mass (:math:`kg`). If not provided, calculated in
             :py:meth:`calculate_blade_mass`.
@@ -87,92 +91,166 @@ class Land2021NLR(Land2020NLR):
         lss_mass_coeff2 (float): Defaults to -311.15 :math:`kg/m`.
         lss_mass_intercept (float): Defaults to 13108.0 :math:`kg`.
         lss_mass_cost_coeff (float): Defaults to 12.9948 :math:`USD/kg`.
-        low_speed_shaft_mass (float):
-
-            .. math::
-                low\_speed\_shaft\_mass = lss\_mass\_coeff1 * {rotor\_diameter} ^ 2
-                + lss\_mass\_coeff2 * {rotor\_diameter}
-                + {lss\_mass\_intercept}
-
-        low_speed_shaft_cost (float):
-
-            .. math::
-                low\_speed\_shaft\_cost = {low\_speed\_shaft\_mass} * {spinner\_mass\_cost\_coeff}
-
+        low_speed_shaft_mass (float): Low speed shaft mass (:math:`kg`). See
+            :py:meth:`calculate_low_speed_shaft_mass` for more details.
+        low_speed_shaft_cost (float): Low speed shaft cost (:math:`USD`). See
+            :py:meth:`calculate_low_speed_shaft_cost` for more details.
         bearing_mass_coeff (float): Defaults to 0.0001.
         bearing_mass_exp (float): Defaults to 3.5.
         bearing_mass_cost_coeff (float): Defaults to 4.914 :math:`USD/kg`.
-        gearbox_torque_density (float): In 2024, modern 5-7MW gearboxes are able to reach 200 Nm/kg.
-        gearbox_torque_exp (float): Defaults to 0.6566.
+        bearing_mass (float): Main bearing mass (:math:`kg`). See :py:meth:`calculate_bearing_mass`
+            for more details.
+        bearing_cost (float): Main bearing cost (:math:`USD`). See :py:meth:`calculate_bearing_cost`
+            for more details.
+        gearbox_torque_density (float): Updated to 132.5 Nm/kg.
         gearbox_torque_cost (float): Unused in 2020. Defaults to 0.
         gearbox_mass_cost_coeff (float): Defaults to 14.0868.
+        gearbox_mass (float): Gearbox mass (:math:`kg`). See :py:meth:`calculate_gearbox_mass`
+            for more details.
+        gearbox_cost (float): Gearbox cost (:math:`USD`). See :py:meth:`calculate_gearbox_cost`
+            for more details.
         brake_mass_cost_coeff (float): In 2020, updated to $3.6254 USD/kg. Regression based sizing
             derived by J.Keller under FOA 1981 support project.
-        hss_mass_coeff (float): High speed shaft is not modeled for 2020. Defaults to 0
-        hss_mass_cost_coeff (float): High speed shaft is not modeled for 2020. Defaults to 0
-        generator_mass_coeff (float): Defaults to 1754.
-        generator_mass_intercept (float): Defaults to 3503.6.
+        brake_mass (float): Brake mass (:math:`kg`). See :py:meth:`calculate_brake_mass` for more
+            details.
+        brake_cost (float): Brake cost (:math:`USD`). See :py:meth:`calculate_brake_cost` for more
+            details.
+        generator_mass_coeff (float): Defaults to 1.6731.
+        generator_mass_intercept (float): Defaults to 3932.7.
         generator_mass_cost_coeff (float): Defaults to 13.5408 :math:`USD/kg`.
+        generator_mass (float): Generator mass (:math:`kg`). See :py:meth:`calculate_generator_mass`
+            for more details.
+        generator_cost (float): Generator cost (:math:`USD`). See
+            :py:meth:`calculate_generator_cost` for more details.
         bedplate_mass_exp (float): Unused in the 2020 model. Defaults to 0.
         bedplate_mass_coeff (float): Defaults to 737.88.
         bedplate_mass_intercept (float): Defaults to -68066.
         bedplate_mass_cost_coeff (float): Defaults to 3.1668 :math:`USD/kg`.
-        bedplate_mass (float):
-
-            .. math::
-                bedplate\_mass = bedplate\_mass\_coeff * rotor\_diameter + bedplate\_mass\_intercept
-
+        bedplate_mass (float): Bedplate mass (:math:`kg`). See :py:meth:`calculate_bedplate_mass`
+            for more details.
+        bedplate_cost (float): Bedplate cost (:math:`USD`). See :py:meth:`calculate_bedplate_cost`
+            for more details.
         yaw_system_non_bearing_mass_coeff (float): Defaults to 1.6.
         yaw_system_mass_coeff (float): Defaults to 0.0007.
         yaw_system_mass_exp (float): Defaults to 3.1571.
         yaw_system_mass_cost_coeff (float): Defaults to 9.0636 :math:`USD/kg`.
         hvac_mass_coeff (float): Not used in 2020. Defaults to 0.
         hvac_mass_cost_coeff (float): Defaults to 135.408 :math:`USD/kg`.
+        yaw_system_mass (float): Yaw system mass (:math:`kg`). See
+            :py:meth:`calculate_yaw_system_mass` for more details.
+        yaw_system_cost (float): Yaw system cost (:math:`USD`). See
+            :py:meth:`calculate_yaw_system_cost` for more details.
         hydraulic_cooling_mass (float): Defaults to 221 :math:`kg`.
-        nacelle_cover_mass_coeff (float): Defaults to 1281.7 :math:`kg/kW`.
-        nacelle_cover_mass_intercept (float): Defaults to 428.19.
+        hydraulic_cooling_cost (float): Hydraulic cooling cost (:math:`USD`). See
+            :py:meth:`calculate_hydraulic_cooling_cost` for more details.
+        nacelle_cover_mass_coeff (float): Defaults to 1.915 :math:`kg/kW`.
+        nacelle_cover_mass_intercept (float): Defaults to 1910.
         nacelle_cover_mass_cost_coeff (float): Defaults to 6.2244 :math:`USD/kg`.
+        nacelle_cover_mass (float): nacelle_cover mass (:math:`kg`). See
+            :py:meth:`calculate_nacelle_cover_mass` for more details.
+        nacelle_cover_cost (float): nacelle_cover mass (:math:`USD`). See
+            :py:meth:`calculate_nacelle_cover_cost` for more details.
         platform_mainframe_mass_coeff (float): Defaults to 0.005.
         platform_mainframe_mass_cost_coeff (float): Defaults to 18.6732 :math:`USD/kg`.
-        platform_mainframe_mass (float):
-            :math:`platform\_mainframe\_mass = platform\_mainframe\_mass\_coeff * bedplate\_mass`
-        platform_mainframe_cost (float):
-
-            ..math::
-                platform\_mainframe\_cost = platform\_mainframe\_mass\_cost\_coeff
-                * platform\_mainframe\_mass
-
+        platform_mainframe_mass (float): Platform mainframe mass (:math:`kg`).
+            See :py:meth:`calculate_platform_mainframe_mass` for more details.
+        platform_mainframe_cost (float): Platform mainframe cost (:math:`USD`).
+            See :py:meth:`calculate_platform_mainframe_cost` for more details.
         crane_mass_cost_coeff (float): Defaults to 4.368 :math:`USD/kg`.
         crane_mass (float): If not provided, defaults to :py:attr:`platform_mainframe_mass`.
         transformer_mass_coeff (float): Defaults to 1915 :math:`kg/kW`.
         transformer_mass_intercept (bool): Defaults to 1910.
         transformer_mass_cost_coeff (float): Defaults to 20.5296 :math:`USD/kg`.
+        transformer_mass (float): Transformer cover mass (:math:`kg`). See
+            :py:meth:`calculate_transformer_mass` for more details.
+        transformer_cost (float): Transformer cover cost (:math:`USD`). See
+            :py:meth:`calculate_transformer_cost` for more details.
         converter_power_cost_coeff (float): Defaults to 50 :math:`USD/kW`.
+        converter_mass (float): Power converter mass (:math:`kg`). See
+            :py:meth:`calculate_converter_mass` for more details.
+        converter_cost (float): Power converter cost (:math:`USD`). See
         controls_cost_coeff (float): 23.0958 :math:`USD/kW`.
-        electrical_connection_cost_coeff (float): Defaults to 45.7002 :math:`USD/kW`.
-        tower_mass_coeff (float): Defaults to 0.152 :math:`kg/m`.
-        tower_mass_intercept (bool): Defaults to -14281.
-        tower_mass_cost_coeff (float): Defaults to 3.1668 :math:`USD/kg`.
-        tower_mass (float): Tower mass (:math:`kg`). See
-            :py:meth:`calculate_tower_mass` for more details.
-
-            .. math::
-                tower\_mass = tower\_mass\_coeff * tower\_height
-                * (\pi * (rotor\_diameter / 2) ^ 2) + tower\_mass\_intercept
-
         controls_mass (float): Controls mass (:math:`kg`). Defaults to 0 :math:`kg`.
         controls_cost (float): Controls cost (:math:`USD`). See
             :py:meth:`calculate_controls_cost` for more details.
+        electrical_connection_cost_coeff (float): Defaults to 45.7002 :math:`USD/kW`.
         electrical_connection_mass (float): Electrical connection mass (:math:`kg`). See
             :py:meth:`calculate_electrical_connection_mass` for more details.
         electrical_connection_cost (float): Electrical connection cost (:math:`USD`). See
             :py:meth:`calculate_electrical_connection_cost` for more details.
-        converter_mass (float): Power converter mass (:math:`kg`). See
-            :py:meth:`calculate_converter_mass` for more details.
-        converter_cost (float): Power converter cost (:math:`USD`). See
             :py:meth:`calculate_converter_cost` for more details.
+        tower_mass_coeff (float): Defaults to 0.000000043 :math:`kg/m`.
+        tower_mass_coeff2 (float): Defaults to 0.064588.
+        tower_mass_intercept (bool): Defaults to 48275.
+        tower_mass_cost_coeff (float): Defaults to 3.1668 :math:`USD/kg`.
+        tower_mass (float): Tower mass (:math:`kg`). See
+            :py:meth:`calculate_tower_mass` for more details.
         tower_cost (float): Tower cost (:math:`USD`). See
             :py:meth:`calculate_tower_cost` for more details.
+        transport_blade_cost_coeff (float): See :py:attr:`calculate_blade_transport_cost` for more
+            details. Defaults to 0.543.
+        transport_blade_cost_coeff2 (float): See :py:attr:`calculate_blade_transport_cost` for more
+            details. Defaults to -7.4903.
+        transport_blade_cost_coeff3 (float): See :py:attr:`calculate_blade_transport_cost` for more
+            details. Defaults to -2847.5.
+        transport_blade_cost_intercept (float): See :py:attr:`calculate_blade_transport_cost` for
+            more details. Defaults to 103627 :math:`USD`.
+        blade_transport_cost (float): Total blade transportation cost (:math:`USD`). See
+            :py:meth:`calculate_blade_transport_cost` for more details.
+        transport_hub_cost_intercept (float): See :py:attr:`calculate_hub_transport_cost` for more
+            details. Defaults to 5000.
+        hub_transport_cost (float): Total hub transportation cost (:math:`USD`). See
+            :py:meth:`calculate_hub_transport_cost` for more details.
+        transport_power_electronics_cost_coeff (float): See
+            :py:attr:`calculate_power_electronics_transport_cost` for more details. Defaults to
+            9 :math:`USD/kW`.
+        power_electronics_transport_cost (float): Total power_electronics transportation cost
+            (:math:`USD`). See :py:meth:`calculate_power_electronics_transport_cost` for more
+            details.
+        transport_drivetrain_cost_coeff (float): See :py:attr:`calculate_drivetrain_transport_cost`
+            for more details. Defaults to 9000 :math:`kg`.
+        transport_drivetrain_cost_coeff2 (float): See :py:attr:`calculate_drivetrain_transport_cost`
+            for more details. Defaults to 45000 :math:`USD`.
+        drivetrain_transport_cost (float): Total drivetrain transportation cost (:math:`USD`). See
+            :py:meth:`calculate_drivetrain_transport_cost` for more details.
+        tower_section_mass_max (float): Maximum mass of each tower section. See
+            :py:attr:`calculate_num_tower_sections` for more details. Defaults to 80000
+            :math:`kg`.
+        num_tower_sections (float): Total number of tower sections. See
+            :py:attr:`calculate_tower_transport_cost` for more details if not providing directly.
+        transport_tower_cost_coeff (float): Transportation cost for a single tower section. See
+            :py:attr:`calculate_tower_transport_cost` for more details. Defaults to 34083
+            :math:`USD`.
+        tower_transport_cost (float): Total tower transportation cost (:math:`USD`). See
+            :py:meth:`calculate_tower_transport_cost` for more details.
+        transport_misc_parts_cost_coeff (float): See :py:attr:`calculate__transport_cost` for more
+            details. Defaults to 0.025 :math:`USD/kg`.
+        parts_transport_cost (float): Total transportation cost of miscellaneous parts
+            (:math:`USD`). See :py:meth:`calculate_parts_transport_cost` for more details.
+        transport_cost (float): Total transportation cost (:math:`USD`). See
+            :py:meth:`calculate_transport_cost` for more details.
+        blade_mass_exp (float): Unused in the 2021 model. Defaults to 0.
+        pitch_bearing_mass_coeff (float): The pitch system is incorporated into the hub for 2021,
+            so it is not explicitly modeled for 2020 and later models. Defaults to 0.
+        pitch_bearing_mass_intercept (float): The pitch system is incorporated into the hub for
+            2021, so it is not explicitly modeled for 2020 and later models. Defaults to 0.
+        bearing_housing_fraction (float): The pitch system is incorporated into the hub for 2021,
+            so it is not explicitly modeled for 2020 and later models. Defaults to 0.
+        mass_sys_offset (float): The pitch system is incorporated into the hub for 2021,
+            so it is not explicitly modeled for 2020 and later models. Defaults to 0.
+        pitch_system_mass_cost_coeff (float): The pitch system is incorporated into the hub for
+            2021, so it is not explicitly modeled for 2020 and later models. Defaults to 0.
+        mass_sys_offset (float): The pitch system is incorporated into the hub for
+            2021, so it is not explicitly modeled for 2020 and later models. Defaults to 0.
+        pitch_system_mass (float): The pitch system is incorporated into the hub for
+            2021, so it is not explicitly modeled for 2020 and later models. Defaults to 0.
+        pitch_system_cost (float): The pitch system is incorporated into the hub for
+            2021, so it is not explicitly modeled for 2020 and later models. Defaults to 0.
+        gearbox_torque_exp (float): Not used int the 2021 model. Defaults to 0.
+        hss_mass_coeff (float): High speed shaft is not modeled for 2020 and later models.
+            Defaults to 0
+        hss_mass_cost_coeff (float): High speed shaft is not modeled for 2020 and later models.
+            Defaults to 0
     """
 
     blade_mass_coeff = base.blade_mass_coeff.reuse(default=8.3612)
@@ -181,13 +259,7 @@ class Land2021NLR(Land2020NLR):
     hub_mass_coeff = base.hub_mass_coeff.reuse(default=8104.7)
     hub_mass_exp = create_field(float, "unitless", "input", default=1.1377)
     hub_mass_cost_coeff = base.hub_mass_cost_coeff.reuse(default=5.96232)
-    pitch_blade_mass_coeff = base.pitch_blade_mass_coeff.reuse(default=0)
-    pitch_system_mass_coeff = base.pitch_system_mass_coeff.reuse(default=0)
-    pitch_blade_mass_intercept = base.pitch_blade_mass_intercept.reuse(default=0)
-    pitch_system_mass = base.pitch_system_mass.reuse(default=0)
-    pitch_system_cost = base.pitch_system_cost.reuse(default=0)
     gearbox_torque_density = base.gearbox_torque_density.reuse(default=132.5)
-    gearbox_torque_exp = base.gearbox_torque_exp.reuse(default=0)
     generator_mass_coeff = base.generator_mass_coeff.reuse(default=1.6731)
     generator_mass_intercept = base.generator_mass_intercept.reuse(default=3932.7)
     nacelle_cover_mass_coeff = base.nacelle_cover_mass_coeff.reuse(default=1.915)
@@ -200,8 +272,14 @@ class Land2021NLR(Land2020NLR):
     # unused attributes
     hub_mass_intercept = base.hub_mass_intercept.reuse(default=0)
     converter_mass_cost_coeff = base.converter_mass_cost_coeff.reuse(default=0)
+    pitch_blade_mass_coeff = base.pitch_blade_mass_coeff.reuse(default=0)
+    pitch_system_mass_coeff = base.pitch_system_mass_coeff.reuse(default=0)
+    pitch_blade_mass_intercept = base.pitch_blade_mass_intercept.reuse(default=0)
+    mass_sys_offset = base.mass_sys_offset.reuse(default=0)
+    pitch_system_mass = base.pitch_system_mass.reuse(default=0)
+    pitch_system_cost = base.pitch_system_cost.reuse(default=0)
+    gearbox_torque_exp = base.gearbox_torque_exp.reuse(default=0)
 
-    # TODO: fix docstrings from 2020 copypasta with 2020 issues and parameterizations
     def __attrs_post_init__(self):
         """Updates the parameter mapping for new mass and cost relationships."""
         self.parameter_map["blade_mass"] = (
@@ -230,18 +308,18 @@ class Land2021NLR(Land2020NLR):
     def calculate_blade_mass(self):
         """Calculates and sets :py:attr:`blade_mass` if it was not provided by the user.
 
-        .. math:: k1 * radius^2 + k2 * radius + b
+        .. math:: k_1 * r^2 + k_2 * r + b
 
         where:
 
-        - :math:`k1 =` :py:attr:`blade_mass_coeff`
-        - :math:`k2 =` :py:attr:`blade_mass_coeff2`
-        - :math:`radius =` :py:attr:`rotor_diameter` / 2
+        - :math:`k_1 =` :py:attr:`blade_mass_coeff`
+        - :math:`k_2 =` :py:attr:`blade_mass_coeff2`
+        - :math:`r =` :py:attr:`rotor_diameter` / 2
         - :math:`b =` :py:attr:`blade_mass_intercept`
 
         Args:
-            blade_mass_coeff (float): :math:`k1` in the mass equation above.
-            blade_mass_coeff2 (float): :math:`k2` in the mass equation above.
+            blade_mass_coeff (float): :math:`k_1` in the mass equation above.
+            blade_mass_coeff2 (float): :math:`k_2` in the mass equation above.
             rotor_diameter (float): Diameter of the swept area of the turbine blades.
             blade_mass_intercept (float): :math:`b` in the mass equation above.
 
@@ -284,14 +362,14 @@ class Land2021NLR(Land2020NLR):
         self.hub_mass = self.hub_mass_coeff * self.rated_power_mw**self.hub_mass_exp
 
     def calculate_gearbox_mass(self):
-        """Calculates and sets :py:attr:`gearbox_mass` for the gearbox if it was not provided
+        r"""Calculates and sets :py:attr:`gearbox_mass` for the gearbox if it was not provided
         by the user.
 
-        .. math:: torque * 1000 / k
+        .. math:: \tau * 1000 / k
 
         where:
 
-        - :math:`torque =` :py:attr:`rotor_torque`
+        - :math:`\tau =` :py:attr:`rotor_torque`
         - :math:`k =` :py:attr:`gearbox_torque_density`
 
         Args:
@@ -334,14 +412,14 @@ class Land2021NLR(Land2020NLR):
     def calculate_tower_mass(self):
         """Calculates and sets :py:attr:`tower_mass` if it was not provided by the user.
 
-        .. math:: k1 * (A * H_{hub})^2 + k2 * A * H_{hub} + b
+        .. math:: k_1 * (A * H_{hub})^2 + k_2 * A * H_{hub} + b
 
         where:
 
-        - :math:`k1 =` :py:attr:`tower_mass_coeff`
+        - :math:`k_1 =` :py:attr:`tower_mass_coeff`
         - :math:`A =` :py:attr:`swept_area`
         - :math:`H_{hub} =` :py:attr:`tower_length`
-        - :math:`k2 =` :py:attr:`tower_mass_coeff2`
+        - :math:`k_2 =` :py:attr:`tower_mass_coeff2`
         - :math:`b =` :py:attr:`tower_mass_intercept`
 
         Args:

@@ -446,9 +446,6 @@ class Land2020NLR(CSMBase):
     _mass_result_name = base._mass_result_names.reuse(default=MASS_RESULT_NAMES)
     _cost_result_names = base._cost_result_names.reuse(default=COST_RESULT_NAMES)
 
-    # TODO: transport cost tests
-    # TODO: breakout transport cost methods to match updated base
-
     def __attrs_post_init__(self):
         """Updates the parameter mapping for new mass and cost relationships."""
         self.parameter_map["blade_mass"] = ("rotor_diameter", "blade_mass_coeff", "blade_mass_exp")
@@ -569,12 +566,12 @@ class Land2020NLR(CSMBase):
     def calculate_blade_mass(self):
         """Calculates and sets :py:attr:`blade_mass` if it was not provided by the user.
 
-        .. math:: k * radius^b
+        .. math:: k * r^b
 
         where:
 
         - :math:`k =` :py:attr:`blade_mass_coeff`
-        - :math:`radius =` :py:attr:`rotor_diameter` / 2
+        - :math:`r =` :py:attr:`rotor_diameter` / 2
         - :math:`b =` :py:attr:`blade_mass_exp`
 
         Args:
@@ -594,26 +591,25 @@ class Land2020NLR(CSMBase):
     def calculate_pitch_system_mass(self):
         """Calculates and sets :py:attr:`pitch_system_mass` if it was not provided by the user.
 
-        :math:`mass = k1*(k2*m_{blade}*n_{blades} + b1) + b2`
+        :math:`mass = k_1*(k_2*m_{blade}*N_{blades} + b_1) + b_2`
 
         where:
 
-        - :math:`k1 =` :py:attr:`pitch_system_mass_coeff`
-        - :math:`k2 =` :py:attr:`pitch_blade_mass_coeff`
-        - :math:`n_{blades} =` :py:attr:`num_blades`
+        - :math:`k_1 =` :py:attr:`pitch_system_mass_coeff`
+        - :math:`k_2 =` :py:attr:`pitch_blade_mass_coeff`
+        - :math:`N_{blades} =` :py:attr:`num_blades`
         - :math:`m_{blade} =` :py:attr:`blade_mass`
-        - :math:`b1 =` :py:attr:`pitch_blade_mass_intercept`
-        - :math:`b2 =` :py:attr:`mass_sys_offset`
+        - :math:`b_1 =` :py:attr:`pitch_blade_mass_intercept`
+        - :math:`b_2 =` :py:attr:`mass_sys_offset`
 
         Args:
             num_blades (int, optional): Number of turbine blades. Defaults to 3.
-            pitch_bearing_mass_coeff (float): :math:`k` in the pitch bearing mass equation.
+            pitch_system_mass_coeff (float): :math:`k_1` in the pitch system mass equation.
+            pitch_blade_mass_coeff (float): :math:`k_1` in the pitch system mass equation.
             blade_mass (float): Blade mass (:math:`kg`). See :py:meth:`calculate_blade_mass`
                 for details.
-            pitch_bearing_mass_intercept (float): :math:`b1` in the pitch bearing mass equation.
-            bearing_housing_fraction (float): Mass of the housing for the bearing as a fraction of
-                the bearing mass. :math:`h` in the pitch system mass equation.
-            mass_sys_offset (float): :math:`b2` in the pitch system mass equation.
+            pitch_blade_mass_intercept (float): :math:`b_1` in the pitch system mass equation.
+            mass_sys_offset (float): :math:`b_2` in the pitch system mass equation.
 
         Raises:
             ValueError: Raised if the required parameters have not been provided or calculated.
@@ -634,20 +630,20 @@ class Land2020NLR(CSMBase):
     def calculate_low_speed_shaft_mass(self):
         """Calculates and sets :py:attr:`low_speed_shaft_mass` if it was not provided by the user.
 
-        :math:`m_{lss} = k1*rd^2 + k2*rd + b`.
+        :math:`m_{lss} = k_1*rd^2 + k_2*rd + b`.
 
         where:
 
-        - :math:`k1 =` :py:attr:`lss_mass_coeff1`
+        - :math:`k_1 =` :py:attr:`lss_mass_coeff1`
         - :math:`rd =` :py:attr:`rotor_diameter`
-        - :math:`k2 =` :py:attr:`lss_mass_coeff2`
+        - :math:`k_2 =` :py:attr:`lss_mass_coeff2`
         - :math:`b =` :py:attr:`lss_mass_intercept`
 
         Args:
             rotor_diameter (int, optional): Turbine rotor diameter, (:math:`m`).
-            lss_mass_coeff1 (float): :math:`k1` in the polynomial low speed shaft mass equation.
-            lss_mass_coeff2 (float): :math:`k2` in the polynomial low speed shaft mass equation.
-            lss_mass_intercept (float): :math:`b1` in the low speed shaft mass equation.
+            lss_mass_coeff1 (float): :math:`k_1` in the polynomial low speed shaft mass equation.
+            lss_mass_coeff2 (float): :math:`k_2` in the polynomial low speed shaft mass equation.
+            lss_mass_intercept (float): :math:`b` in the low speed shaft mass equation.
 
         Raises:
             ValueError: Raised if the required parameters have not been provided or calculated.
@@ -663,15 +659,15 @@ class Land2020NLR(CSMBase):
         )
 
     def calculate_gearbox_mass(self):
-        """Calculates and sets :py:attr:`gearbox_mass` for the gearbox if it was not provided
+        r"""Calculates and sets :py:attr:`gearbox_mass` for the gearbox if it was not provided
         by the user.
 
-        .. math:: k * torque ** b
+        .. math:: k * \tau ^ b
 
         where:
 
         - :math:`k =` :py:attr:`gearbox_torque_density`
-        - :math:`torque =` :py:attr:`rotor_torque`
+        - :math:`\tau =` :py:attr:`rotor_torque`
         - :math:`b =` :py:attr:`gearbox_torque_exp`
 
         Args:
@@ -752,12 +748,12 @@ class Land2020NLR(CSMBase):
     def calculate_bedplate_mass(self):
         """Calculates and sets :py:attr:`bedplate_mass` if it was not provided by the user.
 
-        .. math:: k * rotor_diameter + b
+        .. math:: k * rd + b
 
         where:
 
         - :math:`b =` :py:attr:`bedplate_mass_coeff`
-        - :math:`rotor_diameter =` :py:attr:`rotor_diameter`
+        - :math:`rd =` :py:attr:`rotor_diameter`
         - :math:`b =` :py:attr:`bedplate_mass_intercept`
 
         Args:
@@ -835,8 +831,7 @@ class Land2020NLR(CSMBase):
         r"""Calculates and sets :py:attr:`crane_mass` if it was not provided by the user.
 
         .. math::
-            m_{platform\_mainframe} & has\_crane \\
-            0 & otherwise
+            m_{platform\_mainframe} * has\_crane
 
         where:
 
@@ -862,8 +857,7 @@ class Land2020NLR(CSMBase):
         r"""Calculates and sets :py:attr:`crane_cost` if it was not provided by the user.
 
         .. math::
-            k * m_{crane} & has\_crane \\
-            0 & otherwise
+            k * m_{crane} * has\_crane
 
         where:
 
@@ -890,13 +884,13 @@ class Land2020NLR(CSMBase):
     def calculate_tower_mass(self):
         r"""Calculates and sets :py:attr:`tower_mass` if it was not provided by the user.
 
-        .. math:: k * H_{hub} * swept\_area + b
+        .. math:: k * H_{hub} * A + b
 
         where:
 
         - :math:`k =` :py:attr:`tower_mass_coeff`
         - :math:`H_{hub} =` :py:attr:`tower_length`
-        - :math:`swept\_area = \pi * r^2` where :math:`r` = :py:attr:`rotor_diameter` / 2
+        - :math:`A = \pi * r^2`, or swept area where :math:`r` = :py:attr:`rotor_diameter` / 2
         - :math:`b =` :py:attr:`tower_mass_intercept`
 
         Args:
@@ -1071,23 +1065,23 @@ class Land2020NLR(CSMBase):
         transporting all turbine blades if it was not provided by the user.
 
         .. math::
-            n_{blades} * (k1 * radius^3 + k2 * radius^2 + k3 * radius + b)
+            N_{blades} * (k_1 * r^3 + k_2 * r^2 + k_3 * r + b)
 
         where:
 
-        - :math:`n_{blades} =` :py:attr:`num_blades`
-        - :math:`radius =` :py:attr:`rotor_diameter` / 2
-        - :math:`k1 =` :py:attr:`transport_blade_cost_coeff`
-        - :math:`k2 =` :py:attr:`transport_blade_cost_coeff2`
-        - :math:`k3 =` :py:attr:`transport_blade_cost_coeff3`
+        - :math:`N_{blades} =` :py:attr:`num_blades`
+        - :math:`r =` :py:attr:`rotor_diameter` / 2
+        - :math:`k_1 =` :py:attr:`transport_blade_cost_coeff`
+        - :math:`k_2 =` :py:attr:`transport_blade_cost_coeff2`
+        - :math:`k_3 =` :py:attr:`transport_blade_cost_coeff3`
         - :math:`b =` :py:attr:`transport_blade_cost_intercept`
 
         Args:
             num_blades (float): Number of turbine blades on the rotor.
             rotor_diameter (float): Used to calculate :py:attr:`rotor_radius`.
-            transport_blade_cost_coeff (float): :math:`k1` in the cost equation.
-            transport_blade_cost_coeff2 (float): :math:`k2` in the cost equation.
-            transport_blade_cost_coeff3 (float): :math:`k3` in the cost equation.
+            transport_blade_cost_coeff (float): :math:`k_1` in the cost equation.
+            transport_blade_cost_coeff2 (float): :math:`k_2` in the cost equation.
+            transport_blade_cost_coeff3 (float): :math:`k_3` in the cost equation.
             transport_blade_cost_intercept (float): :math:`b` in the cost equation.
 
         Raises:
@@ -1158,19 +1152,19 @@ class Land2020NLR(CSMBase):
         the user.
 
         .. math::
-            \lceil m_{nacelle} / k1 \rceil * k2
+            \lceil m_{nacelle} / k_1 \rceil * k_2
 
         where:
 
         - :math:`m_{nacelle} =` :py:attr:`nacelle_mass`
-        - :math:`k1 =` :py:attr:`transport_drivetrain_cost_coeff`
-        - :math:`k2 =` :py:attr:`transport_drivetrain_cost_coeff2`
+        - :math:`k_1 =` :py:attr:`transport_drivetrain_cost_coeff`
+        - :math:`k_2 =` :py:attr:`transport_drivetrain_cost_coeff2`
 
         Args:
             nacelle_mass (float): Mass of the nacelle (:math:`kg`). See
                 :py:meth:`calculate_nacelle_mass`.
-            transport_drivetrain_cost_coeff (float): :math:`k1` in the cost equation.
-            transport_drivetrain_cost_coeff2 (float): :math:`k2` in the cost equation.
+            transport_drivetrain_cost_coeff (float): :math:`k_1` in the cost equation.
+            transport_drivetrain_cost_coeff2 (float): :math:`k_2` in the cost equation.
 
         Raises:
             ValueError: Raised if any of the required parameters have not been provided.
@@ -1188,23 +1182,21 @@ class Land2020NLR(CSMBase):
         :py:attr:`tower_transport_cost` if they were not provided by the user.
 
         .. math::
-            n_{tower sections} = \lceil m_{tower} / k1 \rceil
-
-            cost = n_{tower sections} * k2
+            cost = N_{sections} * k
 
         where:
 
+        - :math:`N_{sections} =` :py:attr:`num_tower_sections`
         - :math:`m_{tower} =` :py:attr:`tower_mass`
-        - :math:`k1 =` :py:attr:`tower_section_mass_max`
-        - :math:`k2 =` :py:attr:`transport_tower_cost_coeff`
+        - :math:`k =` :py:attr:`transport_tower_cost_coeff`
 
         Args:
+            num_tower_sections (int): Number of tower sections. See
+                :py:meth:`calculate_num_tower_sections`.
             tower_mass (float): Mass of the tower (:math:`kg`). See
                 :py:meth:`calculate_tower_mass`.
-            tower_section_mass_max (float): Maximum mass of a single tower section, :math:`k1` in
-                the cost equation.
             transport_tower_cost_coeff (float): Transportation cost of a single tower section,
-                :math:`k2` in the cost equation.
+                :math:`k` in the cost equation.
 
         Raises:
             ValueError: Raised if any of the required parameters have not been provided.
@@ -1246,21 +1238,30 @@ class Land2020NLR(CSMBase):
         self.parts_transport_cost = self.transport_misc_parts_cost_coeff * self.turbine_mass
 
     def calculate_transport_cost(self):
-        r"""Calculates and sets :py:attr:`platform_mainframe_cost` if it was not provided by the
-        user.
+        """Calculates and sets :py:attr:`transport_cost` if it was not provided by the user.
 
-        .. math::
-            k * m_crane
+        Sum of transportation costs,:
 
-        where:
-
-        - :math:`k =` :py:attr:`crane_mass_cost_coeff` (:math:`USD/kg`)
-        - :math:`m =` :py:attr:`crane_mass` (:math:`kg`).
+        - :py:attr:`blade_transport_cost`
+        - :py:attr:`hub_transport_cost`
+        - :py:attr:`power_electronics_transport_cost`
+        - :py:attr:`drivetrain_transport_cost`
+        - :py:attr:`tower_transport_cost`
+        - :py:attr:`parts_transport_cost`
 
         Args:
-            crane_mass_cost_coeff (float): Crane cost per kilogram (:math:`USD/kg`).
-            crane_mass (float): Crane mass (:math:`kg`).
-                See :py:meth:`calculate_platform_mainframe_mass` for more details.
+            blade_transport_cost (float): Total blade transportation cost. See
+                :py:meth:`calculate_blade_transport_cost` for more details.
+            hub_transport_cost (float): Hub transportation cost. See
+                :py:meth:`calculate_hub_transport_cost` for more details.
+            power_electronics_transport_cost (float): Power electronics transportation cost. See
+                :py:meth:`calculate_power_electronics_transport_cost` for more details.
+            drivetrain_transport_cost (float): Drivetrain transportation cost. See
+                :py:meth:`calculate_drivetrain_transport_cost` for more details.
+            tower_transport_cost (float): Total tower transportation cost. See
+                :py:meth:`calculate_tower_transport_cost` for more details.
+            parts_transport_cost (float): Miscellaneous parts transportation cost. See
+                :py:meth:`calculate_parts_transport_cost` for more details.
 
         Raises:
             ValueError: Raised if any of the required parameters have not been provided.
