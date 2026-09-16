@@ -47,7 +47,7 @@
         drivetrain_transport_cost, tower_transport_cost, parts_transport_cost,
         parameter_map, parameter_graph, get_results,
         _all_result_names, _mass_result_names, _cost_result_names, _transport_result_names,
-        output_names,
+        output_names, get_component_breakdown,
         fields, fields_dict, _has_values, _validate_inputs, _prepare_calculation,
         parameterize, parameterize_subset, run, get_dependent_attributes,
         get_descendant_attributes, _get_attr_map,

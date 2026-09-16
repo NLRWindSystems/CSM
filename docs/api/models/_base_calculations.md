@@ -69,5 +69,5 @@ listed above. |
 | [`calculate_rotor_cost`](#csm.models.CSMBase.calculate_rotor_cost)() | Calculate cost of the rotor. |
 | [`calculate_turbine_mass`](#csm.models.CSMBase.calculate_turbine_mass)() | Calculate mass of the turbine. |
 | [`calculate_turbine_cost`](#csm.models.CSMBase.calculate_turbine_cost)() | Calculate cost of the turbine. |
-| [`calculate_subsystem_transportation_cost`](#csm.models.CSMBase.calculate_subsystem_transportation_cost)() | Calculate cost of all the independently transported components listed above. |
-| [`calculate_transportation_cost`](#csm.models.CSMBase.calculate_transportation_cost)() | Calculate cost of transporting the turbine's components to the site. |
+| [`calculate_subsystem_transport_cost`](#csm.models.CSMBase.calculate_subsystem_transport_cost)() | Calculate cost of all the independently transported components listed above. |
+| [`calculate_transport_cost`](#csm.models.CSMBase.calculate_transport_cost)() | Calculate cost of transporting the turbine's components to the site. |

@@ -1,4 +1,4 @@
-(api:base-model)=
+(api:model-utils)=
 # Utilities
 
 ```{eval-rst}
