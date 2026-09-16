@@ -1324,7 +1324,7 @@ class CSMBase:
         """Calculates and sets :py:attr:`pitch_system_mass` if it was not provided by the user.
 
         First, the pitch bearing mass is calculated as
-        :math:`m_{bearing} = k*m_{blade}*{num_blades} + b1`. Then the total pitch system mass,
+        :math:`m_{bearing} = k*m_{blade}*N_{blades} + b1`. Then the total pitch system mass,
         including with bearing housing is calculated as :math:`mass = (1+h)*m_{bearing} + b2`.
         The values of the constants were NOT updated in 2015 and are the same as the original CSM.
 
@@ -1332,6 +1332,7 @@ class CSMBase:
 
         - :math:`k =` :py:attr:`pitch_bearing_mass_coeff`
         - :math:`m_{blade} =` :py:attr:`blade_mass`
+        - :math:`N_{blades} =` :py:attr:`num_blades`
         - :math:`b1 =` :py:attr:`pitch_bearing_mass_intercept`
         - :math:`h =` :py:attr:`bearing_housing_fraction`
         - :math:`b2 =` :py:attr:`mass_sys_offset`
@@ -1389,10 +1390,10 @@ class CSMBase:
         self.pitch_system_cost = self.pitch_system_mass_cost_coeff * self.pitch_system_mass
 
     def calculate_spinner_mass(self):
-        """Calculates and sets :py:attr:`spinner_mass` (nose cone mass) if it was not provided by
+        r"""Calculates and sets :py:attr:`spinner_mass` (nose cone mass) if it was not provided by
         the user.
 
-        .. math:: k * rotor_diameter + b
+        .. math:: k * rotor\_diameter + b
 
         where:
 
@@ -1444,15 +1445,15 @@ class CSMBase:
     def calculate_low_speed_shaft_mass(self):
         """Calculates and sets :py:attr:`low_speed_shaft_mass` if it was not provided by the user.
 
-        :math:`m_{lss} = k*(m_{blade}*power)^b1 + b2`.
+        :math:`m_{lss} = k*(m_{blade}*power)^{b_1} + b_2`.
 
         where:
 
         - :math:`k =` :py:attr:`lss_mass_coeff`
         - :math:`power =` :py:attr:`rated_power_kw` / 1000
         - :math:`m_{blade} =` :py:attr:`blade_mass`
-        - :math:`b1 =` :py:attr:`lss_mass_exp`
-        - :math:`b2 =` :py:attr:`lss_mass_intercept`
+        - :math:`b_1 =` :py:attr:`lss_mass_exp`
+        - :math:`b_2 =` :py:attr:`lss_mass_intercept`
 
         Args:
             rated_power_kw (int, optional): Turbine nameplate capacity, (:math:`kW`).
@@ -1499,15 +1500,15 @@ class CSMBase:
         self.low_speed_shaft_cost = self.lss_mass_cost_coeff * self.low_speed_shaft_mass
 
     def calculate_bearing_mass(self):
-        """Calculates and sets :py:attr:`bearing_mass` for the main bearing if it was not provided
+        r"""Calculates and sets :py:attr:`bearing_mass` for the main bearing if it was not provided
         by the user.
 
-        .. math:: k*rotor_diameter^b
+        .. math:: k*rotor\_diameter^b
 
         where:
 
         - :math:`k =` :py:attr:`bearing_mass_coeff`
-        - :math:`rotor_diameter =` :py:attr:`rotor_diameter`
+        - :math:`rotor\_diameter =` :py:attr:`rotor_diameter`
         - :math:`b =` :py:attr:`bearing_mass_exp`
 
         Args:
@@ -1550,8 +1551,21 @@ class CSMBase:
         self.bearing_cost = self.bearing_mass_cost_coeff * self.bearing_mass
 
     def calculate_rotor_torque(self):
-        """Calculates and sets :py:attr:`rated_rpm` and :py:attr:`rotor_torque` if they were not
-        provided by the user.
+        r"""Calculates and sets :py:attr:`rated_rpm` and :py:attr:`rotor_torque` (:math:`\tau`) if
+        they were not provided by the user.
+
+        .. math::
+            power_{hub} = power_{turbine} / efficiency \\
+            v_{rotor} = v_{tip} / r \\
+            rated\_rpm = v_{rotor} / (2\pi) * 60.0 \\
+            \tau = power_{hub} / v_{rotor} \\
+
+        where:
+
+        - :math:`power_{turbine} =` :py:attr:`rated_power_kw` (:math:`kW`)
+        - :math:`efficiency =` :py:attr:`efficiency_max` as a decimal.
+        - :math:`r =` :py:attr:`rotor_diameter` / 2 (:math:`m`)
+        - :math:`v_tip =` :py:attr:`max_tip_speed` (:math:`m/s`)
 
         Args:
             rotor_diameter (float): Turbine rotor diameter (:math:`m`).
@@ -1568,21 +1582,21 @@ class CSMBase:
             return
 
         rated_hub_power = self.rated_power_kw / self.efficiency_max
-        rotor_speed = self.max_tip_speed / (0.5 * self.rotor_diameter)
+        rotor_speed = self.max_tip_speed / self.rotor_radius
         if not rpm_exists:
             self.rated_rpm = rotor_speed / (2.0 * math.pi) * 60.0
         if not torque_exists:
             self.rotor_torque = rated_hub_power / rotor_speed
 
     def calculate_gearbox_mass(self):
-        """Calculates and sets :py:attr:`gearbox_mass` for the gearbox if it was not provided
+        r"""Calculates and sets :py:attr:`gearbox_mass` for the gearbox if it was not provided
         by the user.
 
-        .. math:: torque * 1000 / b
+        .. math:: \tau * 1000 / b
 
         where:
 
-        - :math:`torque =` :py:attr:`rotor_torque`
+        - :math:`\tau =` :py:attr:`rotor_torque`
         - :math:`b =` :py:attr:`gearbox_torque_density`
 
         Args:
@@ -1599,20 +1613,22 @@ class CSMBase:
         self.gearbox_mass = self.rotor_torque * 1e3 / self.gearbox_torque_density
 
     def calculate_gearbox_cost(self):
-        """Calculates and sets :py:attr:`gearbox_cost` if it was not provided by the user.
+        r"""Calculates and sets :py:attr:`gearbox_cost` if it was not provided by the user.
 
-        .. math:: k * m_{gearbox} * {gearbox_torque_cost} / 1000
+        .. math:: k * m_{gearbox} \rho_{\tau} * c_{\tau} / 1000
 
         where:
 
         - :math:`k =` :py:attr:`gearbox_mass_cost_coeff` (:math:`USD/kg`)
         - :math:`m =` :py:attr:`gearbox_mass` (:math:`kg`).
+        - :math:`\rho_{|tau} =` :py:attr:`gearbox_torque_density` (:math:`Nm/kg`).
+        - :math:`c_{|tau} =` :py:attr:`gearbox_torque_cost` (:math:`USD/kN/m`).
 
         Args:
             gearbox_mass (float): Main bearing mass (:math:`kg`). See
                 :py:meth:`calculate_gearbox_mass` for more details.
-            gearbox_torque_density (float): :math:`k` in the mass equation above (:math:`N*m/kg`).
-            gearbox_torque_cost (float): Gearbox cost per :math:`N*m` (:math:`USD/kN/m`).
+            gearbox_torque_density (float): :math:`k` in the mass equation above (:math:`Nm/kg`).
+            gearbox_torque_cost (float): Gearbox cost per :math:`Nm` (:math:`USD/kNm`).
 
         Raises:
             ValueError: Raised if any of the required parameters have not been provided.
@@ -1626,13 +1642,13 @@ class CSMBase:
         )
 
     def calculate_brake_mass(self):
-        """Calculates and sets :py:attr:`brake_mass` for if it was not provided by the user.
+        r"""Calculates and sets :py:attr:`brake_mass` for if it was not provided by the user.
 
-        .. math:: k * torque
+        .. math:: k * \tau
 
         where:
 
-        - :math:`torque =` :py:attr:`rotor_torque`
+        - :math:`\tau =` :py:attr:`rotor_torque`
         - :math:`k =` :py:attr:`brake_mass_coeff`
 
         Args:
@@ -1701,9 +1717,9 @@ class CSMBase:
         self.high_speed_shaft_mass = self.hss_mass_coeff * self.rated_power_kw
 
     def calculate_high_speed_shaft_cost(self):
-        """Calculates and sets :py:attr:`high_speed_shaft_cost` if it was not provided by the user.
+        r"""Calculates and sets :py:attr:`high_speed_shaft_cost` if it was not provided by the user.
 
-        .. math:: k * m_{high_speed_shaft}
+        .. math:: k * m_{high\_speed\_shaft}
 
         where:
 
@@ -1777,13 +1793,13 @@ class CSMBase:
         self.generator_cost = self.generator_mass_cost_coeff * self.generator_mass
 
     def calculate_bedplate_mass(self):
-        """Calculates and sets :py:attr:`bedplate_mass` if it was not provided by the user.
+        r"""Calculates and sets :py:attr:`bedplate_mass` if it was not provided by the user.
 
-        .. math:: rotor_diameter ^ b
+        .. math:: rotor\_diameter ^ b
 
         where:
 
-        - :math:`rotor_diameter =` :py:attr:`rotor_diameter`
+        - :math:`rotor\_diameter =` :py:attr:`rotor_diameter`
         - :math:`b =` :py:attr:`bedplate_mass_exp`
 
         Args:
@@ -1826,19 +1842,19 @@ class CSMBase:
     def calculate_yaw_system_mass(self):
         r"""Calculates and sets :py:attr:`yaw_system_mass` if it was not provided by the user.
 
-        .. math:: k1 * (k2 * rotor\_diameter ^ b)
+        .. math:: k_1 * (k_2 * rotor\_diameter ^ b)
 
         where:
 
-        - :math:`k1 =` :py:attr:`yaw_system_non_bearing_mass_coeff`
-        - :math:`k2 =` :py:attr:`yaw_system_mass_coeff`
+        - :math:`k_1 =` :py:attr:`yaw_system_non_bearing_mass_coeff`
+        - :math:`k_2 =` :py:attr:`yaw_system_mass_coeff`
         - :math:`rotor\_diameter =` :py:attr:`rotor_diameter`
         - :math:`b =` :py:attr:`yaw_system_mass_exp`
 
         Args:
-            yaw_system_non_bearing_mass_coeff (float): :math:`k1` in the mass equation above to
+            yaw_system_non_bearing_mass_coeff (float): :math:`k_1` in the mass equation above to
                 account for non-bearing mass.
-            yaw_system_mass_coeff (float): :math:`k2` in the mass equation above (:math:`kg/kW`).
+            yaw_system_mass_coeff (float): :math:`k_2` in the mass equation above (:math:`kg/kW`).
             rotor_diameter (float): Turbine rotor diameter (:math:`m`).
             yaw_system_mass_exp (bool): :math:`b` in the mass equation above (:math:`kg`).
 
@@ -1902,14 +1918,15 @@ class CSMBase:
         self.hydraulic_cooling_mass = self.hvac_mass_coeff * self.rated_power_kw
 
     def calculate_hydraulic_cooling_cost(self):
-        """Calculates and sets :py:attr:`hydraulic_cooling_cost` if it was not provided by the user.
+        r"""Calculates and sets :py:attr:`hydraulic_cooling_cost` if it was not provided by the
+        user.
 
-        .. math:: k * m_{hydraulic_cooling}
+        .. math:: k * m_{hydraulic\_cooling}
 
         where:
 
         - :math:`k =` :py:attr:`hvac_mass_cost_coeff` (:math:`USD/kg`)
-        - :math:`m =` :py:attr:`hydraulic_cooling_mass` (:math:`kg`).
+        - :math:`m_{hydraulic\_cooling} =` :py:attr:`hydraulic_cooling_mass` (:math:`kg`).
 
         Args:
             hydraulic_cooling_mass (float): Hydraulic cooling mass (:math:`kg`). See
@@ -1982,19 +1999,14 @@ class CSMBase:
         user.
 
         .. math::
-            k * m_{bedplate} + \\left\\{
-                \begin{array}{ll}
-                m_{crane} & has\\_crane \\
-                0 & otherwise \\
-            \\end{array}
-            \right.
+            k * m_{bedplate} + m_{crane} * has\_crane
 
         where:
 
         - :math:`k =` :py:attr:`platform_mainframe_mass_coeff`
         - :math:`m_{bedplate} =` :py:attr:`bedplate_mass`
         - :math:`m_{crane} =` :py:attr:`crane_mass`
-        - :math:`has\\_crane =` :py:attr:`has_crane`
+        - :math:`has\_crane =` :py:attr:`has_crane`
 
         Args:
             has_crane (bool): If True, apply :py:attr:`crane_mass`, otherwise ignore.
@@ -2021,24 +2033,15 @@ class CSMBase:
         user.
 
         .. math::
-            k * (m_{platform\\_mainframe}
-            - \\left\\{
-                \begin{array}{ll}
-                m_{crane} & has\\_crane \\
-                0 & otherwise \\
-            \\end{array}
-            )
-            + \\left\\{
-                \begin{array}{ll}
-                m_{crane} & has\\_crane \\
-                0 & otherwise \\
-            \\end{array}
-            \right.
+            k * (m_{platform\_mainframe} - m_{crane} * has\_crane) + c_{crane} * has\_crane
 
         where:
 
         - :math:`k =` :py:attr:`platform_mainframe_mass_cost_coeff` (:math:`USD/kg`)
         - :math:`m =` :py:attr:`platform_mainframe_mass` (:math:`kg`).
+        - :math:`m_{crane} =` :py:attr:`crane_mass`
+        - :math:`has\_crane =` :py:attr:`has_crane`
+        - :math:`c_{crane} =` :py:attr:`crane_cost`
 
         Args:
             has_crane (bool): If True, apply :py:attr:`crane_cost`, otherwise ignore.
@@ -2226,7 +2229,7 @@ class CSMBase:
     def calculate_tower_mass(self):
         """Calculates and sets :py:attr:`tower_mass` if it was not provided by the user.
 
-        .. math:: k * H_{hub}^b
+        .. math:: k * (H_{hub})^b
 
         where:
 
