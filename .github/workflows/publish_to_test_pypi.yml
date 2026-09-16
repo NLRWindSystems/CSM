@@ -8,7 +8,7 @@ jobs:
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
     environment:
       name: pypi-publishing
-      url: https://test.pypi.org/p/project-name  # TODO: determine PyPI listing name
+      url: https://test.pypi.org/p/turbine-csm
     permissions:
       id-token: write
     steps:

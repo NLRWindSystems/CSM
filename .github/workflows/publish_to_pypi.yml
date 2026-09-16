@@ -8,7 +8,7 @@ jobs:
     if: github.event.action == 'published'
     environment:
       name: pypi-publishing
-      url: https://pypi.org/p/project-name  # TODO: determine PyPI listing name
+      url: https://pypi.org/p/turbine-csm
     permissions:
       id-token: write
     steps:
