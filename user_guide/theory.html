@@ -1,0 +1,1066 @@
+
+<!DOCTYPE html>
+
+
+<html lang="python" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Theory &#8212; CSM</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../_static/documentation_options.js?v=30a733bc"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=b8b12719"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'user_guide/theory';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="canonical" href="https://nlrwindsystems.github.io/CSM/user_guide/theory.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Model Overview" href="model_overview.html" />
+    <link rel="prev" title="CSM by Example" href="../intro/demo.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="python"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../intro.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">CSM</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../intro.html">
+                    NLR Turbine Cost and Scaling Model (CSM)
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../intro/install.html">Installing CSM</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intro/contributing.html">Contributor's Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../intro/demo.html">CSM by Example</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Model Background</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Theory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="model_overview.html">Model Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="new_models.html">Creating a New Model</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api/models/index.html"><code class="docutils literal notranslate"><span class="pre">csm.models</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api/models/base.html">Base Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/models/land_2015.html">NLR Land-Based 2015 Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/models/land_2020.html">NLR Land-Based 2020 Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/models/land_2021.html">NLR Land-Based 2021 Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/models/land_2026.html">NLR Land-Based 2026 Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/models/utils.html">Utilities</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api/tools/index.html">Tools</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api/tools/plot.html">Plotting Library</a></li>
+</ul>
+</details></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/NLRWindSystems/CSM" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/NLRWindSystems/CSM/issues/new?title=Issue%20on%20page%20%2Fuser_guide/theory.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/user_guide/theory.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Theory</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#blades">Blades</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#hub-shell">Hub (Shell)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pitch-system">Pitch System</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinner-nose-cone">Spinner (Nose Cone)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#low-speed-shaft">Low Speed Shaft</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#main-bearings">Main Bearings</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gearbox">Gearbox</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#brake">Brake</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#high-speed-shaft">High Speed Shaft</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#generator">Generator</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#yaw-system">Yaw System</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#hydraulic-cooling">Hydraulic Cooling</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#transformer">Transformer</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cabling-and-electrical-connections">Cabling and Electrical Connections</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#control-system">Control System</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#other-nacelle-equipment">Other Nacelle Equipment</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#bedplate">Bedplate</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#nacelle-cover">Nacelle Cover</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tower">Tower</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sub-system-aggregations">Sub-System Aggregations</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hub-system">Hub System</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#rotor-system">Rotor System</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#nacelle">Nacelle</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#tower-system">Tower System</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#turbine">Turbine</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="theory">
+<span id="id1"></span><h1>Theory<a class="headerlink" href="#theory" title="Link to this heading">#</a></h1>
+<p>Please note this page is sourced, and lightly edited from the original model documentation within
+the WISDEM repository. As such, these scaling relationships are the basis of the <code class="docutils literal notranslate"><span class="pre">CSMBase</span></code> and
+<code class="docutils literal notranslate"><span class="pre">NLR2015Land</span></code> models. For any later models with differing scaling relationships, in-depth
+documentation is forthcoming.</p>
+<p>The theory for the models in this software are based directly on the work described in references <span class="bibtex-citation" id="id2">[<a class="reference internal" href="#id9" title="L. Fingersh, M. Hand, and A. Laxson. Wind turbine design cost and scaling model. NREL/TP-500-40566, National Renewable Energy Laboratory, Golden, CO, December 2005.">Fingersh <em>et al.</em>, 2005</a>, <a class="reference internal" href="#id10" title="R. Harrison and G. Jenkins. Cost modeling of horizontal axis wind turbines. ETSU/W-34-00170-REP, University of Sunderland, School of Environment, Sunderland, UK, December 1993.">Harrison and Jenkins, 1993</a>, <a class="reference internal" href="#id11" title="D.J. Malcolm and A.C. Hansen. Windpact turbine rotor design study. NREL/SR-500-32495, National Renewable Energy Laboratory, Golden, CO, April 2006.">Malcolm and Hansen, 2006</a>, <a class="reference internal" href="#id12" title="B. Maples, M. Hand, and W. Musial. Comparative assessment of direct drive high temperature superconducting generators in multi-megawatt class wind turbines. NREL/TP-5000-49086, National Renewable Energy Laboratory, Golden, CO, October 2010.">Maples <em>et al.</em>, 2010</a>]</span>. This section provides an overview of these simple mass and cost models for the major turbine components.</p>
+<p>The NREL Cost and Scaling Model <span class="bibtex-citation" id="id3">[<a class="reference internal" href="#id9" title="L. Fingersh, M. Hand, and A. Laxson. Wind turbine design cost and scaling model. NREL/TP-500-40566, National Renewable Energy Laboratory, Golden, CO, December 2005.">Fingersh <em>et al.</em>, 2005</a>]</span> provides a simple cost and sizing tool to
+estimate wind turbine component masses and costs based on a small number of input parameters such
+as rotor diameter, hub height and rated power. The model was developed over several results
+following the Wind Partnerships for Advanced Component Technology (WindPACT) work that occurred
+between roughly 2002 to 2005. The original form of the cost model was based on an earlier model
+from 1993 out of the University of Sunderland (the Sunderland Model) <span class="bibtex-citation" id="id4">[<a class="reference internal" href="#id10" title="R. Harrison and G. Jenkins. Cost modeling of horizontal axis wind turbines. ETSU/W-34-00170-REP, University of Sunderland, School of Environment, Sunderland, UK, December 1993.">Harrison and Jenkins, 1993</a>]</span>. The
+Sunderland Model created a set of wind turbine models to estimate the mass and cost of all major
+wind turbine components including: blade, hub system [hub, pitch system, and nose cone], nacelle
+[low speed shaft, main bearings, gearbox, high speed shaft/mechanical brake, generator, variable
+speed electronics, electrical cabling, mainframe [bedplate, platforms and railings, base hardware,
+and crane], HVAC system, controls, and nacelle cover], and tower. The Sunderland model was based
+on a set of semi-empirical models for each component which estimated design loads at the rotor,
+propagated these loads through the entire system, and used the loads to estimate the size of each
+component calibrated to data on actual turbines in the field during that time. Cost estimates were
+then made on a per weight basis using a multiplier again based on field data or industry sources.</p>
+<p>To arrive at the NREL Cost and Scaling Model, the WindPACT studies began in many cases with the
+Sunderland model and updated the results with new coefficients or, in some cases, with entirely
+new cost equations based on curve fits of key design parameters (rotor diameter, etc) to the
+results of detailed design studies <span class="bibtex-citation" id="id5">[<a class="reference internal" href="#id11" title="D.J. Malcolm and A.C. Hansen. Windpact turbine rotor design study. NREL/SR-500-32495, National Renewable Energy Laboratory, Golden, CO, April 2006.">Malcolm and Hansen, 2006</a>]</span>. In addition, the WindPACT work established
+estimates of costs associated with balance of station and operations and maintenance for a
+fictitious wind plant in North Dakota which led to an overall cost of energy model for a wind plant.
+The key cost of energy equation for a wind plant is given in the NREL Cost and Scaling Model
+<span class="bibtex-citation" id="id6">[<a class="reference internal" href="#id9" title="L. Fingersh, M. Hand, and A. Laxson. Wind turbine design cost and scaling model. NREL/TP-500-40566, National Renewable Energy Laboratory, Golden, CO, December 2005.">Fingersh <em>et al.</em>, 2005</a>]</span> as:</p>
+<div class="math notranslate nohighlight">
+\[COE = (FCR*(BOS+TCC))/AEP + (LLC + LRC + (1-tr)*OM)/AEP\]</div>
+<p>where <span class="math notranslate nohighlight">\(COE\)</span> in this equation is a simple estimate of a wind plant cost of energy, <span class="math notranslate nohighlight">\(FCR\)</span> is the
+fixed charge rate for the project, <span class="math notranslate nohighlight">\(BOS\)</span> are the total balance of station costs for the project,
+<span class="math notranslate nohighlight">\(TCC\)</span> are the total turbine capital costs for the project, <span class="math notranslate nohighlight">\(AEP\)</span> is the annual energy production
+for the project, <span class="math notranslate nohighlight">\(LLC\)</span> are the annual land-lease costs, <span class="math notranslate nohighlight">\(LRC\)</span> is the levelized replacement cost
+for major part replacement, <span class="math notranslate nohighlight">\(tr\)</span> is the tax rate, and <span class="math notranslate nohighlight">\(OM\)</span> are the annual operations and
+maintenance costs which are tax deductible.</p>
+<p>While the NREL Cost and Scaling Model improved the overall cost estimation for larger turbines on
+the order of 1 MW+, it abstracted away from the engineering analysis foundations of the original
+Sunderland model. This is depicted in the below figure where it can be seen that the
+engineering-analysis has been replaced by a series of curve fits which relate a small number of
+design parameters to mass and cost estimates for major wind turbine components.</p>
+<p>.. _NRELCSM:</p>
+<figure class="align-center" id="id13">
+<a class="reference internal image-reference" href="../_images/NRELCSM.png"><img alt="../_images/NRELCSM.png" src="../_images/NRELCSM.png" style="width: 5.5in;" />
+</a>
+<figcaption>
+<p><span class="caption-number">Fig. 1 </span><span class="caption-text">NREL Cost and Scaling Model Key Input-Output Relationships. TODO: REFRESH GRAPHIC</span><a class="headerlink" href="#id13" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>The resulting NREL Cost and Scaling Model (as provided in <code class="docutils literal notranslate"><span class="pre">NREL_CSM_TCC</span></code>) allows for a variety of
+interesting analyses including scaling of conventional technology from under a MW to 5 MW+,
+assessing impact of trends in input factors for materials and labor on wind plant cost of energy,
+etc. However, it does not preserve the underlying engineering relationships of the original
+Sunderland model and thus loses some fidelity of assessing how design changes may impact syste
+costs.</p>
+<p>The goal of the development of the second model, <code class="docutils literal notranslate"><span class="pre">Turbine_CostsSE</span></code>, then is to provide a set of
+mass-based component cost calculations. A mass-cost model is developed for each of the major
+turbine components. These use the data underlying the NREL Cost and Scaling Model to estimate
+relationships that can then be scaled based on economic multipliers as done in <span class="bibtex-citation" id="id7">[<a class="reference internal" href="#id9" title="L. Fingersh, M. Hand, and A. Laxson. Wind turbine design cost and scaling model. NREL/TP-500-40566, National Renewable Energy Laboratory, Golden, CO, December 2005.">Fingersh <em>et al.</em>, 2005</a>]</span>.
+Details of the models are described next.</p>
+<p>TODO</p>
+<ul class="simple">
+<li><p>The equation for blade costs includes both materials and manufacturing.</p></li>
+</ul>
+<section id="blades">
+<h2>Blades<a class="headerlink" href="#blades" title="Link to this heading">#</a></h2>
+<p>To obtain the blade mass in kilograms and cost in USD from the rotor diameter in meters,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}m_{blade} &amp;= k_m (0.5 D_{rotor})^{b}\\
+c_{blade} &amp;= k_c m_{blade}\\
+k_m &amp;= 0.5\\
+b   &amp;= (see below)\\
+k_c &amp;= 14.6\end{split}\]</div>
+<p>Where <span class="math notranslate nohighlight">\(D_{rotor}` is the rotor diameter and \)</span>b` is determined by:</p>
+<ul class="simple">
+<li><p>If turbine class I and blade DOES have carbon fiber spar caps, <span class="math notranslate nohighlight">\(b=2.47\)</span></p></li>
+<li><p>If turbine class I and blade DOES NOT have carbon fiber spar caps, <span class="math notranslate nohighlight">\(b=2.54\)</span></p></li>
+<li><p>If turbine class II+ and blade DOES have carbon fiber spar caps, <span class="math notranslate nohighlight">\(b=2.44\)</span></p></li>
+<li><p>If turbine class II+ and blade DOES NOT have carbon fiber spar caps, <span class="math notranslate nohighlight">\(b=2.50\)</span></p></li>
+<li><p>User override of exponent value</p></li>
+</ul>
+<p>For variable names access to override the default values see the :ref:<code class="docutils literal notranslate"><span class="pre">csmsource</span></code>.</p>
+<p>The mass scaling relationships are based on the following data,</p>
+<figure class="align-center">
+<a class="reference internal image-reference" href="../_images/BladeMass.png"><img alt="../_images/BladeMass.png" src="../_images/BladeMass.png" style="width: 5in;" />
+</a>
+</figure>
+</section>
+<section id="hub-shell">
+<h2>Hub (Shell)<a class="headerlink" href="#hub-shell" title="Link to this heading">#</a></h2>
+<p>To obtain the hub shell mass in kilograms and cost in USD from the blade mass in kilograms,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}   m_{hub} &amp;= k_m m_{blade} + b\\
+   c_{hub} &amp;= k_c m_{hub}\\
+   k_m &amp;= 2.3\\
+   b   &amp;= 1320\\
+   k_c &amp;= 3.9\end{split}\]</div>
+<p>For variable names access to override the default values see the :ref:<code class="docutils literal notranslate"><span class="pre">csmsource</span></code>.</p>
+<p>The mass scaling relationships are based on the following data,</p>
+<figure class="align-center">
+<a class="reference internal image-reference" href="../_images/HubMass.png"><img alt="../_images/HubMass.png" src="../_images/HubMass.png" style="width: 4in;" />
+</a>
+</figure>
+</section>
+<section id="pitch-system">
+<h2>Pitch System<a class="headerlink" href="#pitch-system" title="Link to this heading">#</a></h2>
+<p>To obtain the pitch bearing and system mass in kilograms and cost in USD from the blade mass in
+kilograms,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}m_{bearing} &amp;= n_{blade} k_m m_{blade} + b_1\\
+m_{pitch} &amp;= m_{bearing} (1 + h) + b_2\\
+c_{pitch} &amp;= k_c m_{pitch}\\
+k_m &amp;= 0.1295\\
+b_1 &amp;= 491.31\\
+b_2 &amp;= 555\\
+h   &amp;= 0.328\\
+k_c &amp;= 22.1\end{split}\]</div>
+<p>Where <span class="math notranslate nohighlight">\(n_{blade}\)</span> is the number of blades, <span class="math notranslate nohighlight">\(h\)</span> is fractional mass of the pitch bearing housing.</p>
+<p>For variable names access to override the default values see the :ref:<code class="docutils literal notranslate"><span class="pre">csmsource</span></code>.</p>
+</section>
+<section id="spinner-nose-cone">
+<h2>Spinner (Nose Cone)<a class="headerlink" href="#spinner-nose-cone" title="Link to this heading">#</a></h2>
+<p>To obtain the spinner (nose cone) mass in kilograms and cost in USD from the rotor diameter in
+meters,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}m_{spin} &amp;= k_m D_{rotor} + b\\
+c_{spin} &amp;= k_c m_{spin}\\
+k_m &amp;= 15.5\\
+b   &amp;= -980\\
+k_c &amp;= 11.1\end{split}\]</div>
+<p>For variable names access to override the default values see the :ref:<code class="docutils literal notranslate"><span class="pre">csmsource</span></code>.</p>
+<p>The mass scaling relationships are based on the following data,</p>
+<figure class="align-center">
+<a class="reference internal image-reference" href="../_images/SpinnerMass.png"><img alt="../_images/SpinnerMass.png" src="../_images/SpinnerMass.png" style="width: 4in;" />
+</a>
+</figure>
+</section>
+<section id="low-speed-shaft">
+<h2>Low Speed Shaft<a class="headerlink" href="#low-speed-shaft" title="Link to this heading">#</a></h2>
+<p>To obtain the low speed shaft mass in kilograms and cost in USD from the blade mass in kilograms
+and the machine rating in megawatts,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}m_{lss} &amp;= k_m (m_{blade} P_{turbine})^{b_1} + b_2\\
+c_{lss} &amp;= k_c m_{lss}\\
+k_m &amp;= 13\\
+b_1 &amp;= 0.65\\
+b_2 &amp;= 775\\
+k_c &amp;= 11.9\end{split}\]</div>
+<p>Where <span class="math notranslate nohighlight">\(P_{turbine}\)</span> is the machine rating.</p>
+<p>For variable names access to override the default values see the :ref:<code class="docutils literal notranslate"><span class="pre">csmsource</span></code>.</p>
+<p>The mass scaling relationships are based on the following data,</p>
+<figure class="align-center">
+<a class="reference internal image-reference" href="../_images/LssMass.png"><img alt="../_images/LssMass.png" src="../_images/LssMass.png" style="width: 4in;" />
+</a>
+</figure>
+</section>
+<section id="main-bearings">
+<h2>Main Bearings<a class="headerlink" href="#main-bearings" title="Link to this heading">#</a></h2>
+<p>To obtain the main bearings mass in kilograms and cost in USD from the rotor diameter in meters,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}m_{bearing} &amp;= n_{bearing} k_m D_{rotor}^b\\
+c_{bearing} &amp;= k_c m_{bearing}\\
+k_m &amp;= 0.0001\\
+b   &amp;= 3.5\\
+k_c &amp;= 4.5\end{split}\]</div>
+<p>Where <span class="math notranslate nohighlight">\(D_{rotor}\)</span> is the rotor diameter and <span class="math notranslate nohighlight">\(n_{bearing}\)</span> is the number of bearings. For
+variable names access to override the default values see the :ref:<code class="docutils literal notranslate"><span class="pre">csmsource</span></code>. The mass scaling
+relationships are based on the following data,</p>
+<figure class="align-center">
+<a class="reference internal image-reference" href="../_images/BearingMass.png"><img alt="../_images/BearingMass.png" src="../_images/BearingMass.png" style="width: 4in;" />
+</a>
+</figure>
+</section>
+<section id="gearbox">
+<h2>Gearbox<a class="headerlink" href="#gearbox" title="Link to this heading">#</a></h2>
+<p>To obtain the main bearings mass in kilograms and cost in USD from the rotor torque in kilo-Newton
+meters,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}m_{gearbox} &amp;= k_m Q_{rotor}^b\\
+c_{gearbox} &amp;= k_c m_{gearbox}\\
+k_m &amp;= 113\\
+b   &amp;= 0.71\\
+k_c &amp;= 12.9\end{split}\]</div>
+<p>Where <span class="math notranslate nohighlight">\(Q_{rotor}\)</span> is the rotor torque in kilo-Newton meters and is approximated by,</p>
+<div class="math notranslate nohighlight">
+\[Q_{rotor} = \frac{0.5 P_{turbine} D_{rotor}}{\eta V_{tip}}\]</div>
+<p>Where <span class="math notranslate nohighlight">\(P_{turbine}\)</span> is the machine rating in kilowatts, <span class="math notranslate nohighlight">\(D_{rotor}\)</span> is the rotor diameter in meters,
+<span class="math notranslate nohighlight">\(V_{tip}\)</span> is the max tip speed in meters per second, and <span class="math notranslate nohighlight">\(\eta\)</span> is the drivetrain efficiency (as a
+fraction between zero and one).</p>
+<p>For variable names access to override the default values see the :ref:<code class="docutils literal notranslate"><span class="pre">csmsource</span></code>.</p>
+<p>The mass scaling relationships are based on the following data,</p>
+<figure class="align-center">
+<a class="reference internal image-reference" href="../_images/GearboxMass.png"><img alt="../_images/GearboxMass.png" src="../_images/GearboxMass.png" style="width: 4in;" />
+</a>
+</figure>
+</section>
+<section id="brake">
+<h2>Brake<a class="headerlink" href="#brake" title="Link to this heading">#</a></h2>
+<p>To obtain the brake mass in kilograms and cost in USD from the rotor torque in kilo-Newton meters
+(updated in 2020 by J. Keller)),</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}m_{brake} &amp;= k_m Q_{rotor}\\
+c_{brake} &amp;= k_c m_{brake}\\
+k_m &amp;= 1.22\\
+k_c &amp;= 3.6254\end{split}\]</div>
+<p>Where <span class="math notranslate nohighlight">\(Q_{rotor}\)</span> is the rotor torque and is approximated above.</p>
+<p>For variable names access to override the default values see the :ref:<code class="docutils literal notranslate"><span class="pre">csmsource</span></code>.</p>
+</section>
+<section id="high-speed-shaft">
+<h2>High Speed Shaft<a class="headerlink" href="#high-speed-shaft" title="Link to this heading">#</a></h2>
+<p>To obtain the high speed shaft mass in kilograms and cost in USD from the machine rating in
+megawatts,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}m_{hss} &amp;= k_m P_{turbine}\\
+c_{hss} &amp;= k_c m_{hss}\\
+k_m &amp;= 198.94\\
+k_c &amp;= 6.8\end{split}\]</div>
+<p>Where <span class="math notranslate nohighlight">\(P_{turbine}\)</span> is the machine rating.</p>
+<p>For variable names access to override the default values see the :ref:<code class="docutils literal notranslate"><span class="pre">csmsource</span></code>.</p>
+</section>
+<section id="generator">
+<h2>Generator<a class="headerlink" href="#generator" title="Link to this heading">#</a></h2>
+<p>To obtain the generator mass in kilograms and cost in USD from the machine rating in kilowatts,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}m_{generator} &amp;= k_m P_{turbine} + b\\
+c_{generator} &amp;= k_c m_{generator}\\
+k_m &amp;= 2.3\\
+b   &amp;= 3400\\
+k_c &amp;= 12.4\end{split}\]</div>
+<p>Where <span class="math notranslate nohighlight">\(P_{turbine}\)</span> is the machine rating.</p>
+<p>For variable names access to override the default values see the :ref:<code class="docutils literal notranslate"><span class="pre">csmsource</span></code>.</p>
+<p>The mass scaling relationships are based on the following data,</p>
+<figure class="align-center">
+<a class="reference internal image-reference" href="../_images/GeneratorMass.png"><img alt="../_images/GeneratorMass.png" src="../_images/GeneratorMass.png" style="width: 4in;" />
+</a>
+</figure>
+</section>
+<section id="yaw-system">
+<h2>Yaw System<a class="headerlink" href="#yaw-system" title="Link to this heading">#</a></h2>
+<p>To obtain the yaw system mass in kilograms and cost in USD from the rotor diameter in meters,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}m_{yaw} &amp;= k_m D_{rotor}^b\\
+c_{yaw} &amp;= k_c m_{yaw}\\
+k_m &amp;= 0.0009\\
+b   &amp;= 3.314\\
+k_c &amp;= 8.3\end{split}\]</div>
+<p>Where <span class="math notranslate nohighlight">\(D_{rotor}\)</span> is the rotor diameter.</p>
+<p>For variable names access to override the default values see the :ref:<code class="docutils literal notranslate"><span class="pre">csmsource</span></code>.</p>
+</section>
+<section id="hydraulic-cooling">
+<h2>Hydraulic Cooling<a class="headerlink" href="#hydraulic-cooling" title="Link to this heading">#</a></h2>
+<p>To obtain the hydraulic cooling mass in kilograms and cost in USD from the machine rating in
+megawatts,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}m_{hvac} &amp;= k_m P_{turbine}\\
+c_{hvac} &amp;= k_c m_{hvac}\\
+k_m &amp;= 80\\
+k_c &amp;= 124\end{split}\]</div>
+<p>Where $P_{turbine}` is the machine rating.</p>
+<p>For variable names access to override the default values see the :ref:<code class="docutils literal notranslate"><span class="pre">csmsource</span></code>.</p>
+</section>
+<section id="transformer">
+<h2>Transformer<a class="headerlink" href="#transformer" title="Link to this heading">#</a></h2>
+<p>To obtain the transformer mass in kilograms and cost in USD from the machine rating in kilowatts,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}m_{transformer} &amp;= k_m P_{turbine} + b\\
+c_{transformer} &amp;= k_c m_{transformer}\\
+k_m &amp;= 1.915\\
+b   &amp;= 1910\\
+k_c &amp;= 18.8\end{split}\]</div>
+<p>For variable names access to override the default values see the :ref:<code class="docutils literal notranslate"><span class="pre">csmsource</span></code>.</p>
+<p>The mass scaling relationships are based on the following data,</p>
+<figure class="align-center">
+<a class="reference internal image-reference" href="../_images/TransformerMass.png"><img alt="../_images/TransformerMass.png" src="../_images/TransformerMass.png" style="width: 4in;" />
+</a>
+</figure>
+</section>
+<section id="cabling-and-electrical-connections">
+<h2>Cabling and Electrical Connections<a class="headerlink" href="#cabling-and-electrical-connections" title="Link to this heading">#</a></h2>
+<p>To obtain the cabling and electrical connections cost in USD (there is no mass calculated) from the
+machine rating in megawatts,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}c_{connect} &amp;= k_c P_{turbine}\\
+k_c &amp;= 41850\end{split}\]</div>
+<p>Where <span class="math notranslate nohighlight">\(P_{turbine}\)</span> is the machine rating.</p>
+<p>For variable names access to override the default values see the :ref:<code class="docutils literal notranslate"><span class="pre">csmsource</span></code>.</p>
+</section>
+<section id="control-system">
+<h2>Control System<a class="headerlink" href="#control-system" title="Link to this heading">#</a></h2>
+<p>To obtain the control system cost in USD (there is no mass calculated) from the machine rating in
+megawatts,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}c_{control} &amp;= k_c P_{turbine}\\
+k_c &amp;= 21150\end{split}\]</div>
+<p>Where <span class="math notranslate nohighlight">\(P_{turbine}\)</span> is the machine rating.</p>
+<p>For variable names access to override the default values see the :ref:<code class="docutils literal notranslate"><span class="pre">csmsource</span></code>.</p>
+</section>
+<section id="other-nacelle-equipment">
+<h2>Other Nacelle Equipment<a class="headerlink" href="#other-nacelle-equipment" title="Link to this heading">#</a></h2>
+<p>To obtain the nacelle platform and service crane mass in kilograms and cost in USD from the bedplate
+mass in kilograms,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}m_{platform} &amp;= k_m m_{bedplate}\\
+c_{platform} &amp;= k_c m_{platform}\\
+m_{crane} &amp;= 3000\\
+c_{crane} &amp;= 12000\\
+k_m &amp;= 0.125\\
+k_c &amp;= 17.1\end{split}\]</div>
+<p>Note that the service crane is optional with a flag set by the user.</p>
+<p>For variable names access to override the default values see the :ref:<code class="docutils literal notranslate"><span class="pre">csmsource</span></code>.</p>
+</section>
+<section id="bedplate">
+<h2>Bedplate<a class="headerlink" href="#bedplate" title="Link to this heading">#</a></h2>
+<p>To obtain the bedplate mass in kilograms and cost in USD from the rotor diameter in meters,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}m_{bedplate} &amp;= D_{rotor}^b\\
+c_{bedplate} &amp;= k_c m_{bedplate}\\
+b   &amp;= 2.2\\
+k_c &amp;= 2.9\end{split}\]</div>
+<p>Where <span class="math notranslate nohighlight">\(D_{rotor}\)</span> is the rotor diameter. The mass scaling relationships are based on the following
+data,</p>
+<figure class="align-center">
+<a class="reference internal image-reference" href="../_images/BedplateMass.png"><img alt="../_images/BedplateMass.png" src="../_images/BedplateMass.png" style="width: 4in;" />
+</a>
+</figure>
+<p>For variable names access to override the default values see the :ref:<code class="docutils literal notranslate"><span class="pre">csmsource</span></code>.</p>
+</section>
+<section id="nacelle-cover">
+<h2>Nacelle Cover<a class="headerlink" href="#nacelle-cover" title="Link to this heading">#</a></h2>
+<p>To obtain the nacelle cover mass in kilograms and cost in USD from the machine rating in kilowatts,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}m_{cover} &amp;= k_m P_{turbine} + b\\
+c_{cover} &amp;= k_c m_{cover}\\
+k_m &amp;= 1.2817\\
+b   &amp;= 428.19\\
+k_c &amp;= 5.7\end{split}\]</div>
+<p>Where <span class="math notranslate nohighlight">\(P_{turbine}\)</span> is the machine rating.</p>
+<p>For variable names access to override the default values see the :ref:<code class="docutils literal notranslate"><span class="pre">csmsource</span></code>.</p>
+</section>
+<section id="tower">
+<h2>Tower<a class="headerlink" href="#tower" title="Link to this heading">#</a></h2>
+<p>To obtain the tower mass in kilograms and cost in USD from the tower length in meters,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}m_{tower} &amp;= k_m L_{tower}^b\\
+c_{tower} &amp;= k_c m_{tower}\\
+k_m &amp;= 19.828\\
+b   &amp;= 2.0282\\
+k_c &amp;= 2.9\end{split}\]</div>
+<p>Where <span class="math notranslate nohighlight">\(L_{tower}\)</span> is the hub height for onshore turbines and the distance from transition piece to
+hub height offshore.</p>
+<p>For variable names access to override the default values see the :ref:<code class="docutils literal notranslate"><span class="pre">csmsource</span></code>.</p>
+<p>The mass scaling relationships are based on the following data,</p>
+<figure class="align-center">
+<a class="reference internal image-reference" href="../_images/TowerMass.png"><img alt="../_images/TowerMass.png" src="../_images/TowerMass.png" style="width: 4in;" />
+</a>
+</figure>
+</section>
+<section id="sub-system-aggregations">
+<h2>Sub-System Aggregations<a class="headerlink" href="#sub-system-aggregations" title="Link to this heading">#</a></h2>
+<p>There are further aggregations of the components into sub-systems, at which point additional costs
+and/or multipliers are included. For the mass accounting, this includes hub system mass, rotor mass,
+nacelle mass, and total turbine mass,</p>
+<section id="hub-system">
+<h3>Hub System<a class="headerlink" href="#hub-system" title="Link to this heading">#</a></h3>
+<p>It is assumed that the hub system is assembled and transported as a one unit, thus there are
+additional costs at this level of aggregation,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}m_{hubsys} &amp;= m_{hub} + m_{pitch} + m_{spinner}\\
+c_{hubsys} &amp;= (1+kt_{hubsys}+kp_{hubsys}) (1+ko_{hubsys}+ka_{hubsys}) (c_{hub} + c_{pitch} + c_{spinner})\end{split}\]</div>
+<p>Where conceptually, <span class="math notranslate nohighlight">\(k\)</span> is a transportation multiplier, <span class="math notranslate nohighlight">\(kp\)</span> is a profit multiplier, <span class="math notranslate nohighlight">\(ko\)</span> is an
+overhead cost multiplier, and <span class="math notranslate nohighlight">\(ka\)</span> is an assembly cost multiplier. By default, <span class="math notranslate nohighlight">\(kt=kp=ko=ka=0\)</span>.</p>
+<p>For variable names access to override the default values see the :ref:<code class="docutils literal notranslate"><span class="pre">csmsource</span></code>.</p>
+</section>
+<section id="rotor-system">
+<h3>Rotor System<a class="headerlink" href="#rotor-system" title="Link to this heading">#</a></h3>
+<p>The rotor mass and cost is aggregated for conceptual convenience, but it is assumed to b
+transported in separate pieces and assembled on-site, so there are no separate sub-system cost
+multipliers.</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}m_{rotor} &amp;= n_{blade} m_{blade} + m_{hubsys}\\
+c_{rotor} &amp;= n_{blade} c_{blade} + c_{hubsys}\end{split}\]</div>
+<p>For variable names access to override the default values see the :ref:<code class="docutils literal notranslate"><span class="pre">csmsource</span></code>.</p>
+</section>
+<section id="nacelle">
+<h3>Nacelle<a class="headerlink" href="#nacelle" title="Link to this heading">#</a></h3>
+<p>It is assumed that the nacelle and all of its sub-components are assembled and transported as a one
+unit, thus there are additional costs at this level of aggregation,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}m_{nacelle} &amp;= m_{lss} + m_{bearing} + m_{gearbox} + m_{hss} + m_{generator} +m_{bedplate} + \\
+&amp;m_{yaw} + m_{hvac} + m_{transformer} + m_{platform} + m_{cover}\\
+c_{parts} &amp;= c_{lss} + c_{bearing} + c_{gearbox} + c_{hss} + c_{generator} +c_{bedplate} + \\
+&amp;c_{yaw} + c_{hvac} + c_{transformer} + c_{connect} + c_{control} + c_{platform} + c_{cover}\\
+c_{nacelle} &amp;= (1+kt_{nacelle}+kp_{nacelle}) (1+ko_{nacelle}+ka_{nacelle}) c_{parts}\end{split}\]</div>
+<p>Where conceptually, <span class="math notranslate nohighlight">\(kt\)</span> is a transportation multiplier, <span class="math notranslate nohighlight">\(kp\)</span> is a profit multiplier, <span class="math notranslate nohighlight">\(ko\)</span> is an
+overhead cost multiplier, and <span class="math notranslate nohighlight">\(ka\)</span> is an assembly cost multiplier. By default, <span class="math notranslate nohighlight">\(kt=kp=ko=ka=0\)</span>.</p>
+<p>For variable names access to override the default values see the :ref:<code class="docutils literal notranslate"><span class="pre">csmsource</span></code>.</p>
+</section>
+<section id="tower-system">
+<h3>Tower System<a class="headerlink" href="#tower-system" title="Link to this heading">#</a></h3>
+<p>The tower is not aggregated with any other component, but for consistency there are allowances for
+additional costs incurred from transportation and assembly complexity,</p>
+<div class="math notranslate nohighlight">
+\[c_{towersys} = (1+kt_{tower}+kp_{tower}) (1+ko_{tower}+ka_{tower}) c_{tower}\]</div>
+<p>Where conceptually, <span class="math notranslate nohighlight">\(kt\)</span> is a transportation multiplier, <span class="math notranslate nohighlight">\(kp\)</span> is a profit multiplier, <span class="math notranslate nohighlight">\(ko\)</span> is an
+overhead cost multiplier, and <span class="math notranslate nohighlight">\(ka\)</span> is an assembly cost multiplier. By default, <span class="math notranslate nohighlight">\(kt=kp=ko=ka=0\)</span>.</p>
+<p>For variable names access to override the default values see the :ref:<code class="docutils literal notranslate"><span class="pre">csmsource</span></code>.</p>
+</section>
+<section id="turbine">
+<h3>Turbine<a class="headerlink" href="#turbine" title="Link to this heading">#</a></h3>
+<p>The final turbine assembly also allows for user specification of other cost multipliers,</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}m_{turbine} &amp;= m_{rotor} + m_{nacelle} + m_{tower}\\
+c_{turbine} &amp;= (1+kt_{turbine}+kp_{turbine}) (1+ko_{turbine}+ka_{turbine}) (c_{rotor} + c_{nacelle} + c_{towersys})\end{split}\]</div>
+<p>For variable names access to override the default values see the :ref:<code class="docutils literal notranslate"><span class="pre">csmsource</span></code>.</p>
+<div class="docutils container" id="id8">
+<div role="list" class="citation-list">
+<div class="citation" id="id9" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>FHL05<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id2">1</a>,<a role="doc-backlink" href="#id3">2</a>,<a role="doc-backlink" href="#id6">3</a>,<a role="doc-backlink" href="#id7">4</a>)</span>
+<p>L. Fingersh, M. Hand, and A. Laxson. Wind turbine design cost and scaling model. NREL/TP-500-40566, National Renewable Energy Laboratory, Golden, CO, December 2005.</p>
+</div>
+<div class="citation" id="id10" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>HJ93<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id2">1</a>,<a role="doc-backlink" href="#id4">2</a>)</span>
+<p>R. Harrison and G. Jenkins. Cost modeling of horizontal axis wind turbines. ETSU/W-34-00170-REP, University of Sunderland, School of Environment, Sunderland, UK, December 1993.</p>
+</div>
+<div class="citation" id="id11" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span>MH06<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id2">1</a>,<a role="doc-backlink" href="#id5">2</a>)</span>
+<p>D.J. Malcolm and A.C. Hansen. Windpact turbine rotor design study. NREL/SR-500-32495, National Renewable Energy Laboratory, Golden, CO, April 2006.</p>
+</div>
+<div class="citation" id="id12" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">MHM10</a><span class="fn-bracket">]</span></span>
+<p>B. Maples, M. Hand, and W. Musial. Comparative assessment of direct drive high temperature superconducting generators in multi-megawatt class wind turbines. NREL/TP-5000-49086, National Renewable Energy Laboratory, Golden, CO, October 2010.</p>
+</div>
+</div>
+</div>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./user_guide"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../intro/demo.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">CSM by Example</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="model_overview.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Model Overview</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#blades">Blades</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#hub-shell">Hub (Shell)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#pitch-system">Pitch System</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#spinner-nose-cone">Spinner (Nose Cone)</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#low-speed-shaft">Low Speed Shaft</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#main-bearings">Main Bearings</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gearbox">Gearbox</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#brake">Brake</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#high-speed-shaft">High Speed Shaft</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#generator">Generator</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#yaw-system">Yaw System</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#hydraulic-cooling">Hydraulic Cooling</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#transformer">Transformer</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cabling-and-electrical-connections">Cabling and Electrical Connections</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#control-system">Control System</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#other-nacelle-equipment">Other Nacelle Equipment</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#bedplate">Bedplate</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#nacelle-cover">Nacelle Cover</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#tower">Tower</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#sub-system-aggregations">Sub-System Aggregations</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hub-system">Hub System</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#rotor-system">Rotor System</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#nacelle">Nacelle</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#tower-system">Tower System</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#turbine">Turbine</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By National Laboratory of the Rockies
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

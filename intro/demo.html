@@ -1,0 +1,1469 @@
+
+<!DOCTYPE html>
+
+
+<html lang="python" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>CSM by Example &#8212; CSM</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../_static/documentation_options.js?v=30a733bc"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=b8b12719"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'intro/demo';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="canonical" href="https://nlrwindsystems.github.io/CSM/intro/demo.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Theory" href="../user_guide/theory.html" />
+    <link rel="prev" title="Contributor&#39;s Guide" href="contributing.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="python"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../intro.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">CSM</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../intro.html">
+                    NLR Turbine Cost and Scaling Model (CSM)
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installing CSM</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributor's Guide</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">CSM by Example</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Model Background</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/theory.html">Theory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/model_overview.html">Model Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/new_models.html">Creating a New Model</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api/models/index.html"><code class="docutils literal notranslate"><span class="pre">csm.models</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api/models/base.html">Base Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/models/land_2015.html">NLR Land-Based 2015 Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/models/land_2020.html">NLR Land-Based 2020 Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/models/land_2021.html">NLR Land-Based 2021 Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/models/land_2026.html">NLR Land-Based 2026 Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/models/utils.html">Utilities</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api/tools/index.html">Tools</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api/tools/plot.html">Plotting Library</a></li>
+</ul>
+</details></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/NLRWindSystems/CSM" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/NLRWindSystems/CSM/issues/new?title=Issue%20on%20page%20%2Fintro/demo.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/intro/demo.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>CSM by Example</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-models-are-available-and-how-do-i-set-them-up">What Models Are Available and How Do I Set Them Up?</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#replicating-results-from-the-2015-wisdem-excel-model">Replicating Results from the 2015 WISDEM/Excel Model</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#getting-results">Getting Results</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#single-model-runs">Single Model Runs</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#irs-domestic-content-tables">IRS Domestic Content Tables</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#parameter-sweeps">Parameter Sweeps</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#plotting">Plotting</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mass-vs-cost-comparison-for-a-single-parameter-sweep">Mass vs Cost Comparison for a Single Parameter Sweep</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="csm-by-example">
+<h1>CSM by Example<a class="headerlink" href="#csm-by-example" title="Link to this heading">#</a></h1>
+<p>To start, we'll import the relevant packages for the whole demonstration. For a more complete
+definition of all that is made available for each model, please see the
+<a class="reference internal" href="../api/wisdem.html#api-base-model"><span class="std std-ref"><code class="docutils literal notranslate"><span class="pre">CSMBase</span></code> (base model) documentation</span></a>, or any of the other available models.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">csm</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_model</span><span class="p">,</span> <span class="n">Land2015NLR</span><span class="p">,</span> <span class="n">available_models</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">csm.tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot</span>
+
+<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">display</span><span class="o">.</span><span class="n">float_format</span> <span class="o">=</span> <span class="s2">"</span><span class="si">{:,.2f}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span>
+</pre></div>
+</div>
+</div>
+</div>
+<section id="what-models-are-available-and-how-do-i-set-them-up">
+<h2>What Models Are Available and How Do I Set Them Up?<a class="headerlink" href="#what-models-are-available-and-how-do-i-set-them-up" title="Link to this heading">#</a></h2>
+<p>For absolute beginners, we can see which models are available by printing <code class="docutils literal notranslate"><span class="pre">available_models</span></code>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">available_models</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>('CSMBase', 'Land2015NLR', 'Land2020NLR', 'Land2021NLR')
+</pre></div>
+</div>
+</div>
+</div>
+<p>For users that don't want to deal with importing multiple models, simply retrieve them with
+<code class="docutils literal notranslate"><span class="pre">get_model()</span></code>, which makes a series of aliases available for convenience.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">assert</span> <span class="n">Land2015NLR</span> <span class="o">==</span> <span class="n">get_model</span><span class="p">(</span><span class="mi">2015</span><span class="p">)</span> <span class="o">==</span> <span class="n">get_model</span><span class="p">(</span><span class="s2">"land-2015"</span><span class="p">)</span> <span class="o">==</span> <span class="n">get_model</span><span class="p">(</span><span class="s2">"nlr-2015"</span><span class="p">)</span> <span class="o">==</span> <span class="n">get_model</span><span class="p">(</span><span class="s2">"NLR 2015"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Now that we have a variety of convenient means for accessing available models, we can also print out
+the minimum required inputs to run the model.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">nlr2015</span> <span class="o">=</span> <span class="n">get_model</span><span class="p">(</span><span class="s2">"2015"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">nlr2015</span><span class="o">.</span><span class="n">get_required_inputs</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>['turbine_class', 'rated_power_kw', 'rotor_diameter', 'num_bearings', 'blade_has_carbon', 'max_tip_speed', 'tower_length']
+</pre></div>
+</div>
+</div>
+</div>
+<p>Also available with units.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">Land2015NLR</span><span class="o">.</span><span class="n">get_required_inputs</span><span class="p">(</span><span class="n">include_units</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[('turbine_class', 'unitless'), ('rated_power_kw', 'kW'), ('rotor_diameter', 'm'), ('num_bearings', 'unitless'), ('blade_has_carbon', 'unitless'), ('max_tip_speed', 'm/s'), ('tower_length', 'm')]
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="replicating-results-from-the-2015-wisdem-excel-model">
+<h2>Replicating Results from the 2015 WISDEM/Excel Model<a class="headerlink" href="#replicating-results-from-the-2015-wisdem-excel-model" title="Link to this heading">#</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">Land2015NLR</span></code> model is based on teh WISDEM implementation of the CSM, and the configuration
+dictionary is also based on the WISDEM example. To create the model itself, we use
+the <code class="docutils literal notranslate"><span class="pre">from_dict</span></code> method to pass a configuration dictionary, which has additional error handling
+to better guide users if their configurations fail to initialize a model.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">wisdem_test_inputs</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">"turbine_class"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s2">"efficiency_max"</span><span class="p">:</span> <span class="mf">0.9</span><span class="p">,</span>
+    <span class="s2">"num_blades"</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="s2">"num_bearings"</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="s2">"rated_power_kw"</span><span class="p">:</span> <span class="mi">5000</span><span class="p">,</span>
+    <span class="s2">"blade_has_carbon"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="s2">"has_crane"</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="s2">"rotor_diameter"</span><span class="p">:</span> <span class="mi">126</span><span class="p">,</span>
+    <span class="s2">"max_tip_speed"</span><span class="p">:</span> <span class="mi">80</span><span class="p">,</span>
+    <span class="s2">"tower_length"</span><span class="p">:</span> <span class="mi">90</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">nlr2015</span> <span class="o">=</span> <span class="n">Land2015NLR</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">wisdem_test_inputs</span><span class="p">)</span>
+<span class="n">nlr2015</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Turbine cost (USD/kW): $</span><span class="si">{</span><span class="n">nlr2015</span><span class="o">.</span><span class="n">turbine_cost_kw</span><span class="si">:</span><span class="s2">,.2f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Turbine cost (USD/kW): $686.00
+</pre></div>
+</div>
+</div>
+</div>
+<p>For incomplete configurations, this approach will fail, as shown below. However, if we add
+<code class="docutils literal notranslate"><span class="pre">partial=True</span></code>, a partial model can be defined. This is useful for parameter sweeps or calculating
+a limited number of component values.</p>
+<div class="cell tag_raises-exception docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">partial_inputs</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">"turbine_class"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s2">"num_blades"</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="s2">"rated_power_kw"</span><span class="p">:</span> <span class="mi">5000</span><span class="p">,</span>
+    <span class="s2">"blade_has_carbon"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="s2">"rotor_diameter"</span><span class="p">:</span> <span class="mi">126</span><span class="p">,</span>
+    <span class="s2">"max_tip_speed"</span><span class="p">:</span> <span class="mi">80</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">partial2015</span> <span class="o">=</span> <span class="n">Land2015NLR</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">partial_inputs</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="gt">---------------------------------------------------------------------------</span>
+<span class="ne">AttributeError</span><span class="g g-Whitespace">                            </span>Traceback (most recent call last)
+<span class="n">Cell</span> <span class="n">In</span><span class="p">[</span><span class="mi">7</span><span class="p">],</span> <span class="n">line</span> <span class="mi">10</span>
+<span class="g g-Whitespace">      </span><span class="mi">6</span>     <span class="s2">"rotor_diameter"</span><span class="p">:</span> <span class="mi">126</span><span class="p">,</span>
+<span class="g g-Whitespace">      </span><span class="mi">7</span>     <span class="s2">"max_tip_speed"</span><span class="p">:</span> <span class="mi">80</span><span class="p">,</span>
+<span class="g g-Whitespace">      </span><span class="mi">8</span> <span class="p">}</span>
+<span class="g g-Whitespace">      </span><span class="mi">9</span> 
+<span class="ne">---&gt; </span><span class="mi">10</span> <span class="n">partial2015</span> <span class="o">=</span> <span class="n">Land2015NLR</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">partial_inputs</span><span class="p">)</span>
+
+<span class="nn">File /opt/hostedtoolcache/Python/3.12.14/x64/lib/python3.12/site-packages/csm/models/base_model.py:874,</span> in <span class="ni">CSMBase.from_dict</span><span class="nt">(cls, data, partial)</span>
+<span class="g g-Whitespace">    </span><span class="mi">869</span> <span class="k">if</span> <span class="n">missing</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">partial</span><span class="p">:</span>
+<span class="g g-Whitespace">    </span><span class="mi">870</span>     <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+<span class="g g-Whitespace">    </span><span class="mi">871</span>         <span class="sa">f</span><span class="s2">"The class definition for </span><span class="si">{</span><span class="n">_name</span><span class="si">}</span><span class="s2"> is missing the following"</span>
+<span class="g g-Whitespace">    </span><span class="mi">872</span>         <span class="sa">f</span><span class="s2">" inputs: </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">missing</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span>
+<span class="g g-Whitespace">    </span><span class="mi">873</span>     <span class="p">)</span>
+<span class="ne">--&gt; </span><span class="mi">874</span>     <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+<span class="g g-Whitespace">    </span><span class="mi">875</span> <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">data</span><span class="p">)</span>
+
+<span class="ne">AttributeError</span>: The class definition for Land2015NLR is missing the following inputs: tower_length, num_bearings
+</pre></div>
+</div>
+</div>
+</div>
+<p>Now, using <code class="docutils literal notranslate"><span class="pre">partial=True</span></code>, we can create an incomplete model and get the results we desire.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">partial2015</span> <span class="o">=</span> <span class="n">Land2015NLR</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">wisdem_test_inputs</span><span class="p">,</span> <span class="n">partial</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">partial2015</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="s2">"blade_mass"</span><span class="p">,</span> <span class="s2">"blade_cost"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Single blade mass (kg): </span><span class="si">{</span><span class="n">partial2015</span><span class="o">.</span><span class="n">blade_mass</span><span class="si">:</span><span class="s2">,.2f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Single blade cost (thousands, USD): $</span><span class="si">{</span><span class="n">partial2015</span><span class="o">.</span><span class="n">blade_cost</span><span class="o">/</span><span class="mi">1000</span><span class="si">:</span><span class="s2">,.2f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Single blade mass (kg): 18,590.67
+Single blade cost (thousands, USD): $271.42
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="getting-results">
+<h2>Getting Results<a class="headerlink" href="#getting-results" title="Link to this heading">#</a></h2>
+<section id="single-model-runs">
+<h3>Single Model Runs<a class="headerlink" href="#single-model-runs" title="Link to this heading">#</a></h3>
+<p>For basic dictionary outputs, any of <a class="reference internal" href="../api/models/base.html#csm.models.CSMBase.get_results" title="csm.models.CSMBase.get_results"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">get_results</span></code></span></a>,
+<a class="reference internal" href="../api/models/base.html#csm.models.CSMBase.get_mass_results" title="csm.models.CSMBase.get_mass_results"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">get_mass_results</span></code></span></a>,
+<a class="reference internal" href="../api/models/base.html#csm.models.CSMBase.get_cost_results" title="csm.models.CSMBase.get_cost_results"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">get_cost_results</span></code></span></a>, or
+<a class="reference internal" href="../api/models/base.html#csm.models.CSMBase.get_all_results" title="csm.models.CSMBase.get_all_results"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">get_all_results</span></code></span></a>. Below, we demonstrate retrieving the blade
+results.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">nlr2015</span><span class="o">.</span><span class="n">get_results</span><span class="p">([</span><span class="s2">"blade_mass"</span><span class="p">,</span> <span class="s2">"blade_cost"</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>{'blade_mass': 18590.668206489747, 'blade_cost': 271423.7558147503}
+</pre></div>
+</div>
+</div>
+</div>
+<p>For a more complete breakdown, we can also get a DataFrame of all the major mass and cost results.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df</span> <span class="o">=</span> <span class="n">nlr2015</span><span class="o">.</span><span class="n">get_component_breakdown</span><span class="p">()</span>
+<span class="n">df</span><span class="p">[</span><span class="s2">"Cost (USD)"</span><span class="p">]</span> <span class="o">/=</span> <span class="mi">1000</span>
+<span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s2">"Cost (USD)"</span><span class="p">:</span> <span class="s2">"Cost (thousands USD)"</span><span class="p">})</span>
+<span class="n">df</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Mass (kg)</th>
+      <th>Cost (thousands USD)</th>
+    </tr>
+    <tr>
+      <th>Component</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>bearing</th>
+      <td>2,245.42</td>
+      <td>10.10</td>
+    </tr>
+    <tr>
+      <th>bedplate</th>
+      <td>41,765.26</td>
+      <td>121.12</td>
+    </tr>
+    <tr>
+      <th>blade</th>
+      <td>18,590.67</td>
+      <td>271.42</td>
+    </tr>
+    <tr>
+      <th>blade_transport</th>
+      <td>NaN</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>brake</th>
+      <td>5,337.50</td>
+      <td>19.35</td>
+    </tr>
+    <tr>
+      <th>controls</th>
+      <td>0.00</td>
+      <td>105.75</td>
+    </tr>
+    <tr>
+      <th>converter</th>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>drivetrain_transport</th>
+      <td>NaN</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>electrical_connection</th>
+      <td>0.00</td>
+      <td>209.25</td>
+    </tr>
+    <tr>
+      <th>gearbox</th>
+      <td>21,875.00</td>
+      <td>218.75</td>
+    </tr>
+    <tr>
+      <th>generator</th>
+      <td>14,900.00</td>
+      <td>184.76</td>
+    </tr>
+    <tr>
+      <th>high_speed_shaft</th>
+      <td>994.70</td>
+      <td>6.76</td>
+    </tr>
+    <tr>
+      <th>hub</th>
+      <td>44,078.54</td>
+      <td>171.91</td>
+    </tr>
+    <tr>
+      <th>hub_system</th>
+      <td>55,850.44</td>
+      <td>421.36</td>
+    </tr>
+    <tr>
+      <th>hub_transport</th>
+      <td>NaN</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>hydraulic_cooling</th>
+      <td>400.00</td>
+      <td>49.60</td>
+    </tr>
+    <tr>
+      <th>low_speed_shaft</th>
+      <td>22,820.28</td>
+      <td>271.56</td>
+    </tr>
+    <tr>
+      <th>nacelle</th>
+      <td>151,455.88</td>
+      <td>1,665.61</td>
+    </tr>
+    <tr>
+      <th>nacelle_cover</th>
+      <td>6,836.69</td>
+      <td>38.97</td>
+    </tr>
+    <tr>
+      <th>parts_transport</th>
+      <td>NaN</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>pitch_system</th>
+      <td>10,798.91</td>
+      <td>238.66</td>
+    </tr>
+    <tr>
+      <th>platform_mainframe</th>
+      <td>8,220.66</td>
+      <td>101.27</td>
+    </tr>
+    <tr>
+      <th>power_electronics_transport</th>
+      <td>NaN</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>rotor</th>
+      <td>111,622.45</td>
+      <td>1,235.63</td>
+    </tr>
+    <tr>
+      <th>spinner</th>
+      <td>973.00</td>
+      <td>10.80</td>
+    </tr>
+    <tr>
+      <th>tower</th>
+      <td>182,336.48</td>
+      <td>528.78</td>
+    </tr>
+    <tr>
+      <th>tower_transport</th>
+      <td>NaN</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>transformer</th>
+      <td>11,485.00</td>
+      <td>215.92</td>
+    </tr>
+    <tr>
+      <th>transport</th>
+      <td>NaN</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>turbine</th>
+      <td>445,414.81</td>
+      <td>3,430.02</td>
+    </tr>
+    <tr>
+      <th>turbine_kw</th>
+      <td>NaN</td>
+      <td>0.69</td>
+    </tr>
+    <tr>
+      <th>yaw_system</th>
+      <td>12,329.96</td>
+      <td>102.34</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<section id="irs-domestic-content-tables">
+<h4>IRS Domestic Content Tables<a class="headerlink" href="#irs-domestic-content-tables" title="Link to this heading">#</a></h4>
+<p>For helping with calculating the total domestic content, both <code class="docutils literal notranslate"><span class="pre">irs_mpc_breakdown</span></code> and
+<code class="docutils literal notranslate"><span class="pre">total_domestic_content</span></code> are made available. Note that in both the below examples, the data are
+purely expository.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">nlr2015</span><span class="o">.</span><span class="n">irs_mpc_breakdown</span><span class="p">(</span>
+    <span class="n">turbine_production_cost</span><span class="o">=</span><span class="mi">1500</span><span class="p">,</span>
+    <span class="n">tower_flange_material_cost</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span>
+    <span class="n">tower_flange_production_cost</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+      <th>cost</th>
+      <th>Value</th>
+    </tr>
+    <tr>
+      <th>APC</th>
+      <th>MPC</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="5" valign="top">Wind Turbine</th>
+      <th>Blade</th>
+      <td>814,271.27</td>
+      <td>28.02</td>
+    </tr>
+    <tr>
+      <th>Rotor Hub</th>
+      <td>421,362.42</td>
+      <td>14.50</td>
+    </tr>
+    <tr>
+      <th>Nacelle</th>
+      <td>1,665,612.93</td>
+      <td>57.32</td>
+    </tr>
+    <tr>
+      <th>Power Converter</th>
+      <td>-</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <th>Production</th>
+      <td>1,500.00</td>
+      <td>0.05</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">Wind Tower Flange</th>
+      <th>Material</th>
+      <td>2,000.00</td>
+      <td>0.07</td>
+    </tr>
+    <tr>
+      <th>Production</th>
+      <td>1,000.00</td>
+      <td>0.03</td>
+    </tr>
+    <tr>
+      <th>Tower</th>
+      <th>-</th>
+      <td>-</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <th>Steel or iron products in foundation</th>
+      <th>-</th>
+      <td>-</td>
+      <td>-</td>
+    </tr>
+    <tr>
+      <th>Total</th>
+      <th>-</th>
+      <td>2,905,746.61</td>
+      <td>100.00</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">nlr2015</span><span class="o">.</span><span class="n">total_domestic_content</span><span class="p">(</span>
+    <span class="n">turbine_production_cost</span><span class="o">=</span><span class="mi">1500</span><span class="p">,</span>
+    <span class="n">tower_flange_material_cost</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span>
+    <span class="n">tower_flange_production_cost</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+    <span class="n">domestic</span><span class="o">=</span><span class="p">[</span><span class="s2">"tower_flange_material"</span><span class="p">,</span> <span class="s2">"tower_flange_production"</span><span class="p">,</span> <span class="s2">"nacelle"</span><span class="p">],</span>
+    <span class="n">return_table</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+      <th>category</th>
+      <th>cost</th>
+      <th>Value</th>
+      <th>Domestic</th>
+    </tr>
+    <tr>
+      <th>APC</th>
+      <th>MPC</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="5" valign="top">Wind Turbine</th>
+      <th>Blade</th>
+      <td>blade</td>
+      <td>814,271.27</td>
+      <td>28.02</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>Rotor Hub</th>
+      <td>hub</td>
+      <td>421,362.42</td>
+      <td>14.50</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>Nacelle</th>
+      <td>nacelle</td>
+      <td>1,665,612.93</td>
+      <td>57.32</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>Power Converter</th>
+      <td>power_converter</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>Production</th>
+      <td>turbine_production</td>
+      <td>1,500.00</td>
+      <td>0.05</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th rowspan="2" valign="top">Wind Tower Flange</th>
+      <th>Material</th>
+      <td>tower_flange_material</td>
+      <td>2,000.00</td>
+      <td>0.07</td>
+      <td>0.07</td>
+    </tr>
+    <tr>
+      <th>Production</th>
+      <td>tower_flange_production</td>
+      <td>1,000.00</td>
+      <td>0.03</td>
+      <td>0.03</td>
+    </tr>
+    <tr>
+      <th>Tower</th>
+      <th>-</th>
+      <td>-</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>Steel or iron products in foundation</th>
+      <th>-</th>
+      <td>-</td>
+      <td>0.00</td>
+      <td>0.00</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <th>Total</th>
+      <th>-</th>
+      <td>-</td>
+      <td>2,905,746.61</td>
+      <td>100.00</td>
+      <td>0.10</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+</section>
+</section>
+</section>
+<section id="parameter-sweeps">
+<h2>Parameter Sweeps<a class="headerlink" href="#parameter-sweeps" title="Link to this heading">#</a></h2>
+<p>For experimental designs to understand tradeoffs in cost and mass, users can run parameter sweeps
+using either the <a class="reference internal" href="../api/models/base.html#csm.models.CSMBase.parameterize" title="csm.models.CSMBase.parameterize"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">parameterize</span></code></span></a> or
+<a class="reference internal" href="../api/models/base.html#csm.models.CSMBase.parameterize_subset" title="csm.models.CSMBase.parameterize_subset"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">parameterize_subset</span></code></span></a>. For <code class="docutils literal notranslate"><span class="pre">parameterize</span></code>, the entire
+model is run, but for <code class="docutils literal notranslate"><span class="pre">parameterize_subset</span></code> only a single input can be parameterized.</p>
+<p>Note that in the below example, the model does not have to be created first. Additionally, we can
+provide parameterizations as either a &quot;range&quot; of inputs defining the minimum value, maximum value,
+and the number of points to generate in between them, or the &quot;inputs,&quot; which uses the values as
+provided.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">"max_tip_speed"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"range"</span><span class="p">,</span> <span class="mi">80</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+    <span class="s2">"tower_length"</span><span class="p">:</span> <span class="p">(</span><span class="s2">"inputs"</span><span class="p">,</span> <span class="mi">80</span><span class="p">,</span> <span class="mi">110</span><span class="p">),</span>
+<span class="p">}</span>
+<span class="n">results</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"nacelle_mass"</span><span class="p">,</span> <span class="s2">"nacelle_cost"</span><span class="p">,</span> <span class="s2">"tower_mass"</span><span class="p">,</span> <span class="s2">"tower_cost"</span><span class="p">,</span> <span class="s2">"turbine_cost_kw"</span><span class="p">]</span>
+<span class="n">Land2015NLR</span><span class="o">.</span><span class="n">parameterize</span><span class="p">(</span>
+    <span class="n">base_kwargs</span><span class="o">=</span><span class="n">wisdem_test_inputs</span><span class="p">,</span>
+    <span class="n">parameterized_kwargs</span><span class="o">=</span><span class="n">parameters</span><span class="p">,</span>
+    <span class="n">results</span><span class="o">=</span><span class="n">results</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_html"><div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead tr th {
+        text-align: left;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr>
+      <th>max_tip_speed</th>
+      <th colspan="2" halign="left">80.00</th>
+      <th colspan="2" halign="left">85.00</th>
+      <th colspan="2" halign="left">90.00</th>
+    </tr>
+    <tr>
+      <th>tower_length</th>
+      <th>80</th>
+      <th>110</th>
+      <th>80</th>
+      <th>110</th>
+      <th>80</th>
+      <th>110</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>nacelle_cost</th>
+      <td>1,665,612.93</td>
+      <td>1,665,612.93</td>
+      <td>1,651,607.01</td>
+      <td>1,651,607.01</td>
+      <td>1,639,157.31</td>
+      <td>1,639,157.31</td>
+    </tr>
+    <tr>
+      <th>nacelle_mass</th>
+      <td>151,455.88</td>
+      <td>151,455.88</td>
+      <td>149,855.15</td>
+      <td>149,855.15</td>
+      <td>148,432.27</td>
+      <td>148,432.27</td>
+    </tr>
+    <tr>
+      <th>tower_cost</th>
+      <td>416,412.75</td>
+      <td>794,382.29</td>
+      <td>416,412.75</td>
+      <td>794,382.29</td>
+      <td>416,412.75</td>
+      <td>794,382.29</td>
+    </tr>
+    <tr>
+      <th>tower_mass</th>
+      <td>143,590.60</td>
+      <td>273,924.93</td>
+      <td>143,590.60</td>
+      <td>273,924.93</td>
+      <td>143,590.60</td>
+      <td>273,924.93</td>
+    </tr>
+    <tr>
+      <th>turbine_cost_kw</th>
+      <td>663.53</td>
+      <td>739.13</td>
+      <td>660.73</td>
+      <td>736.32</td>
+      <td>658.24</td>
+      <td>733.83</td>
+    </tr>
+  </tbody>
+</table>
+</div></div></div>
+</div>
+</section>
+<section id="plotting">
+<h2>Plotting<a class="headerlink" href="#plotting" title="Link to this heading">#</a></h2>
+<section id="mass-vs-cost-comparison-for-a-single-parameter-sweep">
+<h3>Mass vs Cost Comparison for a Single Parameter Sweep<a class="headerlink" href="#mass-vs-cost-comparison-for-a-single-parameter-sweep" title="Link to this heading">#</a></h3>
+<p>In the following example, we use each of the available models to create their cost and scaling
+curves for a single rotor blade as we modify the rotor diameter. We additionally, plot 2 ATB
+reference turbines and 3 industry reference turbines as examples for each of the models. Finally,
+we add some synthetic empirical data to visually inspect how the curves fit the empirical data.</p>
+<p>In addition to the model and data inputs, we can provide many formatting arguments to control
+display elements such as the line colors, reference turbine markers, empirical data scatter markers,
+axis limits, and legend formatting.</p>
+<p>Please see the <a class="reference internal" href="../api/tools/plot.html#csm.tools.plot.plot_mass_cost_comparison" title="csm.tools.plot.plot_mass_cost_comparison"><span class="xref myst py py-func"><code class="docutils literal notranslate"><span class="pre">plot_mass_cost_comparison</span></code> documentation</span></a>
+for full details on available settings.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">model_base</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">"NLR 2015"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"turbine_class"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">"blade_has_carbon"</span><span class="p">:</span> <span class="kc">False</span><span class="p">},</span>
+    <span class="s2">"NLR 2020"</span><span class="p">:</span> <span class="p">{},</span>
+    <span class="s2">"NLR 2021"</span><span class="p">:</span> <span class="p">{},</span>
+<span class="p">}</span>
+<span class="n">parameterization</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"rotor_diameter"</span><span class="p">:</span> <span class="p">[</span><span class="s2">"range"</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">21</span><span class="p">]}</span>
+<span class="n">reference_turbs</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">"ATB T3 (3.3MW)"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">"rated_power_kw"</span><span class="p">:</span> <span class="mi">3300</span><span class="p">,</span>
+        <span class="s2">"rotor_diameter"</span><span class="p">:</span> <span class="mf">148.0</span><span class="p">,</span>
+        <span class="s2">"tower_length"</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span>
+        <span class="s2">"max_tip_speed"</span><span class="p">:</span> <span class="mi">90</span><span class="p">,</span>
+        <span class="s2">"num_bearings"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="s2">"num_blades"</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+        <span class="s2">"efficiency_max"</span><span class="p">:</span> <span class="mf">0.9</span><span class="p">,</span>
+        <span class="s2">"turbine_class"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="s2">"blade_has_carbon"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="s2">"ATB T1 (6.0MW)"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">"rated_power_kw"</span><span class="p">:</span> <span class="mi">6000</span><span class="p">,</span>
+        <span class="s2">"rotor_diameter"</span><span class="p">:</span> <span class="mf">170.0</span><span class="p">,</span>
+        <span class="s2">"tower_length"</span><span class="p">:</span> <span class="mf">115.0</span><span class="p">,</span>
+        <span class="s2">"max_tip_speed"</span><span class="p">:</span> <span class="mf">90.0</span><span class="p">,</span>
+        <span class="s2">"num_bearings"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="s2">"num_blades"</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+        <span class="s2">"efficiency_max"</span><span class="p">:</span> <span class="mf">0.9</span><span class="p">,</span>
+        <span class="s2">"turbine_class"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="s2">"blade_has_carbon"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="s2">"SG 5.2-165"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">"rated_power_kw"</span><span class="p">:</span> <span class="mi">5200</span><span class="p">,</span>
+        <span class="s2">"rotor_diameter"</span><span class="p">:</span> <span class="mf">165.0</span><span class="p">,</span>
+        <span class="s2">"tower_length"</span><span class="p">:</span> <span class="mf">105.0</span><span class="p">,</span>
+        <span class="s2">"max_tip_speed"</span><span class="p">:</span> <span class="mf">90.0</span><span class="p">,</span>
+        <span class="s2">"num_bearings"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="s2">"num_blades"</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+        <span class="s2">"efficiency_max"</span><span class="p">:</span> <span class="mf">0.9</span><span class="p">,</span>
+        <span class="s2">"turbine_class"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="s2">"blade_has_carbon"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="s2">"SG 7.0-170"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">"rated_power_kw"</span><span class="p">:</span> <span class="mi">7000</span><span class="p">,</span>
+        <span class="s2">"rotor_diameter"</span><span class="p">:</span> <span class="mf">170.0</span><span class="p">,</span>
+        <span class="s2">"tower_length"</span><span class="p">:</span> <span class="mf">135.0</span><span class="p">,</span>
+        <span class="s2">"max_tip_speed"</span><span class="p">:</span> <span class="mf">90.0</span><span class="p">,</span>
+        <span class="s2">"num_bearings"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="s2">"num_blades"</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+        <span class="s2">"efficiency_max"</span><span class="p">:</span> <span class="mf">0.9</span><span class="p">,</span>
+        <span class="s2">"turbine_class"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="s2">"blade_has_carbon"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="s2">"V150-4.5"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">"rated_power_kw"</span><span class="p">:</span> <span class="mi">4500</span><span class="p">,</span>
+        <span class="s2">"rotor_diameter"</span><span class="p">:</span> <span class="mf">150.0</span><span class="p">,</span>
+        <span class="s2">"tower_length"</span><span class="p">:</span> <span class="mf">105.0</span><span class="p">,</span>
+        <span class="s2">"max_tip_speed"</span><span class="p">:</span> <span class="mf">82.0</span><span class="p">,</span>
+        <span class="s2">"num_bearings"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="s2">"num_blades"</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+        <span class="s2">"efficiency_max"</span><span class="p">:</span> <span class="mf">0.9</span><span class="p">,</span>
+        <span class="s2">"turbine_class"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="s2">"blade_has_carbon"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">},</span>
+<span class="p">}</span>
+<span class="n">data</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">[</span><span class="mi">47</span><span class="p">,</span> <span class="mi">2400</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">47</span><span class="p">,</span> <span class="mi">1300</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">23</span><span class="p">,</span> <span class="mi">300</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">80</span><span class="p">,</span> <span class="mi">6500</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">149</span><span class="p">,</span> <span class="mi">21500</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">92</span><span class="p">,</span> <span class="mi">8000</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">],</span>
+    <span class="p">[</span><span class="mf">96.1</span><span class="p">,</span> <span class="mi">11800</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">],</span>
+<span class="p">]</span>
+<span class="n">empirical_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">"rotor_diameter"</span><span class="p">,</span> <span class="s2">"blade_mass"</span><span class="p">,</span> <span class="s2">"blade_cost"</span><span class="p">])</span>
+
+<span class="n">model_line_fmt</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">"NLR 2020"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"c"</span><span class="p">:</span> <span class="s2">"tab:blue"</span><span class="p">},</span>
+    <span class="s2">"NLR 2021"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"c"</span><span class="p">:</span> <span class="s2">"tab:orange"</span><span class="p">,</span> <span class="s2">"ls"</span><span class="p">:</span> <span class="s2">"dashed"</span><span class="p">},</span>
+    <span class="s2">"NLR 2015"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"c"</span><span class="p">:</span> <span class="s2">"tab:green"</span><span class="p">},</span>
+<span class="p">}</span>
+<span class="n">turbine_formatting</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">"ATB T3 (3.3MW)"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"marker"</span><span class="p">:</span> <span class="s2">"*"</span><span class="p">},</span>
+    <span class="s2">"ATB T1 (6.0MW)"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"marker"</span><span class="p">:</span> <span class="s2">"^"</span><span class="p">},</span>
+    <span class="s2">"SG 5.2-165"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">"marker"</span><span class="p">:</span> <span class="s2">"s"</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="s2">"SG 7.0-170"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">"marker"</span><span class="p">:</span> <span class="s2">"D"</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="s2">"V150-4.5"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">"marker"</span><span class="p">:</span> <span class="s2">"o"</span><span class="p">,</span>
+    <span class="p">},</span>
+<span class="p">}</span>
+<span class="n">legend_formatting</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">"loc"</span><span class="p">:</span> <span class="s2">"outside lower center"</span><span class="p">,</span>
+    <span class="s2">"ncols"</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span>
+    <span class="s2">"bbox_to_anchor"</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.1</span><span class="p">),</span>
+    <span class="s2">"frameon"</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">plot</span><span class="o">.</span><span class="n">plot_mass_cost_comparison</span><span class="p">(</span>
+    <span class="n">base_kwargs</span><span class="o">=</span><span class="n">model_base</span><span class="p">,</span>
+    <span class="n">parameterization</span><span class="o">=</span><span class="n">parameterization</span><span class="p">,</span>
+    <span class="n">component</span><span class="o">=</span><span class="s2">"blade"</span><span class="p">,</span>
+    <span class="n">parameter_label</span><span class="o">=</span><span class="s2">"Rotor Diameter (m)"</span><span class="p">,</span>
+    <span class="n">cost_basis</span><span class="o">=</span><span class="s2">"thousands"</span><span class="p">,</span>
+    <span class="n">reference_turbines</span><span class="o">=</span><span class="n">reference_turbs</span><span class="p">,</span>
+    <span class="n">background_data</span><span class="o">=</span><span class="n">empirical_data</span><span class="p">,</span>
+    <span class="n">mass_xlim</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">200</span><span class="p">),</span>
+    <span class="n">mass_ylim</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">40</span><span class="p">),</span>
+    <span class="n">cost_xlim</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">40</span><span class="p">),</span>
+    <span class="n">cost_ylim</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">700</span><span class="p">),</span>
+    <span class="n">model_plot_settings</span><span class="o">=</span><span class="n">model_line_fmt</span><span class="p">,</span>
+    <span class="n">turbine_scatter_settings</span><span class="o">=</span><span class="n">turbine_formatting</span><span class="p">,</span>
+    <span class="n">reference_scatter_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">"c"</span><span class="p">:</span> <span class="s2">"none"</span><span class="p">,</span> <span class="s2">"edgecolor"</span><span class="p">:</span> <span class="s2">"dimgray"</span><span class="p">},</span>
+    <span class="n">background_scatter_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">"marker"</span><span class="p">:</span> <span class="s2">"."</span><span class="p">,</span> <span class="s2">"c"</span><span class="p">:</span> <span class="s2">"lightgray"</span><span class="p">},</span>
+    <span class="n">legend_kwargs</span><span class="o">=</span><span class="n">legend_formatting</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="../_images/4e0a58733160d5bf92e03655c5269a73df29b6e72f24ad554dfe5756576f9e4e.png" src="../_images/4e0a58733160d5bf92e03655c5269a73df29b6e72f24ad554dfe5756576f9e4e.png" />
+</div>
+</div>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./intro"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="contributing.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Contributor's Guide</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../user_guide/theory.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Theory</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-models-are-available-and-how-do-i-set-them-up">What Models Are Available and How Do I Set Them Up?</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#replicating-results-from-the-2015-wisdem-excel-model">Replicating Results from the 2015 WISDEM/Excel Model</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#getting-results">Getting Results</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#single-model-runs">Single Model Runs</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#irs-domestic-content-tables">IRS Domestic Content Tables</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#parameter-sweeps">Parameter Sweeps</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#plotting">Plotting</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mass-vs-cost-comparison-for-a-single-parameter-sweep">Mass vs Cost Comparison for a Single Parameter Sweep</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By National Laboratory of the Rockies
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

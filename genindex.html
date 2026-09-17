@@ -1,0 +1,885 @@
+
+<!DOCTYPE html>
+
+
+<html lang="python" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Index &#8212; CSM</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="_static/documentation_options.js?v=30a733bc"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js?v=b8b12719"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'genindex';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="canonical" href="https://nlrwindsystems.github.io/CSM/genindex.html" />
+    <link rel="index" title="Index" href="#" />
+    <link rel="search" title="Search" href="search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="python"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="_static/searchtools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script src="searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="intro.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">CSM</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="intro.html">
+                    NLR Turbine Cost and Scaling Model (CSM)
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="intro/install.html">Installing CSM</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intro/contributing.html">Contributor's Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="intro/demo.html">CSM by Example</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Model Background</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="user_guide/theory.html">Theory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/model_overview.html">Model Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_guide/new_models.html">Creating a New Model</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="api/models/index.html"><code class="docutils literal notranslate"><span class="pre">csm.models</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/models/base.html">Base Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/models/land_2015.html">NLR Land-Based 2015 Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/models/land_2020.html">NLR Land-Based 2020 Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/models/land_2021.html">NLR Land-Based 2021 Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/models/land_2026.html">NLR Land-Based 2026 Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/models/utils.html">Utilities</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="api/tools/index.html">Tools</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/tools/plot.html">Plotting Library</a></li>
+</ul>
+</details></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/NLRWindSystems/CSM" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/NLRWindSystems/CSM/issues/new?title=Issue%20on%20page%20%2Fgenindex.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1></h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+
+<h1 id="index">Index</h1>
+
+<div class="genindex-jumpbox">
+ <a href="#_"><strong>_</strong></a>
+ | <a href="#C"><strong>C</strong></a>
+ | <a href="#F"><strong>F</strong></a>
+ | <a href="#G"><strong>G</strong></a>
+ | <a href="#I"><strong>I</strong></a>
+ | <a href="#L"><strong>L</strong></a>
+ | <a href="#M"><strong>M</strong></a>
+ | <a href="#O"><strong>O</strong></a>
+ | <a href="#P"><strong>P</strong></a>
+ | <a href="#R"><strong>R</strong></a>
+ | <a href="#S"><strong>S</strong></a>
+ | <a href="#T"><strong>T</strong></a>
+ | <a href="#U"><strong>U</strong></a>
+ 
+</div>
+<h2 id="_">_</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/models/base.html#csm.models.CSMBase._get_attr_map">_get_attr_map() (csm.models.CSMBase class method)</a>
+</li>
+      <li><a href="api/models/base.html#csm.models.CSMBase._has_values">_has_values() (csm.models.CSMBase method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/models/base.html#csm.models.CSMBase._prepare_calculation">_prepare_calculation() (csm.models.CSMBase method)</a>
+</li>
+      <li><a href="api/models/base.html#csm.models.CSMBase._validate_inputs">_validate_inputs() (csm.models.CSMBase method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="C">C</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/models/base.html#csm.models.CSMBase.calculate">calculate() (csm.models.CSMBase method)</a>
+</li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.calculate_bearing_cost">calculate_bearing_cost() (csm.models.CSMBase method)</a>
+</li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.calculate_bearing_mass">calculate_bearing_mass() (csm.models.CSMBase method)</a>
+</li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.calculate_bedplate_cost">calculate_bedplate_cost() (csm.models.CSMBase method)</a>
+</li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.calculate_bedplate_mass">calculate_bedplate_mass() (csm.models.CSMBase method)</a>
+
+      <ul>
+        <li><a href="api/models/land_2020.html#csm.models.Land2020NLR.calculate_bedplate_mass">(csm.models.Land2020NLR method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.calculate_blade_cost">calculate_blade_cost() (csm.models.CSMBase method)</a>
+</li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.calculate_blade_mass">calculate_blade_mass() (csm.models.CSMBase method)</a>
+
+      <ul>
+        <li><a href="api/models/land_2020.html#csm.models.Land2020NLR.calculate_blade_mass">(csm.models.Land2020NLR method)</a>
+</li>
+        <li><a href="api/models/land_2021.html#csm.models.Land2021NLR.calculate_blade_mass">(csm.models.Land2021NLR method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.calculate_blade_transport_cost">calculate_blade_transport_cost() (csm.models.CSMBase method)</a>
+
+      <ul>
+        <li><a href="api/models/land_2020.html#csm.models.Land2020NLR.calculate_blade_transport_cost">(csm.models.Land2020NLR method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.calculate_brake_cost">calculate_brake_cost() (csm.models.CSMBase method)</a>
+</li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.calculate_brake_mass">calculate_brake_mass() (csm.models.CSMBase method)</a>
+</li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.calculate_controls_cost">calculate_controls_cost() (csm.models.CSMBase method)</a>
+</li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.calculate_controls_mass">calculate_controls_mass() (csm.models.CSMBase method)</a>
+</li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.calculate_converter_cost">calculate_converter_cost() (csm.models.CSMBase method)</a>
+</li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.calculate_converter_mass">calculate_converter_mass() (csm.models.CSMBase method)</a>
+</li>
+      <li><a href="api/models/land_2020.html#csm.models.Land2020NLR.calculate_crane_cost">calculate_crane_cost() (csm.models.Land2020NLR method)</a>
+</li>
+      <li><a href="api/models/land_2020.html#csm.models.Land2020NLR.calculate_crane_mass">calculate_crane_mass() (csm.models.Land2020NLR method)</a>
+</li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.calculate_drivetrain_transport_cost">calculate_drivetrain_transport_cost() (csm.models.CSMBase method)</a>
+
+      <ul>
+        <li><a href="api/models/land_2020.html#csm.models.Land2020NLR.calculate_drivetrain_transport_cost">(csm.models.Land2020NLR method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.calculate_electrical_connection_cost">calculate_electrical_connection_cost() (csm.models.CSMBase method)</a>
+</li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.calculate_electrical_connection_mass">calculate_electrical_connection_mass() (csm.models.CSMBase method)</a>
+</li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.calculate_gearbox_cost">calculate_gearbox_cost() (csm.models.CSMBase method)</a>
+
+      <ul>
+        <li><a href="api/models/land_2020.html#csm.models.Land2020NLR.calculate_gearbox_cost">(csm.models.Land2020NLR method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.calculate_gearbox_mass">calculate_gearbox_mass() (csm.models.CSMBase method)</a>
+
+      <ul>
+        <li><a href="api/models/land_2020.html#csm.models.Land2020NLR.calculate_gearbox_mass">(csm.models.Land2020NLR method)</a>
+</li>
+        <li><a href="api/models/land_2021.html#csm.models.Land2021NLR.calculate_gearbox_mass">(csm.models.Land2021NLR method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.calculate_generator_cost">calculate_generator_cost() (csm.models.CSMBase method)</a>
+</li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.calculate_generator_mass">calculate_generator_mass() (csm.models.CSMBase method)</a>
+</li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.calculate_high_speed_shaft_cost">calculate_high_speed_shaft_cost() (csm.models.CSMBase method)</a>
+</li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.calculate_high_speed_shaft_mass">calculate_high_speed_shaft_mass() (csm.models.CSMBase method)</a>
+</li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.calculate_hub_cost">calculate_hub_cost() (csm.models.CSMBase method)</a>
+</li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.calculate_hub_mass">calculate_hub_mass() (csm.models.CSMBase method)</a>
+
+      <ul>
+        <li><a href="api/models/land_2021.html#csm.models.Land2021NLR.calculate_hub_mass">(csm.models.Land2021NLR method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.calculate_hub_system_cost">calculate_hub_system_cost() (csm.models.CSMBase method)</a>
+</li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.calculate_hub_system_mass">calculate_hub_system_mass() (csm.models.CSMBase method)</a>
+</li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.calculate_hub_transport_cost">calculate_hub_transport_cost() (csm.models.CSMBase method)</a>
+
+      <ul>
+        <li><a href="api/models/land_2020.html#csm.models.Land2020NLR.calculate_hub_transport_cost">(csm.models.Land2020NLR method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.calculate_hydraulic_cooling_cost">calculate_hydraulic_cooling_cost() (csm.models.CSMBase method)</a>
+</li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.calculate_hydraulic_cooling_mass">calculate_hydraulic_cooling_mass() (csm.models.CSMBase method)</a>
+
+      <ul>
+        <li><a href="api/models/land_2020.html#csm.models.Land2020NLR.calculate_hydraulic_cooling_mass">(csm.models.Land2020NLR method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.calculate_low_speed_shaft_cost">calculate_low_speed_shaft_cost() (csm.models.CSMBase method)</a>
+</li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.calculate_low_speed_shaft_mass">calculate_low_speed_shaft_mass() (csm.models.CSMBase method)</a>
+
+      <ul>
+        <li><a href="api/models/land_2020.html#csm.models.Land2020NLR.calculate_low_speed_shaft_mass">(csm.models.Land2020NLR method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.calculate_nacelle_cost">calculate_nacelle_cost() (csm.models.CSMBase method)</a>
+
+      <ul>
+        <li><a href="api/models/land_2020.html#csm.models.Land2020NLR.calculate_nacelle_cost">(csm.models.Land2020NLR method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/models/base.html#csm.models.CSMBase.calculate_nacelle_cover_cost">calculate_nacelle_cover_cost() (csm.models.CSMBase method)</a>
+</li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.calculate_nacelle_cover_mass">calculate_nacelle_cover_mass() (csm.models.CSMBase method)</a>
+</li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.calculate_nacelle_mass">calculate_nacelle_mass() (csm.models.CSMBase method)</a>
+
+      <ul>
+        <li><a href="api/models/land_2020.html#csm.models.Land2020NLR.calculate_nacelle_mass">(csm.models.Land2020NLR method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.calculate_num_tower_sections">calculate_num_tower_sections() (csm.models.CSMBase method)</a>
+</li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.calculate_parts_transport_cost">calculate_parts_transport_cost() (csm.models.CSMBase method)</a>
+
+      <ul>
+        <li><a href="api/models/land_2020.html#csm.models.Land2020NLR.calculate_parts_transport_cost">(csm.models.Land2020NLR method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.calculate_pitch_system_cost">calculate_pitch_system_cost() (csm.models.CSMBase method)</a>
+</li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.calculate_pitch_system_mass">calculate_pitch_system_mass() (csm.models.CSMBase method)</a>
+
+      <ul>
+        <li><a href="api/models/land_2020.html#csm.models.Land2020NLR.calculate_pitch_system_mass">(csm.models.Land2020NLR method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.calculate_platform_mainframe_cost">calculate_platform_mainframe_cost() (csm.models.CSMBase method)</a>
+
+      <ul>
+        <li><a href="api/models/land_2020.html#csm.models.Land2020NLR.calculate_platform_mainframe_cost">(csm.models.Land2020NLR method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.calculate_platform_mainframe_mass">calculate_platform_mainframe_mass() (csm.models.CSMBase method)</a>
+
+      <ul>
+        <li><a href="api/models/land_2020.html#csm.models.Land2020NLR.calculate_platform_mainframe_mass">(csm.models.Land2020NLR method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.calculate_power_electronics_transport_cost">calculate_power_electronics_transport_cost() (csm.models.CSMBase method)</a>
+
+      <ul>
+        <li><a href="api/models/land_2020.html#csm.models.Land2020NLR.calculate_power_electronics_transport_cost">(csm.models.Land2020NLR method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.calculate_rotor_cost">calculate_rotor_cost() (csm.models.CSMBase method)</a>
+</li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.calculate_rotor_mass">calculate_rotor_mass() (csm.models.CSMBase method)</a>
+</li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.calculate_rotor_torque">calculate_rotor_torque() (csm.models.CSMBase method)</a>
+</li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.calculate_spinner_cost">calculate_spinner_cost() (csm.models.CSMBase method)</a>
+</li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.calculate_spinner_mass">calculate_spinner_mass() (csm.models.CSMBase method)</a>
+</li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.calculate_subsystem_cost">calculate_subsystem_cost() (csm.models.CSMBase method)</a>
+</li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.calculate_subsystem_mass">calculate_subsystem_mass() (csm.models.CSMBase method)</a>
+</li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.calculate_subsystem_transport_cost">calculate_subsystem_transport_cost() (csm.models.CSMBase method)</a>
+</li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.calculate_system_cost">calculate_system_cost() (csm.models.CSMBase method)</a>
+</li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.calculate_system_mass">calculate_system_mass() (csm.models.CSMBase method)</a>
+</li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.calculate_tower_cost">calculate_tower_cost() (csm.models.CSMBase method)</a>
+</li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.calculate_tower_mass">calculate_tower_mass() (csm.models.CSMBase method)</a>
+
+      <ul>
+        <li><a href="api/models/land_2020.html#csm.models.Land2020NLR.calculate_tower_mass">(csm.models.Land2020NLR method)</a>
+</li>
+        <li><a href="api/models/land_2021.html#csm.models.Land2021NLR.calculate_tower_mass">(csm.models.Land2021NLR method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.calculate_tower_transport_cost">calculate_tower_transport_cost() (csm.models.CSMBase method)</a>
+
+      <ul>
+        <li><a href="api/models/land_2020.html#csm.models.Land2020NLR.calculate_tower_transport_cost">(csm.models.Land2020NLR method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.calculate_transformer_cost">calculate_transformer_cost() (csm.models.CSMBase method)</a>
+</li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.calculate_transformer_mass">calculate_transformer_mass() (csm.models.CSMBase method)</a>
+</li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.calculate_transport_cost">calculate_transport_cost() (csm.models.CSMBase method)</a>
+
+      <ul>
+        <li><a href="api/models/land_2020.html#csm.models.Land2020NLR.calculate_transport_cost">(csm.models.Land2020NLR method)</a>
+</li>
+      </ul></li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.calculate_turbine_cost">calculate_turbine_cost() (csm.models.CSMBase method)</a>
+</li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.calculate_turbine_mass">calculate_turbine_mass() (csm.models.CSMBase method)</a>
+</li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.calculate_yaw_system_cost">calculate_yaw_system_cost() (csm.models.CSMBase method)</a>
+</li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.calculate_yaw_system_mass">calculate_yaw_system_mass() (csm.models.CSMBase method)</a>
+</li>
+      <li><a href="api/models/utils.html#csm.models.utils.convert_float">convert_float() (in module csm.models.utils)</a>
+</li>
+      <li><a href="api/models/utils.html#csm.models.utils.convert_if_allowable_type">convert_if_allowable_type() (in module csm.models.utils)</a>
+</li>
+      <li><a href="api/models/utils.html#csm.models.utils.create_field">create_field() (in module csm.models.utils)</a>
+</li>
+      <li>
+    csm.models.base_model
+
+      <ul>
+        <li><a href="api/models/base.html#module-csm.models.base_model">module</a>
+</li>
+      </ul></li>
+      <li>
+    csm.models.utils
+
+      <ul>
+        <li><a href="api/models/utils.html#module-csm.models.utils">module</a>
+</li>
+      </ul></li>
+      <li><a href="api/models/base.html#csm.models.CSMBase">CSMBase (class in csm.models)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="F">F</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/models/base.html#csm.models.CSMBase.fields">fields (csm.models.CSMBase attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/models/base.html#csm.models.CSMBase.fields_dict">fields_dict (csm.models.CSMBase attribute)</a>
+</li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.from_dict">from_dict() (csm.models.CSMBase class method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="G">G</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/models/utils.html#csm.models.utils.generate_parameterization">generate_parameterization() (in module csm.models.utils)</a>
+</li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.get_all_results">get_all_results() (csm.models.CSMBase method)</a>
+</li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.get_component_breakdown">get_component_breakdown() (csm.models.CSMBase method)</a>
+</li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.get_cost_results">get_cost_results() (csm.models.CSMBase method)</a>
+</li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.get_dependent_attributes">get_dependent_attributes() (csm.models.CSMBase method)</a>
+
+      <ul>
+        <li><a href="api/models/utils.html#csm.models.utils.get_dependent_attributes">(in module csm.models.utils)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/models/base.html#csm.models.CSMBase.get_descendant_attributes">get_descendant_attributes() (csm.models.CSMBase method)</a>
+
+      <ul>
+        <li><a href="api/models/utils.html#csm.models.utils.get_descendant_attributes">(in module csm.models.utils)</a>
+</li>
+      </ul></li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.get_mass_results">get_mass_results() (csm.models.CSMBase method)</a>
+</li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.get_required_inputs">get_required_inputs() (csm.models.CSMBase class method)</a>
+</li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.get_results">get_results() (csm.models.CSMBase method)</a>
+</li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.get_transport_results">get_transport_results() (csm.models.CSMBase method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="I">I</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/models/base.html#csm.models.CSMBase.irs_mpc_breakdown">irs_mpc_breakdown() (csm.models.CSMBase method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="L">L</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/models/land_2015.html#csm.models.nlr2015.Land2015NLR">Land2015NLR (class in csm.models.nlr2015)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/models/land_2020.html#csm.models.nlr2020.Land2020NLR">Land2020NLR (class in csm.models.nlr2020)</a>
+</li>
+      <li><a href="api/models/land_2021.html#csm.models.nlr2021.Land2021NLR">Land2021NLR (class in csm.models.nlr2021)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="M">M</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    module
+
+      <ul>
+        <li><a href="api/models/base.html#module-csm.models.base_model">csm.models.base_model</a>
+</li>
+        <li><a href="api/models/utils.html#module-csm.models.utils">csm.models.utils</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="O">O</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/models/base.html#csm.models.CSMBase.output_names">output_names (csm.models.CSMBase attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="P">P</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/models/base.html#csm.models.CSMBase.parameterize">parameterize() (csm.models.CSMBase class method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/models/base.html#csm.models.CSMBase.parameterize_subset">parameterize_subset() (csm.models.CSMBase class method)</a>
+</li>
+      <li><a href="api/tools/plot.html#csm.tools.plot.plot_mass_cost_comparison">plot_mass_cost_comparison() (in module csm.tools.plot)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="R">R</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/models/base.html#csm.models.CSMBase.rated_power_mw">rated_power_mw (csm.models.CSMBase property)</a>
+</li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.reset_values">reset_values() (csm.models.CSMBase method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/models/utils.html#csm.models.utils.reuse">reuse() (in module csm.models.utils)</a>
+</li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.rotor_radius">rotor_radius (csm.models.CSMBase property)</a>
+</li>
+      <li><a href="api/models/base.html#csm.models.CSMBase.run">run() (csm.models.CSMBase method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="S">S</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/models/base.html#csm.models.CSMBase.swept_area">swept_area (csm.models.CSMBase property)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="T">T</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/models/base.html#csm.models.CSMBase.total_domestic_content">total_domestic_content() (csm.models.CSMBase method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="U">U</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/models/base.html#csm.models.CSMBase.update">update() (csm.models.CSMBase method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By National Laboratory of the Rockies
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

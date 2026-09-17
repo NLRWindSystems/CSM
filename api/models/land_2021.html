@@ -1,0 +1,1355 @@
+
+<!DOCTYPE html>
+
+
+<html lang="python" data-content_root="../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>NLR Land-Based 2021 Model &#8212; CSM</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../../_static/documentation_options.js?v=30a733bc"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../../_static/togglebutton.js?v=b8b12719"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api/models/land_2021';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="canonical" href="https://nlrwindsystems.github.io/CSM/api/models/land_2021.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="NLR Land-Based 2026 Model" href="land_2026.html" />
+    <link rel="prev" title="NLR Land-Based 2020 Model" href="land_2020.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="python"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../../_static/searchtools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../intro.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">CSM</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../../intro.html">
+                    NLR Turbine Cost and Scaling Model (CSM)
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../intro/install.html">Installing CSM</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../intro/contributing.html">Contributor's Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../intro/demo.html">CSM by Example</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Model Background</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide/theory.html">Theory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide/model_overview.html">Model Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user_guide/new_models.html">Creating a New Model</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="index.html"><code class="docutils literal notranslate"><span class="pre">csm.models</span></code></a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="base.html">Base Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="land_2015.html">NLR Land-Based 2015 Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="land_2020.html">NLR Land-Based 2020 Model</a></li>
+<li class="toctree-l2 current active"><a class="current reference internal" href="#">NLR Land-Based 2021 Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="land_2026.html">NLR Land-Based 2026 Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html">Utilities</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../tools/index.html">Tools</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../tools/plot.html">Plotting Library</a></li>
+</ul>
+</details></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/NLRWindSystems/CSM" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/NLRWindSystems/CSM/issues/new?title=Issue%20on%20page%20%2Fapi/models/land_2021.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../../_sources/api/models/land_2021.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>NLR Land-Based 2021 Model</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#csm.models.nlr2021.Land2021NLR"><code class="docutils literal notranslate"><span class="pre">Land2021NLR</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#updated-scaling-relationships">Updated Scaling Relationships</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#csm.models.Land2021NLR.calculate_blade_mass"><code class="docutils literal notranslate"><span class="pre">Land2021NLR.calculate_blade_mass()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#csm.models.Land2021NLR.calculate_hub_mass"><code class="docutils literal notranslate"><span class="pre">Land2021NLR.calculate_hub_mass()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#csm.models.Land2021NLR.calculate_gearbox_mass"><code class="docutils literal notranslate"><span class="pre">Land2021NLR.calculate_gearbox_mass()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#csm.models.Land2021NLR.calculate_tower_mass"><code class="docutils literal notranslate"><span class="pre">Land2021NLR.calculate_tower_mass()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#primary-api">Primary API</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#model-helpers">Model Helpers</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#subsystem-calculations">Subsystem Calculations</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#subsystem-aggregations-systems">Subsystem Aggregations (Systems)</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="nlr-land-based-2021-model">
+<span id="api-land-2021"></span><h1>NLR Land-Based 2021 Model<a class="headerlink" href="#nlr-land-based-2021-model" title="Link to this heading">#</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="csm.models.nlr2021.Land2021NLR">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">csm.models.nlr2021.</span></span><span class="sig-name descname"><span class="pre">Land2021NLR</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rated_power_kw</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotor_diameter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">efficiency_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_bearings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_blades</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blade_mass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blade_cost</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hub_mass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hub_cost</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_tip_speed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rated_rpm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotor_torque</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spinner_mass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spinner_cost</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">low_speed_shaft_mass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">low_speed_shaft_cost</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bearing_mass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bearing_cost</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gearbox_mass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gearbox_cost</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">brake_mass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">brake_cost</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">generator_mass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">generator_cost</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bedplate_mass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bedplate_cost</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yaw_system_mass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yaw_system_cost</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hydraulic_cooling_cost</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nacelle_cover_mass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nacelle_cover_cost</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crane_cost</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">platform_mainframe_mass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">platform_mainframe_cost</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transformer_mass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transformer_cost</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">controls_mass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">controls_cost</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">electrical_connection_mass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">electrical_connection_cost</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">converter_mass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">converter_cost</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tower_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tower_mass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tower_cost</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nacelle_mass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nacelle_cost</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hub_system_mass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hub_system_cost</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotor_mass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotor_cost</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">turbine_mass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">turbine_cost</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">turbine_cost_kw</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blade_transport_cost</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hub_transport_cost</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">power_electronics_transport_cost</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">drivetrain_transport_cost</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tower_section_mass_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">80000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_tower_sections</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tower_transport_cost</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parts_transport_cost</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transport_cost</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">turbine_production_cost</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tower_flange_material_cost</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tower_flange_production_cost</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">turbine_class</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blade_mass_exp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.7679</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blade_mass_cost_coeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">15.9432</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pitch_system_mass_cost_coeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">24.1332</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spinner_mass_coeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.3255</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spinner_mass_intercept</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">204.65</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spinner_mass_cost_coeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">12.1212</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lss_mass_coeff1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.1906</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lss_mass_coeff2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-311.15</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lss_mass_intercept</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">13108.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lss_mass_cost_coeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">12.9948</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bearing_mass_coeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bearing_mass_exp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bearing_mass_cost_coeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4.914</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gearbox_mass_cost_coeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">14.0868</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">brake_mass_coeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.19851</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">brake_mass_intercept</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.893</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">brake_mass_cost_coeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">7.4256</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">generator_mass_cost_coeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">13.5408</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bedplate_mass_coeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">737.88</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bedplate_mass_intercept</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-68066</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bedplate_mass_cost_coeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3.1668</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yaw_system_non_bearing_mass_coeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yaw_system_mass_coeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0007</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yaw_system_mass_exp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3.1571</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">yaw_system_mass_cost_coeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">9.0636</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hvac_mass_cost_coeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">135.408</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hydraulic_cooling_mass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">221</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nacelle_cover_mass_cost_coeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6.2244</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">has_crane</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">platform_mainframe_mass_coeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.005</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">platform_mainframe_mass_cost_coeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">18.6732</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crane_mass_cost_coeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4.368</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crane_mass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transformer_mass_coeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.915</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transformer_mass_intercept</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1910.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transformer_mass_cost_coeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20.5296</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">controls_cost_coeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">23.0958</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">electrical_connection_cost_coeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">45.7002</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tower_mass_cost_coeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3.1668</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transport_blade_cost_coeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.543</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transport_blade_cost_coeff2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-7.4093</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transport_blade_cost_coeff3</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-2847.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transport_blade_cost_intercept</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">103627</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transport_hub_cost_intercept</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transport_power_electronics_cost_coeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">9</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transport_drivetrain_cost_coeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">90000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transport_drivetrain_cost_coeff2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">45000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transport_tower_cost_coeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">34083</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">transport_misc_parts_cost_coeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.025</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blade_has_carbon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bearing_housing_fraction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pitch_bearing_mass_coeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pitch_bearing_mass_intercept</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lss_mass_exp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lss_mass_coeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gearbox_torque_cost</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hss_mass_coeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hss_mass_cost_coeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">high_speed_shaft_mass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">high_speed_shaft_cost</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bedplate_mass_exp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hvac_mass_coeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tower_mass_exp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blade_mass_coeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8.3612</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blade_mass_coeff2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-620.03</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blade_mass_intercept</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">17847</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hub_mass_coeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8104.7</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hub_mass_exp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.1377</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hub_mass_cost_coeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5.96232</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gearbox_torque_density</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">132.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">generator_mass_coeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.6731</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">generator_mass_intercept</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3932.7</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nacelle_cover_mass_coeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.915</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nacelle_cover_mass_intercept</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1910</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">converter_power_cost_coeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tower_mass_coeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4.3e-08</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tower_mass_coeff2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.064588</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tower_mass_intercept</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">48275</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hub_mass_intercept</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">converter_mass_cost_coeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pitch_blade_mass_coeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pitch_system_mass_coeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pitch_blade_mass_intercept</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mass_sys_offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pitch_system_mass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pitch_system_cost</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gearbox_torque_exp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#csm.models.nlr2021.Land2021NLR" title="Link to this definition">#</a></dt>
+<dd><p>NLR 2021 empirically-based model used for development of the IRS Safe Harbor tables.</p>
+<p>Unused parameters from the base model:</p>
+<ul class="simple">
+<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">turbine_class</span></code></p></li>
+<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">blade_has_carbon</span></code></p></li>
+<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">hub_mass_intercept</span></code></p></li>
+<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">bearing_housing_fraction</span></code></p></li>
+<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">pitch_bearing_mass_coeff</span></code></p></li>
+<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">pitch_bearing_mass_intercept</span></code></p></li>
+<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">lss_mass_exp</span></code></p></li>
+<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">lss_mass_coeff</span></code></p></li>
+<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">gearbox_torque_cost</span></code></p></li>
+<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">hss_mass_coeff</span></code></p></li>
+<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">hss_mass_cost_coeff</span></code></p></li>
+<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">high_speed_shaft_mass</span></code></p></li>
+<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">high_speed_shaft_cost</span></code></p></li>
+<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">bedplate_mass_exp</span></code></p></li>
+<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">hvac_mass_coeff</span></code></p></li>
+<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">converter_mass_cost_coeff</span></code></p></li>
+<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">tower_mass_exp</span></code></p></li>
+</ul>
+<p>Unused parameters from the 2020 model:</p>
+<ul class="simple">
+<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">pitch_system_mass_cost_coeff</span></code></p></li>
+</ul>
+<p>Not updated from the 2015 model:</p>
+<ul class="simple">
+<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">pitch_bearing_mass_coeff</span></code></p></li>
+<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">pitch_bearing_mass_intercept</span></code></p></li>
+<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">bearing_housing_fraction</span></code></p></li>
+<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">mass_sys_offset</span></code></p></li>
+</ul>
+<p>Updated scaling relationships:</p>
+<ul class="simple">
+<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">blade_mass</span></code></p></li>
+<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">pitch_system_mass</span></code></p></li>
+<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">gearbox_mass</span></code></p></li>
+<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">converter_cost</span></code></p></li>
+<li><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">tower_mass</span></code></p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num_blades</strong> (<em>int</em>) -- Number of turbine blades</p></li>
+<li><p><strong>num_bearings</strong> (<em>int</em>) -- Number of main bearings.</p></li>
+<li><p><strong>rated_power_kw</strong> (<em>float</em>) -- Turbine rated power (<span class="math notranslate nohighlight">\(kW\)</span>).</p></li>
+<li><p><strong>rotor_diameter</strong> (<em>float</em>) -- Diameter of the swept area of the turbine blades (<span class="math notranslate nohighlight">\(m\)</span>).</p></li>
+<li><p><strong>efficiency_max</strong> (<em>float</em>) -- Maximum possible drivetrain efficiency.</p></li>
+<li><p><strong>has_crane</strong> (<em>bool</em>) -- In the 2020 model, a crane is assumed to exist. Defaults to True.</p></li>
+<li><p><strong>max_tip_speed</strong> (<em>float</em>) -- Maximum allowable blade tip speed (<span class="math notranslate nohighlight">\(m/s\)</span>).</p></li>
+<li><p><strong>tower_length</strong> (<em>float</em>) -- For onshore turbines, this is the hub height (total length above
+ground). For offshore turbines, this is length from transition piece to hub height
+(<span class="math notranslate nohighlight">\(m\)</span>).</p></li>
+<li><p><strong>blade_mass_coeff</strong> (<em>float</em>) -- <span class="math notranslate nohighlight">\(k_1\)</span> in the blade mass equation from
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">calculate_blade_mass()</span></code>. Defaults to 8.3612.</p></li>
+<li><p><strong>blade_mass_coeff2</strong> (<em>float</em>) -- <span class="math notranslate nohighlight">\(k_2\)</span> in the blade mass equation from
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">calculate_blade_mass()</span></code>. Defaults to -620.03.</p></li>
+<li><p><strong>blade_mass_intercept</strong> (<em>float</em>) -- <span class="math notranslate nohighlight">\(b\)</span> in the blade mass equation from
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">calculate_blade_mass()</span></code>. Defaults to 17847.</p></li>
+<li><p><strong>blade_mass_cost_coeff</strong> (<em>float</em>) -- Defaults to 15.9432.</p></li>
+<li><p><strong>blade_mass</strong> (<em>float</em>) -- Blade mass (<span class="math notranslate nohighlight">\(kg\)</span>). If not provided, calculated in
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">calculate_blade_mass()</span></code>.</p></li>
+<li><p><strong>blade_cost</strong> (<em>float</em>) -- Blade cost (<span class="math notranslate nohighlight">\(USD\)</span>). If not provided, calculated in
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">calculate_blade_cost()</span></code>.</p></li>
+<li><p><strong>hub_mass_coeff</strong> (<em>float</em>) -- Defaults to 8104.7.</p></li>
+<li><p><strong>hub_mass_exp</strong> (<em>float</em>) -- Defaults to 1.1377.</p></li>
+<li><p><strong>hub_mass_cost_coeff</strong> (<em>float</em>) -- Defaults to 5.96232.</p></li>
+<li><p><strong>pitch_bearing_mass_coeff</strong> (<em>float</em>) -- Not updated in 2015 or 2020. Defaults to 0.1295.</p></li>
+<li><p><strong>pitch_bearing_mass_intercept</strong> (<em>float</em>) -- Not updated in 2015 or 2020. Defaults to 491.31 kg.</p></li>
+<li><p><strong>bearing_housing_fraction</strong> (<em>float</em>) -- Not updated in 2015 or 2020. Defaults to 0.3280.</p></li>
+<li><p><strong>mass_sys_offset</strong> (<em>float</em>) -- Not updated in 2015 or 2020. Defaults to 555.0 kg.</p></li>
+<li><p><strong>pitch_system_mass_cost_coeff</strong> (<em>float</em>) -- Not updated in 2015 or 2020. Defaults to $22.1 USD/kg.</p></li>
+<li><p><strong>spinner_mass_coeff</strong> (<em>float</em>) -- Defaults to 2.3255 <span class="math notranslate nohighlight">\(kg/m\)</span>.</p></li>
+<li><p><strong>spinner_mass_intercept</strong> (<em>float</em>) -- Defaults to 204.65 <span class="math notranslate nohighlight">\(kg\)</span>.</p></li>
+<li><p><strong>spinner_mass_cost_coeff</strong> (<em>float</em>) -- Defaults to 12.1212 <span class="math notranslate nohighlight">\(USD/kg\)</span>.</p></li>
+<li><p><strong>lss_mass_coeff1</strong> (<em>float</em>) -- Defaults to 2.1906 <span class="math notranslate nohighlight">\(kg/m^2\)</span>.</p></li>
+<li><p><strong>lss_mass_coeff2</strong> (<em>float</em>) -- Defaults to -311.15 <span class="math notranslate nohighlight">\(kg/m\)</span>.</p></li>
+<li><p><strong>lss_mass_intercept</strong> (<em>float</em>) -- Defaults to 13108.0 <span class="math notranslate nohighlight">\(kg\)</span>.</p></li>
+<li><p><strong>lss_mass_cost_coeff</strong> (<em>float</em>) -- Defaults to 12.9948 <span class="math notranslate nohighlight">\(USD/kg\)</span>.</p></li>
+<li><p><strong>low_speed_shaft_mass</strong> (<em>float</em>) -- Low speed shaft mass (<span class="math notranslate nohighlight">\(kg\)</span>). See
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">calculate_low_speed_shaft_mass()</span></code> for more details.</p></li>
+<li><p><strong>low_speed_shaft_cost</strong> (<em>float</em>) -- Low speed shaft cost (<span class="math notranslate nohighlight">\(USD\)</span>). See
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">calculate_low_speed_shaft_cost()</span></code> for more details.</p></li>
+<li><p><strong>bearing_mass_coeff</strong> (<em>float</em>) -- Defaults to 0.0001.</p></li>
+<li><p><strong>bearing_mass_exp</strong> (<em>float</em>) -- Defaults to 3.5.</p></li>
+<li><p><strong>bearing_mass_cost_coeff</strong> (<em>float</em>) -- Defaults to 4.914 <span class="math notranslate nohighlight">\(USD/kg\)</span>.</p></li>
+<li><p><strong>bearing_mass</strong> (<em>float</em>) -- Main bearing mass (<span class="math notranslate nohighlight">\(kg\)</span>). See <code class="xref py py-meth docutils literal notranslate"><span class="pre">calculate_bearing_mass()</span></code>
+for more details.</p></li>
+<li><p><strong>bearing_cost</strong> (<em>float</em>) -- Main bearing cost (<span class="math notranslate nohighlight">\(USD\)</span>). See <code class="xref py py-meth docutils literal notranslate"><span class="pre">calculate_bearing_cost()</span></code>
+for more details.</p></li>
+<li><p><strong>gearbox_torque_density</strong> (<em>float</em>) -- Updated to 132.5 Nm/kg.</p></li>
+<li><p><strong>gearbox_torque_cost</strong> (<em>float</em>) -- Unused in 2020. Defaults to 0.</p></li>
+<li><p><strong>gearbox_mass_cost_coeff</strong> (<em>float</em>) -- Defaults to 14.0868.</p></li>
+<li><p><strong>gearbox_mass</strong> (<em>float</em>) -- Gearbox mass (<span class="math notranslate nohighlight">\(kg\)</span>). See <code class="xref py py-meth docutils literal notranslate"><span class="pre">calculate_gearbox_mass()</span></code>
+for more details.</p></li>
+<li><p><strong>gearbox_cost</strong> (<em>float</em>) -- Gearbox cost (<span class="math notranslate nohighlight">\(USD\)</span>). See <code class="xref py py-meth docutils literal notranslate"><span class="pre">calculate_gearbox_cost()</span></code>
+for more details.</p></li>
+<li><p><strong>brake_mass_cost_coeff</strong> (<em>float</em>) -- In 2020, updated to $3.6254 USD/kg. Regression based sizing
+derived by J.Keller under FOA 1981 support project.</p></li>
+<li><p><strong>brake_mass</strong> (<em>float</em>) -- Brake mass (<span class="math notranslate nohighlight">\(kg\)</span>). See <code class="xref py py-meth docutils literal notranslate"><span class="pre">calculate_brake_mass()</span></code> for more
+details.</p></li>
+<li><p><strong>brake_cost</strong> (<em>float</em>) -- Brake cost (<span class="math notranslate nohighlight">\(USD\)</span>). See <code class="xref py py-meth docutils literal notranslate"><span class="pre">calculate_brake_cost()</span></code> for more
+details.</p></li>
+<li><p><strong>generator_mass_coeff</strong> (<em>float</em>) -- Defaults to 1.6731.</p></li>
+<li><p><strong>generator_mass_intercept</strong> (<em>float</em>) -- Defaults to 3932.7.</p></li>
+<li><p><strong>generator_mass_cost_coeff</strong> (<em>float</em>) -- Defaults to 13.5408 <span class="math notranslate nohighlight">\(USD/kg\)</span>.</p></li>
+<li><p><strong>generator_mass</strong> (<em>float</em>) -- Generator mass (<span class="math notranslate nohighlight">\(kg\)</span>). See <code class="xref py py-meth docutils literal notranslate"><span class="pre">calculate_generator_mass()</span></code>
+for more details.</p></li>
+<li><p><strong>generator_cost</strong> (<em>float</em>) -- Generator cost (<span class="math notranslate nohighlight">\(USD\)</span>). See
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">calculate_generator_cost()</span></code> for more details.</p></li>
+<li><p><strong>bedplate_mass_exp</strong> (<em>float</em>) -- Unused in the 2020 model. Defaults to 0.</p></li>
+<li><p><strong>bedplate_mass_coeff</strong> (<em>float</em>) -- Defaults to 737.88.</p></li>
+<li><p><strong>bedplate_mass_intercept</strong> (<em>float</em>) -- Defaults to -68066.</p></li>
+<li><p><strong>bedplate_mass_cost_coeff</strong> (<em>float</em>) -- Defaults to 3.1668 <span class="math notranslate nohighlight">\(USD/kg\)</span>.</p></li>
+<li><p><strong>bedplate_mass</strong> (<em>float</em>) -- Bedplate mass (<span class="math notranslate nohighlight">\(kg\)</span>). See <code class="xref py py-meth docutils literal notranslate"><span class="pre">calculate_bedplate_mass()</span></code>
+for more details.</p></li>
+<li><p><strong>bedplate_cost</strong> (<em>float</em>) -- Bedplate cost (<span class="math notranslate nohighlight">\(USD\)</span>). See <code class="xref py py-meth docutils literal notranslate"><span class="pre">calculate_bedplate_cost()</span></code>
+for more details.</p></li>
+<li><p><strong>yaw_system_non_bearing_mass_coeff</strong> (<em>float</em>) -- Defaults to 1.6.</p></li>
+<li><p><strong>yaw_system_mass_coeff</strong> (<em>float</em>) -- Defaults to 0.0007.</p></li>
+<li><p><strong>yaw_system_mass_exp</strong> (<em>float</em>) -- Defaults to 3.1571.</p></li>
+<li><p><strong>yaw_system_mass_cost_coeff</strong> (<em>float</em>) -- Defaults to 9.0636 <span class="math notranslate nohighlight">\(USD/kg\)</span>.</p></li>
+<li><p><strong>hvac_mass_coeff</strong> (<em>float</em>) -- Not used in 2020. Defaults to 0.</p></li>
+<li><p><strong>hvac_mass_cost_coeff</strong> (<em>float</em>) -- Defaults to 135.408 <span class="math notranslate nohighlight">\(USD/kg\)</span>.</p></li>
+<li><p><strong>yaw_system_mass</strong> (<em>float</em>) -- Yaw system mass (<span class="math notranslate nohighlight">\(kg\)</span>). See
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">calculate_yaw_system_mass()</span></code> for more details.</p></li>
+<li><p><strong>yaw_system_cost</strong> (<em>float</em>) -- Yaw system cost (<span class="math notranslate nohighlight">\(USD\)</span>). See
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">calculate_yaw_system_cost()</span></code> for more details.</p></li>
+<li><p><strong>hydraulic_cooling_mass</strong> (<em>float</em>) -- Defaults to 221 <span class="math notranslate nohighlight">\(kg\)</span>.</p></li>
+<li><p><strong>hydraulic_cooling_cost</strong> (<em>float</em>) -- Hydraulic cooling cost (<span class="math notranslate nohighlight">\(USD\)</span>). See
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">calculate_hydraulic_cooling_cost()</span></code> for more details.</p></li>
+<li><p><strong>nacelle_cover_mass_coeff</strong> (<em>float</em>) -- Defaults to 1.915 <span class="math notranslate nohighlight">\(kg/kW\)</span>.</p></li>
+<li><p><strong>nacelle_cover_mass_intercept</strong> (<em>float</em>) -- Defaults to 1910.</p></li>
+<li><p><strong>nacelle_cover_mass_cost_coeff</strong> (<em>float</em>) -- Defaults to 6.2244 <span class="math notranslate nohighlight">\(USD/kg\)</span>.</p></li>
+<li><p><strong>nacelle_cover_mass</strong> (<em>float</em>) -- nacelle_cover mass (<span class="math notranslate nohighlight">\(kg\)</span>). See
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">calculate_nacelle_cover_mass()</span></code> for more details.</p></li>
+<li><p><strong>nacelle_cover_cost</strong> (<em>float</em>) -- nacelle_cover mass (<span class="math notranslate nohighlight">\(USD\)</span>). See
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">calculate_nacelle_cover_cost()</span></code> for more details.</p></li>
+<li><p><strong>platform_mainframe_mass_coeff</strong> (<em>float</em>) -- Defaults to 0.005.</p></li>
+<li><p><strong>platform_mainframe_mass_cost_coeff</strong> (<em>float</em>) -- Defaults to 18.6732 <span class="math notranslate nohighlight">\(USD/kg\)</span>.</p></li>
+<li><p><strong>platform_mainframe_mass</strong> (<em>float</em>) -- Platform mainframe mass (<span class="math notranslate nohighlight">\(kg\)</span>).
+See <code class="xref py py-meth docutils literal notranslate"><span class="pre">calculate_platform_mainframe_mass()</span></code> for more details.</p></li>
+<li><p><strong>platform_mainframe_cost</strong> (<em>float</em>) -- Platform mainframe cost (<span class="math notranslate nohighlight">\(USD\)</span>).
+See <code class="xref py py-meth docutils literal notranslate"><span class="pre">calculate_platform_mainframe_cost()</span></code> for more details.</p></li>
+<li><p><strong>crane_mass_cost_coeff</strong> (<em>float</em>) -- Defaults to 4.368 <span class="math notranslate nohighlight">\(USD/kg\)</span>.</p></li>
+<li><p><strong>crane_mass</strong> (<em>float</em>) -- If not provided, defaults to <code class="xref py py-attr docutils literal notranslate"><span class="pre">platform_mainframe_mass</span></code>.</p></li>
+<li><p><strong>transformer_mass_coeff</strong> (<em>float</em>) -- Defaults to 1915 <span class="math notranslate nohighlight">\(kg/kW\)</span>.</p></li>
+<li><p><strong>transformer_mass_intercept</strong> (<em>bool</em>) -- Defaults to 1910.</p></li>
+<li><p><strong>transformer_mass_cost_coeff</strong> (<em>float</em>) -- Defaults to 20.5296 <span class="math notranslate nohighlight">\(USD/kg\)</span>.</p></li>
+<li><p><strong>transformer_mass</strong> (<em>float</em>) -- Transformer cover mass (<span class="math notranslate nohighlight">\(kg\)</span>). See
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">calculate_transformer_mass()</span></code> for more details.</p></li>
+<li><p><strong>transformer_cost</strong> (<em>float</em>) -- Transformer cover cost (<span class="math notranslate nohighlight">\(USD\)</span>). See
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">calculate_transformer_cost()</span></code> for more details.</p></li>
+<li><p><strong>converter_power_cost_coeff</strong> (<em>float</em>) -- Defaults to 50 <span class="math notranslate nohighlight">\(USD/kW\)</span>.</p></li>
+<li><p><strong>converter_mass</strong> (<em>float</em>) -- Power converter mass (<span class="math notranslate nohighlight">\(kg\)</span>). See
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">calculate_converter_mass()</span></code> for more details.</p></li>
+<li><p><strong>converter_cost</strong> (<em>float</em>) -- Power converter cost (<span class="math notranslate nohighlight">\(USD\)</span>). See</p></li>
+<li><p><strong>controls_cost_coeff</strong> (<em>float</em>) -- 23.0958 <span class="math notranslate nohighlight">\(USD/kW\)</span>.</p></li>
+<li><p><strong>controls_mass</strong> (<em>float</em>) -- Controls mass (<span class="math notranslate nohighlight">\(kg\)</span>). Defaults to 0 <span class="math notranslate nohighlight">\(kg\)</span>.</p></li>
+<li><p><strong>controls_cost</strong> (<em>float</em>) -- Controls cost (<span class="math notranslate nohighlight">\(USD\)</span>). See
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">calculate_controls_cost()</span></code> for more details.</p></li>
+<li><p><strong>electrical_connection_cost_coeff</strong> (<em>float</em>) -- Defaults to 45.7002 <span class="math notranslate nohighlight">\(USD/kW\)</span>.</p></li>
+<li><p><strong>electrical_connection_mass</strong> (<em>float</em>) -- Electrical connection mass (<span class="math notranslate nohighlight">\(kg\)</span>). See
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">calculate_electrical_connection_mass()</span></code> for more details.</p></li>
+<li><p><strong>electrical_connection_cost</strong> (<em>float</em>) -- Electrical connection cost (<span class="math notranslate nohighlight">\(USD\)</span>). See
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">calculate_electrical_connection_cost()</span></code> for more details.
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">calculate_converter_cost()</span></code> for more details.</p></li>
+<li><p><strong>tower_mass_coeff</strong> (<em>float</em>) -- Defaults to 0.000000043 <span class="math notranslate nohighlight">\(kg/m\)</span>.</p></li>
+<li><p><strong>tower_mass_coeff2</strong> (<em>float</em>) -- Defaults to 0.064588.</p></li>
+<li><p><strong>tower_mass_intercept</strong> (<em>bool</em>) -- Defaults to 48275.</p></li>
+<li><p><strong>tower_mass_cost_coeff</strong> (<em>float</em>) -- Defaults to 3.1668 <span class="math notranslate nohighlight">\(USD/kg\)</span>.</p></li>
+<li><p><strong>tower_mass</strong> (<em>float</em>) -- Tower mass (<span class="math notranslate nohighlight">\(kg\)</span>). See
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">calculate_tower_mass()</span></code> for more details.</p></li>
+<li><p><strong>tower_cost</strong> (<em>float</em>) -- Tower cost (<span class="math notranslate nohighlight">\(USD\)</span>). See
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">calculate_tower_cost()</span></code> for more details.</p></li>
+<li><p><strong>transport_blade_cost_coeff</strong> (<em>float</em>) -- See <code class="xref py py-attr docutils literal notranslate"><span class="pre">calculate_blade_transport_cost</span></code> for more
+details. Defaults to 0.543.</p></li>
+<li><p><strong>transport_blade_cost_coeff2</strong> (<em>float</em>) -- See <code class="xref py py-attr docutils literal notranslate"><span class="pre">calculate_blade_transport_cost</span></code> for more
+details. Defaults to -7.4903.</p></li>
+<li><p><strong>transport_blade_cost_coeff3</strong> (<em>float</em>) -- See <code class="xref py py-attr docutils literal notranslate"><span class="pre">calculate_blade_transport_cost</span></code> for more
+details. Defaults to -2847.5.</p></li>
+<li><p><strong>transport_blade_cost_intercept</strong> (<em>float</em>) -- See <code class="xref py py-attr docutils literal notranslate"><span class="pre">calculate_blade_transport_cost</span></code> for
+more details. Defaults to 103627 <span class="math notranslate nohighlight">\(USD\)</span>.</p></li>
+<li><p><strong>blade_transport_cost</strong> (<em>float</em>) -- Total blade transportation cost (<span class="math notranslate nohighlight">\(USD\)</span>). See
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">calculate_blade_transport_cost()</span></code> for more details.</p></li>
+<li><p><strong>transport_hub_cost_intercept</strong> (<em>float</em>) -- See <code class="xref py py-attr docutils literal notranslate"><span class="pre">calculate_hub_transport_cost</span></code> for more
+details. Defaults to 5000.</p></li>
+<li><p><strong>hub_transport_cost</strong> (<em>float</em>) -- Total hub transportation cost (<span class="math notranslate nohighlight">\(USD\)</span>). See
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">calculate_hub_transport_cost()</span></code> for more details.</p></li>
+<li><p><strong>transport_power_electronics_cost_coeff</strong> (<em>float</em>) -- See
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">calculate_power_electronics_transport_cost</span></code> for more details. Defaults to
+9 <span class="math notranslate nohighlight">\(USD/kW\)</span>.</p></li>
+<li><p><strong>power_electronics_transport_cost</strong> (<em>float</em>) -- Total power_electronics transportation cost
+(<span class="math notranslate nohighlight">\(USD\)</span>). See <code class="xref py py-meth docutils literal notranslate"><span class="pre">calculate_power_electronics_transport_cost()</span></code> for more
+details.</p></li>
+<li><p><strong>transport_drivetrain_cost_coeff</strong> (<em>float</em>) -- See <code class="xref py py-attr docutils literal notranslate"><span class="pre">calculate_drivetrain_transport_cost</span></code>
+for more details. Defaults to 9000 <span class="math notranslate nohighlight">\(kg\)</span>.</p></li>
+<li><p><strong>transport_drivetrain_cost_coeff2</strong> (<em>float</em>) -- See <code class="xref py py-attr docutils literal notranslate"><span class="pre">calculate_drivetrain_transport_cost</span></code>
+for more details. Defaults to 45000 <span class="math notranslate nohighlight">\(USD\)</span>.</p></li>
+<li><p><strong>drivetrain_transport_cost</strong> (<em>float</em>) -- Total drivetrain transportation cost (<span class="math notranslate nohighlight">\(USD\)</span>). See
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">calculate_drivetrain_transport_cost()</span></code> for more details.</p></li>
+<li><p><strong>tower_section_mass_max</strong> (<em>float</em>) -- Maximum mass of each tower section. See
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">calculate_num_tower_sections</span></code> for more details. Defaults to 80000
+<span class="math notranslate nohighlight">\(kg\)</span>.</p></li>
+<li><p><strong>num_tower_sections</strong> (<em>float</em>) -- Total number of tower sections. See
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">calculate_tower_transport_cost</span></code> for more details if not providing directly.</p></li>
+<li><p><strong>transport_tower_cost_coeff</strong> (<em>float</em>) -- Transportation cost for a single tower section. See
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">calculate_tower_transport_cost</span></code> for more details. Defaults to 34083
+<span class="math notranslate nohighlight">\(USD\)</span>.</p></li>
+<li><p><strong>tower_transport_cost</strong> (<em>float</em>) -- Total tower transportation cost (<span class="math notranslate nohighlight">\(USD\)</span>). See
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">calculate_tower_transport_cost()</span></code> for more details.</p></li>
+<li><p><strong>transport_misc_parts_cost_coeff</strong> (<em>float</em>) -- See <code class="xref py py-attr docutils literal notranslate"><span class="pre">calculate__transport_cost</span></code> for more
+details. Defaults to 0.025 <span class="math notranslate nohighlight">\(USD/kg\)</span>.</p></li>
+<li><p><strong>parts_transport_cost</strong> (<em>float</em>) -- Total transportation cost of miscellaneous parts
+(<span class="math notranslate nohighlight">\(USD\)</span>). See <code class="xref py py-meth docutils literal notranslate"><span class="pre">calculate_parts_transport_cost()</span></code> for more details.</p></li>
+<li><p><strong>transport_cost</strong> (<em>float</em>) -- Total transportation cost (<span class="math notranslate nohighlight">\(USD\)</span>). See
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">calculate_transport_cost()</span></code> for more details.</p></li>
+<li><p><strong>blade_mass_exp</strong> (<em>float</em>) -- Unused in the 2021 model. Defaults to 0.</p></li>
+<li><p><strong>pitch_bearing_mass_coeff</strong> -- The pitch system is incorporated into the hub for 2021,
+so it is not explicitly modeled for 2020 and later models. Defaults to 0.</p></li>
+<li><p><strong>pitch_bearing_mass_intercept</strong> -- The pitch system is incorporated into the hub for
+2021, so it is not explicitly modeled for 2020 and later models. Defaults to 0.</p></li>
+<li><p><strong>bearing_housing_fraction</strong> -- The pitch system is incorporated into the hub for 2021,
+so it is not explicitly modeled for 2020 and later models. Defaults to 0.</p></li>
+<li><p><strong>mass_sys_offset</strong> -- The pitch system is incorporated into the hub for 2021,
+so it is not explicitly modeled for 2020 and later models. Defaults to 0.</p></li>
+<li><p><strong>pitch_system_mass_cost_coeff</strong> -- The pitch system is incorporated into the hub for
+2021, so it is not explicitly modeled for 2020 and later models. Defaults to 0.</p></li>
+<li><p><strong>mass_sys_offset</strong> -- The pitch system is incorporated into the hub for
+2021, so it is not explicitly modeled for 2020 and later models. Defaults to 0.</p></li>
+<li><p><strong>pitch_system_mass</strong> (<em>float</em>) -- The pitch system is incorporated into the hub for
+2021, so it is not explicitly modeled for 2020 and later models. Defaults to 0.</p></li>
+<li><p><strong>pitch_system_cost</strong> (<em>float</em>) -- The pitch system is incorporated into the hub for
+2021, so it is not explicitly modeled for 2020 and later models. Defaults to 0.</p></li>
+<li><p><strong>gearbox_torque_exp</strong> (<em>float</em>) -- Not used int the 2021 model. Defaults to 0.</p></li>
+<li><p><strong>hss_mass_coeff</strong> (<em>float</em>) -- High speed shaft is not modeled for 2020 and later models.
+Defaults to 0</p></li>
+<li><p><strong>hss_mass_cost_coeff</strong> (<em>float</em>) -- High speed shaft is not modeled for 2020 and later models.
+Defaults to 0</p></li>
+<li><p><strong>hub_mass</strong> (<em>float</em>)</p></li>
+<li><p><strong>hub_cost</strong> (<em>float</em>)</p></li>
+<li><p><strong>rated_rpm</strong> (<em>float</em>)</p></li>
+<li><p><strong>rotor_torque</strong> (<em>float</em>)</p></li>
+<li><p><strong>spinner_mass</strong> (<em>float</em>)</p></li>
+<li><p><strong>spinner_cost</strong> (<em>float</em>)</p></li>
+<li><p><strong>crane_cost</strong> (<em>float</em>)</p></li>
+<li><p><strong>nacelle_mass</strong> (<em>float</em>)</p></li>
+<li><p><strong>nacelle_cost</strong> (<em>float</em>)</p></li>
+<li><p><strong>hub_system_mass</strong> (<em>float</em>)</p></li>
+<li><p><strong>hub_system_cost</strong> (<em>float</em>)</p></li>
+<li><p><strong>rotor_mass</strong> (<em>float</em>)</p></li>
+<li><p><strong>rotor_cost</strong> (<em>float</em>)</p></li>
+<li><p><strong>turbine_mass</strong> (<em>float</em>)</p></li>
+<li><p><strong>turbine_cost</strong> (<em>float</em>)</p></li>
+<li><p><strong>turbine_cost_kw</strong> (<em>float</em>)</p></li>
+<li><p><strong>turbine_production_cost</strong> (<em>float</em>)</p></li>
+<li><p><strong>tower_flange_material_cost</strong> (<em>float</em>)</p></li>
+<li><p><strong>tower_flange_production_cost</strong> (<em>float</em>)</p></li>
+<li><p><strong>turbine_class</strong> (<em>int</em>)</p></li>
+<li><p><strong>brake_mass_coeff</strong> (<em>float</em>)</p></li>
+<li><p><strong>brake_mass_intercept</strong> (<em>Any</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>blade_has_carbon</strong> (<em>bool</em>)</p></li>
+<li><p><strong>lss_mass_exp</strong> (<em>float</em>)</p></li>
+<li><p><strong>lss_mass_coeff</strong> (<em>float</em>)</p></li>
+<li><p><strong>high_speed_shaft_mass</strong> (<em>float</em>)</p></li>
+<li><p><strong>high_speed_shaft_cost</strong> (<em>float</em>)</p></li>
+<li><p><strong>tower_mass_exp</strong> (<em>float</em>)</p></li>
+<li><p><strong>hub_mass_intercept</strong> (<em>float</em>)</p></li>
+<li><p><strong>converter_mass_cost_coeff</strong> (<em>float</em>)</p></li>
+<li><p><strong>pitch_blade_mass_coeff</strong> (<em>Any</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>pitch_system_mass_coeff</strong> (<em>Any</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>pitch_blade_mass_intercept</strong> (<em>Any</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<section id="updated-scaling-relationships">
+<h2>Updated Scaling Relationships<a class="headerlink" href="#updated-scaling-relationships" title="Link to this heading">#</a></h2>
+<p>The following calculations were overridden from the 2020 model (<code class="docutils literal notranslate"><span class="pre">Land2020NLR</span></code>) based on available
+industry and open source data at its time of development.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="csm.models.Land2021NLR.calculate_blade_mass">
+<span class="sig-prename descclassname"><span class="pre">Land2021NLR.</span></span><span class="sig-name descname"><span class="pre">calculate_blade_mass</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#csm.models.Land2021NLR.calculate_blade_mass" title="Link to this definition">#</a></dt>
+<dd><p>Calculates and sets <code class="xref py py-attr docutils literal notranslate"><span class="pre">blade_mass</span></code> if it was not provided by the user.</p>
+<div class="math notranslate nohighlight">
+\[k_1 * r^2 + k_2 * r + b\]</div>
+<p>where:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(k_1 =\)</span> <code class="xref py py-attr docutils literal notranslate"><span class="pre">blade_mass_coeff</span></code></p></li>
+<li><p><span class="math notranslate nohighlight">\(k_2 =\)</span> <code class="xref py py-attr docutils literal notranslate"><span class="pre">blade_mass_coeff2</span></code></p></li>
+<li><p><span class="math notranslate nohighlight">\(r =\)</span> <code class="xref py py-attr docutils literal notranslate"><span class="pre">rotor_diameter</span></code> / 2</p></li>
+<li><p><span class="math notranslate nohighlight">\(b =\)</span> <code class="xref py py-attr docutils literal notranslate"><span class="pre">blade_mass_intercept</span></code></p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>blade_mass_coeff</strong> (<em>float</em>) -- <span class="math notranslate nohighlight">\(k_1\)</span> in the mass equation above.</p></li>
+<li><p><strong>blade_mass_coeff2</strong> (<em>float</em>) -- <span class="math notranslate nohighlight">\(k_2\)</span> in the mass equation above.</p></li>
+<li><p><strong>rotor_diameter</strong> (<em>float</em>) -- Diameter of the swept area of the turbine blades.</p></li>
+<li><p><strong>blade_mass_intercept</strong> (<em>float</em>) -- <span class="math notranslate nohighlight">\(b\)</span> in the mass equation above.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> -- Raised if the required parameters have not been provided or calculated.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="csm.models.Land2021NLR.calculate_hub_mass">
+<span class="sig-prename descclassname"><span class="pre">Land2021NLR.</span></span><span class="sig-name descname"><span class="pre">calculate_hub_mass</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#csm.models.Land2021NLR.calculate_hub_mass" title="Link to this definition">#</a></dt>
+<dd><p>Calculates and sets <code class="xref py py-attr docutils literal notranslate"><span class="pre">hub_mass</span></code> if it was not provided by the user.</p>
+<div class="math notranslate nohighlight">
+\[k * power ^ b\]</div>
+<p>where:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(k =\)</span> <code class="xref py py-attr docutils literal notranslate"><span class="pre">hub_mass_coeff</span></code></p></li>
+<li><p><span class="math notranslate nohighlight">\(power =\)</span> <code class="xref py py-attr docutils literal notranslate"><span class="pre">rated_power_mw</span></code></p></li>
+<li><p><span class="math notranslate nohighlight">\(b =\)</span> <code class="xref py py-attr docutils literal notranslate"><span class="pre">hub_mass_exp</span></code></p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>hub_mass_coeff</strong> (<em>float</em>) -- <span class="math notranslate nohighlight">\(k\)</span> in the mass equation above (<span class="math notranslate nohighlight">\(kg/kW\)</span>).</p></li>
+<li><p><strong>rated_power_mw</strong> (<em>float</em>) -- Turbine nameplate capacity (rated power) (<span class="math notranslate nohighlight">\(MW\)</span>).</p></li>
+<li><p><strong>hub_mass_exp</strong> (<em>bool</em>) -- <span class="math notranslate nohighlight">\(b\)</span> in the mass equation above.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> -- Raised if the required parameters have not been provided or calculated.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="csm.models.Land2021NLR.calculate_gearbox_mass">
+<span class="sig-prename descclassname"><span class="pre">Land2021NLR.</span></span><span class="sig-name descname"><span class="pre">calculate_gearbox_mass</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#csm.models.Land2021NLR.calculate_gearbox_mass" title="Link to this definition">#</a></dt>
+<dd><p>Calculates and sets <code class="xref py py-attr docutils literal notranslate"><span class="pre">gearbox_mass</span></code> for the gearbox if it was not provided
+by the user.</p>
+<div class="math notranslate nohighlight">
+\[\tau * 1000 / k\]</div>
+<p>where:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(\tau =\)</span> <code class="xref py py-attr docutils literal notranslate"><span class="pre">rotor_torque</span></code></p></li>
+<li><p><span class="math notranslate nohighlight">\(k =\)</span> <code class="xref py py-attr docutils literal notranslate"><span class="pre">gearbox_torque_density</span></code></p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>rotor_torque</strong> (<em>float</em>) -- Turbine rotor torque at rated power (<span class="math notranslate nohighlight">\(kNm\)</span>).</p></li>
+<li><p><strong>gearbox_torque_density</strong> (<em>float</em>) -- <span class="math notranslate nohighlight">\(k\)</span> in the mass equation above (<span class="math notranslate nohighlight">\(N*m/kg\)</span>).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> -- Raised if the required parameters have not been provided or calculated.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="csm.models.Land2021NLR.calculate_tower_mass">
+<span class="sig-prename descclassname"><span class="pre">Land2021NLR.</span></span><span class="sig-name descname"><span class="pre">calculate_tower_mass</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#csm.models.Land2021NLR.calculate_tower_mass" title="Link to this definition">#</a></dt>
+<dd><p>Calculates and sets <code class="xref py py-attr docutils literal notranslate"><span class="pre">tower_mass</span></code> if it was not provided by the user.</p>
+<div class="math notranslate nohighlight">
+\[k_1 * (A * H_{hub})^2 + k_2 * A * H_{hub} + b\]</div>
+<p>where:</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(k_1 =\)</span> <code class="xref py py-attr docutils literal notranslate"><span class="pre">tower_mass_coeff</span></code></p></li>
+<li><p><span class="math notranslate nohighlight">\(A =\)</span> <code class="xref py py-attr docutils literal notranslate"><span class="pre">swept_area</span></code></p></li>
+<li><p><span class="math notranslate nohighlight">\(H_{hub} =\)</span> <code class="xref py py-attr docutils literal notranslate"><span class="pre">tower_length</span></code></p></li>
+<li><p><span class="math notranslate nohighlight">\(k_2 =\)</span> <code class="xref py py-attr docutils literal notranslate"><span class="pre">tower_mass_coeff2</span></code></p></li>
+<li><p><span class="math notranslate nohighlight">\(b =\)</span> <code class="xref py py-attr docutils literal notranslate"><span class="pre">tower_mass_intercept</span></code></p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tower_mass_coeff</strong> (<em>float</em>) -- <span class="math notranslate nohighlight">\(k\)</span> in the mass equation above.</p></li>
+<li><p><strong>tower_mass_coeff2</strong> (<em>float</em>) -- <span class="math notranslate nohighlight">\(k\)</span> in the mass equation above.</p></li>
+<li><p><strong>rotor_diameter</strong> (<em>float</em>) -- Diameter of the rotor swept area; used to calculate
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">swept_area</span></code>.</p></li>
+<li><p><strong>tower_length</strong> (<em>float</em>) -- For onshore turbines, this is the hub height (total length above
+ground). For offshore turbines, this is length from transition piece to hub height
+(<span class="math notranslate nohighlight">\(m\)</span>).</p></li>
+<li><p><strong>tower_mass_intercept</strong> (<em>bool</em>) -- <span class="math notranslate nohighlight">\(b\)</span> in the mass equation above (<span class="math notranslate nohighlight">\(kg\)</span>).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> -- Raised if the required parameters have not been provided or calculated.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="primary-api">
+<h2>Primary API<a class="headerlink" href="#primary-api" title="Link to this heading">#</a></h2>
+<p>Main interface of the model for end users creating and running a model, and getting results.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Method</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference internal" href="base.html#csm.models.CSMBase.from_dict" title="csm.models.CSMBase.from_dict"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">from_dict</span></code></span></a>(data, partial)</p></td>
+<td><p>Create a complete or incomplete model from a configuration data dictionary.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="base.html#csm.models.CSMBase.calculate" title="csm.models.CSMBase.calculate"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">calculate</span></code></span></a>(args)</p></td>
+<td><p>Calculate individual or a series of outputs.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="base.html#csm.models.CSMBase.run" title="csm.models.CSMBase.run"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">run</span></code></span></a>()</p></td>
+<td><p>Calculate all outputs.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="base.html#csm.models.CSMBase.parameterize" title="csm.models.CSMBase.parameterize"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">parameterize</span></code></span></a>(base_kwargs, parameterized_kwargs, results)</p></td>
+<td><p>Parameter sweep.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="base.html#csm.models.CSMBase.parameterize_subset" title="csm.models.CSMBase.parameterize_subset"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">parameterize_subset</span></code></span></a>(base_kwargs, parameterized_kwargs, results)</p></td>
+<td><p>Parameter sweep with only partial calculation of results for incomplete model definitions.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="base.html#csm.models.CSMBase.get_results" title="csm.models.CSMBase.get_results"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">get_results</span></code></span></a>(args)</p></td>
+<td><p>Retrieve a dictionary of calculated attributes.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="base.html#csm.models.CSMBase.get_all_results" title="csm.models.CSMBase.get_all_results"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">get_all_results</span></code></span></a>()</p></td>
+<td><p>Retrieve a dictionary of all calculated attributes.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="base.html#csm.models.CSMBase.get_mass_results" title="csm.models.CSMBase.get_mass_results"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">get_mass_results</span></code></span></a>()</p></td>
+<td><p>Retrieve a dictionary of calculated mass attributes.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="base.html#csm.models.CSMBase.get_cost_results" title="csm.models.CSMBase.get_cost_results"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">get_cost_results</span></code></span></a>()</p></td>
+<td><p>Retrieve a dictionary of calculated cost attributes.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="base.html#csm.models.CSMBase.get_transport_results" title="csm.models.CSMBase.get_transport_results"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">get_transport_results</span></code></span></a>()</p></td>
+<td><p>Retrieve a dictionary of calculated transport cost attributes.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="base.html#csm.models.CSMBase.get_component_breakdown" title="csm.models.CSMBase.get_component_breakdown"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">get_component_breakdown</span></code></span></a>()</p></td>
+<td><p>Create a component-indexed data frame of mass and cost values.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="base.html#csm.models.CSMBase.irs_mpc_breakdown" title="csm.models.CSMBase.irs_mpc_breakdown"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">irs_mpc_breakdown</span></code></span></a>(turbine_production_cost, tower_flange_material_cost, tower_flange_production_cost)</p></td>
+<td><p>Calculate the base cost breakdown of the US IRS manufactured product component tables.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="base.html#csm.models.CSMBase.total_domestic_content" title="csm.models.CSMBase.total_domestic_content"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">total_domestic_content</span></code></span></a>(turbine_production_cost, tower_flange_material_cost, tower_flange_production_cost, domestic)</p></td>
+<td><p>Calculates the total, valid domestic content production percentage</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="base.html#csm.models.CSMBase.update" title="csm.models.CSMBase.update"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">update</span></code></span></a>(data)</p></td>
+<td><p>Update model values based on a data dictionary and reset any calculated values dependent on the attributes.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="base.html#csm.models.CSMBase.reset_values" title="csm.models.CSMBase.reset_values"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">reset_values</span></code></span></a>(args)</p></td>
+<td><p>Reset attribute(s) back to their model default.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="model-helpers">
+<h2>Model Helpers<a class="headerlink" href="#model-helpers" title="Link to this heading">#</a></h2>
+<p>The following properties and methods are made available for either convenience or performing underlying checks on the
+data.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Attributes/Methods</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference internal" href="#csm.models.CSMBase.rated_power"><span class="xref myst"><code class="docutils literal notranslate"><span class="pre">rated_power_mw</span></code></span></a></p></td>
+<td><p>Turbine nameplate capacity, in :math:<code class="docutils literal notranslate"><span class="pre">MW</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="base.html#csm.models.CSMBase.rotor_radius" title="csm.models.CSMBase.rotor_radius"><span class="xref myst py py-attr"><code class="docutils literal notranslate"><span class="pre">rotor_radius</span></code></span></a></p></td>
+<td><p>Half of the rotor diameter.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="base.html#csm.models.CSMBase.swept_area" title="csm.models.CSMBase.swept_area"><span class="xref myst py py-attr"><code class="docutils literal notranslate"><span class="pre">swept_area</span></code></span></a></p></td>
+<td><p>Rotor swept area.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="base.html#csm.models.CSMBase.output_names" title="csm.models.CSMBase.output_names"><span class="xref myst py py-attr"><code class="docutils literal notranslate"><span class="pre">output_names</span></code></span></a></p></td>
+<td><p>The names of all attributes available as outputs.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="base.html#csm.models.CSMBase.get_dependent_attributes" title="csm.models.CSMBase.get_dependent_attributes"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">get_dependent_attributes</span></code></span></a>(name)</p></td>
+<td><p>Names of all attributes dependent on <code class="docutils literal notranslate"><span class="pre">name</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="base.html#csm.models.CSMBase.get_descendant_attributes" title="csm.models.CSMBase.get_descendant_attributes"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">get_descendant_attributes</span></code></span></a>(name)</p></td>
+<td><p>Names of all attributes <code class="docutils literal notranslate"><span class="pre">name</span></code> depends on.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="base.html#csm.models.CSMBase._get_attr_map" title="csm.models.CSMBase._get_attr_map"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">_get_attr_map</span></code></span></a>(both_as_separate, include_units)</p></td>
+<td><p>Mapping of all the inputs and outputs of the model.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="base.html#csm.models.CSMBase.fields" title="csm.models.CSMBase.fields"><span class="xref myst py py-attr"><code class="docutils literal notranslate"><span class="pre">fields</span></code></span></a></p></td>
+<td><p>Tuple of <code class="docutils literal notranslate"><span class="pre">attrs.Attribute</span></code>s.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="base.html#csm.models.CSMBase.fields_dict" title="csm.models.CSMBase.fields_dict"><span class="xref myst py py-attr"><code class="docutils literal notranslate"><span class="pre">fields_dict</span></code></span></a></p></td>
+<td><p>Dictionary of <code class="docutils literal notranslate"><span class="pre">attrs.Attribute</span></code>s.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="base.html#csm.models.CSMBase._has_values" title="csm.models.CSMBase._has_values"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">_has_values</span></code></span></a>(args)</p></td>
+<td><p>Checks for the existence of a non-None value.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="base.html#csm.models.CSMBase._validate_inputs" title="csm.models.CSMBase._validate_inputs"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">_validate_inputs</span></code></span></a>(parameters)</p></td>
+<td><p>Validates the required attributes for a component's calculation and runs any uncalculated dependent calculations.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="base.html#csm.models.CSMBase._prepare_calculation" title="csm.models.CSMBase._prepare_calculation"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">_prepare_calculation</span></code></span></a></p></td>
+<td><p>Verifies the attribute isn't already calculated and validates its dependencies.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- NOTE: Below is a modification to _base_calculations.md to include 2020- and 20201-specific calculations -->
+</section>
+<section id="subsystem-calculations">
+<h2>Subsystem Calculations<a class="headerlink" href="#subsystem-calculations" title="Link to this heading">#</a></h2>
+<p>The following is a breakdown of all the individual subsystem calculations available.  All subsystem
+values use:math:<code class="docutils literal notranslate"><span class="pre">kg</span></code> for mass and :math:<code class="docutils literal notranslate"><span class="pre">USD</span></code> for cost. Any other values will have units listed.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>System</p></th>
+<th class="head"><p>Method</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Rotor</p></td>
+<td><p><a class="reference internal" href="#csm.models.Land2021NLR.calculate_blade_mass" title="csm.models.Land2021NLR.calculate_blade_mass"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">calculate_blade_mass</span></code></span></a>()</p></td>
+<td><p>Calculate mass of a single blade.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Rotor</p></td>
+<td><p><a class="reference internal" href="base.html#csm.models.CSMBase.calculate_blade_cost" title="csm.models.CSMBase.calculate_blade_cost"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">calculate_blade_cost</span></code></span></a>()</p></td>
+<td><p>Calculate cost of a single blade.</p></td>
+</tr>
+<tr class="row-even"><td><p>Hub System</p></td>
+<td><p><a class="reference internal" href="#csm.models.Land2021NLR.calculate_hub_mass" title="csm.models.Land2021NLR.calculate_hub_mass"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">calculate_hub_mass</span></code></span></a>()</p></td>
+<td><p>Calculate mass of the hub.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Hub System</p></td>
+<td><p><a class="reference internal" href="base.html#csm.models.CSMBase.calculate_hub_cost" title="csm.models.CSMBase.calculate_hub_cost"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">calculate_hub_cost</span></code></span></a>()</p></td>
+<td><p>Calculate cost of the hub.</p></td>
+</tr>
+<tr class="row-even"><td><p>Hub System</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">calculate_pitch_system_mass</span></code></p></td>
+<td><p>Unused in the 2021 model.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Hub System</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">calculate_pitch_system_cost</span></code></p></td>
+<td><p>Unused in the 2021 model.</p></td>
+</tr>
+<tr class="row-even"><td><p>Hub System</p></td>
+<td><p><a class="reference internal" href="base.html#csm.models.CSMBase.calculate_spinner_mass" title="csm.models.CSMBase.calculate_spinner_mass"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">calculate_spinner_mass</span></code></span></a>()</p></td>
+<td><p>Calculate mass of the spinner (nose cone).</p></td>
+</tr>
+<tr class="row-odd"><td><p>Hub System</p></td>
+<td><p><a class="reference internal" href="base.html#csm.models.CSMBase.calculate_spinner_cost" title="csm.models.CSMBase.calculate_spinner_cost"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">calculate_spinner_cost</span></code></span></a>()</p></td>
+<td><p>Calculate cost of the spinner (nose cone).</p></td>
+</tr>
+<tr class="row-even"><td><p>Nacelle</p></td>
+<td><p><a class="reference internal" href="land_2020.html#csm.models.Land2020NLR.calculate_low_speed_shaft_mass" title="csm.models.Land2020NLR.calculate_low_speed_shaft_mass"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">calculate_low_speed_shaft_mass</span></code></span></a>()</p></td>
+<td><p>Calculate mass of the low speed shaft.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Nacelle</p></td>
+<td><p><a class="reference internal" href="base.html#csm.models.CSMBase.calculate_low_speed_shaft_cost" title="csm.models.CSMBase.calculate_low_speed_shaft_cost"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">calculate_low_speed_shaft_cost</span></code></span></a>()</p></td>
+<td><p>Calculate cost of the low speed shaft.</p></td>
+</tr>
+<tr class="row-even"><td><p>Nacelle</p></td>
+<td><p><a class="reference internal" href="base.html#csm.models.CSMBase.calculate_bearing_mass" title="csm.models.CSMBase.calculate_bearing_mass"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">calculate_bearing_mass</span></code></span></a>()</p></td>
+<td><p>Calculate mass of a single main bearing.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Nacelle</p></td>
+<td><p><a class="reference internal" href="base.html#csm.models.CSMBase.calculate_bearing_cost" title="csm.models.CSMBase.calculate_bearing_cost"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">calculate_bearing_cost</span></code></span></a>()</p></td>
+<td><p>Calculate cost of a single main bearing.</p></td>
+</tr>
+<tr class="row-even"><td><p>Nacelle</p></td>
+<td><p><a class="reference internal" href="base.html#csm.models.CSMBase.calculate_rotor_torque" title="csm.models.CSMBase.calculate_rotor_torque"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">calculate_rotor_torque</span></code></span></a>()</p></td>
+<td><p>Calculate the rotor_torque (:math:<code class="docutils literal notranslate"><span class="pre">Nm</span></code>).</p></td>
+</tr>
+<tr class="row-odd"><td><p>Nacelle</p></td>
+<td><p><a class="reference internal" href="#csm.models.Land2021NLR.calculate_gearbox_mass" title="csm.models.Land2021NLR.calculate_gearbox_mass"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">calculate_gearbox_mass</span></code></span></a>()</p></td>
+<td><p>Calculate mass of the gearbox.</p></td>
+</tr>
+<tr class="row-even"><td><p>Nacelle</p></td>
+<td><p><a class="reference internal" href="land_2020.html#csm.models.Land2020NLR.calculate_gearbox_cost" title="csm.models.Land2020NLR.calculate_gearbox_cost"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">calculate_gearbox_cost</span></code></span></a>()</p></td>
+<td><p>Calculate cost of the gearbox.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Nacelle</p></td>
+<td><p><a class="reference internal" href="base.html#csm.models.CSMBase.calculate_brake_mass" title="csm.models.CSMBase.calculate_brake_mass"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">calculate_brake_mass</span></code></span></a>()</p></td>
+<td><p>Calculate mass of the brakes.</p></td>
+</tr>
+<tr class="row-even"><td><p>Nacelle</p></td>
+<td><p><a class="reference internal" href="base.html#csm.models.CSMBase.calculate_brake_cost" title="csm.models.CSMBase.calculate_brake_cost"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">calculate_brake_cost</span></code></span></a>()</p></td>
+<td><p>Calculate cost of the brakes.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Nacelle</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">calculate_high_speed_shaft_mass</span></code></p></td>
+<td><p>Unused in the 2020 and later models.</p></td>
+</tr>
+<tr class="row-even"><td><p>Nacelle</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">calculate_high_speed_shaft_cost</span></code></p></td>
+<td><p>Unused in the 2020 and later models.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Nacelle</p></td>
+<td><p><a class="reference internal" href="base.html#csm.models.CSMBase.calculate_generator_mass" title="csm.models.CSMBase.calculate_generator_mass"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">calculate_generator_mass</span></code></span></a>()</p></td>
+<td><p>Calculate mass of the generator.</p></td>
+</tr>
+<tr class="row-even"><td><p>Nacelle</p></td>
+<td><p><a class="reference internal" href="base.html#csm.models.CSMBase.calculate_generator_cost" title="csm.models.CSMBase.calculate_generator_cost"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">calculate_generator_cost</span></code></span></a>()</p></td>
+<td><p>Calculate cost of the generator.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Nacelle</p></td>
+<td><p><a class="reference internal" href="land_2020.html#csm.models.Land2020NLR.calculate_bedplate_mass" title="csm.models.Land2020NLR.calculate_bedplate_mass"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">calculate_bedplate_mass</span></code></span></a>()</p></td>
+<td><p>Calculate mass of the bedplate.</p></td>
+</tr>
+<tr class="row-even"><td><p>Nacelle</p></td>
+<td><p><a class="reference internal" href="base.html#csm.models.CSMBase.calculate_bedplate_cost" title="csm.models.CSMBase.calculate_bedplate_cost"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">calculate_bedplate_cost</span></code></span></a>()</p></td>
+<td><p>Calculate cost of the bedplate.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Nacelle</p></td>
+<td><p><a class="reference internal" href="base.html#csm.models.CSMBase.calculate_yaw_system_mass" title="csm.models.CSMBase.calculate_yaw_system_mass"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">calculate_yaw_system_mass</span></code></span></a>()</p></td>
+<td><p>Calculate mass of the yaw system.</p></td>
+</tr>
+<tr class="row-even"><td><p>Nacelle</p></td>
+<td><p><a class="reference internal" href="base.html#csm.models.CSMBase.calculate_yaw_system_cost" title="csm.models.CSMBase.calculate_yaw_system_cost"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">calculate_yaw_system_cost</span></code></span></a>()</p></td>
+<td><p>Calculate cost of the yaw system.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Nacelle</p></td>
+<td><p><a class="reference internal" href="land_2020.html#csm.models.Land2020NLR.calculate_hydraulic_cooling_mass" title="csm.models.Land2020NLR.calculate_hydraulic_cooling_mass"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">calculate_hydraulic_cooling_mass</span></code></span></a>()</p></td>
+<td><p>Calculate mass of the HVAC system.</p></td>
+</tr>
+<tr class="row-even"><td><p>Nacelle</p></td>
+<td><p><a class="reference internal" href="base.html#csm.models.CSMBase.calculate_hydraulic_cooling_cost" title="csm.models.CSMBase.calculate_hydraulic_cooling_cost"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">calculate_hydraulic_cooling_cost</span></code></span></a>()</p></td>
+<td><p>Calculate cost of the HVAC system.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Nacelle</p></td>
+<td><p><a class="reference internal" href="base.html#csm.models.CSMBase.calculate_nacelle_cover_mass" title="csm.models.CSMBase.calculate_nacelle_cover_mass"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">calculate_nacelle_cover_mass</span></code></span></a>()</p></td>
+<td><p>Calculate mass of the nacelle cover.</p></td>
+</tr>
+<tr class="row-even"><td><p>Nacelle</p></td>
+<td><p><a class="reference internal" href="base.html#csm.models.CSMBase.calculate_nacelle_cover_cost" title="csm.models.CSMBase.calculate_nacelle_cover_cost"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">calculate_nacelle_cover_cost</span></code></span></a>()</p></td>
+<td><p>Calculate cost of the nacelle cover.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Nacelle</p></td>
+<td><p><a class="reference internal" href="land_2020.html#csm.models.Land2020NLR.calculate_platform_mainframe_mass" title="csm.models.Land2020NLR.calculate_platform_mainframe_mass"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">calculate_platform_mainframe_mass</span></code></span></a>()</p></td>
+<td><p>Calculate mass of the platform railing.</p></td>
+</tr>
+<tr class="row-even"><td><p>Nacelle</p></td>
+<td><p><a class="reference internal" href="land_2020.html#csm.models.Land2020NLR.calculate_platform_mainframe_cost" title="csm.models.Land2020NLR.calculate_platform_mainframe_cost"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">calculate_platform_mainframe_cost</span></code></span></a>()</p></td>
+<td><p>Calculate cost of the platform railing.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Nacelle</p></td>
+<td><p><a class="reference internal" href="base.html#csm.models.CSMBase.calculate_transformer_mass" title="csm.models.CSMBase.calculate_transformer_mass"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">calculate_transformer_mass</span></code></span></a>()</p></td>
+<td><p>Calculate mass of the transformer.</p></td>
+</tr>
+<tr class="row-even"><td><p>Nacelle</p></td>
+<td><p><a class="reference internal" href="base.html#csm.models.CSMBase.calculate_transformer_cost" title="csm.models.CSMBase.calculate_transformer_cost"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">calculate_transformer_cost</span></code></span></a>()</p></td>
+<td><p>Calculate cost of the transformer.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Nacelle</p></td>
+<td><p><a class="reference internal" href="base.html#csm.models.CSMBase.calculate_controls_mass" title="csm.models.CSMBase.calculate_controls_mass"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">calculate_controls_mass</span></code></span></a>()</p></td>
+<td><p>Calculate mass of the controls system.</p></td>
+</tr>
+<tr class="row-even"><td><p>Nacelle</p></td>
+<td><p><a class="reference internal" href="base.html#csm.models.CSMBase.calculate_controls_cost" title="csm.models.CSMBase.calculate_controls_cost"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">calculate_controls_cost</span></code></span></a>()</p></td>
+<td><p>Calculate cost of the controls system.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Nacelle</p></td>
+<td><p><a class="reference internal" href="base.html#csm.models.CSMBase.calculate_electrical_connection_mass" title="csm.models.CSMBase.calculate_electrical_connection_mass"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">calculate_electrical_connection_mass</span></code></span></a>()</p></td>
+<td><p>Calculate mass of the electrical connections.</p></td>
+</tr>
+<tr class="row-even"><td><p>Nacelle</p></td>
+<td><p><a class="reference internal" href="base.html#csm.models.CSMBase.calculate_electrical_connection_cost" title="csm.models.CSMBase.calculate_electrical_connection_cost"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">calculate_electrical_connection_cost</span></code></span></a>()</p></td>
+<td><p>Calculate cost of the electrical connections.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Nacelle</p></td>
+<td><p><a class="reference internal" href="base.html#csm.models.CSMBase.calculate_converter_mass" title="csm.models.CSMBase.calculate_converter_mass"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">calculate_converter_mass</span></code></span></a>()</p></td>
+<td><p>Calculate mass of the power converter system.</p></td>
+</tr>
+<tr class="row-even"><td><p>Nacelle</p></td>
+<td><p><a class="reference internal" href="base.html#csm.models.CSMBase.calculate_converter_cost" title="csm.models.CSMBase.calculate_converter_cost"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">calculate_converter_cost</span></code></span></a>()</p></td>
+<td><p>Calculate cost of the power converter system.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Tower</p></td>
+<td><p><a class="reference internal" href="#csm.models.Land2021NLR.calculate_tower_mass" title="csm.models.Land2021NLR.calculate_tower_mass"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">calculate_tower_mass</span></code></span></a>()</p></td>
+<td><p>Calculate mass of the tower.</p></td>
+</tr>
+<tr class="row-even"><td><p>Tower</p></td>
+<td><p><a class="reference internal" href="base.html#csm.models.CSMBase.calculate_tower_cost" title="csm.models.CSMBase.calculate_tower_cost"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">calculate_tower_cost</span></code></span></a>()</p></td>
+<td><p>Calculate cost of the tower.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Transport</p></td>
+<td><p><a class="reference internal" href="land_2020.html#csm.models.Land2020NLR.calculate_blade_transport_cost" title="csm.models.Land2020NLR.calculate_blade_transport_cost"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">calculate_blade_transport_cost</span></code></span></a>()</p></td>
+<td><p>Calculate the total blade transport cost.</p></td>
+</tr>
+<tr class="row-even"><td><p>Transport</p></td>
+<td><p><a class="reference internal" href="land_2020.html#csm.models.Land2020NLR.calculate_hub_transport_cost" title="csm.models.Land2020NLR.calculate_hub_transport_cost"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">calculate_hub_transport_cost</span></code></span></a>()</p></td>
+<td><p>Calculate the hub transport cost.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Transport</p></td>
+<td><p><a class="reference internal" href="land_2020.html#csm.models.Land2020NLR.calculate_power_electronics_transport_cost" title="csm.models.Land2020NLR.calculate_power_electronics_transport_cost"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">calculate_power_electronics_transport_cost</span></code></span></a>()</p></td>
+<td><p>Calculate the power electronics transport cost.</p></td>
+</tr>
+<tr class="row-even"><td><p>Transport</p></td>
+<td><p><a class="reference internal" href="land_2020.html#csm.models.Land2020NLR.calculate_drivetrain_transport_cost" title="csm.models.Land2020NLR.calculate_drivetrain_transport_cost"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">calculate_drivetrain_transport_cost</span></code></span></a>()</p></td>
+<td><p>Calculate the drivetrain transport cost.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Transport</p></td>
+<td><p><a class="reference internal" href="land_2020.html#csm.models.Land2020NLR.calculate_tower_transport_cost" title="csm.models.Land2020NLR.calculate_tower_transport_cost"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">calculate_tower_transport_cost</span></code></span></a>()</p></td>
+<td><p>Calculate the tower transport cost.</p></td>
+</tr>
+<tr class="row-even"><td><p>Transport</p></td>
+<td><p><a class="reference internal" href="land_2020.html#csm.models.Land2020NLR.calculate_transport_cost" title="csm.models.Land2020NLR.calculate_transport_cost"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">calculate_transport_cost</span></code></span></a>()</p></td>
+<td><p>Calculate the total transport cost.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="subsystem-aggregations-systems">
+<h2>Subsystem Aggregations (Systems)<a class="headerlink" href="#subsystem-aggregations-systems" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Method</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference internal" href="base.html#csm.models.CSMBase.calculate_subsystem_mass" title="csm.models.CSMBase.calculate_subsystem_mass"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">calculate_subsystem_mass</span></code></span></a>()</p></td>
+<td><p>Calculate mass of all subsystems listed above.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="base.html#csm.models.CSMBase.calculate_subsystem_cost" title="csm.models.CSMBase.calculate_subsystem_cost"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">calculate_subsystem_cost</span></code></span></a>()</p></td>
+<td><p>Calculate cost of all subsystems</p></td>
+</tr>
+<tr class="row-even"><td><p>listed above.</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="land_2020.html#csm.models.Land2020NLR.calculate_nacelle_mass" title="csm.models.Land2020NLR.calculate_nacelle_mass"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">calculate_nacelle_mass</span></code></span></a>()</p></td>
+<td><p>Calculate mass of the nacelle.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="land_2020.html#csm.models.Land2020NLR.calculate_nacelle_cost" title="csm.models.Land2020NLR.calculate_nacelle_cost"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">calculate_nacelle_cost</span></code></span></a>()</p></td>
+<td><p>Calculate cost of the nacelle.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="base.html#csm.models.CSMBase.calculate_hub_system_mass" title="csm.models.CSMBase.calculate_hub_system_mass"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">calculate_hub_system_mass</span></code></span></a>()</p></td>
+<td><p>Calculate mass of hub system.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="base.html#csm.models.CSMBase.calculate_hub_system_cost" title="csm.models.CSMBase.calculate_hub_system_cost"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">calculate_hub_system_cost</span></code></span></a>()</p></td>
+<td><p>Calculate cost of hub system.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="base.html#csm.models.CSMBase.calculate_rotor_mass" title="csm.models.CSMBase.calculate_rotor_mass"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">calculate_rotor_mass</span></code></span></a>()</p></td>
+<td><p>Calculate mass of the rotor.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="base.html#csm.models.CSMBase.calculate_rotor_cost" title="csm.models.CSMBase.calculate_rotor_cost"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">calculate_rotor_cost</span></code></span></a>()</p></td>
+<td><p>Calculate cost of the rotor.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="base.html#csm.models.CSMBase.calculate_turbine_mass" title="csm.models.CSMBase.calculate_turbine_mass"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">calculate_turbine_mass</span></code></span></a>()</p></td>
+<td><p>Calculate mass of the turbine.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="base.html#csm.models.CSMBase.calculate_turbine_cost" title="csm.models.CSMBase.calculate_turbine_cost"><span class="xref myst py py-meth"><code class="docutils literal notranslate"><span class="pre">calculate_turbine_cost</span></code></span></a>()</p></td>
+<td><p>Calculate cost of the turbine.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./api/models"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="land_2020.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">NLR Land-Based 2020 Model</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="land_2026.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">NLR Land-Based 2026 Model</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#csm.models.nlr2021.Land2021NLR"><code class="docutils literal notranslate"><span class="pre">Land2021NLR</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#updated-scaling-relationships">Updated Scaling Relationships</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#csm.models.Land2021NLR.calculate_blade_mass"><code class="docutils literal notranslate"><span class="pre">Land2021NLR.calculate_blade_mass()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#csm.models.Land2021NLR.calculate_hub_mass"><code class="docutils literal notranslate"><span class="pre">Land2021NLR.calculate_hub_mass()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#csm.models.Land2021NLR.calculate_gearbox_mass"><code class="docutils literal notranslate"><span class="pre">Land2021NLR.calculate_gearbox_mass()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#csm.models.Land2021NLR.calculate_tower_mass"><code class="docutils literal notranslate"><span class="pre">Land2021NLR.calculate_tower_mass()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#primary-api">Primary API</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#model-helpers">Model Helpers</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#subsystem-calculations">Subsystem Calculations</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#subsystem-aggregations-systems">Subsystem Aggregations (Systems)</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By National Laboratory of the Rockies
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

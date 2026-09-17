@@ -1,0 +1,799 @@
+
+<!DOCTYPE html>
+
+
+<html lang="python" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Contributor&#39;s Guide &#8212; CSM</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=9c3e77be" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="../_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="../_static/documentation_options.js?v=30a733bc"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=b8b12719"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'intro/contributing';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="canonical" href="https://nlrwindsystems.github.io/CSM/intro/contributing.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="CSM by Example" href="demo.html" />
+    <link rel="prev" title="Installing CSM" href="install.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="python"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="../_static/searchtools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../intro.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">CSM</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../intro.html">
+                    NLR Turbine Cost and Scaling Model (CSM)
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Getting Started</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installing CSM</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Contributor's Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="demo.html">CSM by Example</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Model Background</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/theory.html">Theory</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/model_overview.html">Model Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/new_models.html">Creating a New Model</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api/models/index.html"><code class="docutils literal notranslate"><span class="pre">csm.models</span></code></a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api/models/base.html">Base Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/models/land_2015.html">NLR Land-Based 2015 Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/models/land_2020.html">NLR Land-Based 2020 Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/models/land_2021.html">NLR Land-Based 2021 Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/models/land_2026.html">NLR Land-Based 2026 Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/models/utils.html">Utilities</a></li>
+</ul>
+</details></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../api/tools/index.html">Tools</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api/tools/plot.html">Plotting Library</a></li>
+</ul>
+</details></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/NLRWindSystems/CSM" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/NLRWindSystems/CSM/issues/new?title=Issue%20on%20page%20%2Fintro/contributing.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/intro/contributing.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button pst-navbar-icon"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Contributor's Guide</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#installing-csm-for-developers">Installing CSM for Developers</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#bug-reports">Bug Reports</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#submitting-code-through-pull-requests">Submitting Code (Through Pull Requests)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#merging-pull-requests">Merging Pull Requests</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#documentation">Documentation</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#building-the-documentation-site">Building the Documentation Site</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#generate-the-local-documentation-site-for-inspection">Generate the Local Documentation Site for Inspection</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#viewing-the-locally-built-documentation">Viewing the Locally Built Documentation</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-process">Release Process</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#standard">Standard</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#patches">Patches</a></li>
+</ul>
+</li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="contributor-s-guide">
+<span id="contributor-guide"></span><h1>Contributor's Guide<a class="headerlink" href="#contributor-s-guide" title="Link to this heading">#</a></h1>
+<p>We welcome contributions in the form of bug reports, bug fixes, improvements to the documentation,
+ideas for enhancements (or the enhancements themselves!).</p>
+<p>You can find a <a class="reference external" href="https://github.com/NLRWindSystems/CSM/issues">list of current issues</a> in the
+project's GitHub repo. Feel free to tackle any existing bugs or enhancement ideas by submitting a
+<a class="reference external" href="https://github.com/NLRWindSystems/CSM/pulls">pull request</a>.</p>
+<section id="installing-csm-for-developers">
+<span id="developer-install"></span><h2>Installing CSM for Developers<a class="headerlink" href="#installing-csm-for-developers" title="Link to this heading">#</a></h2>
+<p>Please see the <a class="reference internal" href="install.html#install"><span class="std std-ref">Installation Guide</span></a> for how to set up an environment and install CSM.</p>
+<p>Developers should add install using <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-e</span> <span class="pre">.[develop]</span></code> after creating a CSM environment to
+ensure the documentation, testing, and linting can be done without any additional installation steps.</p>
+<p>Please be sure to also install the pre-commit hooks if contributing code back to the main
+repository via the following. This enables a series of automated formatting and code linting
+(style and correctness checking) to ensure the code is stylistically consistent.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pre-commit<span class="w"> </span>install
+</pre></div>
+</div>
+<p>If a check (or multiple) fails (commit is blocked), and reformatting was done, then restage
+(<code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">add</span></code>) your files and commit them again to see if all issues were resolved without user
+intervention. If changes are required follow the suggested fix, or resolve the stated
+issue(s). Restaging and committing may take multiple attempts steps if errors are unaddressed
+or insufficiently addressed. Please see <a class="reference external" href="https://pre-commit.com/">pre-commit</a>,
+<a class="reference external" href="https://docs.astral.sh/ruff/">ruff</a>, or <a class="reference external" href="https://pycqa.github.io/isort/">isort</a> for more
+information.</p>
+</section>
+<section id="bug-reports">
+<h2>Bug Reports<a class="headerlink" href="#bug-reports" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Please include a short (but detailed) Python snippet or explanation for reproducing the problem.
+Be sure to attach or include a link to any input files that will be needed to reproduce the error.</p></li>
+<li><p>Explain the behavior you expected, and how what you got differed.</p></li>
+</ul>
+</section>
+<section id="submitting-code-through-pull-requests">
+<h2>Submitting Code (Through Pull Requests)<a class="headerlink" href="#submitting-code-through-pull-requests" title="Link to this heading">#</a></h2>
+<ol class="arabic">
+<li><p>Fork the repository to your personal GitHub Account.</p></li>
+<li><p>Clone your fork, replacing &quot;AccountName&quot; with your user name.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/AccountName/CSM.git
+</pre></div>
+</div>
+</li>
+<li><p>For general development, create a branch off of <code class="docutils literal notranslate"><span class="pre">develop</span></code>, for a hot fix/patch, create a branch off
+of <code class="docutils literal notranslate"><span class="pre">main</span></code>. Use either example as a base. In general it's common to indicate the type of
+development with text before the slash such as <code class="docutils literal notranslate"><span class="pre">fix/</span></code>, <code class="docutils literal notranslate"><span class="pre">patch/</span></code>, <code class="docutils literal notranslate"><span class="pre">feature/</span></code>, <code class="docutils literal notranslate"><span class="pre">enhancement/</span></code>,
+etc., followed by a short dash-separate description of the contribution, such as
+<code class="docutils literal notranslate"><span class="pre">enhancement/pandas-v3-upgrade</span></code>. See below for an example of creating a new branch based off
+either <code class="docutils literal notranslate"><span class="pre">develop</span></code> or <code class="docutils literal notranslate"><span class="pre">main</span></code>.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>checkout<span class="w"> </span>develop
+git<span class="w"> </span>checkout<span class="w"> </span>-b<span class="w"> </span>feature/new-model
+</pre></div>
+</div>
+<p>Or</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>checkout<span class="w"> </span>main
+git<span class="w"> </span>checkout<span class="w"> </span>-b<span class="w"> </span>patch/fix-issue
+</pre></div>
+</div>
+</li>
+<li><p>Commit and push your changes in stages to track the various states of your development, though
+less ideally, you may do this step all at once when development is complete.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>add<span class="w"> </span>&lt;files-that-were-updated&gt;
+git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">"short description of changes"</span>
+git<span class="w"> </span>push
+</pre></div>
+</div>
+</li>
+<li><p>Open a pull request. The remainder of this section will walk through the requirements that should
+be met prior to submitting a pull request to the <code class="docutils literal notranslate"><span class="pre">develop</span></code> or <code class="docutils literal notranslate"><span class="pre">main</span></code> branch of the repository.</p></li>
+</ol>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>Pull requests should be submitted to the <code class="docutils literal notranslate"><span class="pre">develop</span></code> branch unless a new release is being created. If
+so, please also read the <a class="reference internal" href="#release-process"><span class="xref myst">release guide</span></a>.</p>
+</div>
+<ul class="simple">
+<li><p>Changes should be pass the linting and autoformatting checks provided through <code class="docutils literal notranslate"><span class="pre">pre-commit</span></code>.
+If they do not, the PR's CI pipeline will fail and will block the acceptance of your
+contributions until they pass. If your commit fails, then check the <code class="docutils literal notranslate"><span class="pre">pre-commit</span></code> logs to see
+if any fixes were automatically applied or if manual changes are required. Once the changes are
+made, simply reattempt to add and commit your files.</p></li>
+<li><p>Keep style fixes to a separate commit to make your pull request more readable.</p></li>
+<li><p>Docstrings are required and should follow the
+<a class="reference external" href="https://www.sphinx-doc.org/en/master/usage/extensions/example_google.html">Google style</a>.</p></li>
+<li><p>When you start working on a pull request, start by creating a new branch pointing at the latest
+commit on <a class="reference external" href="https://github.com/NLRWindSystems/CSM/tree/develop">develop</a> based on your own fork
+(i.e., replace &quot;NLRWindSystems&quot; with your GitHub username).</p></li>
+<li><p>The CSM copyright policy is detailed in the
+<a class="reference external" href="https://github.com/NLRWindSystems/CSM/blob/main/LICENSE"><code class="docutils literal notranslate"><span class="pre">LICENSE</span></code></a>.</p></li>
+<li><p>Build the docs locally, check that the build everything is in good order, and links work.</p></li>
+</ul>
+<section id="merging-pull-requests">
+<h3>Merging Pull Requests<a class="headerlink" href="#merging-pull-requests" title="Link to this heading">#</a></h3>
+<p>Assuming the PR has been successfully reviewed, please read on.</p>
+<p>For any development branch (e.g., <code class="docutils literal notranslate"><span class="pre">feature/my-contribution</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">develop</span></code> or <code class="docutils literal notranslate"><span class="pre">fix/important-bug</span></code> -&gt;
+<code class="docutils literal notranslate"><span class="pre">main</span></code>), always use the &quot;squash and merge&quot; method for merging PRs (use merge button's drop down
+menu).</p>
+<p>For the standard release process (i.e., <code class="docutils literal notranslate"><span class="pre">develop</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">main</span></code>), always use the standard merge process
+(create a merge commit in the merge button's drop down menu).</p>
+</section>
+</section>
+<section id="documentation">
+<h2>Documentation<a class="headerlink" href="#documentation" title="Link to this heading">#</a></h2>
+<p>When contributing new features or fixing existing capabilities, be sure to add and/or update the
+docstrings as needed to ensure the documentation site stays up to date with the latest changes.
+Please also update any relevant guides or examples in the documentation if functionality has
+changed, or if there is new functionality that should be highlighted.</p>
+<section id="building-the-documentation-site">
+<h3>Building the Documentation Site<a class="headerlink" href="#building-the-documentation-site" title="Link to this heading">#</a></h3>
+<p>Once the <code class="docutils literal notranslate"><span class="pre">develop</span></code> extras are installed, and your CSM environment is activated, the documentation can
+be built using the following two procedures.</p>
+</section>
+<section id="generate-the-local-documentation-site-for-inspection">
+<h3>Generate the Local Documentation Site for Inspection<a class="headerlink" href="#generate-the-local-documentation-site-for-inspection" title="Link to this heading">#</a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>jupyter-book<span class="w"> </span>build<span class="w"> </span>docs/
+</pre></div>
+</div>
+<p>For more information on the build process in Jupyter Book, please check:
+<a class="reference external" href="https://jupyterbook.org/v1/basics/build.html">https://jupyterbook.org/v1/basics/build.html</a>. For more general details, please visit
+<a class="reference external" href="https://jupyterbook.org/v1/intro.html">https://jupyterbook.org/v1/intro.html</a>.</p>
+</section>
+<section id="viewing-the-locally-built-documentation">
+<h3>Viewing the Locally Built Documentation<a class="headerlink" href="#viewing-the-locally-built-documentation" title="Link to this heading">#</a></h3>
+<p>In addition to building the documentation, be sure to check the results by opening the following
+path in your browser: <code class="docutils literal notranslate"><span class="pre">file:///&lt;path-to-CSM&gt;/CSM/docs/_build/html/index.html</span></code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If the browser appears to be out of date from what you expected to be built, please try reloading
+the page a few times. If that doesn't work, then:</p>
+<ol class="arabic simple">
+<li><p>Close the documentation tab</p></li>
+<li><p>Clear your browser's cache</p></li>
+<li><p>Rebuild the docs using <a class="reference internal" href="#prior-to-a-pull-request"><span class="xref myst">prior to a PR section</span></a></p></li>
+<li><p>Open the page again.</p></li>
+</ol>
+</div>
+</section>
+</section>
+<section id="release-process">
+<h2>Release Process<a class="headerlink" href="#release-process" title="Link to this heading">#</a></h2>
+<section id="standard">
+<h3>Standard<a class="headerlink" href="#standard" title="Link to this heading">#</a></h3>
+<p>Most contributions will be into the <code class="docutils literal notranslate"><span class="pre">develop</span></code> branch, and once the threshold for a release has been
+met the following steps should be taken to create a new release</p>
+<ol class="arabic">
+<li><p>On <code class="docutils literal notranslate"><span class="pre">develop</span></code>, bump the version appropriately, see the
+<a class="reference external" href="https://semver.org/">semantic versioning guidelines</a> for details.</p>
+<ul class="simple">
+<li><p>Semantic Versioning follows a MAJOR.MINOR.PATCH versioning pattern, and new functionality
+should get a minor release, and fixes/minor updates should get a patch release.</p></li>
+</ul>
+</li>
+<li><p>Update the <code class="docutils literal notranslate"><span class="pre">##</span> <span class="pre">Unreleased</span></code> title to the new version and release date.</p></li>
+<li><p>Open a pull request from <code class="docutils literal notranslate"><span class="pre">develop</span></code> into <code class="docutils literal notranslate"><span class="pre">main</span></code>.</p></li>
+<li><p>When all CI tests pass, and the PR has been approved, merge the PR into main.</p></li>
+<li><p>Pull the latest changes from GitHub into the local copy of the main branch.</p></li>
+<li><p>Tag the latest commit to match the version bump in step 1 (replace &quot;v1.2.3&quot; in all instances
+below), and push it to the repository.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>tag<span class="w"> </span>-a<span class="w"> </span>v1.2.3<span class="w"> </span>-m<span class="w"> </span><span class="s2">"v1.2.3 release"</span>
+git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span>v1.2.3
+</pre></div>
+</div>
+</li>
+<li><p>Check that the
+<a class="reference external" href="https://github.com/NLRWindSystems/CSM/actions/workflows/publish_to_test_pypi.yml">Test PyPI GitHub Action</a>
+has run successfully.</p>
+<ol class="arabic">
+<li><p>If the action failed, identify and fix the issue, then</p></li>
+<li><p>delete the local and remote tag using the following (replace &quot;v1.2.3&quot; in all instances just like
+in step 6):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>tag<span class="w"> </span>-d<span class="w"> </span>v1.2.3
+git<span class="w"> </span>push<span class="w"> </span>--delete<span class="w"> </span>origin<span class="w"> </span>v1.2.3
+</pre></div>
+</div>
+</li>
+<li><p>Start back at step 1.</p></li>
+</ol>
+</li>
+<li><p>When the Test PyPI Action has successfully run,
+<a class="reference external" href="https://github.com/NLRWindSystems/CSM/releases/new">create a new release</a> using the tag created in
+step 6.</p></li>
+</ol>
+</section>
+<section id="patches">
+<h3>Patches<a class="headerlink" href="#patches" title="Link to this heading">#</a></h3>
+<p>Any pull requests directly into the main branch that alter the CSM model (excludes anything
+in <code class="docutils literal notranslate"><span class="pre">docs/</span></code>, or outside of <code class="docutils literal notranslate"><span class="pre">csm/</span></code> and <code class="docutils literal notranslate"><span class="pre">tests/</span></code>), should be sure to follow the instructions
+below:</p>
+<ol class="arabic simple">
+<li><p>All CI tests pass and the patch version has been bumped according to the
+<a class="reference external" href="https://semver.org/">semantic versioning guidelines</a>.</p></li>
+<li><p>Follow steps 2 through 8 above.</p></li>
+<li><p>Merge the NLRWindSystems main branch back into the <code class="docutils literal notranslate"><span class="pre">develop</span></code> branch and push the changes.</p></li>
+</ol>
+</section>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./intro"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="install.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Installing CSM</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="demo.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">CSM by Example</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item"><div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#installing-csm-for-developers">Installing CSM for Developers</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#bug-reports">Bug Reports</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#submitting-code-through-pull-requests">Submitting Code (Through Pull Requests)</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#merging-pull-requests">Merging Pull Requests</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#documentation">Documentation</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#building-the-documentation-site">Building the Documentation Site</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#generate-the-local-documentation-site-for-inspection">Generate the Local Documentation Site for Inspection</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#viewing-the-locally-built-documentation">Viewing the Locally Built Documentation</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#release-process">Release Process</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#standard">Standard</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#patches">Patches</a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By National Laboratory of the Rockies
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  <p class="copyright">
+    
+      © Copyright 2026.
+      <br/>
+    
+  </p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
