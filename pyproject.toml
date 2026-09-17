@@ -7,9 +7,9 @@ name = "turbine-csm"
 dynamic = ["version"]
 authors = [{ name = "Rob Hammond", email = "rob.hammond@nlr.gov" }]
 readme = { file = "README.md", content-type = "text/markdown" }
-description = "Wind Turbine Cost and Scaling Model Relationships"
-requires-python = ">=3.12"
-# license = { file = "LICENSE" }
+description = "Wind Turbine Cost and Scaling Model"
+requires-python = ">=3.11"
+license = { file = "LICENSE" }
 dependencies = [
   "attrs>=23",
   "numpy>=1.26",
@@ -17,6 +17,29 @@ dependencies = [
   "pyyaml>=6",
   "networkx",
   "matplotlib>=3.8",
+]
+keywords = [
+    "python3",
+    "wind-energy",
+    "cost-model",
+    "wind-turbine",
+]
+classifiers = [  # https://pypi.org/classifiers/
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Other Audience",
+    "License :: OSI Approved :: BSD License",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 
 [project.optional-dependencies]
@@ -59,7 +82,7 @@ include_trailing_comma = true
 use_parentheses = true
 length_sort = true
 lines_after_imports = 2
-line_length = 88
+line_length = 100
 
 
 [tool.ruff]
@@ -124,7 +147,7 @@ exclude = [
 [tool.ruff.lint.per-file-ignores]
 "*/__init__.py" = ["E501", "D104", "F401"]
 "test/*" = ["D100", "D101", "D102", "D103"]
-"example/*.ipynb" = ["T201"]
+"examples/*.ipynb" = ["T201"]
 
 [tool.coverage.run]
 # Coverage.py configuration file
