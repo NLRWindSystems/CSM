@@ -5,6 +5,7 @@ on:
     branches: [main]
 jobs:
   make-pages:
+    environment: github-pages
     runs-on: ubuntu-latest
     permissions:
       contents: write
