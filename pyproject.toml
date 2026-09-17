@@ -3,20 +3,60 @@ requires = ["setuptools", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "CSM"
+name = "turbine-csm"
 dynamic = ["version"]
-authors = [{ name = "Paul Crook", email = "paul.crook@nrel.gov" }]
+authors = [{ name = "Rob Hammond", email = "rob.hammond@nlr.gov" }]
 readme = { file = "README.md", content-type = "text/markdown" }
-description = "Wind Turbine Cost and Scaling Model Relationships"
-requires-python = ">=3.12"
-# license = { file = "LICENSE" }
+description = "Wind Turbine Cost and Scaling Model"
+requires-python = ">=3.11"
+license = { file = "LICENSE" }
 dependencies = [
   "attrs>=23",
   "numpy>=1.26",
   "pandas>=2.2",
   "pyyaml>=6",
-  "tqdm>=4",
-  "openpyxl>=3",
+  "networkx",
+  "matplotlib>=3.8",
+]
+keywords = [
+    "python3",
+    "wind-energy",
+    "cost-model",
+    "wind-turbine",
+]
+classifiers = [  # https://pypi.org/classifiers/
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Other Audience",
+    "License :: OSI Approved :: BSD License",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+[project.optional-dependencies]
+develop = [
+    "pre-commit>=2.20",
+    "isort>=5.10",
+    "pytest>=9",
+    "pytest-cov>=4",
+    "pytest-check",
+    "ruff>=0.2",
+    "ty",
+    "jupyter-book<2",
+    "sphinxcontrib-napoleon",
+]
+experimental = [
+  "scipy>=1.11",
+  "python-pptx>=1.0",
 ]
 
 [tool.setuptools]
@@ -34,7 +74,7 @@ skip = []
 multi_line_output = 3
 sections = ["FUTURE", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
 known_third_party = ["attrs", "numpy", "pandas"]
-# known_first_party = "wombat"
+known_first_party = "csm"
 known_local_folder = "test"
 combine_as_imports = true
 force_grid_wrap = 0
@@ -42,58 +82,95 @@ include_trailing_comma = true
 use_parentheses = true
 length_sort = true
 lines_after_imports = 2
-line_length = 88
+line_length = 100
 
 
 [tool.ruff]
-src = ["csm"]
-cache-dir = "./.cache/ruff"
-line-length = 88
-target-version = "py39"
-fix = false
+src = ["csm", "test"]
+line-length = 100
+target-version = "py311"
+fix = true
 
 [tool.ruff.lint]
 # See https://github.com/charliermarsh/ruff#supported-rules
 # for rules included and matching to prefix.
-ignore-init-module-imports = true
+select = ["F", "E", "W", "C4", "D", "UP", "NPY", "PTH", "RUF", "FBT", "B", "PIE", "T20", "SIM", ]
+
+# D205: not using summary lines and descriptions, just descriptions
+# D401: don't believe enough in imperative mode to make all the changes currently
+ignore = ["D205", "D401"]
+
+# Allow autofix for all enabled rules (when `--fix`) is provided.
+fixable = ["F", "E", "W", "C4", "D", "UP", "NPY", "PTH", "RUF", "FBT", "B", "PIE", "T20", "SIM", ]
+unfixable = []
 
 # Exclude a variety of commonly ignored directories.
 exclude = [
-  ".cache",
-  ".bzr",
-  ".direnv",
-  ".eggs",
-  ".git",
-  ".hg",
-  ".nox",
-  ".pants.d",
-  ".svn",
-  ".tox",
-  ".venv",
-  "__pypackages__",
-  "_build",
-  "buck-out",
-  "build",
-  "dist",
-  "node_modules",
-  "venv",
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".hg",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "venv",
+    "examples/archival/*",
+    "examples/*.ipynb"
 ]
 
+# Allow unused variables when underscore-prefixed.
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 
 [tool.ruff.lint.pydocstyle]
-convention = "numpy"
+convention = "google"
 
-[tool.mypy]
-exclude = ["csm/model"]
-ignore_missing_imports = true
-no_implicit_optional = true
-check_untyped_defs = true
-cache_dir = ".cache/mypy/"
+[tool.ty.src]
+include = [
+    "csm/",
+    "tests",
+]
+exclude = [
+  "pyproject.toml"
+]
 
-[tool.pytest.ini_options]
-cache_dir = ".cache/pytest"
-addopts = "--cov=csm --cov-report term-missing"
+[tool.ruff.lint.per-file-ignores]
+"*/__init__.py" = ["E501", "D104", "F401"]
+"test/*" = ["D100", "D101", "D102", "D103"]
+"examples/*.ipynb" = ["T201"]
 
 [tool.coverage.run]
-omit = ["./csm/model/*"]
-data_file = "./.cache/coverage.sqlite"
+# Coverage.py configuration file
+# https://coverage.readthedocs.io/en/latest/config.html
+branch = true
+source = ["csm/*"]
+omit = [
+  "*/test/*",
+  "*/test_*.py"
+]
+
+[tool.pytest]
+addopts = [
+  "--strict-markers",
+  "-r fEsxX",
+  # "--cov=csm",
+  # "--cov-report=term-missing"
+]
+tmp_path_retention_count = "1"
+tmp_path_retention_policy = "failed"
+cache_dir = ".cache"
+markers = [
+    "unit: marks unit tests (deselect with '-m \"not unit\"')",
+    "regression: marks regression tests (deselect with '-m \"not regression\"')",
+    "integration: marks unit tests (deselect with '-m \"not integration\"')",
+]

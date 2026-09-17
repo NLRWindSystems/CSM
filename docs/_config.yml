@@ -1,0 +1,69 @@
+# Book settings
+# Learn more at https://jupyterbook.org/customize/config.html
+# NOTE: Use the v1 site until v2 has autodocs: https://jupyterbook.org/v1
+
+title: CSM
+author: National Laboratory of the Rockies
+# logo: logo.png
+copyright: '2026'
+
+
+# See https://jupyterbook.org/content/execute.html
+execute:
+  execute_notebooks: auto
+  merge_streams: true  # keeps unsynchronized cell outputs in a single output cell
+  exclude_patterns:
+    - _build
+    - Thumbs.db
+    - DS_Store
+    - '**.ipynb_checkpoints'
+
+latex:
+  latex_documents:
+    targetname: book.tex
+
+bibtex_bibfiles:
+  - references.bib
+
+repository:
+  url: https://github.com/NLRWindSystems/CSM
+  path_to_book: docs
+  branch: main
+
+# Add GitHub buttons to your book
+# See https://jupyterbook.org/customize/config.html#add-a-link-to-your-repository
+html:
+  use_issues_button: true
+  use_repository_button: true
+  baseurl: https://nlrwindsystems.github.io/CSM/
+  show_toc_level: 3
+  show_nav_level: 2
+  navigation_depth: 2
+  collapse_navigation: true
+sphinx:
+  extra_extensions:
+    - sphinx.ext.autodoc
+    - sphinx.ext.autosummary
+    - sphinx.ext.napoleon
+  config:
+    language: python
+    bibtex_reference_style: author_year
+    autosummary_generate: true
+    autodoc_default_options:
+      members: true
+      member-order: bysource
+      undoc-members: true
+      private-members: true
+      # special-members: true
+      # inherited-members
+      # show-inheritance
+      # ignore-module-all
+      # imported-members: true
+      # exclude-members
+      # class-doc-from
+      # no-value
+    autodoc_typehints: description
+    napoleon_use_admonition_for_notes: true
+    napoleon_use_rtype: false
+    nb_merge_streams: true
+    nb_execution_raise_on_error: true

@@ -1,0 +1,62 @@
+name: Testing
+on:
+  pull_request:
+    branches:
+      - main
+      - develop
+    paths:
+      - csm/**.py
+      - test/
+  schedule:
+    - cron: 0 0 * * MON
+jobs:
+  build:
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+          - macos-latest
+        python-version:
+          - '3.11'
+          - '3.14'
+        test-type:
+          - unit
+          - regression
+          # - integration  # TODO: integration tests
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v6
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install ".[develop]"
+      - name: Run ${{ matrix.test-type }} tests
+        shell: bash -el {0}
+        run: pytest . -m ${{ matrix.test-type }} --cov=csm --cov-report=lcov:./${{ matrix.test-type }}-coverage.lcov
+      - name: Upload test coverage
+        uses: coverallsapp/github-action@v2
+        if: contains(matrix.os, 'ubuntu') && contains(matrix.python-version, '3.14')
+        with:
+          github-token: ${{ secrets.COVERALLS_REPO_TOKEN }}
+          files: ./${{ matrix.test-type }}-coverage.lcov
+          flag-name: ${{ matrix.test-type }}
+          parallel: true
+          fail-on-error: false
+
+  # TODO: enable once public
+  # coverage-finish:
+  #   needs: build
+  #   if: always()
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Coveralls finished
+  #       uses: coverallsapp/github-action@v2
+  #       with:
+  #         github-token: ${{ secrets.COVERALLS_REPO_TOKEN }}
+  #         parallel-finished: true
+  #         fail-on-error: false
