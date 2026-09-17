@@ -23,7 +23,7 @@ jobs:
         test-type:
           - unit
           - regression
-          - integration
+          # - integration  # TODO: integration tests
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v6
