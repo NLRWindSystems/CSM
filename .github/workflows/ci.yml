@@ -48,15 +48,14 @@ jobs:
           parallel: true
           fail-on-error: false
 
-  # TODO: enable once public
-  # coverage-finish:
-  #   needs: build
-  #   if: always()
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Coveralls finished
-  #       uses: coverallsapp/github-action@v2
-  #       with:
-  #         github-token: ${{ secrets.COVERALLS_REPO_TOKEN }}
-  #         parallel-finished: true
-  #         fail-on-error: false
+  coverage-finish:
+    needs: build
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Coveralls finished
+        uses: coverallsapp/github-action@v2
+        with:
+          github-token: ${{ secrets.COVERALLS_REPO_TOKEN }}
+          parallel-finished: true
+          fail-on-error: false
