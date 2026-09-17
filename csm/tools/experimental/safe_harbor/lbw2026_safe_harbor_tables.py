@@ -27,10 +27,7 @@ from pathlib import Path
 import pandas as pd
 
 from csm.models.nlr2026 import Land2026NLR
-from csm.tools.experimental.nlr_cower_table_generator import (
-    DEFAULT_TURBINE_SPECS,
-    to_model_kwargs,
-)
+from csm.tools.experimental.nlr_cower_table_generator import DEFAULT_TURBINE_SPECS, to_model_kwargs
 
 
 CONFIG_NAMES = ("ATB T3 (3.3MW)", "V150-4.5")

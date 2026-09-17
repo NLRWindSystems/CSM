@@ -40,9 +40,7 @@ from openpyxl.chart.shapes import GraphicalProperties
 from openpyxl.chart.error_bar import ErrorBars
 from openpyxl.chart.data_source import NumRef, NumDataSource
 
-from csm.tools.experimental.safe_harbor.lbw2026_safe_harbor_sweep import (
-    generate_safe_harbor_sweep,
-)
+from csm.tools.experimental.safe_harbor.lbw2026_safe_harbor_sweep import generate_safe_harbor_sweep
 
 
 # The 2023 published reference table this sweep is compared against (see the module docstring) —
