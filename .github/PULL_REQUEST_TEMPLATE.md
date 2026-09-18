@@ -48,7 +48,10 @@ IMPORTANT NOTES
 
 <!--
 For reference on how to setup a new model and its respective documentation, please
-review the 2020 and 2021 models and their documentation.
+review the 2020 and 2021 models and their documentation. Please review
+https://nlrwindsystems.github.io/CSM/intro/contributing.html#new-models and
+https://nlrwindsystems.github.io/CSM/user_guide/new_models.html for more information on creating
+new models.
 
 NOTE: PRs will be rejected if new model submissions are unable to satisfy all of the following
 criteria.
