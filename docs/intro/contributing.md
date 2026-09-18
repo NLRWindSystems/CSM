@@ -123,6 +123,16 @@ be built using the following two procedures.
 
 ### Generate the Local Documentation Site for Inspection
 
+To prepare the documentation and ensure it builds successfully prior to submission, run the
+following command within the `docs/` folder.
+
+```bash
+sh build_book.sh
+```
+
+For simple updates to formatting, or for a first build, users can simply run the following at the
+project's top-level folder. Alternatively if inside the `docs/` folder, substitute "docs/" with ".".
+
 ```bash
 jupyter-book build docs/
 ```
@@ -196,3 +206,122 @@ below:
    [semantic versioning guidelines](https://semver.org/).
 2. Follow steps 2 through 8 above.
 3. Merge the NLRWindSystems main branch back into the `develop` branch and push the changes.
+
+(contributor-guide:new-model)=
+## New Models
+
+New model submissions will have the following checklist to complete prior to a PR being merged.
+Models seeking feedback or help may be submitted as a draft PR with clear communication about
+where help is needed and an action plan.
+
+The `Land2020NLR` and `Land2021NLR` both offer good entry points for the kinds of changes needed
+to models and their documentation to be successfully integrated. This section will cover more
+details about the requirements for each over item in the checklist below.
+
+- [ ] `parameter_map` has been updated to reflect the required variables for each calculation
+- [ ] New tests created
+  - [ ] Unit tests
+  - [ ] Regression tests
+- [ ] Model docstrings
+  - [ ] New default values are listed
+  - [ ] New and deprecated scaling models are highlighted in the description
+  - [ ] New scaling model methods adhere to the existing format for model equations and required inputs
+- [ ] Model documentation
+  - [ ] New documentation page has been added to `docs/api/models/`
+    - [ ] `autoclass` is setup similar to existing models to control displayed elements
+    - [ ] Updated scaling relationships have a dedicated subsection
+    - [ ] All calculations are correctly referenced in the reference tables
+          (these can be copied and modified from an existing model or from `_base_calculations.md`
+          or `_shared_functionality.md`)
+  - [ ] The new documentation page is indexed appropriately in `docs/api/index.md`
+
+### Model Changes
+
+The [new model creation guide](#new-models) provides a good overview of the requirements to create
+a well-validated model, and this guide will fill in some of the gaps to ensure it consistently
+works for all users.
+
+#### `parameter_map`
+
+The [parameter mapping guide](#new-models:parameter-map) provides a good overview of how to modify
+an existing component calculation (e.g., `blade_mass` in the guide), so it should be referred to
+as a starting point.
+
+For components that will no longer be modeled, there are two options to update `parameter_map`, and
+both will have the same effect of not relying on any other values for their now deprecated
+calculation.
+
+1. Set the dictionary value to an empty tuple: `self.parameter_map["blade_mass"] = ()`.
+2. Set the dictionary value equal to length-1 tuple of dictionary key:
+   `self.parameter_map["blade_mass"] = ("blade_mass", )`.
+
+#### Component calculations and aggregations
+
+Prior to calculating a value for any scaling relationship, the model must first verify the required
+values to calculate that value exist, or attempt to calculate them. Please see the
+[defining a new scaling relationship section of the new model guide](#new-models:new-scaling)
+for further details.
+
+Once completed, any upstream results calculations should be updated to account for any necessary
+changes. In most cases this should not be necessary, however if it is, please see the
+[new model results calculation documentation](#new-models:results) for more details.
+
+### Testing
+
+At minimum, new models should replicate the testing format of the `test/test_Land2020NLR.py`,
+which checks that the default values exist as expected when the model is initialized with no inputs,
+and that minimum required inputs produces a set of expected results when `run()` is called.
+
+### Model Documentation
+
+text
+
+#### Docstrings
+
+A model class should have have a thorough docstring providing the following:
+
+* A brief description of the model (1-2 sentences).
+* A more detailed description of the model (paragraph), if applicable.
+* Changes from the base and parent models (See `Land2021NLR` for an example of this).
+* `Args` section describing the required inputs to run the whole model
+* `Parameters` section describing all the attributes of the model with their existing or updated
+  default values. These may be copied from an existing model for simplicity, but updated with
+  relevant information as needed.
+  * Unused parameters can be described as such at the bottom of this section.
+
+Individual component calculations should have the following information:
+
+* A basic, 1 sentence description of the method (can be copied from parent class(es)).
+* Detailed description, if needed or desired.
+* New formula in math-type with a mapping from the mathematical symbols or variables to the model's
+  attributes
+* `Args` to describe the required attributes to perform the calculation. Attribute descriptions
+  may be copied from the class docstring for ease and consistency.
+* `Raises` section copied from any other docstring.
+
+#### Documentation Site
+
+A new Markdown file in `docs/api/models` should be created that is similar to existing model files
+and then referenced in the table of contents section of `docs/api/index.md`. In the new Markdown
+file, the following information should be present. Most of the information can be copied over from
+the base model or the parent class' documentation with edits for any updated information.
+
+For an example of how this should look, please review any of `land_2015.md`, `land_2020.md`, or
+`land_2021.md`.
+
+* Under the first level heading, any relevant information that does not already exist in the model's
+  docstring should be placed here.
+* Using the `eval-rst` directive, generate an `autoclass` summary for the new model, updating the
+  `inherited-memebers` field with any parent classes, and the `exclude-members` with any newly added
+  attributes or methods.
+* Under a second-level heading, generate the method documentation for add any updated scaling
+  relationships.
+* Include the `_shared_functionality.md` file (directly copy this from an existing document).
+* Copy over the subsystem calculations and subsystem aggregations sections from an existing file
+  and update the model references for any new scaling relationships, e.g., for a new
+  `calculate_blade_mass` for a new `NLR2027Distributed` whose parent class is `CSMBase`, change
+  "#csm.models.CSMBase.calculate_blade_mass" to
+  "#csm.models.NLR2027Distributed.calculate_blade_mass". If a calculation has been removed, simply
+  remove the hyperlink, so
+  "[`calculate_blade_mass`](#csm.models.Land2021NLR.calculate_blade_mass)()" becomes
+  "`calculate_blade_mass`" and indicate the calculation is now unused.

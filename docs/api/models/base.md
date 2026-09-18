@@ -132,6 +132,7 @@
 .. automethod:: csm.models.CSMBase.total_domestic_content
 ```
 
+(api:base-model:helpers)=
 ## Model Helpers
 
 ```{eval-rst}
