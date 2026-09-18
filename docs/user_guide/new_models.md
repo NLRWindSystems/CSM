@@ -1,8 +1,14 @@
+(new-models)=
 # Creating a New Model
 
 This guide will walk through the process and considerations for creating a new model by focusing on
 creating a new blade mass formulation with new mass relationships, mirroring the
 [`Land2020NLR`](#api:land-2020) model.
+
+## Submitting a model to the repository
+
+Please see the new [model contributor's guide](#contributor-guide:new-model) for more details about
+the expectations for models that will be included in the repository.
 
 ## Imports and setup
 
@@ -63,6 +69,7 @@ class CustomModel(CSMBase):
     blade_mass_exp = create_field(obj=float, units="unitless", io_type="input", default=9.2157)
 ```
 
+(new-models:parameter-map)=
 #### Updating the parameter mapping and post initialization hook
 
 The `parameter_map` defines what each attribute's dependent attributes are, enabling the
@@ -82,6 +89,7 @@ dependency graph based on these relationships.
         super().__attrs_post_init__()
 ```
 
+(new-models:new-scaling)=
 #### Defining a new scaling relationship
 
 For the new `calculate_blade_mass` method, the first three lines are used to determine if the focal
@@ -95,13 +103,18 @@ value. It is important to adhere to the existing attribute naming conventions to
 runtime. Please note, the docstring has not been created in this example, but please follow the
 examples set forth in `CSMBase` or any custom models for the information that should be provided.
 
+Note that `rotor_radius` is used in the calculation, but `rotor_diameter` is listed in the
+`parameter_map` because `rotor_diameter` is the user input and `rotor_radius` is a property
+of `CSMBase` that is calculated from `rotor_diameter`. See the
+[base model's helper documentation](#api:base-model:helpers) for other such properties.
+
 ```python
     def calculate_blade_mass(self):
         exists = self._prepare_calculation("blade_mass")
         if exists:
             return
 
-        self.blade_mass = self.blade_mass_coeff * (self.rotor_diameter / 2) ** self.blade_mass_exp
+        self.blade_mass = self.blade_mass_coeff * (self.rotor_radius / 2) ** self.blade_mass_exp
 ```
 
 #### Updating results calculations
@@ -169,6 +182,6 @@ class CustomModel(CSMBase):
             return
 
         self.blade_mass = (
-            self.blade_mass_coeff * (self.rotor_diameter / 2) ** self.blade_mass_exp
+            self.blade_mass_coeff * (self.rotor_radius / 2) ** self.blade_mass_exp
         )
 ```
